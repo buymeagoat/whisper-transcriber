@@ -162,6 +162,19 @@ FROM python:3.10-slim
 
 ---
 
+## 🛠️ System Administration Features
+
+- Admin-only dashboard (`/admin`)
+- View system status (active jobs, thread count)
+- View full application logs (`app_log.txt`)
+- Restart Flask application via web button (container-level command)
+  - Admin clicks "Restart Backend"
+  - Triggers a subprocess or container-level restart (supervised context)
+  - Optional: show countdown and auto-refresh UI
+- Delete stale jobs (manually or via cleanup rule)
+
+---
+
 ## 📈 Planned Enhancements (not critical path)
 
 | Feature | Notes |

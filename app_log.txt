@@ -8,3 +8,68 @@
 2025-04-09 21:07:06,004 [INFO] \U0001f7e2 Flask application starting...
 2025-04-09 21:07:06,024 [WARNING]  * Debugger is active!
 2025-04-09 21:07:06,031 [INFO]  * Debugger PIN: 135-443-926
+2025-04-09 21:32:10,701 [INFO] \U0001f7e2 Flask application starting...
+2025-04-09 21:32:11,589 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.52:5000
+2025-04-09 21:32:11,589 [INFO] [33mPress CTRL+C to quit[0m
+2025-04-09 21:32:11,590 [INFO]  * Restarting with stat
+2025-04-09 21:32:11,976 [INFO] \U0001f7e2 Flask application starting...
+2025-04-09 21:32:11,998 [WARNING]  * Debugger is active!
+2025-04-09 21:32:12,003 [INFO]  * Debugger PIN: 135-443-926
+2025-04-10 07:41:36,834 [INFO] \U0001f7e2 Flask application starting...
+2025-04-10 07:41:37,761 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.52:5000
+2025-04-10 07:41:37,761 [INFO] [33mPress CTRL+C to quit[0m
+2025-04-10 07:41:37,764 [INFO]  * Restarting with stat
+2025-04-10 07:41:38,125 [INFO] \U0001f7e2 Flask application starting...
+2025-04-10 07:41:38,149 [WARNING]  * Debugger is active!
+2025-04-10 07:41:38,155 [INFO]  * Debugger PIN: 135-443-926
+2025-04-10 07:41:47,804 [INFO] 127.0.0.1 - - [10/Apr/2025 07:41:47] "GET /jobs HTTP/1.1" 200 -
+2025-04-10 07:41:48,367 [INFO] 127.0.0.1 - - [10/Apr/2025 07:41:48] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-04-10 07:43:52,101 [INFO]  * Detected change in 'C:\\Users\\welco\\whisper-transcriber\\app\\main.py', reloading
+2025-04-10 07:43:52,172 [INFO]  * Restarting with stat
+2025-04-10 07:46:18,269 [INFO] \U0001f7e2 Flask application starting...
+2025-04-10 07:46:19,144 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.52:5000
+2025-04-10 07:46:19,144 [INFO] [33mPress CTRL+C to quit[0m
+2025-04-10 07:46:19,146 [INFO]  * Restarting with stat
+2025-04-10 07:46:19,505 [INFO] \U0001f7e2 Flask application starting...
+2025-04-10 07:46:19,528 [WARNING]  * Debugger is active!
+2025-04-10 07:46:19,533 [INFO]  * Debugger PIN: 135-443-926
+2025-04-10 07:46:23,678 [INFO] \U0001f4cb Loaded 0 jobs for display
+2025-04-10 07:46:23,684 [INFO] 127.0.0.1 - - [10/Apr/2025 07:46:23] "GET /jobs HTTP/1.1" 200 -
+2025-04-10 07:46:30,044 [INFO] 127.0.0.1 - - [10/Apr/2025 07:46:30] "GET / HTTP/1.1" 200 -
+2025-04-10 07:46:36,253 [INFO] \U0001f4e5 Received file: 2025-04-02_AnnAlvord_JakeLesnau_Meeting.m4a \u2192 337e9070-6691-46a9-8427-41a858fd4766_2025-04-02_AnnAlvord_JakeLesnau_Meeting.m4a
+2025-04-10 07:46:36,254 [INFO] \U0001f4dd Created job ID: 337e9070-6691-46a9-8427-41a858fd4766
+2025-04-10 07:46:36,258 [INFO] \U0001f4cc Job metadata saved: 337e9070-6691-46a9-8427-41a858fd4766
+2025-04-10 07:46:36,258 [INFO] 127.0.0.1 - - [10/Apr/2025 07:46:36] "[32mPOST /upload HTTP/1.1[0m" 302 -
+2025-04-10 07:46:36,367 [INFO] 127.0.0.1 - - [10/Apr/2025 07:46:36] "GET /status/337e9070-6691-46a9-8427-41a858fd4766 HTTP/1.1" 200 -
+2025-04-10 07:48:02,523 [INFO] \U0001f7e2 Flask application starting...
+2025-04-10 07:48:03,394 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.52:5000
+2025-04-10 07:48:03,394 [INFO] [33mPress CTRL+C to quit[0m
+2025-04-10 07:48:03,396 [INFO]  * Restarting with stat
+2025-04-10 07:48:03,752 [INFO] \U0001f7e2 Flask application starting...
+2025-04-10 07:48:03,773 [WARNING]  * Debugger is active!
+2025-04-10 07:48:03,777 [INFO]  * Debugger PIN: 135-443-926
+2025-04-10 07:50:32,235 [INFO] \U0001f7e2 Flask application starting...
+2025-04-10 07:50:33,105 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.52:5000
+2025-04-10 07:50:33,106 [INFO] [33mPress CTRL+C to quit[0m
+2025-04-10 07:50:33,108 [INFO]  * Restarting with stat
+2025-04-10 07:50:33,506 [INFO] \U0001f7e2 Flask application starting...
+2025-04-10 07:50:33,531 [WARNING]  * Debugger is active!
+2025-04-10 07:50:33,535 [INFO]  * Debugger PIN: 135-443-926
+2025-04-10 07:52:04,383 [INFO] \U0001f4cb Loaded 1 jobs for display
+2025-04-10 07:52:04,393 [INFO] 127.0.0.1 - - [10/Apr/2025 07:52:04] "GET /jobs HTTP/1.1" 200 -
+2025-04-10 07:57:40,444 [INFO] 127.0.0.1 - - [10/Apr/2025 07:57:40] "GET /status/337e9070-6691-46a9-8427-41a858fd4766 HTTP/1.1" 200 -

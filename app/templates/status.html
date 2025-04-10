@@ -1,13 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Job Status</title>
-</head>
-<body>
-    <h2>Status for Job ID: {{ job_id }}</h2>
-    <p>Latest status: {{ state }}</p>
-    {% if not done %}
-        <p>Still processing...</p>
-    {% endif %}
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Status for Job {{ job_id }}{% endblock %}
+
+{% block content %}
+<h1>Status for Job ID: {{ job_id }}</h1>
+<p><strong>Latest status:</strong> {{ state }}</p>
+
+{% if error %}
+<p style="color:red;">An error occurred during transcription.</p>
+{% elif done %}
+<p><a href="{{ download_url }}">Download Transcript</a></p>
+{% endif %}
+
+<h2>Log Output</h2>
+<pre>{{ log }}</pre>
+
+<p>Still processing... This page refreshes every 5 seconds.</p>
+<script>
+    setTimeout(() => location.reload(), 5000);
+</script>
+{% endblock %}

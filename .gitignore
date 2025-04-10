@@ -4,9 +4,11 @@ __pycache__/
 *$py.class
 
 #app_custom
-data/
 uploads/
-app/uploads/
+logs/
+data/
+transcripts/
+*.db
 
 # C extensions
 *.so

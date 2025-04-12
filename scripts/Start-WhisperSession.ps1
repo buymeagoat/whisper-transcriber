@@ -8,7 +8,7 @@ $status = git status --short
 $clean = if ($status) { "❌ Uncommitted changes or untracked files" } else { "✅ Clean working directory" }
 
 # Python module validator (current + anticipated)
-$pythonCheck = @'
+$pythonCheck = @"
 import sys
 import importlib
 
@@ -27,7 +27,7 @@ for mod in required_modules:
         print(f"  - {mod}: ✅")
     except ImportError:
         print(f"  - {mod}: ❌ (try: pip install {mod})")
-'@
+"@
 
 $pythonOutput = python -c $pythonCheck 2>&1
 

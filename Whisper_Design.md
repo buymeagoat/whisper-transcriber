@@ -1,6 +1,6 @@
 # 🧠 Whisper Transcriber — Core System Design Document
 
-**Version:** 1.5  
+**Version:** 1.6  
 **Audience:** Senior Developers  
 **Author:** GPT (for Tony)  
 **Last Updated:** 2025-04-12
@@ -11,41 +11,35 @@
 
 Build a local web-based transcription platform using OpenAI Whisper, designed to run in a Docker container inside a VMware-managed VM (eventually OVF). The system provides a browser-based interface for uploading audio, selecting settings, viewing live progress, and downloading transcripts — all without internet access.
 
-This document reflects the **true, current implementation state**, based on direct analysis of all local files. Development follows milestone-based gating to ensure code and documentation stay aligned.
+This document reflects only **tested, implemented work**. If a module exists but has not been functionally verified, it is listed as 🔜 Upcoming.
 
 ---
 
-## 🔧 Project Milestones (History + Plan)
+## 🔧 Project Milestones (Verified)
 
 ### ✅ Completed
 - Repository initialized and under Git
-- Initial design documents created
 - `scripts/Start-WhisperSession.ps1` created and validates environment
-- `app/transcribe.py` implemented with `openai-whisper` CLI
 - `app/job_store.py` implemented with SQLite + full CRUD
 - `app/main.py` implemented with Flask routes + subprocess job calling
 - UI templates created: `base.html`, `index.html`, `jobs.html`, `status.html`
 
-### 🚧 In Progress
-- Live job log streaming (TBD)
-- Download transcript button (not wired yet)
-
 ### 🔜 Upcoming
-- Logging module (`log_utils.py`)
-- Transcript viewer
-- Containerization (Dockerfile, local wheels)
-- Optional: authentication (`auth.py`), configuration centralization (`config.py`)
+- Validate `transcribe.py` with real audio (currently untested)
+- Add transcript download functionality
+- Add `log_utils.py` for streaming logs
+- Begin Docker containerization
 
 ---
 
 ## 🔧 Architecture Overview
 
-### 📁 Current Project Layout
+### 📁 Project Layout
 
 ```
 whisper-transcriber/
 ├── app/
-│   ├── transcribe.py       # ✅ Implemented
+│   ├── transcribe.py       # 🔜 Exists, needs validation
 │   ├── job_store.py        # ✅ Implemented
 │   ├── main.py             # ✅ Implemented
 │   └── templates/          # ✅ UI Templates
@@ -57,7 +51,7 @@ whisper-transcriber/
 ├── scripts/
 │   └── Start-WhisperSession.ps1  # ✅ Implemented
 │
-├── setup_env.py           # ⚙️ Local dev utility script
+├── setup_env.py           # ⚙️ Dev-only reset script
 ├── README.md              # ✅ Present
 ├── .gitignore             # ✅ Present
 ├── Whisper_Design.md      # ✅ This file
@@ -66,100 +60,85 @@ whisper-transcriber/
 
 ---
 
-## 🛠️ Core Functional Modules
-
-### `transcribe.py` ✅
-- CLI script to run OpenAI Whisper transcription
-- Uses `whisper.load_model()` with runtime options
-- Outputs JSON with timestamps
-- Model, format, language selectable via args
+## 🛠️ Core Modules
 
 ### `job_store.py` ✅
-- SQLite persistence for job records
-- Functions: `add_job`, `get_job`, `get_all_jobs`, `update_job_status`
-- Manages job schema and lifecycle
+- SQLite-backed persistence for all jobs
+- CRUD lifecycle management
+- Ready for use in Flask, CLI, or async
 
 ### `main.py` ✅
-- Flask web server with routes:
-  - `/`: Upload interface
-  - `/submit`: Handles new jobs
-  - `/jobs`: Lists all jobs
-  - `/status/<job_id>`: Shows log + transcript link
-- Launches transcription jobs via subprocess call to `transcribe.py`
+- Flask routes: `/`, `/submit`, `/jobs`, `/status/<job_id>`
+- Handles file uploads and job metadata
+- Submits jobs via subprocess call to `transcribe.py`
+
+### `transcribe.py` 🔜
+- Python script using `openai-whisper`
+- Supports CLI args: model, language, output format
+- Script exists but has **not been tested with real audio**
+- Validation is a required milestone
 
 ### UI Templates ✅
-- `base.html`: Shared layout
-- `index.html`: Upload form
-- `jobs.html`: Job history
-- `status.html`: Job result/status view
+- Bootstrap layout and job views implemented
+- Output and status displayed in browser
 
 ---
 
-## ⚙️ Support Scripts & Utilities
+## 🔢 What’s Next (Milestone Plan)
 
-### `Start-WhisperSession.ps1` ✅
-- Verifies git status, Python version, and installed packages
-- Part of the milestone-based development flow
-- Used to initialize each dev session
+1. **Validate Transcription Engine**
+   - Run real audio through `transcribe.py`
+   - Inspect output JSON and error handling
+   - Document behavior and adjust if needed
 
-### `setup_env.py` ⚙️
-- Local utility script (not required for container build)
-- Wipes `.db`, log folders, and resets environment
-- Used to prep fresh local development
+2. **Implement transcript download UI**
+   - Add Flask route to serve finished transcript files
 
----
+3. **Build `log_utils.py`**
+   - Write per-job logs to disk
+   - Integrate with job view page
 
-## 🔢 Development Flow — What’s Next?
-
-1. **Implement `log_utils.py`**
-   - Provide per-job logging to disk
-   - Integrate live tailing into `/status/<job_id>` view
-
-2. **Wire download link for transcript**
-   - Job completion view should link to final transcript file
-
-3. **Containerize project**
-   - Build `Dockerfile`
-   - Use vendored wheels only
-   - Include preloaded model weights
+4. **Begin Docker containerization**
+   - Offline support required
+   - All packages vendored
+   - Model weights bundled in image
 
 ---
 
 ## 🎙️ Transcription Engine
 
-- Engine: `openai-whisper` (Python binding)
-- Default model: Set via CLI in `transcribe.py`
-- Options: `tiny`, `base`, `small`, `medium`, `large`
-- Model weights must be preloaded — offline-only container enforcement applies
+- Engine: `openai-whisper`
+- Script: `app/transcribe.py`
+- Models: `tiny`, `base`, `small`, etc.
+- Must run offline — models must be preloaded
 
 ---
 
 ## 📋 Development Policy
 
-All development must follow gated milestones:
-
 | Status | Meaning                            |
 |--------|-------------------------------------|
-| ✅     | Fully implemented and tested        |
-| 🚧     | Being actively developed or staged  |
-| 🔜     | Approved and next to be built       |
-| ❌     | Do not begin until promoted         |
+| ✅     | Implemented and verified            |
+| 🔜     | Exists but unvalidated              |
+| 🚧     | Actively in progress                |
+| ❌     | Planned only — do not build yet     |
 
-No module may be implemented if not approved in this document. Whisper GPT enforces this rule.
+No module may be treated as “Complete” unless verified by test or usage.  
+Whisper GPT is configured to enforce this rule during development sessions.
 
 ---
 
 ## 📦 Containerization Policy
 
-- **No runtime internet** — model and dependencies must be preloaded
-- All pip packages must be vendored as `.whl` files
-- Audio uploads and transcripts go to bind-mountable volumes
-- Build uses `python:3.10-slim` as base
+- No internet access allowed at runtime
+- Pip wheels must be vendored
+- All model weights preloaded into build
+- Volumes: `/uploads`, `/logs`, `/transcripts`, `/data`
 
 ---
 
 ## 📅 GPT Sync Log
 
-- 2025-04-12: All modules confirmed implemented via source inspection
-- 2025-04-12: Design doc reconciled with reality — Flask + UI promoted
-- 2025-04-12: Roadmap updated; next milestone is logging + transcript UI
+- 2025-04-12: `transcribe.py` demoted from ✅ to 🔜 due to lack of testing
+- 2025-04-12: GPT logic now halts development if design doc is out of sync
+- 2025-04-12: Roadmap shifted to reflect true milestone order

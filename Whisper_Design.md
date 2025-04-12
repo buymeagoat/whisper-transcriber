@@ -191,3 +191,23 @@ FROM python:3.10-slim
 ## ✅ Final Notes
 
 This design reflects a production-grade architecture with a clean interface, robust backend, and future-focused extensibility. It enables development to proceed in modular phases, with clear separation between user workflows, job handling, and system administration.
+
+---
+
+## 🧪 Development Tracking (GPT Context)
+
+### ✅ Recently Completed
+- Initial architecture loaded into GPT (April 2025)
+- Whisper_Design.md integrated as design source of truth
+
+### 🚧 In Progress
+- [Insert current task here, e.g. “Implement job retry logic in job_store.py”]
+
+### 🔜 Planned
+- UI enhancement: persistent nav bar
+- Add `/metrics` endpoint for system health
+- Migrate to WebSocket-based log streaming
+
+### ⏳ GPT Sync Note
+This section is updated by the developer with GPT guidance after each significant task. GPT reads this section to resume where we left off across sessions.
+

@@ -196,12 +196,14 @@ This design reflects a production-grade architecture with a clean interface, rob
 
 ## 🧪 Development Tracking (GPT Context)
 
-✅ Recently Completed
+✅Recently Completed
 Initial architecture loaded into GPT (April 2025)
 
 Whisper_Design.md integrated as design source of truth
 
 Committed GPT commit/push workflow and design doc tracking process (Commit: bd6919a)
+
+Behavioral alignment with gpt_config_notes.md completed (Commit: 82b72ba → config loaded into GPT)
 
 🚧 In Progress
 Evaluate and prepare for scoped user access via auth.py

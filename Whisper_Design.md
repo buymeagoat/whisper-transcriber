@@ -1,9 +1,9 @@
 # 🧠 Whisper Transcriber — Core System Design Document
 
-**Version:** 1.0  
+**Version:** 1.5  
 **Audience:** Senior Developers  
 **Author:** GPT (for Tony)  
-**Last Updated:** 2025-04-09
+**Last Updated:** 2025-04-12
 
 ---
 
@@ -11,210 +11,155 @@
 
 Build a local web-based transcription platform using OpenAI Whisper, designed to run in a Docker container inside a VMware-managed VM (eventually OVF). The system provides a browser-based interface for uploading audio, selecting settings, viewing live progress, and downloading transcripts — all without internet access.
 
+This document reflects the **true, current implementation state**, based on direct analysis of all local files. Development follows milestone-based gating to ensure code and documentation stay aligned.
+
 ---
 
-## 🔧 Critical Architecture Overview
+## 🔧 Project Milestones (History + Plan)
 
-### 📁 Directory Structure (Container Layout)
+### ✅ Completed
+- Repository initialized and under Git
+- Initial design documents created
+- `scripts/Start-WhisperSession.ps1` created and validates environment
+- `app/transcribe.py` implemented with `openai-whisper` CLI
+- `app/job_store.py` implemented with SQLite + full CRUD
+- `app/main.py` implemented with Flask routes + subprocess job calling
+- UI templates created: `base.html`, `index.html`, `jobs.html`, `status.html`
+
+### 🚧 In Progress
+- Live job log streaming (TBD)
+- Download transcript button (not wired yet)
+
+### 🔜 Upcoming
+- Logging module (`log_utils.py`)
+- Transcript viewer
+- Containerization (Dockerfile, local wheels)
+- Optional: authentication (`auth.py`), configuration centralization (`config.py`)
+
+---
+
+## 🔧 Architecture Overview
+
+### 📁 Current Project Layout
 
 ```
-whisper_transcriber/
+whisper-transcriber/
 ├── app/
-│   ├── main.py             # Flask web server
-│   ├── transcribe.py       # Whisper logic, cooperative logging
-│   ├── job_store.py        # SQLite-based job persistence
-│   ├── log_utils.py        # Central logging utilities
-│   ├── auth.py             # Simple authentication system
-│   └── config.py           # Configuration for paths, cleanup, user roles
+│   ├── transcribe.py       # ✅ Implemented
+│   ├── job_store.py        # ✅ Implemented
+│   ├── main.py             # ✅ Implemented
+│   └── templates/          # ✅ UI Templates
+│       ├── base.html
+│       ├── index.html
+│       ├── jobs.html
+│       └── status.html
 │
-├── templates/              # Jinja2 templates
-│   ├── index.html
-│   ├── status.html
-│   ├── jobs.html
-│   └── admin.html
+├── scripts/
+│   └── Start-WhisperSession.ps1  # ✅ Implemented
 │
-├── static/                 # Vanilla JS + CSS
-│   ├── style.css
-│   └── progress.js
-│
-├── uploads/                # Uploaded audio files
-├── transcripts/            # Transcription outputs
-├── logs/                   # Per-job logs
-├── data/                   # SQLite DB + users
-│   └── jobs.db
-├── Dockerfile
-├── requirements.txt
-└── entrypoint.py
+├── setup_env.py           # ⚙️ Local dev utility script
+├── README.md              # ✅ Present
+├── .gitignore             # ✅ Present
+├── Whisper_Design.md      # ✅ This file
+└── data/jobs.db           # 🟡 Runtime artifact
 ```
 
 ---
 
-## 🧱 Core Functional Modules
+## 🛠️ Core Functional Modules
 
-### `main.py`
-- Flask routes and UI entrypoints
-- Starts background transcription jobs in threads
-- Reads/writes to `job_store.py` for state
-- Cooperatively cancels jobs using a shared `CANCELLED` dict
+### `transcribe.py` ✅
+- CLI script to run OpenAI Whisper transcription
+- Uses `whisper.load_model()` with runtime options
+- Outputs JSON with timestamps
+- Model, format, language selectable via args
 
-### `transcribe.py`
-- Loads Whisper model (based on user selection)
-- Supports:
-  - Transcription vs Translation
-  - Segmenting (start/end)
-  - Timestamped vs plain output
-  - Initial prompt
-- Writes `.txt`, `.srt`, or `.vtt` to `transcripts/`
-- Logs output to `logs/<job_id>.log`
+### `job_store.py` ✅
+- SQLite persistence for job records
+- Functions: `add_job`, `get_job`, `get_all_jobs`, `update_job_status`
+- Manages job schema and lifecycle
 
-### `job_store.py`
-- Wraps SQLite DB `jobs.db`
-- Defines schema for:
+### `main.py` ✅
+- Flask web server with routes:
+  - `/`: Upload interface
+  - `/submit`: Handles new jobs
+  - `/jobs`: Lists all jobs
+  - `/status/<job_id>`: Shows log + transcript link
+- Launches transcription jobs via subprocess call to `transcribe.py`
 
-```sql
-CREATE TABLE jobs (
-  job_id TEXT PRIMARY KEY,
-  file_name TEXT,
-  original_name TEXT,
-  created_at TEXT,
-  status TEXT,
-  model TEXT,
-  format TEXT,
-  timestamps BOOLEAN,
-  task TEXT,
-  language TEXT,
-  initial_prompt TEXT,
-  start_time INTEGER,
-  end_time INTEGER,
-  log_path TEXT,
-  output_path TEXT
-);
-```
-
-### `auth.py`
-- Basic login and session tracking
-- Admin user defined at setup
-- Admin can add additional users via `/admin/users`
+### UI Templates ✅
+- `base.html`: Shared layout
+- `index.html`: Upload form
+- `jobs.html`: Job history
+- `status.html`: Job result/status view
 
 ---
 
-## 🧭 Job Lifecycle
+## ⚙️ Support Scripts & Utilities
 
-1. Upload page `/`
-   - User uploads audio and selects settings
-2. Server analyzes file via `/analyze_audio`
-   - Detects duration and language
-3. User submits via `/upload`
-4. Flask starts thread to run `transcribe.py`
-5. Job is visible at `/status/<job_id>`
-   - Progress shown live
-   - Log streamed from `logs/<id>.log`
-6. When complete:
-   - Transcript is written
-   - Status is marked as “Done”
-7. User can download via `/download/<job_id>`
+### `Start-WhisperSession.ps1` ✅
+- Verifies git status, Python version, and installed packages
+- Part of the milestone-based development flow
+- Used to initialize each dev session
+
+### `setup_env.py` ⚙️
+- Local utility script (not required for container build)
+- Wipes `.db`, log folders, and resets environment
+- Used to prep fresh local development
 
 ---
 
-## 🔐 Authentication & Permissions
+## 🔢 Development Flow — What’s Next?
 
-- Users must log in to access `/jobs`, `/upload`, or `/admin`
-- Admin account defined in config or SQLite
-- Admins can:
-  - Restart backend
-  - Delete jobs
-  - Add/remove users
-  - Trigger cleanup of old logs
-- Future option: IP restriction for admin functions
+1. **Implement `log_utils.py`**
+   - Provide per-job logging to disk
+   - Integrate live tailing into `/status/<job_id>` view
 
----
+2. **Wire download link for transcript**
+   - Job completion view should link to final transcript file
 
-## 📝 Logging Architecture
-
-| Type | Path | Description |
-|------|------|-------------|
-| Per-job logs | `logs/<job_id>.log` | Segment-by-segment log output (shown in UI) |
-| App logs     | `app_log.txt`       | Flask errors, job state, startup, auth events |
-| Critical vs Non-critical | Stored on separate partitions if needed |
-
-### 🧹 Log Cleanup Strategy
-- Manual by default
-- Configurable option to remove logs older than `X` days
-- Executed via UI or cron-style backend
+3. **Containerize project**
+   - Build `Dockerfile`
+   - Use vendored wheels only
+   - Include preloaded model weights
 
 ---
 
-## 📦 Containerization
+## 🎙️ Transcription Engine
 
-### Base Image:
-```dockerfile
-FROM python:3.10-slim
-```
-
-- Whisper and dependencies installed from local `.whl` files
-- FFmpeg included
-- No internet access required at runtime
-- Mounted volumes:
-  - `/uploads`
-  - `/logs`
-  - `/transcripts`
-  - `/data`
+- Engine: `openai-whisper` (Python binding)
+- Default model: Set via CLI in `transcribe.py`
+- Options: `tiny`, `base`, `small`, `medium`, `large`
+- Model weights must be preloaded — offline-only container enforcement applies
 
 ---
 
-## 🛠️ System Administration Features
+## 📋 Development Policy
 
-- Admin-only dashboard (`/admin`)
-- View system status (active jobs, thread count)
-- View full application logs (`app_log.txt`)
-- Restart Flask application via web button (container-level command)
-  - Admin clicks "Restart Backend"
-  - Triggers a subprocess or container-level restart (supervised context)
-  - Optional: show countdown and auto-refresh UI
-- Delete stale jobs (manually or via cleanup rule)
+All development must follow gated milestones:
 
----
+| Status | Meaning                            |
+|--------|-------------------------------------|
+| ✅     | Fully implemented and tested        |
+| 🚧     | Being actively developed or staged  |
+| 🔜     | Approved and next to be built       |
+| ❌     | Do not begin until promoted         |
 
-## 📈 Planned Enhancements (not critical path)
-
-| Feature | Notes |
-|---------|-------|
-| Job retry/resume | Support restarts after crash or container reboot |
-| WebSocket log streaming | Instead of polling |
-| Job archive download | .zip of transcript + log |
-| Role-based auth | Future tiered permission levels |
-| `/metrics` endpoint | For external system monitoring |
-| Job retention policy | Auto-delete old transcripts after 30 days |
+No module may be implemented if not approved in this document. Whisper GPT enforces this rule.
 
 ---
 
-## ✅ Final Notes
+## 📦 Containerization Policy
 
-This design reflects a production-grade architecture with a clean interface, robust backend, and future-focused extensibility. It enables development to proceed in modular phases, with clear separation between user workflows, job handling, and system administration.
+- **No runtime internet** — model and dependencies must be preloaded
+- All pip packages must be vendored as `.whl` files
+- Audio uploads and transcripts go to bind-mountable volumes
+- Build uses `python:3.10-slim` as base
 
 ---
 
-## 🧪 Development Tracking (GPT Context)
+## 📅 GPT Sync Log
 
-✅Recently Completed
-Initial architecture loaded into GPT (April 2025)
-
-Whisper_Design.md integrated as design source of truth
-
-Committed GPT commit/push workflow and design doc tracking process (Commit: bd6919a)
-
-Behavioral alignment with gpt_config_notes.md completed (Commit: 82b72ba → config loaded into GPT)
-
-🚧 In Progress
-Evaluate and prepare for scoped user access via auth.py
-
-🔜 Planned
-UI enhancement: persistent nav bar
-
-Add /metrics endpoint for system health
-
-Migrate to WebSocket-based log streaming
-
-⏳ GPT Sync Note
-This section is updated by the developer with GPT guidance after each significant task. GPT reads this section to resume where we left off across sessions.
-
+- 2025-04-12: All modules confirmed implemented via source inspection
+- 2025-04-12: Design doc reconciled with reality — Flask + UI promoted
+- 2025-04-12: Roadmap updated; next milestone is logging + transcript UI

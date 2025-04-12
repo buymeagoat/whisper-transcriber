@@ -1,31 +1,29 @@
-﻿# scripts/start-whispersession.ps1
+﻿# start-whispersession.ps1
+# Whisper Transcriber – Session Initialization Script
 
-Write-Host "`n📂 Whisper Transcriber — Session Verification Report`n" -ForegroundColor Cyan
+$repoUrl = "https://github.com/buymeagoat/whisper-transcriber"
+$branch = git rev-parse --abbrev-ref HEAD
+$remote = git config --get remote.origin.url
+$status = git status --short
+$clean = if ($status) { "❌ Uncommitted changes or untracked files" } else { "✅ Clean working directory" }
 
-# Git Remote
-$gitRemote = git remote -v 2>&1
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Unable to read git remote. Are you in a git repo?" -ForegroundColor Red
-    exit 1
-}
+Write-Host "------------------------------"
+Write-Host "📌 WHISPER SESSION INITIALIZATION"
+Write-Host "------------------------------`n"
 
-Write-Host "🔗 Git Remote:" -ForegroundColor Yellow
-$gitRemote | ForEach-Object { Write-Host $_ }
-Write-Host ""
+Write-Host "🔹 Repo URL:"
+Write-Host "Repo: $repoUrl"
+Write-Host "✅ This is my active local development repo`n"
 
-# Git Branch
-$gitBranch = git branch --show-current 2>&1
-Write-Host "🌿 Branch:" -ForegroundColor Yellow
-Write-Host $gitBranch
-Write-Host ""
+Write-Host "🔹 Repo State:"
+Write-Host "Active Branch: $branch"
+Write-Host "Remote: $remote"
+Write-Host "Status: $clean`n"
 
-# Git Status
-$gitStatus = git status --short 2>&1
-Write-Host "📦 Working Directory Status:" -ForegroundColor Yellow
-if ($gitStatus) {
-    Write-Host $gitStatus
-} else {
-    Write-Host "nothing to commit, working tree clean"
-}
+Write-Host "🔹 ChatGPT Authorization:"
+Write-Host "✅ You have permission to analyze this repository and fetch live files from:"
+Write-Host "$repoUrl"
+Write-Host "You are allowed to load and review all committed files to support development.`n"
 
-Write-Host "`n✅ Copy this full block into ChatGPT to verify your dev session." -ForegroundColor Green
+Write-Host "📋 Paste this entire output into ChatGPT to continue setup."
+Write-Host "------------------------------"

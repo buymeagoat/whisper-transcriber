@@ -1,53 +1,153 @@
-# Whisper Transcriber
+Whisper Transcriber
+Offline-first, privacy-focused audio transcription platform using OpenAI Whisper models.
 
-A lightweight audio transcription tool leveraging OpenAI's Whisper models, designed for rapid local transcription and future offline containerized deployment.
+📋 Features
+⚡ Offline transcription (no cloud dependency if models are staged)
 
----
+🖥️ Minimal web UI for uploading and viewing transcripts
 
-## 🏁 Developer Quickstart
+🧠 Local-only SQLite job tracking (no external servers)
 
-1. **Clone the repository** (if you haven't already):
+🚀 Developer bootstrap scripts for easy session startup
 
-    ```bash
-    git clone https://github.com/buymeagoat/whisper-transcriber.git
-    cd whisper-transcriber
-    ```
+🎯 Clean .txt and .json transcript outputs
 
-2. **(First time only)** — Create the virtual environment:
+📦 Local Whisper model staging to avoid downloads
 
-    ```powershell
-    python -m venv whisper-env
-    ```
+🛠️ Installation
+Clone the repository:
 
-3. **Start your development session** (this activates venv + validates setup automatically):
-
-    ```powershell
-    .\scripts\run-dev-session.ps1
-    ```
-
-✅ This automatically:
-- Activates your Python virtual environment
-- Validates environment modules (auto-installs missing ones)
-- Confirms Git repo health
-- Prepares your dev session for development or testing
-
----
-
-## 📋 Developer Notes
-
-- The `whisper-env/` folder is **ignored** by Git (`.gitignore`) and remains local-only.
-- Always start your session by running:
-
-    ```powershell
-    .\scripts\run-dev-session.ps1
-    ```
-
-- If you see missing module warnings, simply re-run the dev session script — it will attempt automatic recovery.
-
----
-
-## 🎯 Typical Daily Workflow
-
-```powershell
+bash
+Copy
+Edit
+git clone https://github.com/buymeagoat/whisper-transcriber.git
 cd whisper-transcriber
+Create and activate a Python virtual environment:
+
+bash
+Copy
+Edit
+python -m venv whisper-env
+
+# Windows
+.\whisper-env\Scripts\activate
+
+# macOS/Linux
+source whisper-env/bin/activate
+Install dependencies:
+
+bash
+Copy
+Edit
+pip install -r requirements.txt
+(Optional) Pre-stage Whisper models for fully offline operation:
+Place .pt model files into /models/{model_name}/{model_name}.pt folders.
+
+Example structure:
+
+plaintext
+Copy
+Edit
+models/
+  base.en/base.en.pt
+  tiny/tiny.pt
+  medium/medium.pt
+⚡ Usage
+🔹 Start Local Developer Session
+(Recommended for setup validation)
+
+bash
+Copy
+Edit
 .\scripts\run-dev-session.ps1
+Verifies repo, venv, Python modules, models folder, etc.
+
+Fix issues before running the app.
+
+🔹 Run CLI Transcription
+bash
+Copy
+Edit
+python app/transcribe.py --input uploads/your_audio_file.wav
+Optional flags:
+
+--model tiny
+
+--model small.en
+
+Default: base.en
+
+Transcripts are saved into:
+
+transcripts/your_audio_file.json
+
+transcripts/your_audio_file.txt
+
+🔹 Run Web UI
+Start the local Flask server:
+
+bash
+Copy
+Edit
+python app/main.py
+Open your browser to:
+
+cpp
+Copy
+Edit
+http://127.0.0.1:5000
+Upload new audio files
+
+View processing status
+
+Download finished transcripts
+
+📂 Project Structure
+plaintext
+Copy
+Edit
+whisper-transcriber/
+├── app/
+├── scripts/
+├── uploads/
+├── transcripts/
+├── logs/
+├── models/
+├── data/
+├── whisper-env/ (local virtualenv)
+├── setup_env.py
+├── requirements.txt
+├── README.md
+├── Whisper_Design.md
+└── .gitignore
+🧹 GitHub Hygiene
+.gitignore ensures:
+
+whisper-env/
+
+uploads/
+
+logs/
+
+transcripts/
+
+models/
+
+data/jobs.db
+
+are NOT committed to GitHub for security and cleanliness.
+
+🔮 Upcoming Improvements
+Transcript download button in Web UI
+
+Docker container for easy full offline deployment
+
+Improved session log viewer
+
+Unit tests for CLI and Flask routes
+
+Config option for "strict offline mode" (no downloads allowed)
+
+🛡️ License
+MIT License.
+See LICENSE file for details.

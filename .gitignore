@@ -12,7 +12,9 @@ transcripts/
 whisper-env/
 .vscode/
 *.log
-app/uploads/
+
+# Ignore local staged models
+models/
 
 
 # C extensions

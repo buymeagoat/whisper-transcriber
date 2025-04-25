@@ -1,39 +1,107 @@
 import argparse
+import os
+import sys
+import datetime
 import whisper
 import json
-import os
 
+# -------------------------------
+# Setup Logging
+# -------------------------------
+logs_dir = os.path.join(os.path.dirname(__file__), '..', 'logs')
+if not os.path.exists(logs_dir):
+    os.makedirs(logs_dir)
 
-def transcribe_audio(input_path, model_size="base", language=None, output_path=None):
-    if not os.path.isfile(input_path):
-        raise FileNotFoundError(f"Audio file not found: {input_path}")
+timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H%M')
+log_filename = os.path.join(logs_dir, f'transcribe_{timestamp}.log')
 
-    print(f"Loading Whisper model: {model_size}...")
-    model = whisper.load_model(model_size)
+class Tee(object):
+    def __init__(self, *streams):
+        self.streams = streams
 
-    print("Transcribing audio...")
-    result = model.transcribe(input_path, language=language)
+    def write(self, data):
+        for stream in self.streams:
+            stream.write(data)
+            stream.flush()
 
-    if output_path:
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(result, f, indent=2, ensure_ascii=False)
-        print(f"Transcription saved to {output_path}")
+    def flush(self):
+        for stream in self.streams:
+            stream.flush()
+
+sys.stdout = Tee(sys.stdout, open(log_filename, 'w', encoding='utf-8'))
+sys.stderr = sys.stdout
+
+# -------------------------------
+# Argument Parsing
+# -------------------------------
+parser = argparse.ArgumentParser(description="Transcribe an audio file using Whisper.")
+parser.add_argument("--input", required=True, help="Path to input audio file")
+parser.add_argument("--model", default="base.en", help="Whisper model size (tiny, base, small, medium, large)")
+args = parser.parse_args()
+
+# -------------------------------
+# Load Whisper Model (Local First)
+# -------------------------------
+def load_local_whisper_model(model_size="base.en"):
+    models_root = os.path.join(os.path.dirname(__file__), '..', 'models')
+    model_folder = os.path.join(models_root, model_size)
+    model_path = os.path.join(model_folder, f"{model_size}.pt")
+
+    if os.path.isfile(model_path):
+        print(f"✅ Loading model '{model_size}' directly from local file: {model_path}")
+        return whisper.load_model(model_path)
     else:
-        print(json.dumps(result, indent=2, ensure_ascii=False))
+        print(f"⚠️ Local model '{model_size}' not found. Falling back to remote download.")
+        return whisper.load_model(model_size)
 
-    return result
+print("Starting transcription process...")
+start_time = datetime.datetime.now()
+print(f"Start Time: {start_time}")
 
+model = load_local_whisper_model(args.model)
 
-def main():
-    parser = argparse.ArgumentParser(description="Transcribe an audio file using OpenAI Whisper")
-    parser.add_argument("--input", required=True, help="Path to the input audio file")
-    parser.add_argument("--model", default="base", help="Whisper model size (tiny, base, small, medium, large)")
-    parser.add_argument("--language", help="Optional language override (e.g., 'en')")
-    parser.add_argument("--output", help="Optional path to save JSON transcription result")
+# -------------------------------
+# Transcribe Audio
+# -------------------------------
+print(f"Transcribing file: {args.input}...")
+result = model.transcribe(args.input)
 
-    args = parser.parse_args()
-    transcribe_audio(args.input, args.model, args.language, args.output)
+# -------------------------------
+# Save Transcript
+# -------------------------------
+transcripts_dir = os.path.join(os.path.dirname(__file__), '..', 'transcripts')
+if not os.path.exists(transcripts_dir):
+    os.makedirs(transcripts_dir)
 
+base_filename = os.path.splitext(os.path.basename(args.input))[0]
+output_json = os.path.join(transcripts_dir, f"{base_filename}.json")
+output_txt = os.path.join(transcripts_dir, f"{base_filename}.txt")
 
-if __name__ == "__main__":
-    main()
+# Save full JSON transcript
+with open(output_json, 'w', encoding='utf-8') as f:
+    json.dump(result, f, ensure_ascii=False, indent=2)
+
+# Save clean readable TXT transcript
+if 'segments' in result:
+    with open(output_txt, 'w', encoding='utf-8') as f:
+        for segment in result['segments']:
+            start_sec = int(segment['start'])
+            minutes = start_sec // 60
+            seconds = start_sec % 60
+            timestamp = f"[{minutes:02}:{seconds:02}]"
+            f.write(f"{timestamp} {segment['text'].strip()}\n")
+else:
+    with open(output_txt, 'w', encoding='utf-8') as f:
+        f.write("No segments found.\n")
+
+# -------------------------------
+# Final Logging
+# -------------------------------
+end_time = datetime.datetime.now()
+print("✅ Transcription complete.")
+print(f"Language Detected: {result.get('language', 'unknown')}")
+print(f"Transcript Saved (JSON): {output_json}")
+print(f"Transcript Saved (TXT): {output_txt}")
+print(f"Log Saved: {log_filename}")
+print(f"End Time: {end_time}")
+print(f"Duration: {end_time - start_time}")

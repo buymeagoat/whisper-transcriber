@@ -9,6 +9,11 @@ logs/
 data/
 transcripts/
 *.db
+whisper-env/
+.vscode/
+*.log
+app/uploads/
+
 
 # C extensions
 *.so

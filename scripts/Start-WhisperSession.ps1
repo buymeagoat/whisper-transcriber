@@ -1,5 +1,7 @@
 ﻿# Start-WhisperSession.ps1
-# Whisper Transcriber - Developer Session Starter (Self-Healing + Clean Venv Check)
+# Whisper Transcriber - Developer Session Starter (Self-Healing + Clean Venv Check + Folder Verification)
+# Determine project root (one level up from /scripts/)
+$ProjectRoot = (Resolve-Path "$PSScriptRoot\..").Path
 
 Clear-Host
 
@@ -12,7 +14,7 @@ Write-Output "------------------------------"
 
 # Venv Check
 if (-not $env:VIRTUAL_ENV) {
-    Write-Output "\n⚠️  Your Python virtual environment (whisper-env) is NOT activated!"
+    Write-Output "⚠️  Your Python virtual environment (whisper-env) is NOT activated!"
     Write-Output ""
     Write-Output "To continue:" 
     Write-Output "  1. Copy the command below"
@@ -29,11 +31,11 @@ if (-not $env:VIRTUAL_ENV) {
 }
 
 # Display Repo Info
-Write-Output "\n🔹 Repo URL:"
+Write-Output "🔹 Repo URL:"
 $repoUrl = git config --get remote.origin.url
 Write-Output "Repo: $repoUrl"
 
-Write-Output "\n🔹 Repo State:"
+Write-Output "🔹 Repo State:"
 $branch = git rev-parse --abbrev-ref HEAD
 $remote = git config --get remote.origin.url
 $status = git status --porcelain
@@ -43,19 +45,19 @@ Write-Output "Remote: $remote"
 
 if ($status) {
     Write-Output "Status: ❌ Uncommitted changes or untracked files"
-    Write-Output "\nUncommitted Changes/Untracked Files:"
+    Write-Output "Uncommitted Changes/Untracked Files:"
     git status --short
 } else {
     Write-Output "Status: ✅ Repo is clean"
 }
 
 # ChatGPT Authorization Notice
-Write-Output "\n🔹 ChatGPT Authorization:"
+Write-Output "🔹 ChatGPT Authorization:"
 Write-Output "✅ You have permission to analyze this repository and fetch live files from:"
 Write-Output "$repoUrl"
 
 # Environment Check
-Write-Output "\n🔹 Environment Check:"
+Write-Output "🔹 Environment Check:"
 
 $pythonCheck = @'
 import sys
@@ -98,5 +100,26 @@ try {
     Write-Output $_
 }
 
-Write-Output "\n------------------------------"
+# -------------------------------
+# Check for critical project folders
+# -------------------------------
+Write-Output "🔹 Folder Structure Check:"
+
+# Calculate project root (one level up from scripts/)
+$ProjectRoot = (Resolve-Path "$PSScriptRoot\..").Path
+
+$requiredFolders = @("uploads", "logs", "transcripts")
+
+foreach ($folder in $requiredFolders) {
+    $folderPath = Join-Path $ProjectRoot $folder
+    if (-Not (Test-Path $folderPath)) {
+        Write-Output "⚠️  Folder '$folder' not found at project root. Creating..."
+        New-Item -ItemType Directory -Path $folderPath | Out-Null
+    } else {
+        Write-Output "✅ Folder '$folder' exists at project root."
+    }
+}
+
+
+Write-Output "------------------------------"
 Write-Output "Session Initialization Complete."

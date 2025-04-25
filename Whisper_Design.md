@@ -1,144 +1,122 @@
-# 🧠 Whisper Transcriber — Core System Design Document
-
-**Version:** 1.6  
-**Audience:** Senior Developers  
-**Author:** GPT (for Tony)  
-**Last Updated:** 2025-04-12
+# Whisper Transcriber - Project Design Document
 
 ---
 
-## ✅ Project Goal
+## 📆 Project Overview
 
-Build a local web-based transcription platform using OpenAI Whisper, designed to run in a Docker container inside a VMware-managed VM (eventually OVF). The system provides a browser-based interface for uploading audio, selecting settings, viewing live progress, and downloading transcripts — all without internet access.
+**Whisper Transcriber** is a local-first, privacy-respecting audio transcription platform.
 
-This document reflects only **tested, implemented work**. If a module exists but has not been functionally verified, it is listed as 🔜 Upcoming.
-
----
-
-## 🔧 Project Milestones (Verified)
-
-### ✅ Completed
-- Repository initialized and under Git
-- `scripts/Start-WhisperSession.ps1` created and validates environment
-- `app/job_store.py` implemented with SQLite + full CRUD
-- `app/main.py` implemented with Flask routes + subprocess job calling
-- UI templates created: `base.html`, `index.html`, `jobs.html`, `status.html`
-
-### 🔜 Upcoming
-- Validate `transcribe.py` with real audio (currently untested)
-- Add transcript download functionality
-- Add `log_utils.py` for streaming logs
-- Begin Docker containerization
+Features:
+- Offline-first transcription using OpenAI Whisper or compatible models
+- Minimal web UI for uploading audio, viewing, and downloading transcripts
+- Local SQLite job tracking (no cloud dependency)
+- Lightweight CLI bootstrap for developer sessions
 
 ---
 
-## 🔧 Architecture Overview
-
-### 📁 Project Layout
+## 📊 Project Layout
 
 ```
 whisper-transcriber/
 ├── app/
-│   ├── transcribe.py       # 🔜 Exists, needs validation
-│   ├── job_store.py        # ✅ Implemented
-│   ├── main.py             # ✅ Implemented
-│   └── templates/          # ✅ UI Templates
+│   ├── transcribe.py          # CLI transcription tool
+│   ├── job_store.py           # SQLite job tracking
+│   ├── main.py                # Flask routes for UI
+│   └── templates/             # HTML templates for UI
 │       ├── base.html
 │       ├── index.html
 │       ├── jobs.html
 │       └── status.html
 │
 ├── scripts/
-│   └── Start-WhisperSession.ps1  # ✅ Implemented
+│   └── start-whispersession.ps1  # Developer environment session starter
 │
-├── setup_env.py           # ⚙️ Dev-only reset script
-├── README.md              # ✅ Present
-├── .gitignore             # ✅ Present
-├── Whisper_Design.md      # ✅ This file
-└── data/jobs.db           # 🟡 Runtime artifact
+├── uploads/                 # Uploaded audio files (runtime only)
+├── transcripts/              # Output transcript files (.json, .txt)
+├── logs/                     # Runtime logs and debug logs
+├── data/
+│   └── jobs.db                # SQLite database file (created at runtime)
+│
+├── setup_env.py              # Developer environment reset tool
+├── requirements.txt          # Python dependencies
+├── README.md                 # Project overview and usage
+├── Whisper_Design.md         # This design document
+├── .gitignore                # Ignores whisper-env, uploads, logs, transcripts
+└── whisper-env/              # (local virtual environment, ignored by Git)
 ```
 
 ---
 
-## 🛠️ Core Modules
+## 🔢 Local Development Environment
 
-### `job_store.py` ✅
-- SQLite-backed persistence for all jobs
-- CRUD lifecycle management
-- Ready for use in Flask, CLI, or async
+- Create a local Python virtual environment:
 
-### `main.py` ✅
-- Flask routes: `/`, `/submit`, `/jobs`, `/status/<job_id>`
-- Handles file uploads and job metadata
-- Submits jobs via subprocess call to `transcribe.py`
+```bash
+python -m venv whisper-env
+```
 
-### `transcribe.py` 🔜
-- Python script using `openai-whisper`
-- Supports CLI args: model, language, output format
-- Script exists but has **not been tested with real audio**
-- Validation is a required milestone
+- Activate the virtual environment:
 
-### UI Templates ✅
-- Bootstrap layout and job views implemented
-- Output and status displayed in browser
+```bash
+# Windows
+.\whisper-env\Scripts\activate
 
----
+# macOS/Linux
+source whisper-env/bin/activate
+```
 
-## 🔢 What’s Next (Milestone Plan)
+- Install dependencies:
 
-1. **Validate Transcription Engine**
-   - Run real audio through `transcribe.py`
-   - Inspect output JSON and error handling
-   - Document behavior and adjust if needed
+```bash
+pip install -r requirements.txt
+```
 
-2. **Implement transcript download UI**
-   - Add Flask route to serve finished transcript files
-
-3. **Build `log_utils.py`**
-   - Write per-job logs to disk
-   - Integrate with job view page
-
-4. **Begin Docker containerization**
-   - Offline support required
-   - All packages vendored
-   - Model weights bundled in image
+- `whisper-env/` is **ignored from GitHub** via `.gitignore` and should always remain local.
 
 ---
 
-## 🎙️ Transcription Engine
+## 🔄 Development Workflow
 
-- Engine: `openai-whisper`
-- Script: `app/transcribe.py`
-- Models: `tiny`, `base`, `small`, etc.
-- Must run offline — models must be preloaded
-
----
-
-## 📋 Development Policy
-
-| Status | Meaning                            |
-|--------|-------------------------------------|
-| ✅     | Implemented and verified            |
-| 🔜     | Exists but unvalidated              |
-| 🚧     | Actively in progress                |
-| ❌     | Planned only — do not build yet     |
-
-No module may be treated as “Complete” unless verified by test or usage.  
-Whisper GPT is configured to enforce this rule during development sessions.
+1. **Start Developer Session:**
+   ```bash
+   .\scripts\start-whispersession.ps1
+   ```
+2. **Upload or place audio files into** `uploads/`
+3. **Run CLI transcription:**
+   ```bash
+   python app/transcribe.py --input uploads/yourfile.wav
+   ```
+4. **View transcripts in** `transcripts/`
+5. **(Optional) Start Flask UI:**
+   ```bash
+   python app/main.py
+   ```
 
 ---
 
-## 📦 Containerization Policy
+## 📅 Milestone Status
 
-- No internet access allowed at runtime
-- Pip wheels must be vendored
-- All model weights preloaded into build
-- Volumes: `/uploads`, `/logs`, `/transcripts`, `/data`
+| Component                 | Status   |
+|----------------------------|----------|
+| Developer Session Script   | ✅ Completed |
+| CLI Transcription (`transcribe.py`) | ✅ Validated |
+| Database Schema (`job_store.py`) | ✅ Completed |
+| Flask App Skeleton (`main.py`) | ✅ Completed |
+| HTML Templates (`templates/`) | ✅ Created |
+| Transcript Download UI | ⏳ Upcoming |
+| Job Logs UI (`log_utils.py`) | ⏳ Upcoming |
+| Dockerfile / Offline Packaging | ⏳ Upcoming |
 
 ---
 
-## 📅 GPT Sync Log
+## 🚀 Next Steps
 
-- 2025-04-12: `transcribe.py` demoted from ✅ to 🔜 due to lack of testing
-- 2025-04-12: GPT logic now halts development if design doc is out of sync
-- 2025-04-12: Roadmap shifted to reflect true milestone order
+- Implement **transcript download feature** in UI
+- Add **basic log visualization** (job status and errors)
+- Build **Docker container** for full offline deployability
+- Create lightweight **unit tests** for CLI and Flask endpoints
+
+---
+
+# 👋 End of Document
+

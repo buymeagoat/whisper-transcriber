@@ -1,69 +1,66 @@
+# setup_env.py
+# Whisper Transcriber - Developer Environment Reset and Bootstrap
+
 import os
 import shutil
-import sqlite3
 import stat
-import subprocess
+import sqlite3
 
-SAFE_KEEP = {".git", "setup_env.py"}
-REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
-
-def make_writable_and_remove(path):
-    def onerror(func, path, _):
-        os.chmod(path, stat.S_IWRITE)
-        func(path)
-    if os.path.isdir(path):
-        shutil.rmtree(path, onerror=onerror)
-        print(f"🧹 Deleted folder: {os.path.relpath(path, REPO_ROOT)}")
-    else:
-        os.remove(path)
-        print(f"🧼 Deleted file: {os.path.relpath(path, REPO_ROOT)}")
+def make_writable(func, path, _):
+    """Helper function to make files writable during deletion."""
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
 
 def wipe_all_except_safe():
-    for item in os.listdir(REPO_ROOT):
-        if item in SAFE_KEEP:
-            continue
-        full_path = os.path.join(REPO_ROOT, item)
-        make_writable_and_remove(full_path)
+    """Deletes everything in the repo except .git/, setup_env.py, and whisper-env/ (local venv)."""
+    SAFE_KEEP = {".git", "setup_env.py", "whisper-env"}
+    for item in os.listdir('.'):
+        if item not in SAFE_KEEP:
+            if os.path.isdir(item):
+                shutil.rmtree(item, onerror=make_writable)
+            else:
+                os.remove(item)
 
-def restore_git_files():
-    try:
-        subprocess.run(["git", "restore", "."], check=True)
-        print("🔄 Restored tracked files from Git.")
-    except Exception:
-        print("⚠️  Git restore failed. Make sure Git is installed and you're in a cloned repo.")
-
-def recreate_directories():
-    for folder in ["uploads", "logs", "data", "transcripts"]:
-        os.makedirs(os.path.join(REPO_ROOT, folder), exist_ok=True)
-        print(f"📁 Created directory: {folder}")
+def create_folder_structure():
+    """Creates essential folders fresh."""
+    folders = ["uploads", "logs", "data", "transcripts"]
+    for folder in folders:
+        os.makedirs(folder, exist_ok=True)
 
 def initialize_database():
-    db_path = os.path.join(REPO_ROOT, "data", "jobs.db")
-    schema = """
+    """Creates a fresh SQLite database for job tracking."""
+    conn = sqlite3.connect("data/jobs.db")
+    c = conn.cursor()
+    c.execute("""
     CREATE TABLE IF NOT EXISTS jobs (
-        job_id TEXT PRIMARY KEY,
-        file_name TEXT NOT NULL,
-        status TEXT NOT NULL,
+        job_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        file_name TEXT,
+        status TEXT,
         model TEXT,
-        created TEXT NOT NULL
-    );
-    """
-    with sqlite3.connect(db_path) as conn:
-        conn.execute(schema)
-    print("🗃️ Initialized jobs.db with correct schema.")
+        created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    conn.commit()
+    conn.close()
 
 if __name__ == "__main__":
-    print("🔧 Resetting whisper-transcriber environment...")
-    print("⚠️  WARNING: This will DELETE everything in this folder except:")
-    for item in SAFE_KEEP:
-        print(f" - {item}")
-    print("🛠 It will then restore Git files and recreate required folders.")
-    confirm = input("Type 'yes' to confirm: ").strip().lower()
-    if confirm == "yes":
-        wipe_all_except_safe()
-        restore_git_files()
-        recreate_directories()
-        initialize_database()
-        print("✅ Environment is clean and ready.")
-    else:
-        print("❌ Cancelled.")
+    print("\n------------------------------")
+    print("✨ WHISPER ENVIRONMENT RESET")
+    print("------------------------------\n")
+
+    print("Wiping repository (except .git/, setup_env.py, and whisper-env/)...")
+    wipe_all_except_safe()
+
+    print("Creating fresh folder structure...")
+    create_folder_structure()
+
+    print("Initializing new database (data/jobs.db)...")
+    initialize_database()
+
+    print("\n✅ Environment reset complete.")
+    print("- uploads/     (for incoming audio)")
+    print("- logs/        (for system and job logs)")
+    print("- data/        (for jobs.db database)")
+    print("- transcripts/ (for output transcripts)")
+    print("- whisper-env/ (local venv, untouched, NOT in Git)")
+    print("\nReady to develop!")

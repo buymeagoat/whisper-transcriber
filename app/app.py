@@ -6,10 +6,10 @@ from datetime import datetime
 import time
 
 # Import centralized paths
-from paths import UPLOADS_DIR as UPLOADS_FOLDER, TRANSCRIPTS_DIR as TRANSCRIPTS_FOLDER, DB_PATH
+from paths import UPLOADS_DIR, TRANSCRIPTS_DIR, DB_PATH
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOADS_FOLDER
+app.config['UPLOAD_FOLDER'] = UPLOADS_DIR
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -54,8 +54,12 @@ def background_transcription(filepath, filename):
     thread = threading.Thread(target=transcribe_file, args=(filepath, filename))
     thread.start()
 
-@app.route('/', methods=['GET', 'POST'])
-def upload_file():
+@app.route('/', methods=['GET'])
+def home():
+    return render_template('home.html')
+
+@app.route('/new_transcription', methods=['GET', 'POST'])
+def new_transcription():
     if request.method == 'POST':
         file = request.files['file']
         if file:
@@ -64,21 +68,30 @@ def upload_file():
             file.save(save_path)
             save_job(filename)
             background_transcription(save_path, filename)
-            return redirect(url_for('jobs'))
-    return render_template('home.html')
+            return redirect(url_for('active_jobs'))
+    return render_template('new_transcription.html')
 
-@app.route('/jobs')
-def jobs():
+@app.route('/active_jobs')
+def active_jobs():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('SELECT filename, status, created_at FROM jobs ORDER BY created_at DESC')
     jobs = cursor.fetchall()
     conn.close()
-    return render_template('jobs.html', jobs=jobs)
+    return render_template('active_jobs.html', jobs=jobs)
+
+@app.route('/past_jobs')
+def past_jobs():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('SELECT filename, status, created_at FROM jobs WHERE status = "Completed" ORDER BY created_at DESC')
+    jobs = cursor.fetchall()
+    conn.close()
+    return render_template('past_jobs.html', jobs=jobs)
 
 @app.route('/transcripts/<filename>')
 def download_transcript(filename):
-    return send_from_directory(TRANSCRIPTS_FOLDER, filename)
+    return send_from_directory(TRANSCRIPTS_DIR, filename)
 
 if __name__ == '__main__':
     init_db()

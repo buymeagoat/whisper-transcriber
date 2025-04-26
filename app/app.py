@@ -41,15 +41,23 @@ def update_job_status(file_name, status):
     conn.commit()
     conn.close()
 
-def transcribe_file(filepath, file_name):
-    from transcribe import transcribe_audio  # Import here to avoid circular imports
+import subprocess
+import sys
 
+def transcribe_file(filepath, file_name):
     update_job_status(file_name, 'Running')
     try:
-        transcribe_audio(filepath)
+        subprocess.run([
+            sys.executable, "transcribe.py",
+            "--input", filepath,
+            "--model", "small"  # Adjust model size if needed
+        ], check=True)
         update_job_status(file_name, 'Completed')
+    except subprocess.CalledProcessError as e:
+        print(f"[Error] Subprocess failed while transcribing {file_name}: {e}")
+        update_job_status(file_name, 'Failed')
     except Exception as e:
-        print(f"Error transcribing {file_name}: {e}")
+        print(f"[Error] Unexpected error while transcribing {file_name}: {e}")
         update_job_status(file_name, 'Failed')
 
 def background_transcription(filepath, file_name):

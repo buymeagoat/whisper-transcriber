@@ -9,21 +9,16 @@
     <thead>
       <tr>
         <th>File Name</th>
-        <th>Model</th>
-        <th>Progress</th>
         <th>Status</th>
+        <th>Created</th>
       </tr>
     </thead>
     <tbody>
-      {% for job_id, job in jobs.items() %}
+      {% for job in jobs %}
       <tr>
-        <td>{{ job.filename }}</td>
-        <td>{{ job.model }}</td>
-        <td>
-          <progress value="{{ job.progress }}" max="100" class="w-32"></progress>
-          {{ job.progress }}%
-        </td>
-        <td>{{ job.status }}</td>
+        <td>{{ job[0] }}</td>  {# file_name #}
+        <td>{{ job[1] }}</td>  {# status #}
+        <td>{{ job[2] }}</td>  {# created timestamp #}
       </tr>
       {% endfor %}
     </tbody>

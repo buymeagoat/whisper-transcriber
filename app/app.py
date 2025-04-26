@@ -1,3 +1,5 @@
+import threading
+import subprocess
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 import os
 import uuid
@@ -63,7 +65,8 @@ def new_transcription():
                 }
             }
 
-            # TODO: Launch transcription process asynchronously
+            # 🚀 Launch the transcription background thread
+            threading.Thread(target=transcribe_file, args=(job_id,), daemon=True).start()
 
             return redirect(url_for('active_jobs_view'))
     return render_template('new_transcription.html')
@@ -79,6 +82,38 @@ def past_jobs():
 @app.route('/transcripts/<path:filename>')
 def download_transcript(filename):
     return send_from_directory(app.config['TRANSCRIPT_FOLDER'], filename, as_attachment=True)
+
+def transcribe_file(job_id):
+    job = active_jobs.get(job_id)
+    if not job:
+        return
+
+    filename = job['filename']
+    input_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    model = job['model']
+
+    active_jobs[job_id]['status'] = 'Running'
+    active_jobs[job_id]['progress'] = 10  # Start at 10%
+
+    try:
+        # Call transcribe.py as subprocess
+        subprocess.run([
+            'python', 'transcribe.py',
+            '--model', model,
+            '--input', input_path
+        ], check=True)
+
+        # Mark job as complete
+        active_jobs[job_id]['progress'] = 100
+        active_jobs[job_id]['status'] = 'Completed'
+
+        # ✅ Move job to completed_jobs
+        completed_jobs[job_id] = active_jobs.pop(job_id)
+
+    except subprocess.CalledProcessError as e:
+        active_jobs[job_id]['status'] = 'Failed'
+        active_jobs[job_id]['progress'] = 0
+        print(f"Transcription failed for {filename}: {e}")
 
 if __name__ == '__main__':
     app.run(debug=True)

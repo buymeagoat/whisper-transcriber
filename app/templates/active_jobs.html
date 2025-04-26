@@ -1,32 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
 
-
 <section class="p-8 text-white bg-gray-800 min-h-screen">
   <h1 class="text-3xl font-bold mb-6">Active Transcriptions</h1>
 
-  <!-- Jobs Table -->
+  {% if jobs %}
   <table class="w-full text-left">
     <thead>
       <tr>
         <th>File Name</th>
         <th>Model</th>
         <th>Progress</th>
-        <th>ETA</th>
         <th>Status</th>
-        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
+      {% for job_id, job in jobs.items() %}
       <tr>
-        <td>example.wav</td>
-        <td>small.en</td>
-        <td><progress value="65" max="100"></progress></td>
-        <td>1m 32s</td>
-        <td>Running</td>
-        <td><button class="bg-red-600 p-2">Cancel</button></td>
+        <td>{{ job.filename }}</td>
+        <td>{{ job.model }}</td>
+        <td>
+          <progress value="{{ job.progress }}" max="100" class="w-32"></progress>
+          {{ job.progress }}%
+        </td>
+        <td>{{ job.status }}</td>
       </tr>
+      {% endfor %}
     </tbody>
   </table>
+  {% else %}
+    <p class="text-center mt-8">No active jobs right now.</p>
+  {% endif %}
 </section>
+
 {% endblock %}

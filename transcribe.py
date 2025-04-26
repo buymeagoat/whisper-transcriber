@@ -8,7 +8,7 @@ import json
 # -------------------------------
 # Setup Logging
 # -------------------------------
-logs_dir = os.path.join(os.path.dirname(__file__), '..', 'logs')
+logs_dir = os.path.join(os.path.dirname(__file__), 'logs')
 if not os.path.exists(logs_dir):
     os.makedirs(logs_dir)
 
@@ -35,15 +35,15 @@ sys.stderr = sys.stdout
 # Argument Parsing
 # -------------------------------
 parser = argparse.ArgumentParser(description="Transcribe an audio file using Whisper.")
-parser.add_argument("--input", required=True, help="Path to input audio file")
-parser.add_argument("--model", default="base.en", help="Whisper model size (tiny, base, small, medium, large)")
+parser.add_argument('--input', required=True, help='Path to input audio file')
+parser.add_argument('--model', default='base.en', help='Whisper model size (tiny, base, small, medium, large)')
 args = parser.parse_args()
 
 # -------------------------------
 # Load Whisper Model (Local First)
 # -------------------------------
 def load_local_whisper_model(model_size="base.en"):
-    models_root = os.path.join(os.path.dirname(__file__), '..', 'models')
+    models_root = os.path.join(os.path.dirname(__file__), 'models')
     model_folder = os.path.join(models_root, model_size)
     model_path = os.path.join(model_folder, f"{model_size}.pt")
 
@@ -69,17 +69,11 @@ result = model.transcribe(args.input)
 # -------------------------------
 # Save Transcript
 # -------------------------------
-transcripts_dir = os.path.join(os.path.dirname(__file__), '..', 'transcripts')
-if not os.path.exists(transcripts_dir):
-    os.makedirs(transcripts_dir)
+transcripts_dir = os.path.join(os.path.dirname(__file__), 'transcripts')
+os.makedirs(transcripts_dir, exist_ok=True)
 
 base_filename = os.path.splitext(os.path.basename(args.input))[0]
-output_json = os.path.join(transcripts_dir, f"{base_filename}.json")
 output_txt = os.path.join(transcripts_dir, f"{base_filename}.txt")
-
-# Save full JSON transcript
-with open(output_json, 'w', encoding='utf-8') as f:
-    json.dump(result, f, ensure_ascii=False, indent=2)
 
 # Save clean readable TXT transcript
 if 'segments' in result:
@@ -100,7 +94,6 @@ else:
 end_time = datetime.datetime.now()
 print("✅ Transcription complete.")
 print(f"Language Detected: {result.get('language', 'unknown')}")
-print(f"Transcript Saved (JSON): {output_json}")
 print(f"Transcript Saved (TXT): {output_txt}")
 print(f"Log Saved: {log_filename}")
 print(f"End Time: {end_time}")

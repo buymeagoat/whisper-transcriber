@@ -25,16 +25,17 @@ The system allows users to:
       new_transcription.html  # Upload new transcription job
       active_jobs.html    # View active jobs
       past_jobs.html      # View completed jobs
-  models/                 # Local Whisper model .pt files
-  uploads/                # Uploaded audio/video files
-  transcripts/            # Output TXT transcripts
-  logs/                   # Transcription logs (stdout/stderr)
   data/
     jobs.db               # SQLite database to store job records
-  transcribe.py            # Command-line script to run Whisper transcription
-  setup_env.py             # (future) Script to rebuild environment from scratch
-  Whisper_Design.md        # This design document
-  README.md                # Project overview and instructions
+  logs/                   # Transcription logs (stdout/stderr)
+  models/                 # Local Whisper model .pt files
+  transcripts/            # Output TXT transcripts
+  uploads/                # Uploaded audio/video files
+  paths.py                # Centralized path management
+  transcribe.py           # Command-line script to run Whisper transcription
+  setup_env.py            # (future) Script to rebuild environment from scratch
+  Whisper_Design.md       # This design document
+  README.md               # Project overview and instructions
 ```
 
 ---
@@ -50,6 +51,7 @@ The system allows users to:
 - [x] **Download TXT transcript**
 - [x] **TXT-only output from `transcribe.py` (no JSON)**
 - [x] **Basic professional dark-themed UI**
+- [x] **Centralized path management using `paths.py`**
 
 ### Pending Work (🔄 In Progress)
 - [ ] **Better active job progress display** (if desired)
@@ -79,6 +81,7 @@ The system allows users to:
 - `transcribe.py` was relocated from `/app/` to root for subprocess cleanliness.
 - `.json` outputs were intentionally removed from transcriptions.
 - Database-backed completed job persistence now implemented using `jobs.db`.
+- Centralized absolute path management introduced via `paths.py`.
 
 ---
 
@@ -95,4 +98,3 @@ The system allows users to:
 ---
 
 # End of Updated Whisper_Design.md
-

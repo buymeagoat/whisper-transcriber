@@ -6,7 +6,7 @@ from datetime import datetime
 import time
 
 # Import centralized paths
-from paths import UPLOADS_FOLDER, TRANSCRIPTS_FOLDER, DB_PATH
+from paths import UPLOADS_DIR as UPLOADS_FOLDER, TRANSCRIPTS_DIR as TRANSCRIPTS_FOLDER, DB_PATH
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOADS_FOLDER
@@ -65,7 +65,7 @@ def upload_file():
             save_job(filename)
             background_transcription(save_path, filename)
             return redirect(url_for('jobs'))
-    return render_template('upload.html')
+    return render_template('home.html')
 
 @app.route('/jobs')
 def jobs():

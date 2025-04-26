@@ -2,33 +2,29 @@
 {% block content %}
 
 <section class="p-8 text-white bg-gray-800 min-h-screen">
-  <h1 class="text-3xl font-bold mb-6">Past Transcriptions</h1>
+  <h1 class="text-3xl font-bold mb-6">Past Transcription Jobs</h1>
 
   {% if jobs %}
   <table class="w-full text-left">
     <thead>
       <tr>
         <th>File Name</th>
-        <th>Model</th>
-        <th>Date Completed</th>
-        <th>Download</th>
+        <th>Status</th>
+        <th>Created</th>
       </tr>
     </thead>
     <tbody>
-      {% for job_id, job in jobs.items() %}
-      <tr>
-        <td>{{ job.filename }}</td>
-        <td>{{ job.model }}</td>
-        <td>{{ job.completed_time if job.completed_time else "Unknown" }}</td>
-        <td>
-          <a href="{{ url_for('download_transcript', filename=(job.filename.rsplit('.', 1)[0] + '.txt')|urlencode) }}" class="underline">⬇️ Download TXT</a>
-        </td>
+      {% for job in jobs %}
+      <tr class="border-b border-gray-700">
+        <td>{{ job[0] }}</td>  {# file_name #}
+        <td>{{ job[1] }}</td>  {# status #}
+        <td>{{ job[2] }}</td>  {# created timestamp #}
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% else %}
-    <p class="text-center mt-8">No completed jobs yet.</p>
+    <p class="text-center mt-8">No past jobs found.</p>
   {% endif %}
 </section>
 

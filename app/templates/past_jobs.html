@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="p-8 text-white bg-gray-800 min-h-screen">
+    <h1 class="text-3xl font-bold mb-6">Past Transcriptions</h1>
+  
+    <!-- Search Bar -->
+    <input type="text" placeholder="Search jobs..." class="mb-4 w-full p-2 bg-gray-700 text-white" />
+  
+    <!-- Jobs Table -->
+    <table class="w-full text-left">
+      <thead>
+        <tr>
+          <th>File Name</th>
+          <th>Model</th>
+          <th>Date Completed</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>example.wav</td>
+          <td>small.en</td>
+          <td>2025-04-25</td>
+          <td><a href="/transcripts/example.txt" class="underline">⬇️ Download TXT</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  {% endblock %}

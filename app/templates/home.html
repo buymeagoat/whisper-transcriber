@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="p-8 text-white bg-gray-800 min-h-screen flex flex-col items-center justify-center space-y-8">
+  <h1 class="text-4xl font-bold">Welcome to Whisper Transcriber</h1>
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 w-full max-w-4xl">
+    
+    <a href="/new-transcription" class="bg-blue-600 hover:bg-blue-700 p-6 rounded-xl text-center font-bold text-xl">
+      ➕ New Transcription
+    </a>
+    
+    <a href="/active-jobs" class="bg-yellow-600 hover:bg-yellow-700 p-6 rounded-xl text-center font-bold text-xl">
+      ⏳ Active Jobs
+    </a>
+    
+    <a href="/past-jobs" class="bg-green-600 hover:bg-green-700 p-6 rounded-xl text-center font-bold text-xl">
+      📜 Past Jobs
+    </a>
+
+  </div>
+
+</section>
+
+{% endblock %}

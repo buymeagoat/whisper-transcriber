@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<section class="p-8 text-white bg-gray-800 min-h-screen">
+  <h1 class="text-3xl font-bold mb-6">Active Transcriptions</h1>
+
+  <!-- Jobs Table -->
+  <table class="w-full text-left">
+    <thead>
+      <tr>
+        <th>File Name</th>
+        <th>Model</th>
+        <th>Progress</th>
+        <th>ETA</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>example.wav</td>
+        <td>small.en</td>
+        <td><progress value="65" max="100"></progress></td>
+        <td>1m 32s</td>
+        <td>Running</td>
+        <td><button class="bg-red-600 p-2">Cancel</button></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+{% endblock %}

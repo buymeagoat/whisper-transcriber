@@ -1,80 +1,81 @@
-# Whisper Transcriber — Design Document
+# 📚 Whisper Transcriber — Architecture Design
 
-## 🛠 Project Overview
-Whisper Transcriber is a local-first, privacy-focused platform for transcribing audio files using OpenAI's Whisper models. The project emphasizes simplicity, local processing, and minimal external dependencies.
+---
 
-## 📦 Project Structure
+## 📂 Folder Structure
 
-```
-/whisper-transcriber/
-  app/
-    app.py
-    templates/
-  data/
-    jobs.db
-  logs/
-  models/
-  transcripts/
-  uploads/
-  paths.py
-  transcribe.py
-  setup_env.py
-  Whisper_Design.md
-  README.md
-```
+/whisper-transcriber  
+├── app/  
+│   ├── app.py  
+│   ├── templates/  
+│   │   ├── base.html  
+│   │   ├── home.html  
+│   │   ├── new-transcription.html  
+│   │   ├── active-jobs.html  
+│   │   ├── past-jobs.html  
+├── data/  
+│   ├── (jobs.db dynamically created)  
+├── logs/  
+├── models/  
+├── transcripts/  
+├── uploads/  
+├── scripts/  
+│   ├── migrate_db.py  
+│   ├── inspect_db.py  
+├── paths.py  
+├── README.md  
+├── Whisper_Design.md  
 
-## 🧩 Key Components
+> **Note:**  
+> - `/data/jobs.db` is dynamically created if missing at runtime (not Git-tracked).  
+> - `/uploads`, `/logs`, and `/transcripts` folders are required and are auto-created if absent.
 
-- `app/app.py`: Flask app handling uploads, job tracking, and downloads.
-- `paths.py`: Centralized module for all filesystem path constants.
-- `transcribe.py`: Transcription engine script using Whisper.
-- `jobs.db`: SQLite database for tracking job states.
-- `uploads/`: Folder for incoming audio files.
-- `transcripts/`: Folder for output transcripts.
+---
 
-## 🔥 Core Features
+## 🛢️ Database Schema (`jobs` Table)
 
-- Web interface for uploading and tracking transcription jobs.
-- Background threading for transcription processing.
-- Centralized path management through `paths.py`.
-- Local-only, privacy-respecting design.
-- Modular code structure for future expansion (e.g., Docker, offline mode).
+| Column Name       | Type                | Purpose                                               |
+|:------------------|:--------------------|:------------------------------------------------------|
+| `job_id`           | INTEGER PRIMARY KEY | Unique identifier (auto-incremented)                  |
+| `file_name`        | TEXT                | Original uploaded file name                           |
+| `status`           | TEXT                | Current job status (`Queued`, `Running`, `Completed`, `Failed`) |
+| `model`            | TEXT                | Whisper model size selected                           |
+| `created`          | TIMESTAMP           | Timestamp when the job was created (default `CURRENT_TIMESTAMP`) |
+| `duration_seconds` | REAL                | Duration of the audio file in seconds (optional)      |
+| `language_detected`| TEXT                | Auto-detected language (optional)                     |
+| `error_message`    | TEXT                | Error message if job fails (optional)                 |
+| `completed_at`     | TIMESTAMP           | Timestamp when job completed (optional)               |
 
-## 🏃 Running the Web Application Locally
+> **Schema Notes:**  
+> - `init_db()` inside `app.py` creates the `jobs` table if it doesn't exist.  
+> - `scripts/migrate_db.py` can be used to update existing databases to include newer fields.
 
-From the project root (`/whisper-transcriber`), run:
+---
 
-```bash
-py -m app.app
-```
+## 🔄 Application Flow Overview
 
-This will launch the Flask server with correct module paths.
+1. **User uploads** an audio or video file via `/new-transcription`.
+2. **Job is created** in `jobs.db` with `status = Queued`.
+3. **Background thread** starts transcription using `transcribe.py`.
+4. **Job status updates** (`Running`, `Completed`, or `Failed`) in database.
+5. **Results displayed** on `/active-jobs` and `/past-jobs`.
+6. **Transcript available** for download after job completion.
 
-### Why use `-m app.app`?
+---
 
-Running with `-m` ensures Python treats `/app` as a module, allowing clean imports (like `from paths import ...`) without needing hacky sys.path changes.
+## 📢 Current Stability Status
 
-## 🔮 Future Enhancements
+✅ Flask routes functional and error-handled  
+✅ Database schema future-proofed for additional metadata  
+✅ Frontend templates fully synchronized with backend data structures  
+✅ Migration tooling and inspection tooling available  
+✅ Professional absolute path management enforced via `paths.py`
 
-- Add transcript download button after processing.
-- Full test and validation of `transcribe.py` with real audio.
-- Docker container for offline deployment.
-- Improved active jobs UI.
-- Full unit testing coverage.
+---
 
-## ✅ Current Progress
+## 🎯 Next Steps (Optional Enhancements)
 
-- Web interface fully working (upload, active jobs, past jobs, download transcript)
-- Background threading for transcription
-- TXT-only output from `transcribe.py`
-- `jobs.db` tracking all job statuses (Queued → Running → Completed)
-- Flask app cleaned up and functional
-- Centralized path management with `paths.py`
-- Whisper_Design.md updated to reflect all changes
-
-## 📋 Special Notes
-
-- No hardcoded folder or database paths inside scripts.
-- Always import from `paths.py`.
-- Always launch app from the project root using `py -m app.app`.
-- Keep Whisper_Design.md and README.md updated with any architecture changes.
+- Add download link for completed transcripts
+- Improve UI (progress bars, better timestamp formatting)
+- Dockerize app for easier deployment
+- Improve word-by-word timestamp display (post-transcription)

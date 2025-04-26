@@ -1,140 +1,98 @@
-Whisper Transcriber - Project Design Document
-📆 Project Overview
-Whisper Transcriber is a local-first, privacy-respecting audio transcription platform.
+# Whisper Transcriber Design Doc
 
-Features:
+## 📒 Project Overview
 
-Offline-first transcription using OpenAI Whisper models
+Whisper Transcriber is a professional-grade web application for managing audio/video transcription tasks using OpenAI's Whisper models.
 
-Minimal web UI for uploading audio, viewing, and downloading transcripts
+The system allows users to:
+- Upload audio/video files
+- Select model size and language variant (multilingual or English-only)
+- Track active transcription jobs
+- View and download completed transcriptions as clean TXT files
 
-Local SQLite job tracking (no cloud dependency)
+---
 
-Staged local model loading to avoid unnecessary network downloads
+## 🔢 Folder Structure
 
-Lightweight CLI bootstrap for developer sessions
+```
+/whisper-transcriber/
+  app/
+    app.py                # Flask app main file
+    templates/
+      base.html           # Base template
+      home.html           # Main menu (New, Active, Past Jobs)
+      new_transcription.html  # Upload new transcription job
+      active_jobs.html    # View active jobs
+      past_jobs.html      # View completed jobs
+  models/                 # Local Whisper model .pt files
+  uploads/                # Uploaded audio/video files
+  transcripts/            # Output TXT transcripts
+  logs/                   # Transcription logs (stdout/stderr)
+  data/
+    jobs.db               # SQLite database to store completed jobs
+  transcribe.py            # Command-line script to run Whisper transcription
+  setup_env.py             # (future) Script to rebuild environment from scratch
+  Whisper_Design.md        # This design document
+  README.md                # Project overview and instructions
+```
 
-📊 Project Layout
-plaintext
-Copy
-Edit
-whisper-transcriber/
-├── app/
-│   ├── transcribe.py          # CLI transcription tool
-│   ├── job_store.py           # SQLite job tracking
-│   ├── main.py                # Flask routes for UI
-│   └── templates/             # HTML templates for UI
-│       ├── base.html
-│       ├── index.html
-│       ├── jobs.html
-│       └── status.html
-│
-├── scripts/
-│   ├── start-whispersession.ps1  # Developer environment session starter
-│   └── run-dev-session.ps1       # Local dev booster script
-│
-├── uploads/                 # Uploaded audio files (runtime only)
-├── transcripts/              # Output transcript files (.json and .txt)
-├── logs/                     # Runtime logs and debug logs
-├── data/
-│   └── jobs.db                # SQLite database file (created at runtime)
-│
-├── models/                   # Staged Whisper model files (.pt)
-│
-├── setup_env.py              # Developer environment reset tool
-├── requirements.txt          # Python dependencies
-├── README.md                 # Project overview and usage
-├── Whisper_Design.md         # This design document
-├── .gitignore                # Ignores whisper-env, uploads, logs, transcripts, models
-└── whisper-env/              # (local virtual environment, ignored by Git)
-🔢 Local Development Environment
-Create a local Python virtual environment:
+---
 
-bash
-Copy
-Edit
-python -m venv whisper-env
-Activate the virtual environment:
+## 📑 Key Features
 
-bash
-Copy
-Edit
-# Windows
-.\whisper-env\Scripts\activate
+### Current Features (✅ Completed)
+- [x] **Web upload form** (new transcription)
+- [x] **Active Jobs tracking**
+- [x] **Background thread-based transcription**
+- [x] **Move completed jobs out of Active Jobs**
+- [x] **Past Jobs listing (dynamic)**
+- [x] **Download TXT transcript**
+- [x] **TXT-only output from `transcribe.py` (no JSON)**
+- [x] **Basic professional dark-themed UI**
 
-# macOS/Linux
-source whisper-env/bin/activate
-Install dependencies:
+### Pending Work (🔄 In Progress)
+- [ ] **Database persistence for completed jobs** (`jobs.db`) — survival across server restarts
+- [ ] **Better active job progress display** (if desired)
+- [ ] **File upload size and extension validation hardening**
+- [ ] **Multi-file upload support (optional future feature)**
+- [ ] **Docker containerization (optional)**
 
-bash
-Copy
-Edit
-pip install -r requirements.txt
-Important: Stage Whisper .pt models manually into the /models/ folder structure to avoid forced re-downloads during usage.
 
-whisper-env/ is ignored from GitHub via .gitignore and should always remain local.
+---
 
-🔄 Development Workflow
-Start Developer Session:
+## 🛰 Transcription Engine
 
-bash
-Copy
-Edit
-.\scripts\run-dev-session.ps1
-Upload or place audio files into uploads/
+- **Whisper Local Models**: Models loaded from `/models/` folder if available.
+- **Default Behavior**: TXT output saved into `/transcripts/`, logs into `/logs/`.
+- **Model Choices Available**:
+  - tiny / tiny.en
+  - base / base.en
+  - small / small.en
+  - medium / medium.en
+  - large
 
-Run CLI transcription:
+(Default recommended model = `small.en` for general-purpose transcription.)
 
-bash
-Copy
-Edit
-python app/transcribe.py --input uploads/yourfile.wav
-View transcripts in transcripts/:
+---
 
-.json for developer metadata
+## ✨ Known Differences from Original Plan
+- `transcribe.py` was relocated from `/app/` to root for subprocess cleanliness.
+- `.json` outputs were intentionally removed from transcriptions.
+- Memory-based `completed_jobs` currently clears on server restart; persistence pending.
 
-.txt for clean user-readable transcripts
+---
 
-(Optional) Start Flask UI for uploads and viewing:
+## 🚀 Next Steps
 
-bash
-Copy
-Edit
-python app/main.py
-📦 Whisper Models Staging
+| Priority | Task |
+|:--------|:-----|
+| 🔗 | Implement SQLite persistence for Completed Jobs |
+| 📈 | Upgrade Past Jobs view to show database entries |
+| 🛋️ | Create migrations/setup for `jobs.db` if needed |
+| 📑 | Polish README and usage instructions |
 
-Model Name	Folder Structure	Filename
-tiny	/models/tiny/	tiny.pt
-tiny.en	/models/tiny.en/	tiny.en.pt
-base	/models/base/	base.pt
-base.en	/models/base.en/	base.en.pt
-small	/models/small/	small.pt
-medium	/models/medium/	medium.pt
-large-v2	/models/large-v2/	large-v2.pt
-Models must be staged manually.
 
-If a requested model is not found locally, fallback download occurs automatically unless restricted via future config options.
+---
 
-📅 Milestone Status
-
-Component	Status
-Developer Session Script	✅ Completed
-CLI Transcription (transcribe.py)	✅ Completed
-Local Model Staging & Loading	✅ Completed
-Clean TXT Transcript Export	✅ Completed
-Flask App Skeleton (main.py)	✅ Completed
-HTML Templates (templates/)	✅ Created
-Transcript Download UI	⏳ Upcoming
-Job Logs UI	⏳ Upcoming
-Dockerfile / Offline Packaging	⏳ Upcoming
-🚀 Next Steps
-Implement transcript download feature in UI
-
-Build Docker container for full offline deployment
-
-Add basic log visualization (job status and error tracing)
-
-Introduce optional config toggles for strict offline mode (no auto-downloads)
-
-Create lightweight unit tests for CLI and Flask routes
+# End of Updated Whisper_Design.md
 

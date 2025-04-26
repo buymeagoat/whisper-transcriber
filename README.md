@@ -1,153 +1,93 @@
-Whisper Transcriber
-Offline-first, privacy-focused audio transcription platform using OpenAI Whisper models.
+# Whisper Transcriber
 
-📋 Features
-⚡ Offline transcription (no cloud dependency if models are staged)
+A local-first, privacy-focused audio transcription platform powered by OpenAI's Whisper models.
 
-🖥️ Minimal web UI for uploading and viewing transcripts
+---
 
-🧠 Local-only SQLite job tracking (no external servers)
+## 📦 Project Structure
 
-🚀 Developer bootstrap scripts for easy session startup
+```
+/whisper-transcriber/
+  app/
+    app.py
+    templates/
+  data/
+    jobs.db
+  logs/
+  models/
+  transcripts/
+  uploads/
+  paths.py
+  transcribe.py
+  setup_env.py
+  Whisper_Design.md
+  README.md
+```
 
-🎯 Clean .txt and .json transcript outputs
+---
 
-📦 Local Whisper model staging to avoid downloads
+## 🚀 Getting Started
 
-🛠️ Installation
-Clone the repository:
+### 1. Clone the Repository
 
-bash
-Copy
-Edit
+```bash
 git clone https://github.com/buymeagoat/whisper-transcriber.git
 cd whisper-transcriber
-Create and activate a Python virtual environment:
+```
 
-bash
-Copy
-Edit
+### 2. Set Up the Environment
+
+Make sure you have Python 3.10 installed. Then, set up a virtual environment:
+
+```bash
 python -m venv whisper-env
-
-# Windows
 .\whisper-env\Scripts\activate
-
-# macOS/Linux
-source whisper-env/bin/activate
-Install dependencies:
-
-bash
-Copy
-Edit
 pip install -r requirements.txt
-(Optional) Pre-stage Whisper models for fully offline operation:
-Place .pt model files into /models/{model_name}/{model_name}.pt folders.
+```
 
-Example structure:
+Ensure `ffmpeg` is installed and available in your system PATH.
 
-plaintext
-Copy
-Edit
-models/
-  base.en/base.en.pt
-  tiny/tiny.pt
-  medium/medium.pt
-⚡ Usage
-🔹 Start Local Developer Session
-(Recommended for setup validation)
+### 3. Run the Application
 
-bash
-Copy
-Edit
-.\scripts\run-dev-session.ps1
-Verifies repo, venv, Python modules, models folder, etc.
+From the project root, run:
 
-Fix issues before running the app.
+```bash
+py -m app.app
+```
 
-🔹 Run CLI Transcription
-bash
-Copy
-Edit
-python app/transcribe.py --input uploads/your_audio_file.wav
-Optional flags:
+This will launch the Flask server locally.
 
---model tiny
+> ℹ️ We use `-m app.app` to ensure Python treats `/app` as a module, enabling clean imports like `from paths import ...`.
 
---model small.en
+---
 
-Default: base.en
+## 🛠 Core Features
 
-Transcripts are saved into:
+- Simple web UI for uploading audio files.
+- Background threading to transcribe files asynchronously.
+- Local SQLite database to track job statuses.
+- Downloadable `.txt` transcripts.
+- Centralized filesystem management via `paths.py`.
 
-transcripts/your_audio_file.json
 
-transcripts/your_audio_file.txt
+## 🔮 Future Enhancements
 
-🔹 Run Web UI
-Start the local Flask server:
+- Transcript download button after transcription completes.
+- Full audio testing of `transcribe.py` output.
+- Docker containerization for offline deployment.
+- UI improvements for active job tracking.
+- Unit tests and full coverage.
 
-bash
-Copy
-Edit
-python app/main.py
-Open your browser to:
+---
 
-cpp
-Copy
-Edit
-http://127.0.0.1:5000
-Upload new audio files
+## 📢 Special Notes
 
-View processing status
+- Always run the app from the project root.
+- No hardcoded folder paths — always import from `paths.py`.
+- Keep `Whisper_Design.md` updated with any architectural changes.
 
-Download finished transcripts
+---
 
-📂 Project Structure
-plaintext
-Copy
-Edit
-whisper-transcriber/
-├── app/
-├── scripts/
-├── uploads/
-├── transcripts/
-├── logs/
-├── models/
-├── data/
-├── whisper-env/ (local virtualenv)
-├── setup_env.py
-├── requirements.txt
-├── README.md
-├── Whisper_Design.md
-└── .gitignore
-🧹 GitHub Hygiene
-.gitignore ensures:
+## 📄 License
 
-whisper-env/
-
-uploads/
-
-logs/
-
-transcripts/
-
-models/
-
-data/jobs.db
-
-are NOT committed to GitHub for security and cleanliness.
-
-🔮 Upcoming Improvements
-Transcript download button in Web UI
-
-Docker container for easy full offline deployment
-
-Improved session log viewer
-
-Unit tests for CLI and Flask routes
-
-Config option for "strict offline mode" (no downloads allowed)
-
-🛡️ License
-MIT License.
-See LICENSE file for details.
+This project is licensed under the MIT License.

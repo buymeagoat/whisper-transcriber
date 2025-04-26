@@ -1,100 +1,80 @@
-# Whisper Transcriber Design Doc
+# Whisper Transcriber — Design Document
 
-## 📒 Project Overview
+## 🛠 Project Overview
+Whisper Transcriber is a local-first, privacy-focused platform for transcribing audio files using OpenAI's Whisper models. The project emphasizes simplicity, local processing, and minimal external dependencies.
 
-Whisper Transcriber is a professional-grade web application for managing audio/video transcription tasks using OpenAI's Whisper models.
-
-The system allows users to:
-- Upload audio/video files
-- Select model size and language variant (multilingual or English-only)
-- Track active transcription jobs
-- View and download completed transcriptions as clean TXT files
-- Persist completed job records into a SQLite database (`jobs.db`) to survive restarts
-
----
-
-## 🔢 Folder Structure
+## 📦 Project Structure
 
 ```
 /whisper-transcriber/
   app/
-    app.py                # Flask app main file
+    app.py
     templates/
-      base.html           # Base template
-      home.html           # Main menu (New, Active, Past Jobs)
-      new_transcription.html  # Upload new transcription job
-      active_jobs.html    # View active jobs
-      past_jobs.html      # View completed jobs
   data/
-    jobs.db               # SQLite database to store job records
-  logs/                   # Transcription logs (stdout/stderr)
-  models/                 # Local Whisper model .pt files
-  transcripts/            # Output TXT transcripts
-  uploads/                # Uploaded audio/video files
-  paths.py                # Centralized path management
-  transcribe.py           # Command-line script to run Whisper transcription
-  setup_env.py            # (future) Script to rebuild environment from scratch
-  Whisper_Design.md       # This design document
-  README.md               # Project overview and instructions
+    jobs.db
+  logs/
+  models/
+  transcripts/
+  uploads/
+  paths.py
+  transcribe.py
+  setup_env.py
+  Whisper_Design.md
+  README.md
 ```
 
----
+## 🧩 Key Components
 
-## 📑 Key Features
+- `app/app.py`: Flask app handling uploads, job tracking, and downloads.
+- `paths.py`: Centralized module for all filesystem path constants.
+- `transcribe.py`: Transcription engine script using Whisper.
+- `jobs.db`: SQLite database for tracking job states.
+- `uploads/`: Folder for incoming audio files.
+- `transcripts/`: Folder for output transcripts.
 
-### Current Features (✅ Completed)
-- [x] **Web upload form** (new transcription)
-- [x] **Active Jobs tracking**
-- [x] **Background thread-based transcription**
-- [x] **Move completed jobs into `jobs.db` SQLite database**
-- [x] **Past Jobs listing (dynamic from database)**
-- [x] **Download TXT transcript**
-- [x] **TXT-only output from `transcribe.py` (no JSON)**
-- [x] **Basic professional dark-themed UI**
-- [x] **Centralized path management using `paths.py`**
+## 🔥 Core Features
 
-### Pending Work (🔄 In Progress)
-- [ ] **Better active job progress display** (if desired)
-- [ ] **File upload size and extension validation hardening**
-- [ ] **Multi-file upload support (optional future feature)**
-- [ ] **Docker containerization (optional)**
+- Web interface for uploading and tracking transcription jobs.
+- Background threading for transcription processing.
+- Centralized path management through `paths.py`.
+- Local-only, privacy-respecting design.
+- Modular code structure for future expansion (e.g., Docker, offline mode).
 
+## 🏃 Running the Web Application Locally
 
----
+From the project root (`/whisper-transcriber`), run:
 
-## 🛰 Transcription Engine
+```bash
+py -m app.app
+```
 
-- **Whisper Local Models**: Models loaded from `/models/` folder if available.
-- **Default Behavior**: TXT output saved into `/transcripts/`, logs into `/logs/`.
-- **Model Choices Available**:
-  - tiny / tiny.en
-  - base / base.en
-  - small / small.en
-  - medium / medium.en
-  - large
+This will launch the Flask server with correct module paths.
 
-(Default recommended model = `small.en` for general-purpose transcription.)
+### Why use `-m app.app`?
 
----
+Running with `-m` ensures Python treats `/app` as a module, allowing clean imports (like `from paths import ...`) without needing hacky sys.path changes.
 
-## ✨ Known Differences from Original Plan
-- `transcribe.py` was relocated from `/app/` to root for subprocess cleanliness.
-- `.json` outputs were intentionally removed from transcriptions.
-- Database-backed completed job persistence now implemented using `jobs.db`.
-- Centralized absolute path management introduced via `paths.py`.
+## 🔮 Future Enhancements
 
----
+- Add transcript download button after processing.
+- Full test and validation of `transcribe.py` with real audio.
+- Docker container for offline deployment.
+- Improved active jobs UI.
+- Full unit testing coverage.
 
-## 🚀 Next Steps
+## ✅ Current Progress
 
-| Priority | Task |
-|:--------|:-----|
-| 📈 | Enhance active job progress indicators |
-| 🛋️ | Implement multi-file uploads (optional) |
-| 🛢️ | Containerize app for easier deployment |
-| 📑 | Update and polish final documentation |
+- Web interface fully working (upload, active jobs, past jobs, download transcript)
+- Background threading for transcription
+- TXT-only output from `transcribe.py`
+- `jobs.db` tracking all job statuses (Queued → Running → Completed)
+- Flask app cleaned up and functional
+- Centralized path management with `paths.py`
+- Whisper_Design.md updated to reflect all changes
 
+## 📋 Special Notes
 
----
-
-# End of Updated Whisper_Design.md
+- No hardcoded folder or database paths inside scripts.
+- Always import from `paths.py`.
+- Always launch app from the project root using `py -m app.app`.
+- Keep Whisper_Design.md and README.md updated with any architecture changes.

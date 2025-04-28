@@ -1,126 +1,136 @@
-import logging
-from logging.handlers import RotatingFileHandler
+from flask import Flask, render_template, request, redirect, url_for
 import os
-
-# Setup logging
-log_dir = os.path.join(os.path.dirname(__file__), '../logs')
-os.makedirs(log_dir, exist_ok=True)
-
-log_path = os.path.join(log_dir, 'app.log')
-
-handler = RotatingFileHandler(log_path, maxBytes=1_000_000, backupCount=5)
-formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
-handler.setFormatter(formatter)
-
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-logger.addHandler(handler)
-
-from flask import Flask, request, render_template, redirect, url_for, send_from_directory
 import threading
-import os
 import sqlite3
-from datetime import datetime
-import time
-
-# Import centralized paths
-from paths import UPLOADS_DIR, TRANSCRIPTS_DIR, DB_PATH
-
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOADS_DIR
-
-def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS jobs (
-            job_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            file_name TEXT,
-            status TEXT,
-            model TEXT,
-            created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    conn.close()
-
-
-def save_job(file_name, status='Queued'):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('INSERT INTO jobs (file_name, status, created) VALUES (?, ?, ?)', (file_name, status, datetime.now()))
-    conn.commit()
-    conn.close()
-
-def update_job_status(file_name, status):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('UPDATE jobs SET status = ? WHERE file_name = ?', (status, file_name))
-    conn.commit()
-    conn.close()
-
+import uuid
 import subprocess
-import sys
+from logger import get_server_logger
 
-def transcribe_file(filepath, file_name):
-    update_job_status(file_name, 'Running')
+# --------------------------
+# Flask App Setup
+# --------------------------
+app = Flask(__name__)
+
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+TRANSCRIPT_FOLDER = os.path.join(os.getcwd(), 'transcripts')
+DATABASE = os.path.join(os.getcwd(), 'jobs.db')
+
+# Ensure necessary folders exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(TRANSCRIPT_FOLDER, exist_ok=True)
+
+# --------------------------
+# Server Logger Initialization
+# --------------------------
+server_logger = get_server_logger()
+
+# --------------------------
+# Helper Functions
+# --------------------------
+def init_db():
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS jobs
+                 (id TEXT PRIMARY KEY, filename TEXT, status TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+    conn.commit()
+    conn.close()
+
+init_db()
+
+
+def add_job_to_db(job_id, filename):
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute("INSERT INTO jobs (id, filename, status) VALUES (?, ?, ?)", (job_id, filename, "Queued"))
+    conn.commit()
+    conn.close()
+    server_logger.info(f"New job added to DB: JobID={job_id}, Filename={filename}")
+
+
+def update_job_status(job_id, status):
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute("UPDATE jobs SET status = ? WHERE id = ?", (status, job_id))
+    conn.commit()
+    conn.close()
+    server_logger.info(f"JobID={job_id} status updated to {status}")
+
+
+def transcribe_background(job_id, filepath):
     try:
+        update_job_status(job_id, "Running")
+        server_logger.info(f"Background transcription started for JobID={job_id}")
+        
         subprocess.run([
-            sys.executable, "transcribe.py",
-            "--input", filepath,
-            "--model", "small"  # Adjust model size if needed
+            "python", "transcribe.py", "--job_id", job_id, "--input_file", filepath
         ], check=True)
-        update_job_status(file_name, 'Completed')
+
+        update_job_status(job_id, "Completed")
+        server_logger.info(f"Background transcription completed for JobID={job_id}")
     except subprocess.CalledProcessError as e:
-        print(f"[Error] Subprocess failed while transcribing {file_name}: {e}")
-        update_job_status(file_name, 'Failed')
-    except Exception as e:
-        print(f"[Error] Unexpected error while transcribing {file_name}: {e}")
-        update_job_status(file_name, 'Failed')
+        update_job_status(job_id, "Failed")
+        server_logger.error(f"Transcription failed for JobID={job_id}: {str(e)}")
 
-def background_transcription(filepath, file_name):
-    thread = threading.Thread(target=transcribe_file, args=(filepath, file_name))
-    thread.start()
-
-@app.route('/', methods=['GET'])
+# --------------------------
+# Routes
+# --------------------------
+@app.route("/")
 def home():
-    return render_template('home.html')
+    server_logger.info("Accessed home page '/'")
+    return render_template("home.html")
 
-@app.route('/new-transcription', methods=['GET', 'POST'])
+
+@app.route("/new-transcription", methods=["GET", "POST"])
 def new_transcription():
-    if request.method == 'POST':
+    if request.method == "POST":
+        if 'file' not in request.files:
+            server_logger.warning("No file part in upload request.")
+            return redirect(request.url)
         file = request.files['file']
+        if file.filename == '':
+            server_logger.warning("No file selected for uploading.")
+            return redirect(request.url)
         if file:
-            file_name = file.filename
-            save_path = os.path.join(app.config['UPLOAD_FOLDER'], file_name)
-            file.save(save_path)
-            save_job(file_name)
-            background_transcription(save_path, file_name)
+            filename = file.filename
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(filepath)
+            server_logger.info(f"File uploaded successfully: {filename}, saved at {filepath}")
+
+            job_id = str(uuid.uuid4())
+            add_job_to_db(job_id, filename)
+
+            thread = threading.Thread(target=transcribe_background, args=(job_id, filepath))
+            thread.start()
+            server_logger.info(f"Background thread launched for JobID={job_id}")
+
             return redirect(url_for('active_jobs'))
-    return render_template('new-transcription.html')
+    return render_template("new_transcription.html")
 
-@app.route('/active-jobs')
+
+@app.route("/active-jobs")
 def active_jobs():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('SELECT file_name, status, created FROM jobs ORDER BY created DESC')
-    jobs = cursor.fetchall()
+    server_logger.info("Accessed active jobs page '/active-jobs'")
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute("SELECT id, filename, status, created_at FROM jobs WHERE status IN ('Queued', 'Running')")
+    jobs = c.fetchall()
     conn.close()
-    return render_template('active-jobs.html', jobs=jobs)
+    return render_template("active_jobs.html", jobs=jobs)
 
-@app.route('/past-jobs')
+
+@app.route("/past-jobs")
 def past_jobs():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('SELECT file_name, status, created FROM jobs WHERE status = "Completed" ORDER BY created DESC')
-    jobs = cursor.fetchall()
+    server_logger.info("Accessed past jobs page '/past-jobs'")
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute("SELECT id, filename, status, created_at FROM jobs WHERE status = 'Completed'")
+    jobs = c.fetchall()
     conn.close()
-    return render_template('past-jobs.html', jobs=jobs)
+    return render_template("past_jobs.html", jobs=jobs)
 
-@app.route('/transcripts/<file_name>')
-def download_transcript(file_name):
-    return send_from_directory(TRANSCRIPTS_DIR, file_name)
-
-if __name__ == '__main__':
-    init_db()
-    app.run(debug=True)
+# --------------------------
+# App Runner
+# --------------------------
+if __name__ == "__main__":
+    server_logger.info("Starting Flask server for Whisper Transcriber...")
+    app.run(debug=True, host='0.0.0.0', port=5000)

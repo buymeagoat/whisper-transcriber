@@ -3,98 +3,99 @@ import os
 import sys
 import datetime
 import whisper
-import json
+from logger import get_job_logger
 
-# -------------------------------
-# Setup Logging
-# -------------------------------
-logs_dir = os.path.join(os.path.dirname(__file__), 'logs')
-if not os.path.exists(logs_dir):
-    os.makedirs(logs_dir)
-
-timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H%M')
-log_filename = os.path.join(logs_dir, f'transcribe_{timestamp}.log')
-
+# --------------------------
+# Tee class for stdout/stderr capture
+# --------------------------
 class Tee(object):
-    def __init__(self, *streams):
-        self.streams = streams
+    def __init__(self, *files):
+        self.files = files
 
-    def write(self, data):
-        for stream in self.streams:
-            stream.write(data)
-            stream.flush()
+    def write(self, obj):
+        for f in self.files:
+            f.write(obj)
+            f.flush()
 
     def flush(self):
-        for stream in self.streams:
-            stream.flush()
+        for f in self.files:
+            f.flush()
 
-sys.stdout = Tee(sys.stdout, open(log_filename, 'w', encoding='utf-8'))
-sys.stderr = sys.stdout
+# --------------------------
+# Main transcription function
+# --------------------------
+def main():
+    parser = argparse.ArgumentParser(description="Transcribe an audio file using Whisper.")
+    parser.add_argument("--input", required=True, help="Path to input audio file")
+    parser.add_argument("--model", default="base.en", help="Model size to use (tiny, base, small, medium, large)")
+    parser.add_argument("--job_id", required=True, help="Unique Job ID for logging")
+    args = parser.parse_args()
 
-# -------------------------------
-# Argument Parsing
-# -------------------------------
-parser = argparse.ArgumentParser(description="Transcribe an audio file using Whisper.")
-parser.add_argument('--input', required=True, help='Path to input audio file')
-parser.add_argument('--model', default='base.en', help='Whisper model size (tiny, base, small, medium, large)')
-args = parser.parse_args()
+    input_file = args.input
+    model_size = args.model
+    job_id = args.job_id
 
-# -------------------------------
-# Load Whisper Model (Local First)
-# -------------------------------
-def load_local_whisper_model(model_size="base.en"):
-    models_root = os.path.join(os.path.dirname(__file__), 'models')
-    model_folder = os.path.join(models_root, model_size)
-    model_path = os.path.join(model_folder, f"{model_size}.pt")
+    # Setup structured logger
+    logger = get_job_logger(job_id)
 
-    if os.path.isfile(model_path):
-        print(f"✅ Loading model '{model_size}' directly from local file: {model_path}")
-        return whisper.load_model(model_path)
-    else:
-        print(f"⚠️ Local model '{model_size}' not found. Falling back to remote download.")
-        return whisper.load_model(model_size)
+    # Setup tee log for stdout/stderr capture
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_path = os.path.join("logs", f"transcribe_stdout_{job_id}_{timestamp}.log")
+    os.makedirs("logs", exist_ok=True)
+    f = open(log_path, "w")
+    original_stdout = sys.stdout
+    original_stderr = sys.stderr
+    sys.stdout = Tee(sys.stdout, f)
+    sys.stderr = Tee(sys.stderr, f)
 
-print("Starting transcription process...")
-start_time = datetime.datetime.now()
-print(f"Start Time: {start_time}")
+    try:
+        logger.info(f"Starting transcription job: JobID={job_id}, InputFile={input_file}, ModelSize={model_size}")
 
-model = load_local_whisper_model(args.model)
+        # Load model
+        local_model_path = os.path.join("models", model_size, f"{model_size}.pt")
+        if os.path.exists(local_model_path):
+            logger.info(f"Loading local model from {local_model_path}")
+            model = whisper.load_model(local_model_path)
+        else:
+            logger.info(f"Local model not found. Downloading model {model_size} via whisper.load_model.")
+            model = whisper.load_model(model_size)
 
-# -------------------------------
-# Transcribe Audio
-# -------------------------------
-print(f"Transcribing file: {args.input}...")
-result = model.transcribe(args.input)
+        # Transcribe
+        logger.info("Starting audio transcription...")
+        result = model.transcribe(input_file)
 
-# -------------------------------
-# Save Transcript
-# -------------------------------
-transcripts_dir = os.path.join(os.path.dirname(__file__), 'transcripts')
-os.makedirs(transcripts_dir, exist_ok=True)
+        # Prepare transcript output
+        transcript_dir = "transcripts"
+        os.makedirs(transcript_dir, exist_ok=True)
+        base_filename = os.path.splitext(os.path.basename(input_file))[0]
+        transcript_path = os.path.join(transcript_dir, f"{base_filename}_transcript.txt")
 
-base_filename = os.path.splitext(os.path.basename(args.input))[0]
-output_txt = os.path.join(transcripts_dir, f"{base_filename}.txt")
+        logger.info(f"Saving transcript to {transcript_path}")
+        with open(transcript_path, "w", encoding="utf-8") as out_file:
+            if "segments" in result and result["segments"] is not None:
+                for segment in result["segments"]:
+                    start = str(datetime.timedelta(seconds=int(segment["start"])))
+                    text = segment["text"].strip()
+                    out_file.write(f"[{start}] {text}\n")
+            else:
+                out_file.write(result["text"].strip() + "\n")
 
-# Save clean readable TXT transcript
-if 'segments' in result:
-    with open(output_txt, 'w', encoding='utf-8') as f:
-        for segment in result['segments']:
-            start_sec = int(segment['start'])
-            minutes = start_sec // 60
-            seconds = start_sec % 60
-            timestamp = f"[{minutes:02}:{seconds:02}]"
-            f.write(f"{timestamp} {segment['text'].strip()}\n")
-else:
-    with open(output_txt, 'w', encoding='utf-8') as f:
-        f.write("No segments found.\n")
+        # Finish
+        detected_language = result.get("language", "unknown")
+        logger.info(f"Transcription completed successfully. Detected language: {detected_language}")
 
-# -------------------------------
-# Final Logging
-# -------------------------------
-end_time = datetime.datetime.now()
-print("✅ Transcription complete.")
-print(f"Language Detected: {result.get('language', 'unknown')}")
-print(f"Transcript Saved (TXT): {output_txt}")
-print(f"Log Saved: {log_filename}")
-print(f"End Time: {end_time}")
-print(f"Duration: {end_time - start_time}")
+    except Exception as e:
+        logger.exception(f"Exception occurred during transcription: {str(e)}")
+        raise
+
+    finally:
+        # Restore original stdout/stderr
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
+        f.close()
+
+# --------------------------
+# App Runner
+# --------------------------
+if __name__ == "__main__":
+    main()

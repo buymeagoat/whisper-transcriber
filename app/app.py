@@ -1,3 +1,21 @@
+import logging
+from logging.handlers import RotatingFileHandler
+import os
+
+# Setup logging
+log_dir = os.path.join(os.path.dirname(__file__), '../logs')
+os.makedirs(log_dir, exist_ok=True)
+
+log_path = os.path.join(log_dir, 'app.log')
+
+handler = RotatingFileHandler(log_path, maxBytes=1_000_000, backupCount=5)
+formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+handler.setFormatter(formatter)
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+logger.addHandler(handler)
+
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory
 import threading
 import os

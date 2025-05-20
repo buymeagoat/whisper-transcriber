@@ -1,0 +1,31 @@
+# Byte-compiled
+__pycache__/
+*.py[cod]
+
+# Python virtual env
+venv/
+.env
+
+# Audio jobs
+uploads/
+outputs/
+logs/
+
+# Large models
+models/
+
+# Logs and generated files
+*.log
+*.zip
+*.db
+*.srt
+*.vtt
+*.m4a
+*.mp3
+*.wav
+*.ogg
+
+# System/IDE
+.DS_Store
+.idea/
+.vscode/

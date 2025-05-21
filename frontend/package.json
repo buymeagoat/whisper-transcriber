@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "log:tail": "bash -c 'tail -n 50 ../../logs/*.log'",
+    "log:last": "bash -c 'ls -t ../../logs/*.log | head -n 1 | xargs tail -n 50'",
+    "meta:list": "bash -c 'ls -1 ../../outputs/*.json | tail -n 10'",
+    "meta:view": "bash -c 'ls -t ../../outputs/*.json | head -n 1 | xargs cat | jq'"
   },
   "dependencies": {
     "react": "^19.1.0",

@@ -88,10 +88,23 @@ async def create_job(file: UploadFile = File(...), model: str = Form("tiny")):
             log_event(log_fp, f"🧠 Executing command: {' '.join(cmd)}")
 
             transcribe_start = time.time()
-            result = subprocess.run(cmd, stdout=log_fp, stderr=log_fp)
+            process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                bufsize=1,
+                universal_newlines=True
+            )
+
+            for line in process.stdout:
+                log_fp.write(line)
+                log_fp.flush()
+
+            process.stdout.close()
+            return_code = process.wait()
             transcribe_end = time.time()
 
-            log_event(log_fp, f"🏁 Whisper return code: {result.returncode}")
+            log_event(log_fp, f"🏁 Whisper return code: {return_code}")
             log_event(log_fp, f"🕓 Transcription duration: {round(transcribe_end - transcribe_start, 2)} sec")
 
             if not os.path.exists(output_txt):
@@ -111,7 +124,7 @@ async def create_job(file: UploadFile = File(...), model: str = Form("tiny")):
                 "file_size_bytes": file_size,
                 "file_sha256": file_hash,
                 "mime_type": mime_type,
-                "return_code": result.returncode
+                "return_code": return_code
             }
 
             with open(output_json, "w", encoding="utf-8") as jf:

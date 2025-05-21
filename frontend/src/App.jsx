@@ -26,7 +26,15 @@ export default function App() {
 
       const data = await res.json();
       if (res.ok) {
-        setStatus(`✅ Done! Output: ${data.output_txt}`);
+        const logUrl = `/${data.log}`;
+        const outUrl = `/${data.output_txt}`;
+        setStatus(
+          `✅ Done!\n\n` +
+          `📄 Transcript: ${data.output_txt}\n` +
+          `📘 Log file: ${data.log}\n\n` +
+          `🔗 [Open Transcript](${outUrl})\n` +
+          `🔗 [Open Log](${logUrl})`
+        );
       } else {
         setStatus(`❌ Error: ${data.error}`);
       }
@@ -76,7 +84,7 @@ export default function App() {
         </form>
 
         {status && (
-          <div className="p-3 mt-4 bg-zinc-800 rounded border border-zinc-700">
+          <div className="p-3 mt-4 whitespace-pre-wrap bg-zinc-800 rounded border border-zinc-700">
             {status}
           </div>
         )}

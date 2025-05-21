@@ -7,7 +7,7 @@ import hashlib
 import mimetypes
 import traceback
 import time
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Request
 from fastapi.responses import JSONResponse
 from datetime import datetime
 
@@ -17,6 +17,7 @@ UPLOAD_DIR = "uploads"
 OUTPUT_DIR = "outputs"
 LOG_DIR = "logs"
 MODEL_DIR = "models"
+ACCESS_LOG = os.path.join(LOG_DIR, "access.log")
 ALLOWED_MODELS = {"tiny", "base", "small", "medium", "large"}
 ALLOWED_EXT = (".m4a", ".mp3", ".wav")
 MAX_SIZE_BYTES = 100 * 1024 * 1024
@@ -37,6 +38,20 @@ def compute_sha256(file_path):
         for chunk in iter(lambda: f.read(8192), b""):
             sha256.update(chunk)
     return sha256.hexdigest()
+
+def log_access(request: Request, response_code: int, duration: float):
+    timestamp = datetime.utcnow().isoformat()
+    log_line = f"[{timestamp}] {request.client.host} {request.method} {request.url.path} -> {response_code} in {duration:.2f}s\n"
+    with open(ACCESS_LOG, "a", encoding="utf-8") as log_fp:
+        log_fp.write(log_line)
+
+@app.middleware("http")
+async def access_logger(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    log_access(request, response.status_code, duration)
+    return response
 
 @app.post("/jobs")
 async def create_job(file: UploadFile = File(...), model: str = Form("tiny")):
@@ -146,3 +161,19 @@ async def create_job(file: UploadFile = File(...), model: str = Form("tiny")):
             log_event(log_fp, f"❌ Exception occurred: {str(e)}")
             log_event(log_fp, traceback.format_exc())
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@app.post("/log_event")
+async def log_frontend_event(request: Request):
+    try:
+        body = await request.json()
+    except:
+        body = {"error": "invalid json"}
+
+    timestamp = datetime.utcnow().isoformat()
+    entry = f"[{timestamp}] {request.client.host} {json.dumps(body)}\n"
+
+    frontend_log = os.path.join(LOG_DIR, "frontend.log")
+    with open(frontend_log, "a", encoding="utf-8") as log_fp:
+        log_fp.write(entry)
+
+    return {"status": "ok"}

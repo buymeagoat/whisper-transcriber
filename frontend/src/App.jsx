@@ -1,9 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function App() {
   const [file, setFile] = useState(null);
   const [model, setModel] = useState('tiny');
   const [status, setStatus] = useState('');
+
+  // 🔁 Log that the frontend loaded
+  useEffect(() => {
+    fetch('/log_event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: 'frontend_loaded', timestamp: new Date().toISOString() })
+    }).catch(() => {
+      // Optional: suppress or surface frontend logging failure
+    });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

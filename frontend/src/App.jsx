@@ -14,6 +14,7 @@ export default function App() {
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('model', model);
 
     setStatus('⏳ Uploading and transcribing…');
 
@@ -46,15 +47,14 @@ export default function App() {
               value={model}
               onChange={(e) => setModel(e.target.value)}
               className="w-full p-2 rounded bg-zinc-800 border border-zinc-600"
-              disabled
             >
-              <option value="tiny">tiny (default)</option>
+              <option value="tiny">tiny</option>
               <option value="base">base</option>
               <option value="small">small</option>
               <option value="medium">medium</option>
               <option value="large">large</option>
             </select>
-            <p className="text-xs text-zinc-400 mt-1">[Model choice wired soon]</p>
+            <p className="text-xs text-zinc-400 mt-1">All models available offline</p>
           </div>
 
           <div>

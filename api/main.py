@@ -1,179 +1,228 @@
 import os
 import uuid
-import shutil
-import subprocess
-import json
-import hashlib
-import mimetypes
-import traceback
 import time
-from fastapi import FastAPI, UploadFile, File, Form, Request
-from fastapi.responses import JSONResponse
+import shutil
+import logging
+import sqlite3
 from datetime import datetime
+from subprocess import Popen, PIPE
 
-app = FastAPI()
+from fastapi import FastAPI, UploadFile, File, Form, Request, Query
+from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse
+from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 UPLOAD_DIR = "uploads"
 OUTPUT_DIR = "outputs"
-LOG_DIR = "logs"
 MODEL_DIR = "models"
+LOG_DIR = "logs"
 ACCESS_LOG = os.path.join(LOG_DIR, "access.log")
-ALLOWED_MODELS = {"tiny", "base", "small", "medium", "large"}
-ALLOWED_EXT = (".m4a", ".mp3", ".wav")
-MAX_SIZE_BYTES = 100 * 1024 * 1024
+FRONTEND_LOG = os.path.join(LOG_DIR, "frontend.log")
+DB_PATH = "jobs.db"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-os.makedirs(LOG_DIR, exist_ok=True)
 os.makedirs(MODEL_DIR, exist_ok=True)
+os.makedirs(LOG_DIR, exist_ok=True)
 
-def log_event(log_fp, message):
-    timestamp = datetime.utcnow().isoformat()
-    log_fp.write(f"[{timestamp}] {message}\n")
-    log_fp.flush()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("whisper")
 
-def compute_sha256(file_path):
-    sha256 = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        for chunk in iter(lambda: f.read(8192), b""):
-            sha256.update(chunk)
-    return sha256.hexdigest()
+app = FastAPI()
 
-def log_access(request: Request, response_code: int, duration: float):
-    timestamp = datetime.utcnow().isoformat()
-    log_line = f"[{timestamp}] {request.client.host} {request.method} {request.url.path} -> {response_code} in {duration:.2f}s\n"
-    with open(ACCESS_LOG, "a", encoding="utf-8") as log_fp:
-        log_fp.write(log_line)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.middleware("http")
 async def access_logger(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
     duration = time.time() - start_time
-    log_access(request, response.status_code, duration)
+    log_line = f"[{datetime.utcnow().isoformat()}] {request.client.host} {request.method} {request.url.path} -> {response.status_code} in {duration:.2f}s\n"
+    with open(ACCESS_LOG, "a", encoding="utf-8") as f:
+        f.write(log_line)
     return response
 
-@app.post("/jobs")
-async def create_job(file: UploadFile = File(...), model: str = Form("tiny")):
-    overall_start = time.time()
-    job_id = str(uuid.uuid4())
-    filename = f"{job_id}_{file.filename}"
-    upload_path = os.path.join(UPLOAD_DIR, filename)
-    log_path = os.path.join(LOG_DIR, f"{job_id}.log")
-    output_txt = os.path.join(OUTPUT_DIR, f"{job_id}.txt")
-    output_json = os.path.join(OUTPUT_DIR, f"{job_id}.json")
-
-    try:
-        if not file.filename.lower().endswith(ALLOWED_EXT):
-            return JSONResponse(content={"error": "Unsupported file type."}, status_code=400)
-
-        with open(upload_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-
-        if os.path.getsize(upload_path) > MAX_SIZE_BYTES:
-            os.remove(upload_path)
-            return JSONResponse(content={"error": "File too large."}, status_code=400)
-
-        if model not in ALLOWED_MODELS:
-            return JSONResponse(content={"error": f"Invalid model '{model}'"}, status_code=400)
-
-        with open(log_path, "w", encoding="utf-8") as log_fp:
-            start_time = datetime.utcnow()
-            log_event(log_fp, f"🟢 START job {job_id}")
-            log_event(log_fp, f"📥 File saved to: {upload_path}")
-            file_size = os.path.getsize(upload_path)
-            mime_type, _ = mimetypes.guess_type(upload_path)
-            file_hash = compute_sha256(upload_path)
-
-            log_event(log_fp, f"📦 File size: {file_size} bytes")
-            log_event(log_fp, f"📄 MIME type: {mime_type}")
-            log_event(log_fp, f"🔐 SHA256: {file_hash}")
-            log_event(log_fp, f"📊 Model selected: {model}")
-
-            cmd = [
-                "whisper", upload_path,
-                "--model", model,
-                "--model_dir", MODEL_DIR,
-                "--language", "en",
-                "--output_dir", OUTPUT_DIR,
-                "--output_format", "txt",
-                "--verbose", "True"
-            ]
-
-            log_event(log_fp, f"🧠 Executing command: {' '.join(cmd)}")
-
-            transcribe_start = time.time()
-            process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                bufsize=1,
-                universal_newlines=True
-            )
-
-            for line in process.stdout:
-                log_fp.write(line)
-                log_fp.flush()
-
-            process.stdout.close()
-            return_code = process.wait()
-            transcribe_end = time.time()
-
-            log_event(log_fp, f"🏁 Whisper return code: {return_code}")
-            log_event(log_fp, f"🕓 Transcription duration: {round(transcribe_end - transcribe_start, 2)} sec")
-
-            if not os.path.exists(output_txt):
-                log_event(log_fp, f"❌ Output not found: {output_txt}")
-                return JSONResponse(content={"error": "Transcription failed."}, status_code=500)
-
-            end_time = datetime.utcnow()
-            metadata = {
-                "job_id": job_id,
-                "input_file": upload_path,
-                "output_file": output_txt,
-                "language": "en",
-                "model": model,
-                "duration_sec": round((end_time - start_time).total_seconds(), 2),
-                "started_utc": start_time.isoformat(),
-                "finished_utc": end_time.isoformat(),
-                "file_size_bytes": file_size,
-                "file_sha256": file_hash,
-                "mime_type": mime_type,
-                "return_code": return_code
-            }
-
-            with open(output_json, "w", encoding="utf-8") as jf:
-                json.dump(metadata, jf, indent=2)
-
-            log_event(log_fp, f"✅ Completed: {output_txt}")
-            log_event(log_fp, f"📄 Metadata saved: {output_json}")
-            log_event(log_fp, f"⏳ Total job duration: {round(time.time() - overall_start, 2)} sec")
-
-        return {
-            "job_id": job_id,
-            "output_txt": output_txt,
-            "output_json": output_json,
-            "log": log_path
-        }
-
-    except Exception as e:
-        with open(log_path, "a", encoding="utf-8") as log_fp:
-            log_event(log_fp, f"❌ Exception occurred: {str(e)}")
-            log_event(log_fp, traceback.format_exc())
-        return JSONResponse(content={"error": str(e)}, status_code=500)
-
 @app.post("/log_event")
-async def log_frontend_event(request: Request):
-    try:
-        body = await request.json()
-    except:
-        body = {"error": "invalid json"}
+async def log_frontend_event(payload: dict):
+    timestamp = datetime.utcnow().isoformat()
+    with open(FRONTEND_LOG, "a", encoding="utf-8") as f:
+        f.write(f"[{timestamp}] {jsonable_encoder(payload)}\n")
+    return {"status": "logged"}
+
+@app.get("/log/access")
+def read_access_log():
+    return PlainTextResponse(open(ACCESS_LOG, "r", encoding="utf-8").read())
+
+def handle_whisper_job(job_id: str, upload_path: str, log_path: str, transcript_path: str, model: str):
+    cmd = [
+        "whisper", upload_path,
+        "--model", model,
+        "--model_dir", MODEL_DIR,
+        "--output_dir", OUTPUT_DIR,
+        "--output_format", "txt",
+        "--language", "en",
+        "--verbose", "True"
+    ]
+
+    def run():
+        with open(log_path, "w", encoding="utf-8") as log_fp:
+            process = Popen(cmd, stdout=log_fp, stderr=log_fp)
+            process.wait()
+
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+        if os.path.exists(transcript_path):
+            cur.execute("UPDATE jobs SET status = ?, transcript_path = ? WHERE id = ?", ("completed", transcript_path, job_id))
+        else:
+            cur.execute("UPDATE jobs SET status = ?, error_message = ? WHERE id = ?", ("failed", "Transcript file not found", job_id))
+        conn.commit()
+        conn.close()
+
+    import threading
+    threading.Thread(target=run).start()
+
+@app.post("/jobs")
+async def submit_job(file: UploadFile = File(...), model: str = Form("tiny")):
+    job_id = str(uuid.uuid4())
+    timestamp = datetime.utcnow().isoformat()
+    saved_filename = f"{job_id}_{file.filename}"
+    upload_path = os.path.join(UPLOAD_DIR, saved_filename)
+    log_path = os.path.join(LOG_DIR, f"{job_id}.log")
+    transcript_path = os.path.join(OUTPUT_DIR, f"{saved_filename}.txt")
+
+    with open(upload_path, "wb") as out_file:
+        shutil.copyfileobj(file.file, out_file)
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO jobs (id, original_filename, saved_filename, model, created_at, status)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (job_id, file.filename, saved_filename, model, timestamp, "running"))
+    conn.commit()
+    conn.close()
+
+    handle_whisper_job(job_id, upload_path, log_path, transcript_path, model)
+    return {"job_id": job_id}
+
+@app.get("/jobs")
+def list_jobs(status: str = Query(None)):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    if status:
+        cur.execute("""
+            SELECT id, original_filename, saved_filename, model, created_at, status FROM jobs
+            WHERE status = ?
+            ORDER BY created_at DESC
+        """, (status,))
+    else:
+        cur.execute("""
+            SELECT id, original_filename, saved_filename, model, created_at, status FROM jobs
+            WHERE status != 'completed'
+            ORDER BY created_at DESC
+        """)
+
+    rows = cur.fetchall()
+    conn.close()
+    return jsonable_encoder([
+        {
+            "id": r[0],
+            "original_filename": r[1],
+            "saved_filename": r[2],
+            "model": r[3],
+            "created_at": r[4],
+            "status": r[5]
+        } for r in rows
+    ])
+
+@app.get("/transcript/{job_id}")
+def get_transcript(job_id: str):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT transcript_path FROM jobs WHERE id = ?", (job_id,))
+    row = cur.fetchone()
+    conn.close()
+    if not row or not row[0] or not os.path.exists(row[0]):
+        return JSONResponse(status_code=404, content={"error": "Transcript not found"})
+    return FileResponse(row[0], media_type="text/plain", filename=os.path.basename(row[0]))
+
+@app.get("/transcript/{job_id}/view")
+def get_transcript_text(job_id: str):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT transcript_path FROM jobs WHERE id = ?", (job_id,))
+    row = cur.fetchone()
+    conn.close()
+    if not row or not os.path.exists(row[0]):
+        return JSONResponse(status_code=404, content={"error": "Transcript not found"})
+    with open(row[0], "r", encoding="utf-8") as f:
+        return {"text": f.read()}
+
+@app.post("/jobs/{job_id}/restart")
+def restart_job(job_id: str, model: str = Form("tiny")):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT original_filename, saved_filename FROM jobs WHERE id = ?", (job_id,))
+    row = cur.fetchone()
+    conn.close()
+
+    if not row:
+        return JSONResponse(status_code=404, content={"error": "Original job not found"})
+
+    filename, saved = row
+    full_path = os.path.join(UPLOAD_DIR, saved)
+    log_path = os.path.join(LOG_DIR, f"{job_id}.log")
+    transcript_path = os.path.join(OUTPUT_DIR, f"{saved}.txt")
+
+    if not os.path.exists(full_path):
+        return JSONResponse(status_code=404, content={"error": "Original file missing"})
 
     timestamp = datetime.utcnow().isoformat()
-    entry = f"[{timestamp}] {request.client.host} {json.dumps(body)}\n"
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("UPDATE jobs SET model = ?, created_at = ?, status = ?, transcript_path = NULL, error_message = NULL WHERE id = ?", (model, timestamp, "running", job_id))
+    conn.commit()
+    conn.close()
 
-    frontend_log = os.path.join(LOG_DIR, "frontend.log")
-    with open(frontend_log, "a", encoding="utf-8") as log_fp:
-        log_fp.write(entry)
+    handle_whisper_job(job_id, full_path, log_path, transcript_path, model)
+    return {"status": "restarted"}
 
-    return {"status": "ok"}
+@app.delete("/jobs/{job_id}")
+def delete_job(job_id: str):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT saved_filename, transcript_path FROM jobs WHERE id = ?", (job_id,))
+    row = cur.fetchone()
+    if not row:
+        conn.close()
+        return JSONResponse(status_code=404, content={"error": "Job not found"})
+
+    upload_path = os.path.join(UPLOAD_DIR, row[0])
+    if os.path.exists(upload_path): os.remove(upload_path)
+    if row[1] and os.path.exists(row[1]): os.remove(row[1])
+    cur.execute("DELETE FROM jobs WHERE id = ?", (job_id,))
+    conn.commit()
+    conn.close()
+    return {"status": "deleted"}
+
+@app.get("/audio/{job_id}")
+def get_original_audio(job_id: str):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT saved_filename FROM jobs WHERE id = ?", (job_id,))
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return JSONResponse(status_code=404, content={"error": "Audio not found"})
+    path = os.path.join(UPLOAD_DIR, row[0])
+    if not os.path.exists(path):
+        return JSONResponse(status_code=404, content={"error": "Audio file missing"})
+    return FileResponse(path, media_type="audio/mpeg", filename=os.path.basename(path))

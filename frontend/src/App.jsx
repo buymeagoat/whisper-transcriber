@@ -1,105 +1,118 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import CompletedJobsPage from "./CompletedJobsPage";
+import AdminLogsPage from "./AdminLogsPage";
+import ActiveJobsPage from "./ActiveJobsPage";
+import TranscriptViewPage from "./TranscriptViewPage";
+
+function UploadPage() {
+  const [file, setFile] = useState(null);
+  const [model, setModel] = useState("tiny");
+  const [status, setStatus] = useState(null);
+
+  const handleUpload = async () => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("model", model);
+
+    setStatus("Uploading and transcribing...");
+    try {
+      const res = await fetch("/jobs", { method: "POST", body: formData });
+      const data = await res.json();
+      if (res.ok) {
+        setStatus(`✅ Job started: ${data.job_id}`);
+      } else {
+        setStatus(`❌ Error: ${data.error}`);
+      }
+    } catch (err) {
+      setStatus(`❌ Network error`);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold">Upload Audio File for Transcription</h2>
+
+      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+
+      <div>
+        <label className="block mb-1">Select Model</label>
+        <select
+          className="text-black p-1"
+          value={model}
+          onChange={(e) => setModel(e.target.value)}
+        >
+          <option value="tiny">tiny</option>
+          <option value="base">base</option>
+          <option value="small">small</option>
+          <option value="medium">medium</option>
+          <option value="large">large</option>
+        </select>
+      </div>
+
+      <button
+        onClick={handleUpload}
+        className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
+      >
+        Transcribe
+      </button>
+
+      {status && <p>{status}</p>}
+    </div>
+  );
+}
+
+function AdminPage() {
+  const [logs, setLogs] = useState("");
+
+  useEffect(() => {
+    fetch("/log/access")
+      .then(res => res.text())
+      .then(data => setLogs(data))
+      .catch(() => setLogs("Unable to load logs."));
+  }, []);
+
+  return (
+    <div className="p-4 space-y-4">
+      <h2 className="text-xl font-bold">🛠️ Admin Logs</h2>
+      <pre className="bg-zinc-800 p-4 rounded overflow-x-auto whitespace-pre-wrap text-sm border border-zinc-700">
+        {logs || "No logs available."}
+      </pre>
+    </div>
+  );
+}
 
 export default function App() {
-  const [file, setFile] = useState(null);
-  const [model, setModel] = useState('tiny');
-  const [status, setStatus] = useState('');
-
-  // 🔁 Log that the frontend loaded
   useEffect(() => {
     fetch('/log_event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ event: 'frontend_loaded', timestamp: new Date().toISOString() })
-    }).catch(() => {
-      // Optional: suppress or surface frontend logging failure
-    });
+    }).catch(() => {});
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!file) {
-      setStatus('❌ Please select a file first.');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('model', model);
-
-    setStatus('⏳ Uploading and transcribing…');
-
-    try {
-      const res = await fetch('/jobs', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        const logUrl = `/${data.log}`;
-        const outUrl = `/${data.output_txt}`;
-        setStatus(
-          `✅ Done!\n\n` +
-          `📄 Transcript: ${data.output_txt}\n` +
-          `📘 Log file: ${data.log}\n\n` +
-          `🔗 [Open Transcript](${outUrl})\n` +
-          `🔗 [Open Log](${logUrl})`
-        );
-      } else {
-        setStatus(`❌ Error: ${data.error}`);
-      }
-    } catch (err) {
-      setStatus(`❌ Failed: ${err.message}`);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-zinc-900 text-white p-6">
-      <div className="max-w-xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold">🎙️ Whisper Transcriber</h1>
+    <Router>
+      <div className="min-h-screen bg-zinc-900 text-white">
+        <nav className="bg-zinc-800 p-4 flex space-x-4 border-b border-zinc-700">
+          <Link className="hover:underline" to="/upload">Upload</Link>
+          <Link className="hover:underline" to="/active">Active Jobs</Link>
+          <Link className="hover:underline" to="/completed">Completed Jobs</Link>
+          <Link className="hover:underline" to="/admin">Admin</Link>
+        </nav>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1 text-sm font-medium">Select model:</label>
-            <select
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              className="w-full p-2 rounded bg-zinc-800 border border-zinc-600"
-            >
-              <option value="tiny">tiny</option>
-              <option value="base">base</option>
-              <option value="small">small</option>
-              <option value="medium">medium</option>
-              <option value="large">large</option>
-            </select>
-            <p className="text-xs text-zinc-400 mt-1">All models available offline</p>
-          </div>
-
-          <div>
-            <label className="block mb-1 text-sm font-medium">Upload audio file:</label>
-            <input
-              type="file"
-              accept=".mp3,.m4a,.wav"
-              onChange={(e) => setFile(e.target.files[0])}
-              className="w-full p-2 rounded bg-zinc-800 border border-zinc-600"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow"
-          >
-            Start Transcription
-          </button>
-        </form>
-
-        {status && (
-          <div className="p-3 mt-4 whitespace-pre-wrap bg-zinc-800 rounded border border-zinc-700">
-            {status}
-          </div>
-        )}
+        <main className="p-6">
+          <Routes>
+            <Route path="/" element={<Navigate to="/upload" replace />} />
+            <Route path="/upload" element={<UploadPage />} />
+            <Route path="/active" element={<ActiveJobsPage />} />
+            <Route path="/completed" element={<CompletedJobsPage />} />
+            <Route path="/admin" element={<AdminLogsPage />} />
+            <Route path="/transcript/:jobId/view" element={<TranscriptViewPage />} />
+          </Routes>
+        </main>
       </div>
-    </div>
+    </Router>
   );
 }

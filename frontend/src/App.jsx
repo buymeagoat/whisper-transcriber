@@ -5,6 +5,7 @@ import CompletedJobsPage from "./pages/CompletedJobsPage";
 import AdminLogsPage from "./pages/AdminLogsPage";
 import ActiveJobsPage from "./pages/ActiveJobsPage";
 import TranscriptViewPage from "./pages/TranscriptViewPage";
+import SettingsPage from "./pages/SettingsPage";
 
 export default function App() {
   useEffect(() => {
@@ -23,6 +24,7 @@ export default function App() {
           <Link className="hover:underline" to="/active">Active Jobs</Link>
           <Link className="hover:underline" to="/completed">Completed Jobs</Link>
           <Link className="hover:underline" to="/admin">Admin</Link>
+          <Link className="hover:underline" to="/settings">Settings</Link>
         </nav>
 
         <main className="p-6">
@@ -32,6 +34,7 @@ export default function App() {
             <Route path="/active" element={<ActiveJobsPage />} />
             <Route path="/completed" element={<CompletedJobsPage />} />
             <Route path="/admin" element={<AdminLogsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />   
             <Route path="/transcript/:jobId/view" element={<TranscriptViewPage />} />
           </Routes>
         </main>

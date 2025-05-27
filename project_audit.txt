@@ -21,24 +21,36 @@
 .git/logs/HEAD
 .git/logs/refs/heads/master
 .git/logs/refs/remotes/origin/master
+.git/objects/00/7960b92ac17307a28a46849ebd7eb3d86d2c99
 .git/objects/0b/7f4929399bde94449f5ffd9fb0f8de6ca080ef
 .git/objects/12/cab55b37cbfe2e82570056e751713efb684ba9
 .git/objects/14/d6608e366200d3fffdb0bed9212e940ff70c93
+.git/objects/1a/3466b1319b867a40a39a941072d9f074cc30b6
 .git/objects/1c/8784688c2d54ef45063be7ccd612dcab316151
 .git/objects/33/ce2be605f1dea08a1778f12658ad23d8d20758
+.git/objects/36/112a3c68590d6a8e07fea0ce70a5afb38c951a
 .git/objects/37/9c3887fc1a9930df133e58d3d387f6c82d1cec
+.git/objects/48/0b130d632ca677c11f23d9fe82cf4014d15e0c
+.git/objects/4a/c855c2bfa53c81f98fdcf64eb6a7730b256326
 .git/objects/50/f3ba5846681260b73512a6c2026e462540792c
 .git/objects/53/be9cca5195c8fbd0c50a873f6b7ac0484fa81f
+.git/objects/53/dcb154975a27423f6cacb72df5d7de0c75f765
 .git/objects/55/7b37c44d5cb352ff331f90e7fba0189cdfa65e
+.git/objects/56/9a341bfcc2cae8cb00d62faccec2e6d9f7341e
 .git/objects/5f/7a5e9629b8be349d5f536d69d051c9742323c2
 .git/objects/69/f7969c724ef1bdebb6f65261050246d6d9d706
 .git/objects/6c/87de9bb3358469122cc991d5cf578927246184
+.git/objects/6d/840458dd34a22cdecedf1856117e811db0de5f
+.git/objects/6f/9bc42d9d50a33977c228efd5e8bc0edc6bf043
 .git/objects/70/59a962adb0138b65dd10e0aee66ccfe984b8c6
 .git/objects/85/30f525ed4f92575aa59c941e93c798c2266214
+.git/objects/87/76864fb048ce0c767658c3bade2ad822a7d272
 .git/objects/87/944a37e20c11e0709a99e8d4ba172ca7bcec47
 .git/objects/8c/2da305e58dec310ea15e4ad9adaeb16a851bca
 .git/objects/8c/8cc931e4f09988d4d5a302b06c590263c1c058
 .git/objects/94/c0b2fc152a086447a04f62793957235d2475be
+.git/objects/98/e4f9c44effe479ed38c66ba922e7bcc672916f
+.git/objects/9a/e0153e21ff5b2161ffbb64324d86388e268a4e
 .git/objects/9d/a844e0f0ffbdeb236473f293b79285459666b2
 .git/objects/9d/fa1848e73ed48495fbeec7e4aeb7cd1f69dad9
 .git/objects/a3/e1218bd79f1f33443e8c580e42332bb52b9db8
@@ -46,26 +58,40 @@
 .git/objects/a9/13247e0a54179a3504d826631fac52550c5bf1
 .git/objects/aa/aff4db9b3a1f50bd2af4311d91397fea1ecd07
 .git/objects/b5/c61c956711f981a41e95f7fcf0038436cfbb22
+.git/objects/b6/390abd4bf671505c1c0422670988d91045d4ec
 .git/objects/b7/dcf7baaeaee15ac6a56c91718b90eeb652be40
 .git/objects/b9/d355df2a5956b526c004531b7b0ffe412461e0
+.git/objects/ba/ddd83f758a1de8f3c9312884cb13ad876c35e7
 .git/objects/bd/e498641eeafa24476fc21c6fe04db3900f0ad8
+.git/objects/c1/45f895a40b4570c91ff0536925f99e03cad0e6
 .git/objects/c4/e22f9465ecf0d649724831e55986a48a4bea77
+.git/objects/c5/244bcbbbad15766505b7f8ec3b34623beeb394
 .git/objects/cc/df851b64acd340069f1d6bea76afd167354c62
 .git/objects/d0/3c09e4ed6cef88277da15611d62ee786d7f285
 .git/objects/d1/9b221b9082a6a06a7050a77fe01950d45dd6a4
 .git/objects/d2/550320d22ad1f58312c45bc34bc861a4e97d40
+.git/objects/d2/e9828546c0d05d4cd8f465dd450f68a88af3fa
+.git/objects/d3/109b84488c179ea9eb2bec7006b210b7c9cc4b
 .git/objects/d5/64d0bc3dd917926892c55e3706cc116d5b165e
+.git/objects/db/8d9c88cfcf1af6af741ec1748a557456714171
 .git/objects/de/d827bf760fcac34fd148b6ce51dd70b2c424e3
+.git/objects/e3/94d2cf6703033525844645847fd7fa7c3f69b9
 .git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
 .git/objects/e7/b8dfb1b2a60bd50538bec9f876511b9cac21e3
 .git/objects/e9/74d6646b8ccf81103743ce3b1db5028511ae98
 .git/objects/ec/2b712d301e7ddeca8327fc4b967069cc82047b
+.git/objects/ef/de7d4541712cc6bd1b19ae4760a33d382b67e1
+.git/objects/f1/27905ca0f3d0df0f829f37b8f1378fbfc2bedc
 .git/packed-refs
 .git/refs/heads/master
 .git/refs/remotes/origin/master
 .gitignore
+alembic.ini
 api/main.py
 api/metadata_writer.py
+api/migrations/README
+api/migrations/env.py
+api/migrations/script.py.mako
 api/models.py
 api/utils/logger.py
 audit_environment.py
@@ -77,20 +103,21 @@ frontend/README.md
 frontend/README.zip
 frontend/dist/output.css
 frontend/eslint.config.js
-frontend/index.html
 frontend/package-lock.json
 frontend/package.json
 frontend/postcss.config.js
+frontend/public/index.html
 frontend/public/vite.svg
-frontend/src/ActiveJobsPage.jsx
-frontend/src/AdminLogsPage.jsx
 frontend/src/App.css
 frontend/src/App.jsx
-frontend/src/CompletedJobsPage.jsx
-frontend/src/TranscriptViewPage.jsx
 frontend/src/assets/react.svg
 frontend/src/index.css
 frontend/src/main.jsx
+frontend/src/pages/ActiveJobsPage.jsx
+frontend/src/pages/AdminLogsPage.jsx
+frontend/src/pages/CompletedJobsPage.jsx
+frontend/src/pages/TranscriptViewPage.jsx
+frontend/src/pages/UploadPage.jsx
 frontend/tailwind.config.js
 frontend/vite.config.js
 jobs.db
@@ -410,72 +437,342 @@ passlib
 python-jose
 watchdog
 
-== FILE: .gitignore ==
-# =========================
-# Byte-compiled Python files
-# =========================
-__pycache__/
-*.py[cod]
+== FILE: audit_environment.py ==
+# audit_environment.py
 
-# =========================
-# Python Virtual Environment
-# =========================
-venv/
-.env
+"""
+Audit the project structure and file contents for Whisper Transcriber.
+Outputs:
+1. Full file tree
+2. Contents of all files created, patched, or expected
 
-# =========================
-# Project Folders — keep structure, ignore contents
-# Use .gitkeep to track folder presence
-# =========================
-uploads/*
-!uploads/.gitkeep
+Output: project_audit.txt
+"""
 
-transcripts/*
-!transcripts/.gitkeep
+import os
 
-logs/*
-!logs/.gitkeep
+ROOT_DIR = os.path.abspath(".")
+OUTPUT_FILE = "project_audit.txt"
+EXCLUDE_DIRS = {"venv", "node_modules", "__pycache__"}
 
-models/*
-!models/.gitkeep
+# === CRITICAL FILES (present or planned) ===
+CRITICAL_FILES = [
+    # Root-level
+    "design_scope.md",
+    "requirements.txt",
+    "audit_environment.py",
+    "orchestrate.py",                 # CLI runner
+    "alembic.ini",
 
-metadata/*
-!metadata/.gitkeep
+    # Backend
+    "api/main.py",
+    "api/models.py",
+    "api/metadata_writer.py",
+    "api/utils/logger.py",
+    "api/migrations/env.py",
+]
 
-# =========================
-# Whisper Artifacts
-# =========================
-*.srt
-*.vtt
-*.m4a
-*.mp3
-*.wav
-*.ogg
-*.zip
-*.log
+# Alembic versions (dynamic)
+for root, _, files in os.walk("api/migrations/versions"):
+    for file in files:
+        if file.endswith(".py"):
+            CRITICAL_FILES.append(os.path.join(root, file))
 
-# =========================
-# Database — track jobs.db if desired
-# =========================
-# *.db         # Uncomment to ignore ALL .db files
-# !jobs.db     # Uncomment if you want to keep jobs.db only
+# Frontend core
+CRITICAL_FILES += [
+    "frontend/package.json",
+    "frontend/vite.config.js",
+    "frontend/public/index.html",
+    "frontend/src/main.jsx",
+    "frontend/src/App.jsx",
+]
 
-# =========================
-# Node & Frontend
-# =========================
-frontend/node_modules/
-frontend/dist/
-frontend/bin/tailwindcss
+# Frontend pages — current + expected
+PAGE_COMPONENTS = [
+    "UploadPage.jsx",
+    "ActiveJobsPage.jsx",
+    "CompletedJobsPage.jsx",
+    "TranscriptViewPage.jsx",
+    "AdminLogsPage.jsx",
+    "DashboardPage.jsx",      # Expected, uncreated
+    "SettingsPage.jsx",       # Expected, uncreated
+]
+for page in PAGE_COMPONENTS:
+    CRITICAL_FILES.append(f"frontend/src/pages/{page}")
 
-# =========================
-# Editor/IDE/System Files
-# =========================
-.DS_Store
-.idea/
-.vscode/
+# Optional: include session state
+if os.path.exists("handoff.txt"):
+    CRITICAL_FILES.append("handoff.txt")
+
+def is_excluded(path):
+    parts = path.split(os.sep)
+    return any(part in EXCLUDE_DIRS for part in parts)
+
+def list_all_files():
+    file_list = []
+    for root, dirs, files in os.walk(ROOT_DIR):
+        dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS]
+        for f in files:
+            full_path = os.path.relpath(os.path.join(root, f), ROOT_DIR)
+            if not is_excluded(full_path):
+                file_list.append(full_path)
+    return file_list
+
+def dump_file_contents(outfile, filepath):
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            contents = f.read()
+        outfile.write(f"\n== FILE: {filepath} ==\n")
+        outfile.write(contents)
+        outfile.write("\n")
+    except Exception as e:
+        outfile.write(f"\n== FILE: {filepath} (error reading: {e}) ==\n")
+
+def main():
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as out:
+        out.write("== FILE TREE ==\n")
+        for path in sorted(list_all_files()):
+            out.write(f"{path}\n")
+
+        out.write("\n== CRITICAL FILE CONTENTS ==\n")
+        for path in CRITICAL_FILES:
+            if os.path.exists(path):
+                dump_file_contents(out, path)
+            else:
+                out.write(f"\n== FILE: {path} (missing) ==\n")
+
+if __name__ == "__main__":
+    main()
 
 
-== FILE: jobs.db (error reading: 'utf-8' codec can't decode byte 0xf8 in position 102: invalid start byte) ==
+== FILE: orchestrate.py ==
+# orchestrate.py
+
+import os
+import time
+import argparse
+import requests
+import threading
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+
+API_URL = "http://localhost:8000"
+UPLOAD_ENDPOINT = f"{API_URL}/jobs"
+STATUS_ENDPOINT = f"{API_URL}/jobs"
+
+def is_audio_file(path):
+    return path.suffix.lower() in [".mp3", ".wav", ".m4a", ".flac", ".ogg"]
+
+def submit_job(file_path, model):
+    try:
+        with open(file_path, "rb") as f:
+            files = {"file": (file_path.name, f, "audio/mpeg")}
+            data = {"model": model}
+            res = requests.post(UPLOAD_ENDPOINT, files=files, data=data)
+            if res.status_code == 200:
+                job_id = res.json().get("job_id")
+                print(f"[✓] Submitted: {file_path.name} → job_id={job_id}")
+                return job_id
+            else:
+                print(f"[!] Failed to submit {file_path.name}: {res.status_code}")
+    except Exception as e:
+        print(f"[!] Error submitting {file_path.name}: {e}")
+    return None
+
+def watch_jobs(job_ids):
+    remaining = set(job_ids)
+    while remaining:
+        time.sleep(5)
+        try:
+            res = requests.get(STATUS_ENDPOINT)
+            statuses = {job["id"]: job["status"] for job in res.json()}
+            for job_id in list(remaining):
+                if job_id in statuses and statuses[job_id] in ["completed", "failed"]:
+                    print(f"[•] Job {job_id} finished with status: {statuses[job_id]}")
+                    remaining.remove(job_id)
+        except Exception as e:
+            print(f"[!] Error checking job status: {e}")
+
+def main(args):
+    input_path = Path(args.input_dir)
+    audio_files = [f for f in input_path.iterdir() if is_audio_file(f)]
+
+    print(f"[~] Found {len(audio_files)} audio files in {input_path}")
+
+    job_ids = []
+
+    if args.concurrency > 1:
+        with ThreadPoolExecutor(max_workers=args.concurrency) as executor:
+            futures = [executor.submit(submit_job, f, args.model) for f in audio_files]
+            for fut in futures:
+                job_id = fut.result()
+                if job_id:
+                    job_ids.append(job_id)
+    else:
+        for f in audio_files:
+            job_id = submit_job(f, args.model)
+            if job_id:
+                job_ids.append(job_id)
+
+    print(f"[✓] Submitted {len(job_ids)} jobs.")
+
+    if args.watch:
+        print("[~] Watching for completion...")
+        watch_jobs(job_ids)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Batch submit audio files to Whisper Transcriber")
+    parser.add_argument("--input_dir", required=True, help="Directory with audio files to transcribe")
+    parser.add_argument("--model", default="tiny", help="Whisper model to use")
+    parser.add_argument("--concurrency", type=int, default=1, help="How many files to upload in parallel")
+    parser.add_argument("--watch", action="store_true", help="Wait for all jobs to finish")
+    args = parser.parse_args()
+    main(args)
+
+
+== FILE: alembic.ini ==
+# A generic, single database configuration.
+
+[alembic]
+# path to migration scripts.
+# this is typically a path given in POSIX (e.g. forward slashes)
+# format, relative to the token %(here)s which refers to the location of this
+# ini file
+script_location = %(here)s/api/migrations
+
+# template used to generate migration file names; The default value is %%(rev)s_%%(slug)s
+# Uncomment the line below if you want the files to be prepended with date and time
+# see https://alembic.sqlalchemy.org/en/latest/tutorial.html#editing-the-ini-file
+# for all available tokens
+# file_template = %%(year)d_%%(month).2d_%%(day).2d_%%(hour).2d%%(minute).2d-%%(rev)s_%%(slug)s
+
+# sys.path path, will be prepended to sys.path if present.
+# defaults to the current working directory.  for multiple paths, the path separator
+# is defined by "path_separator" below.
+prepend_sys_path = .
+
+
+# timezone to use when rendering the date within the migration file
+# as well as the filename.
+# If specified, requires the python>=3.9 or backports.zoneinfo library and tzdata library.
+# Any required deps can installed by adding `alembic[tz]` to the pip requirements
+# string value is passed to ZoneInfo()
+# leave blank for localtime
+# timezone =
+
+# max length of characters to apply to the "slug" field
+# truncate_slug_length = 40
+
+# set to 'true' to run the environment during
+# the 'revision' command, regardless of autogenerate
+# revision_environment = false
+
+# set to 'true' to allow .pyc and .pyo files without
+# a source .py file to be detected as revisions in the
+# versions/ directory
+# sourceless = false
+
+# version location specification; This defaults
+# to <script_location>/versions.  When using multiple version
+# directories, initial revisions must be specified with --version-path.
+# The path separator used here should be the separator specified by "path_separator"
+# below.
+# version_locations = %(here)s/bar:%(here)s/bat:%(here)s/alembic/versions
+
+# path_separator; This indicates what character is used to split lists of file
+# paths, including version_locations and prepend_sys_path within configparser
+# files such as alembic.ini.
+# The default rendered in new alembic.ini files is "os", which uses os.pathsep
+# to provide os-dependent path splitting.
+#
+# Note that in order to support legacy alembic.ini files, this default does NOT
+# take place if path_separator is not present in alembic.ini.  If this
+# option is omitted entirely, fallback logic is as follows:
+#
+# 1. Parsing of the version_locations option falls back to using the legacy
+#    "version_path_separator" key, which if absent then falls back to the legacy
+#    behavior of splitting on spaces and/or commas.
+# 2. Parsing of the prepend_sys_path option falls back to the legacy
+#    behavior of splitting on spaces, commas, or colons.
+#
+# Valid values for path_separator are:
+#
+# path_separator = :
+# path_separator = ;
+# path_separator = space
+# path_separator = newline
+#
+# Use os.pathsep. Default configuration used for new projects.
+path_separator = os
+
+# set to 'true' to search source files recursively
+# in each "version_locations" directory
+# new in Alembic version 1.10
+# recursive_version_locations = false
+
+# the output encoding used when revision files
+# are written from script.py.mako
+# output_encoding = utf-8
+
+# database URL.  This is consumed by the user-maintained env.py script only.
+# other means of configuring database URLs may be customized within the env.py
+# file.
+sqlalchemy.url = driver://user:pass@localhost/dbname
+
+
+[post_write_hooks]
+# post_write_hooks defines scripts or Python functions that are run
+# on newly generated revision scripts.  See the documentation for further
+# detail and examples
+
+# format using "black" - use the console_scripts runner, against the "black" entrypoint
+# hooks = black
+# black.type = console_scripts
+# black.entrypoint = black
+# black.options = -l 79 REVISION_SCRIPT_FILENAME
+
+# lint with attempts to fix using "ruff" - use the exec runner, execute a binary
+# hooks = ruff
+# ruff.type = exec
+# ruff.executable = %(here)s/.venv/bin/ruff
+# ruff.options = check --fix REVISION_SCRIPT_FILENAME
+
+# Logging configuration.  This is also consumed by the user-maintained
+# env.py script only.
+[loggers]
+keys = root,sqlalchemy,alembic
+
+[handlers]
+keys = console
+
+[formatters]
+keys = generic
+
+[logger_root]
+level = WARNING
+handlers = console
+qualname =
+
+[logger_sqlalchemy]
+level = WARNING
+handlers =
+qualname = sqlalchemy.engine
+
+[logger_alembic]
+level = INFO
+handlers =
+qualname = alembic
+
+[handler_console]
+class = StreamHandler
+args = (sys.stderr,)
+level = NOTSET
+formatter = generic
+
+[formatter_generic]
+format = %(levelname)-5.5s [%(name)s] %(message)s
+datefmt = %H:%M:%S
+
 
 == FILE: api/main.py ==
 import os
@@ -705,36 +1002,64 @@ def get_original_audio(job_id: str):
     return FileResponse(path, media_type="audio/mpeg", filename=os.path.basename(path))
 
 
-== FILE: api/utils/logger.py ==
-# api/utils/logger.py
+== FILE: api/models.py ==
+# api/models.py
 
-import os
-import logging
-from logging.handlers import RotatingFileHandler
+from sqlalchemy import Column, String, Integer, Float, Text, DateTime, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
 
-LOG_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../logs"))
+Base = declarative_base()
 
-def get_logger(job_id: str) -> logging.Logger:
-    """Returns a rotating per-job logger."""
-    os.makedirs(LOG_DIR, exist_ok=True)
-    log_path = os.path.join(LOG_DIR, f"{job_id}.log")
+class Job(Base):
+    """
+    Table: jobs
+    Tracks each transcription request and its output status.
+    - transcript_path: now refers to transcript.md under transcripts/{job_id}/
+    """
+    __tablename__ = "jobs"
+    id = Column(String, primary_key=True)
+    original_filename = Column(String, nullable=False)
+    saved_filename = Column(String, nullable=False)
+    model = Column(String, nullable=False)
+    created_at = Column(DateTime, nullable=False)
+    completed_at = Column(DateTime)
+    status = Column(String, nullable=False)
+    transcript_path = Column(String)  # Path to transcript.md
+    error_message = Column(Text)
 
-    logger = logging.getLogger(f"job_{job_id}")
-    logger.setLevel(logging.DEBUG)
+class Metadata(Base):
+    """
+    Table: metadata
+    Per-job enrichment: abstract, keywords, duration, vector ID, etc.
+    """
+    __tablename__ = "metadata"
+    job_id = Column(String, ForeignKey("jobs.id"), primary_key=True)
+    lang = Column(String)
+    tokens = Column(Integer)
+    duration = Column(Float)
+    abstract = Column(Text)
+    keywords = Column(Text)
+    vector_id = Column(String)
 
-    # Avoid duplicate handlers
-    if not logger.handlers:
-        handler = RotatingFileHandler(
-            log_path,
-            maxBytes=10_000_000,
-            backupCount=3,
-            encoding="utf-8"
-        )
-        formatter = logging.Formatter("[%(asctime)s] %(levelname)s: %(message)s")
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+class Heartbeat(Base):
+    """
+    Table: heartbeats
+    Tracks active worker pings to detect stall/dead jobs.
+    """
+    __tablename__ = "heartbeats"
+    job_id = Column(String, ForeignKey("jobs.id"), primary_key=True)
+    last_seen = Column(DateTime, nullable=False)
 
-    return logger
+class User(Base):
+    """
+    Table: users
+    Placeholder for future login/auth integration.
+    """
+    __tablename__ = "users"
+    id = Column(String, primary_key=True)
+    name = Column(String)
+    role = Column(String)
+    created_at = Column(DateTime)
 
 
 == FILE: api/metadata_writer.py ==
@@ -827,67 +1152,118 @@ if __name__ == "__main__":
     run_metadata_writer(args.job_id, args.transcript, args.duration, args.sample_rate)
 
 
-== FILE: api/models.py ==
-# api/models.py
+== FILE: api/utils/logger.py ==
+# api/utils/logger.py
 
-from sqlalchemy import Column, String, Integer, Float, Text, DateTime, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+import os
+import logging
+from logging.handlers import RotatingFileHandler
 
-Base = declarative_base()
+LOG_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../logs"))
 
-class Job(Base):
-    """
-    Table: jobs
-    Tracks each transcription request and its output status.
-    - transcript_path: now refers to transcript.md under transcripts/{job_id}/
-    """
-    __tablename__ = "jobs"
-    id = Column(String, primary_key=True)
-    original_filename = Column(String, nullable=False)
-    saved_filename = Column(String, nullable=False)
-    model = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    completed_at = Column(DateTime)
-    status = Column(String, nullable=False)
-    transcript_path = Column(String)  # Path to transcript.md
-    error_message = Column(Text)
+def get_logger(job_id: str) -> logging.Logger:
+    """Returns a rotating per-job logger."""
+    os.makedirs(LOG_DIR, exist_ok=True)
+    log_path = os.path.join(LOG_DIR, f"{job_id}.log")
 
-class Metadata(Base):
-    """
-    Table: metadata
-    Per-job enrichment: abstract, keywords, duration, vector ID, etc.
-    """
-    __tablename__ = "metadata"
-    job_id = Column(String, ForeignKey("jobs.id"), primary_key=True)
-    lang = Column(String)
-    tokens = Column(Integer)
-    duration = Column(Float)
-    abstract = Column(Text)
-    keywords = Column(Text)
-    vector_id = Column(String)
+    logger = logging.getLogger(f"job_{job_id}")
+    logger.setLevel(logging.DEBUG)
 
-class Heartbeat(Base):
-    """
-    Table: heartbeats
-    Tracks active worker pings to detect stall/dead jobs.
-    """
-    __tablename__ = "heartbeats"
-    job_id = Column(String, ForeignKey("jobs.id"), primary_key=True)
-    last_seen = Column(DateTime, nullable=False)
+    # Avoid duplicate handlers
+    if not logger.handlers:
+        handler = RotatingFileHandler(
+            log_path,
+            maxBytes=10_000_000,
+            backupCount=3,
+            encoding="utf-8"
+        )
+        formatter = logging.Formatter("[%(asctime)s] %(levelname)s: %(message)s")
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
 
-class User(Base):
-    """
-    Table: users
-    Placeholder for future login/auth integration.
-    """
-    __tablename__ = "users"
-    id = Column(String, primary_key=True)
-    name = Column(String)
-    role = Column(String)
-    created_at = Column(DateTime)
+    return logger
 
 
-== FILE: api/migrations/env.py (missing) ==
+== FILE: api/migrations/env.py ==
+from logging.config import fileConfig
+
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+
+from alembic import context
+
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+config = context.config
+
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
+target_metadata = None
+
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
+
+
+def run_migrations_offline() -> None:
+    """Run migrations in 'offline' mode.
+
+    This configures the context with just a URL
+    and not an Engine, though an Engine is acceptable
+    here as well.  By skipping the Engine creation
+    we don't even need a DBAPI to be available.
+
+    Calls to context.execute() here emit the given string to the
+    script output.
+
+    """
+    url = config.get_main_option("sqlalchemy.url")
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode.
+
+    In this scenario we need to create an Engine
+    and associate a connection with the context.
+
+    """
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection, target_metadata=target_metadata
+        )
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()
+
 
 == FILE: frontend/package.json ==
 {
@@ -938,13 +1314,47 @@ export default defineConfig({
   server: {
     proxy: {
       '/log_event': 'http://localhost:8000',
-      '/jobs': 'http://localhost:8000'
+      '/jobs': 'http://localhost:8000',
+      '/transcript': 'http://localhost:8000',
+      '/audio': 'http://localhost:8000'
     }
   }
 })
 
 
-== FILE: frontend/public/index.html (missing) ==
+== FILE: frontend/public/index.html ==
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/dist/output.css" />
+    <title>Whisper Transcriber</title>
+    <meta name="description" content="Whisper transcription UI with real-time logging support." />
+  </head>
+  <body class="bg-zinc-900 text-white">
+    <div id="log-warning" class="bg-yellow-500 text-black p-2 text-sm text-center hidden">
+      ⚠️ Logs will not appear unless the backend is running at http://localhost:8000
+    </div>
+
+    <noscript>
+      <div style="background:#f87171;color:white;padding:10px;text-align:center;">
+        ❌ JavaScript is required to use Whisper Transcriber.
+      </div>
+    </noscript>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Show warning if backend appears offline
+      fetch("/jobs", { method: "OPTIONS" }).catch(() => {
+        document.getElementById("log-warning").style.display = "block";
+      });
+    </script>
+  </body>
+</html>
+
 
 == FILE: frontend/src/main.jsx ==
 import './index.css';
@@ -961,14 +1371,55 @@ createRoot(document.getElementById('root')).render(
 
 
 == FILE: frontend/src/App.jsx ==
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import CompletedJobsPage from "./CompletedJobsPage";
-import AdminLogsPage from "./AdminLogsPage";
-import ActiveJobsPage from "./ActiveJobsPage";
-import TranscriptViewPage from "./TranscriptViewPage";
+import UploadPage from "./pages/UploadPage";
+import CompletedJobsPage from "./pages/CompletedJobsPage";
+import AdminLogsPage from "./pages/AdminLogsPage";
+import ActiveJobsPage from "./pages/ActiveJobsPage";
+import TranscriptViewPage from "./pages/TranscriptViewPage";
 
-function UploadPage() {
+export default function App() {
+  useEffect(() => {
+    fetch('/log_event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: 'frontend_loaded', timestamp: new Date().toISOString() })
+    }).catch(() => {});
+  }, []);
+
+  return (
+    <Router>
+      <div className="min-h-screen bg-zinc-900 text-white">
+        <nav className="bg-zinc-800 p-4 flex space-x-4 border-b border-zinc-700">
+          <Link className="hover:underline" to="/upload">Upload</Link>
+          <Link className="hover:underline" to="/active">Active Jobs</Link>
+          <Link className="hover:underline" to="/completed">Completed Jobs</Link>
+          <Link className="hover:underline" to="/admin">Admin</Link>
+        </nav>
+
+        <main className="p-6">
+          <Routes>
+            <Route path="/" element={<Navigate to="/upload" replace />} />
+            <Route path="/upload" element={<UploadPage />} />
+            <Route path="/active" element={<ActiveJobsPage />} />
+            <Route path="/completed" element={<CompletedJobsPage />} />
+            <Route path="/admin" element={<AdminLogsPage />} />
+            <Route path="/transcript/:jobId/view" element={<TranscriptViewPage />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
+  );
+}
+
+
+== FILE: frontend/src/pages/UploadPage.jsx ==
+// frontend/src/pages/UploadPage.jsx
+
+import { useState } from "react";
+
+export default function UploadPage() {
   const [file, setFile] = useState(null);
   const [model, setModel] = useState("tiny");
   const [status, setStatus] = useState(null);
@@ -1026,64 +1477,273 @@ function UploadPage() {
   );
 }
 
-function AdminPage() {
-  const [logs, setLogs] = useState("");
+
+== FILE: frontend/src/pages/ActiveJobsPage.jsx ==
+import { useEffect, useState } from "react";
+
+export default function ActiveJobsPage() {
+  const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
-    fetch("/log/access")
-      .then(res => res.text())
-      .then(data => setLogs(data))
-      .catch(() => setLogs("Unable to load logs."));
+    fetch("/jobs")
+      .then(res => res.json())
+      .then(data => setJobs(data))
+      .catch(() => setJobs([]));
   }, []);
 
   return (
     <div className="p-4 space-y-4">
-      <h2 className="text-xl font-bold">🛠️ Admin Logs</h2>
-      <pre className="bg-zinc-800 p-4 rounded overflow-x-auto whitespace-pre-wrap text-sm border border-zinc-700">
-        {logs || "No logs available."}
-      </pre>
+      <h2 className="text-xl font-bold">⏳ Active Jobs</h2>
+      <table className="w-full table-auto border-collapse border border-zinc-700">
+        <thead>
+          <tr className="bg-zinc-800">
+            <th className="border border-zinc-700 px-2 py-1 text-left">Filename</th>
+            <th className="border border-zinc-700 px-2 py-1 text-left">Model</th>
+            <th className="border border-zinc-700 px-2 py-1 text-left">Status</th>
+            <th className="border border-zinc-700 px-2 py-1 text-left">Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {jobs.length === 0 ? (
+            <tr>
+              <td colSpan="4" className="text-center py-4 text-zinc-400">
+                No active jobs found.
+              </td>
+            </tr>
+          ) : (
+            jobs.map(job => (
+              <tr key={job.id} className="hover:bg-zinc-800">
+                <td className="border border-zinc-700 px-2 py-1">{job.original_filename}</td>
+                <td className="border border-zinc-700 px-2 py-1">{job.model}</td>
+                <td className="border border-zinc-700 px-2 py-1">{job.status}</td>
+                <td className="border border-zinc-700 px-2 py-1">{new Date(job.created_at).toLocaleString()}</td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }
 
-export default function App() {
+
+== FILE: frontend/src/pages/CompletedJobsPage.jsx ==
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
+export default function CompletedJobsPage() {
+  const [jobs, setJobs] = useState([]);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    fetch('/log_event', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event: 'frontend_loaded', timestamp: new Date().toISOString() })
-    }).catch(() => {});
+    fetch("http://localhost:8000/jobs?status=completed")
+      .then((res) => res.json())
+      .then((data) => setJobs(data))
+      .catch(() => setError("Failed to load completed jobs"));
   }, []);
 
-  return (
-    <Router>
-      <div className="min-h-screen bg-zinc-900 text-white">
-        <nav className="bg-zinc-800 p-4 flex space-x-4 border-b border-zinc-700">
-          <Link className="hover:underline" to="/upload">Upload</Link>
-          <Link className="hover:underline" to="/active">Active Jobs</Link>
-          <Link className="hover:underline" to="/completed">Completed Jobs</Link>
-          <Link className="hover:underline" to="/admin">Admin</Link>
-        </nav>
+  const downloadTranscript = (jobId) => {
+    window.open(`http://localhost:8000/transcript/${jobId}`);
+  };
 
-        <main className="p-6">
-          <Routes>
-            <Route path="/" element={<Navigate to="/upload" replace />} />
-            <Route path="/upload" element={<UploadPage />} />
-            <Route path="/active" element={<ActiveJobsPage />} />
-            <Route path="/completed" element={<CompletedJobsPage />} />
-            <Route path="/admin" element={<AdminLogsPage />} />
-            <Route path="/transcript/:jobId/view" element={<TranscriptViewPage />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+  const restartJob = async (jobId) => {
+    const model = prompt("Enter model (e.g., tiny, base, small, medium, large):", "base");
+    if (model) {
+      const formData = new FormData();
+      formData.append("model", model);
+      try {
+        const res = await fetch(`http://localhost:8000/jobs/${jobId}/restart`, {
+          method: "POST",
+          body: formData,
+        });
+        if (!res.ok) throw new Error("Failed to restart job");
+        alert("Job restart requested");
+      } catch (err) {
+        alert("Error restarting job");
+      }
+    }
+  };
+
+  const deleteJob = async (jobId) => {
+    try {
+      const res = await fetch(`http://localhost:8000/jobs/${jobId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete job");
+      setJobs(jobs.filter((j) => j.id !== jobId));
+    } catch (err) {
+      alert("Error deleting job");
+    }
+  };
+
+  const downloadAudio = (jobId) => {
+    window.open(`http://localhost:8000/audio/${jobId}`);
+  };
+
+  if (error) return <div className="text-red-500">{error}</div>;
+
+  return (
+    <div className="p-4 space-y-4">
+      <h2 className="text-2xl font-bold">Completed Jobs</h2>
+      <table className="w-full table-auto border-collapse border border-zinc-700">
+        <thead>
+          <tr className="bg-zinc-800">
+            <th className="border border-zinc-700 px-2 py-1 text-left">Filename</th>
+            <th className="border border-zinc-700 px-2 py-1 text-left">Model</th>
+            <th className="border border-zinc-700 px-2 py-1 text-left">Completed</th>
+            <th className="border border-zinc-700 px-2 py-1 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {jobs.length === 0 ? (
+            <tr>
+              <td colSpan="4" className="text-center py-4 text-zinc-400">
+                No completed jobs found.
+              </td>
+            </tr>
+          ) : (
+            jobs.map((job) => (
+              <tr key={job.id} className="hover:bg-zinc-800">
+                <td className="border border-zinc-700 px-2 py-1">
+                  <Link
+                    className="text-blue-400 hover:underline"
+                    to={`/transcript/${job.id}/view`}
+                  >
+                    {job.original_filename}
+                  </Link>
+                </td>
+                <td className="border border-zinc-700 px-2 py-1">{job.model}</td>
+                <td className="border border-zinc-700 px-2 py-1">{new Date(job.created_at).toLocaleString()}</td>
+                <td className="border border-zinc-700 px-2 py-1 space-x-1">
+                  <button
+                    className="px-2 py-1 bg-blue-500 text-white rounded"
+                    onClick={() => window.open(`/transcript/${job.id}/view`, '_blank')}
+                  >
+                    View
+                  </button>
+                  <button
+                    className="px-2 py-1 bg-green-500 text-white rounded"
+                    onClick={() => downloadTranscript(job.id)}
+                  >
+                    Download
+                  </button>
+                  <button
+                    className="px-2 py-1 bg-gray-500 text-white rounded"
+                    onClick={() => downloadAudio(job.id)}
+                  >
+                    Audio
+                  </button>
+                  <button
+                    className="px-2 py-1 bg-yellow-500 text-white rounded"
+                    onClick={() => restartJob(job.id)}
+                  >
+                    Restart
+                  </button>
+                  <button
+                    className="px-2 py-1 bg-red-600 text-white rounded"
+                    onClick={() => deleteJob(job.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
-== FILE: frontend/src/pages/UploadPage.jsx (missing) ==
 
-== FILE: frontend/src/pages/AdminLogsPage.jsx (missing) ==
+== FILE: frontend/src/pages/TranscriptViewPage.jsx ==
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 
-== FILE: frontend/src/pages/ActiveJobsPage.jsx (missing) ==
+export default function TranscriptViewPage() {
+  const { jobId } = useParams();
+  const [transcript, setTranscript] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-== FILE: frontend/src/pages/TranscriptViewPage.jsx (missing) ==
+  useEffect(() => {
+    fetch(`/transcript/${jobId}/view`)
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch transcript");
+        return res.json();
+      })
+      .then(data => {
+        setTranscript(data.text || "");
+        setError(null);
+      })
+      .catch(() => setError("Transcript could not be loaded."))
+      .finally(() => setLoading(false));
+  }, [jobId]);
+
+  return (
+    <div className="p-4 space-y-4">
+      <h2 className="text-xl font-bold">📄 Transcript Viewer</h2>
+      <p className="text-sm text-zinc-400">Job ID: {jobId}</p>
+
+      {loading && <p>Loading transcript...</p>}
+      {error && <p className="text-red-400">{error}</p>}
+
+      {!loading && !error && (
+        <div className="bg-zinc-900 border border-zinc-700 p-4 rounded whitespace-pre-wrap overflow-y-auto max-h-[75vh]">
+          {transcript || <em>No transcript data found.</em>}
+        </div>
+      )}
+
+      <div className="pt-4">
+        <Link to="/completed" className="text-blue-400 hover:underline">
+          ← Back to Completed Jobs
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+
+== FILE: frontend/src/pages/AdminLogsPage.jsx ==
+import { useEffect, useState } from "react";
+
+export default function AdminLogsPage() {
+  const [logs, setLogs] = useState([]);
+
+  useEffect(() => {
+    fetch("/logs")
+      .then(res => res.json())
+      .then(data => setLogs(data))
+      .catch(() => setLogs([]));
+  }, []);
+
+  const handleView = (path) => {
+    window.open(`/logs/view?path=${encodeURIComponent(path)}`, '_blank');
+  };
+
+  const handleDownload = (path) => {
+    window.open(`/logs/download?path=${encodeURIComponent(path)}`, '_blank');
+  };
+
+  return (
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">Admin Logs</h2>
+      <div className="space-y-4">
+        {logs.map(log => (
+          <div key={log} className="border p-4 rounded shadow-sm">
+            <div className="font-mono text-sm break-all">{log}</div>
+            <div className="mt-2 space-x-2">
+              <button onClick={() => handleView(log)} className="px-2 py-1 bg-blue-600 text-white rounded">View</button>
+              <button onClick={() => handleDownload(log)} className="px-2 py-1 bg-green-600 text-white rounded">Download</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+== FILE: frontend/src/pages/DashboardPage.jsx (missing) ==
+
+== FILE: frontend/src/pages/SettingsPage.jsx (missing) ==

@@ -1,61 +1,72 @@
 # audit_environment.py
+
 """
-This script generates a comprehensive audit of the `whisper-transcriber/` project directory.
-It performs two main tasks:
+Audit the project structure and file contents for Whisper Transcriber.
+Outputs:
+1. Full file tree
+2. Contents of all files created, patched, or expected
 
-1. Recursively lists all files and folders, excluding `venv/` and `node_modules/`.
-2. Outputs the full contents of all files defined as critical in design_scope.md, including both backend and frontend sources.
-
-The output is written to `project_audit.txt` in the current working directory.
+Output: project_audit.txt
 """
 
 import os
 
-# Root directory to scan
 ROOT_DIR = os.path.abspath(".")
-EXCLUDE_DIRS = {"venv", "node_modules", "__pycache__"}
 OUTPUT_FILE = "project_audit.txt"
+EXCLUDE_DIRS = {"venv", "node_modules", "__pycache__"}
 
-# Critical files to dump in full
+# === CRITICAL FILES (present or planned) ===
 CRITICAL_FILES = [
+    # Root-level
     "design_scope.md",
     "requirements.txt",
-    ".gitignore",
-    "jobs.db",
+    "audit_environment.py",
+    "orchestrate.py",                 # CLI runner
+    "alembic.ini",
+
     # Backend
     "api/main.py",
-    "api/utils/logger.py",
-    "api/metadata_writer.py",
     "api/models.py",
+    "api/metadata_writer.py",
+    "api/utils/logger.py",
     "api/migrations/env.py",
-]  # Versions/*.py will be included dynamically
-
-# Frontend
-FRONTEND_FILES = [
-    "frontend/package.json",
-    "frontend/vite.config.js",
-    "frontend/public/index.html",
-    "frontend/src/main.jsx",
-    "frontend/src/App.jsx",
-    "frontend/src/pages/UploadPage.jsx",
-    "frontend/src/pages/AdminLogsPage.jsx",
-    "frontend/src/pages/ActiveJobsPage.jsx",
-    "frontend/src/pages/TranscriptViewPage.jsx",
 ]
 
-# Add all migration versions
+# Alembic versions (dynamic)
 for root, _, files in os.walk("api/migrations/versions"):
     for file in files:
         if file.endswith(".py"):
             CRITICAL_FILES.append(os.path.join(root, file))
 
-CRITICAL_FILES += FRONTEND_FILES
+# Frontend core
+CRITICAL_FILES += [
+    "frontend/package.json",
+    "frontend/vite.config.js",
+    "frontend/public/index.html",
+    "frontend/src/main.jsx",
+    "frontend/src/App.jsx",
+]
 
+# Frontend pages — current + expected
+PAGE_COMPONENTS = [
+    "UploadPage.jsx",
+    "ActiveJobsPage.jsx",
+    "CompletedJobsPage.jsx",
+    "TranscriptViewPage.jsx",
+    "AdminLogsPage.jsx",
+    "DashboardPage.jsx",      # Expected, uncreated
+    "SettingsPage.jsx",       # Expected, uncreated
+]
+for page in PAGE_COMPONENTS:
+    CRITICAL_FILES.append(f"frontend/src/pages/{page}")
+
+# Optional: include session state
+if os.path.exists("handoff.txt"):
+    CRITICAL_FILES.append("handoff.txt")
 
 def is_excluded(path):
     parts = path.split(os.sep)
     return any(part in EXCLUDE_DIRS for part in parts)
-
 
 def list_all_files():
     file_list = []
@@ -67,7 +78,6 @@ def list_all_files():
                 file_list.append(full_path)
     return file_list
 
-
 def dump_file_contents(outfile, filepath):
     try:
         with open(filepath, "r", encoding="utf-8") as f:
@@ -77,7 +87,6 @@ def dump_file_contents(outfile, filepath):
         outfile.write("\n")
     except Exception as e:
         outfile.write(f"\n== FILE: {filepath} (error reading: {e}) ==\n")
-
 
 def main():
     with open(OUTPUT_FILE, "w", encoding="utf-8") as out:
@@ -91,7 +100,6 @@ def main():
                 dump_file_contents(out, path)
             else:
                 out.write(f"\n== FILE: {path} (missing) ==\n")
-
 
 if __name__ == "__main__":
     main()

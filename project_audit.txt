@@ -1,0 +1,969 @@
+== FILE TREE ==
+.git/COMMIT_EDITMSG
+.git/HEAD
+.git/config
+.git/description
+.git/hooks/applypatch-msg.sample
+.git/hooks/commit-msg.sample
+.git/hooks/fsmonitor-watchman.sample
+.git/hooks/post-update.sample
+.git/hooks/pre-applypatch.sample
+.git/hooks/pre-commit.sample
+.git/hooks/pre-merge-commit.sample
+.git/hooks/pre-push.sample
+.git/hooks/pre-rebase.sample
+.git/hooks/pre-receive.sample
+.git/hooks/prepare-commit-msg.sample
+.git/hooks/push-to-checkout.sample
+.git/hooks/update.sample
+.git/index
+.git/info/exclude
+.git/info/refs
+.git/logs/HEAD
+.git/logs/refs/heads/master
+.git/logs/refs/remotes/origin/main
+.git/logs/refs/remotes/origin/master
+.git/objects/0c/d687046c0e3dce2aaff4a5cbb213dcc2de2cee
+.git/objects/10/7b85e41409430f394d37ec2e7764f0cfb726b8
+.git/objects/12/cab55b37cbfe2e82570056e751713efb684ba9
+.git/objects/14/d6608e366200d3fffdb0bed9212e940ff70c93
+.git/objects/19/13e86925969dbefc27a542abdc30098dd5cf58
+.git/objects/1c/8784688c2d54ef45063be7ccd612dcab316151
+.git/objects/21/23e42b8753db58fb60092b432f21468115ea14
+.git/objects/33/373ebbed0d2c1e43067bb925bf596086f7cfb5
+.git/objects/37/9c3887fc1a9930df133e58d3d387f6c82d1cec
+.git/objects/3d/cc4faa8903b561fe4dda1d0a91ad759401446d
+.git/objects/3f/e8f08a29fbdceb033f9811094e99f6b4bb849f
+.git/objects/4a/f2b89baf2284e2e3c715722a0b09260b5c6ebc
+.git/objects/4d/294255418caf60ebbc6eb6671d4ad765423cce
+.git/objects/4e/0ca9d7757a85313e7a708851ecd9092109a822
+.git/objects/4f/768aa475f4b28fc9625b5748f0428566ec0a30
+.git/objects/50/f3ba5846681260b73512a6c2026e462540792c
+.git/objects/52/873bb9e6d67764897207e710b090a7ede44057
+.git/objects/53/be9cca5195c8fbd0c50a873f6b7ac0484fa81f
+.git/objects/55/86df22bb1fe6b85b0ea3261f54d327471bdd33
+.git/objects/56/2e28373cb928a27ee43241704085b70ffa62a8
+.git/objects/5f/7a5e9629b8be349d5f536d69d051c9742323c2
+.git/objects/65/fa2f5dbf5ee14a54039792e48f75afc2078fec
+.git/objects/69/f7969c724ef1bdebb6f65261050246d6d9d706
+.git/objects/6a/49c38d04ebe4f282db8b5d3cfb5f233ea5011b
+.git/objects/6d/1c068ca2b6d9921ad591f908036e3d531e539c
+.git/objects/7b/2205013be83d723af7ce358e03cbad4b49ad85
+.git/objects/7e/07fb8a7af678068eaa1064fc1fe1fe03713152
+.git/objects/80/810425b6162395f97517cee570c74cd5d4a2a2
+.git/objects/82/c22824904ceb629e284152a097438089a2759d
+.git/objects/85/30f525ed4f92575aa59c941e93c798c2266214
+.git/objects/8c/8cc931e4f09988d4d5a302b06c590263c1c058
+.git/objects/8d/db2192168c329cfeda6505289c54476df74d21
+.git/objects/90/310aa3565e9b267d3442ce73e3835922007d9c
+.git/objects/97/c9a16347e50744436e80de1871bd0ed489186d
+.git/objects/99/072f65998afd0e85e375928e0cb997f73531d9
+.git/objects/9d/1d44633d1325b162fdb3fd9d78c3ee2aa2126b
+.git/objects/9d/a844e0f0ffbdeb236473f293b79285459666b2
+.git/objects/9d/fa1848e73ed48495fbeec7e4aeb7cd1f69dad9
+.git/objects/a2/bbd53e6c2507736fd95826eee863f7e65d3aa1
+.git/objects/a2/e5de5f85f99c30f4d1c7e429b05b5aa575582a
+.git/objects/a3/e1218bd79f1f33443e8c580e42332bb52b9db8
+.git/objects/a9/13247e0a54179a3504d826631fac52550c5bf1
+.git/objects/aa/aff4db9b3a1f50bd2af4311d91397fea1ecd07
+.git/objects/b2/c69e7dae8a570a421dba1705f99b401deae877
+.git/objects/b6/dc1920be1362a9ec8aaca06cbdb3f89fae6626
+.git/objects/b7/93036967a259b97f179ef2db1e4067cd49aa40
+.git/objects/b7/9ed7f3196b119f4d445b7386682b252b443793
+.git/objects/b7/dcf7baaeaee15ac6a56c91718b90eeb652be40
+.git/objects/c4/40aea249b2e5ea4992f4a7f73f778796c69ed2
+.git/objects/c4/e22f9465ecf0d649724831e55986a48a4bea77
+.git/objects/cc/317a97c58bf3e9cb9962a699f70852dc9a6ea4
+.git/objects/cc/df851b64acd340069f1d6bea76afd167354c62
+.git/objects/d0/3c09e4ed6cef88277da15611d62ee786d7f285
+.git/objects/d1/9b221b9082a6a06a7050a77fe01950d45dd6a4
+.git/objects/d2/550320d22ad1f58312c45bc34bc861a4e97d40
+.git/objects/d2/cee30896427de065eed6e12c29c2c284493b72
+.git/objects/d4/fe8ef75b63aea23c633f752ea18b639a2b50fe
+.git/objects/d5/64d0bc3dd917926892c55e3706cc116d5b165e
+.git/objects/e0/c7be24ec5b14f3f43d2f525e25a95bc3ee070f
+.git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+.git/objects/e9/74d6646b8ccf81103743ce3b1db5028511ae98
+.git/objects/ea/4e2dafdba8ccc41f66487844ed2c6d88b31572
+.git/objects/ed/95e458d73ce6e4623ea8b70c2695d2693d8eda
+.git/objects/ee/f323d3b2549a05bb3d4b2ffc6a1f158e73cef3
+.git/objects/ef/fabe8ca62fbeb49991ed5972ab6bb6b7d0fb95
+.git/objects/f1/a1d3dc24e39f2e2305732f6d540e488357e3d6
+.git/objects/f6/b2ba0ebbcecbfae248506cdea7d46f609e5b67
+.git/objects/info/commit-graph
+.git/objects/info/packs
+.git/objects/pack/pack-ae02a85d40d77ddbeac65d5bb4b6ac53369b2eab.idx
+.git/objects/pack/pack-ae02a85d40d77ddbeac65d5bb4b6ac53369b2eab.pack
+.git/packed-refs
+.git/refs/heads/master
+.git/refs/remotes/origin/main
+.git/refs/remotes/origin/master
+.git/refs/tags/v0.9.0-mvp-ready
+.gitignore
+api/main.py
+api/utils/logger.py
+audit_environment.py
+design_scope.md
+download_models.sh
+dummy.wav
+frontend/.gitignore
+frontend/README.md
+frontend/README.zip
+frontend/dist/output.css
+frontend/eslint.config.js
+frontend/index.html
+frontend/package-lock.json
+frontend/package.json
+frontend/postcss.config.js
+frontend/public/vite.svg
+frontend/src/ActiveJobsPage.jsx
+frontend/src/AdminLogsPage.jsx
+frontend/src/App.css
+frontend/src/App.jsx
+frontend/src/CompletedJobsPage.jsx
+frontend/src/TranscriptViewPage.jsx
+frontend/src/assets/react.svg
+frontend/src/index.css
+frontend/src/main.jsx
+frontend/tailwind.config.js
+frontend/vite.config.js
+jobs.db
+logs/.gitkeep
+logs/94de520c-50d9-4293-9bfb-edd809af1b79.log
+logs/access.log
+logs/aefc56b1-9ef5-488e-9804-3d0204341283.log
+logs/frontend.log
+metadata/.gitkeep
+models/.gitkeep
+models/base.pt
+models/large-v3.pt
+models/medium.pt
+models/small.pt
+models/tiny.pt
+project_audit.txt
+requirements.txt
+transcripts/.gitkeep
+uploads/.gitkeep
+uploads/aefc56b1-9ef5-488e-9804-3d0204341283_2025-04-02_AnnAlvord_JakeLesnau_Meeting.m4a
+
+== CRITICAL FILE CONTENTS ==
+
+== FILE: design_scope.md ==
+Whisper Transcriber — Full System Blueprint and Guardrails
+
+🎯 Final Outcome Directive
+
+This project must culminate in an application that:
+
+* Is usable and intuitive for non‑technical users with no prior AI experience
+* Makes audio transcription fast, obvious, and frictionless from upload to result
+* Provides a guided and well‑labeled UI with clear system feedback
+* Surfaces transcripts as structured, navigable, and human‑readable documents
+* Automatically stores and indexes metadata for downstream AI retrieval or project linkage
+* Proactively guides the user toward this vision
+* Identifies and closes any gaps in implementation that would hinder usability, clarity, or semantic utility
+
+🔭 Project Vision
+
+An AI‑enhanced transcription and job‑management tool for uploading audio/video, monitoring progress, and retrieving enriched transcripts in a clean web‑based frontend backed by a Python FastAPI backend.
+
+Goal: Build a scalable MVP supporting real‑time job tracking, structured metadata enrichment, user annotations, and context‑aware AI integration.
+
+🗂️ Folder and File Structure
+
+```
+whisper‑transcriber/
+├── api/
+│   ├── __pycache__
+│   ├── main.py                # FastAPI app, all API endpoints
+│   ├── jobs.db                # SQLite DB file
+│   ├── metadata_writer.py     # Generate transcript metadata
+│   └── logs/                  # Per‑job log storage
+├── frontend/
+│   ├── dist/
+│   ├── node_modules/
+│   ├── public/
+│   ├── src/
+│   │   ├── App.jsx            # Main React Router + Nav
+│   │   ├── main.jsx           # Entrypoint
+│   │   ├── UploadPage.jsx
+│   │   ├── ActiveJobsPage.jsx
+│   │   ├── CompletedJobsPage.jsx
+│   │   ├── TranscriptViewPage.jsx
+│   │   ├── AdminLogsPage.jsx
+│   │   ├── DashboardPage.jsx  # (NEW) Summary overview of jobs + stats
+│   │   └── SettingsPage.jsx   # (Future) Server/admin configuration
+│   └── assets/
+│       └── ... static files
+├── logs/
+├── metadata/
+├── models/
+├── transcripts/
+├── uploads/
+├── venv/
+├── .gitignore
+├── design_scope.md
+├── jobs.db
+├── requirements.txt
+├── schema.sql
+└── orchestrate.py             # CLI batch orchestrator
+```
+
+---
+
+🚀 **Development Quick‑Start**
+
+**Backend**
+
+```bash
+poetry install  # or pip install -r requirements.txt
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Frontend**
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+```
+
+For a production build, run `npm run build` and serve the generated `dist/` folder with an ASGI static files mount.
+
+---
+
+🛠️ **Logging Policy**
+
+| Concern          | Decision                                                                       |
+| ---------------- | ------------------------------------------------------------------------------ |
+| Per‑job log path | `backend/logs/{job_id}.log`                                                    |
+| Rotation         | `RotatingFileHandler`, max 10 MB, 3 backups                                    |
+| Levels           | `DEBUG` in dev, `INFO` in prod                                                 |
+| Surfacing errors | Backend returns `detail` in JSON; frontend shows toast + link to AdminLogsPage |
+| Retention        | 30 days or 1 GB total, whichever first                                         |
+
+---
+
+🔄 **Job Restart UX**
+
+1. **UI affordance:** On *CompletedJobsPage* each job row shows a “↻ Restart” icon‑button.
+2. **Endpoint:** `POST /jobs/{id}/restart`
+
+   * Re‑queues the media using same parameters.
+   * Returns new `job_id`.
+3. **State flow:** New job appears in ActiveJobsPage. Original job remains archived.
+4. **Guardrail:** Backend enforces a single concurrent restart per source file.
+
+---
+
+⚙️ **Ingestion Timing Flag**
+
+| Scenario              | Parameter              | Outcome                                               |
+| --------------------- | ---------------------- | ----------------------------------------------------- |
+| Auto ingest (default) | `ingest=true`          | Transcript automatically written to vector DB         |
+| Manual ingest later   | `ingest=false`         | User clicks “Ingest” on TranscriptViewPage when ready |
+| CLI override          | `--ingest/--no-ingest` | Mirrors API behaviour                                 |
+
+---
+
+📄 **`metadata_writer.py` Responsibilities**
+
+* **Trigger:** Called by backend once transcription finishes *or* via CLI for batch re‑processing.
+* **Inputs:**
+
+  * `job_id`
+  * Raw transcript JSON from Whisper/Faster‑Whisper
+  * Media file metadata (duration, sample‑rate)
+* **Processing:**
+
+  * Compute duration, token counts, language, average WPM.
+  * Generate 500‑char abstract and keyword list.
+  * Detect speaker changes if diarization data present.
+* **Outputs:**
+
+  * Persist row in `metadata` table (`job_id`, `lang`, `tokens`, `duration`, `abstract`, `vector_id`).
+  * Write sidecar markdown (`transcript.md`) and JSON (`metadata.json`) under `transcripts/{job_id}/`.
+* **Properties:** Pure function, deterministic, no global state.
+
+---
+
+✅ **Status Summary**
+
+| Component              | Status    |
+| ---------------------- | --------- |
+| UploadPage.jsx         | TODO      |
+| ActiveJobsPage.jsx     | ✅ Stable  |
+| CompletedJobsPage.jsx  | ✅ Stable  |
+| TranscriptViewPage.jsx | ✅ Stable  |
+| AdminLogsPage.jsx      | ✅ Stable  |
+| DashboardPage.jsx      | TODO      |
+| main.py (API)          | ✅ Stable  |
+| orchestrate.py         | TODO      |
+| metadata\_writer.py    | ✅ Defined |
+
+---
+
+🎨 **UI & UX Detailed Guidance**
+
+##### End‑User Experience
+
+1. **UploadPage** – drag‑and‑drop, **drag‑select multi‑upload** (shift‑click or marquee) up to 10 files ≤ 2 GB each; file cards cascade with inline validation (format / size / duration).
+2. **ActiveJobsPage** – real‑time table with status chip (Queued ▢ / Processing ◔ / Enriching … / Done ✔), ETA **smoothed with exponential moving average** to avoid jitter; heartbeat dot blinks each 5 s; progress bar animates continuously.
+3. **CompletedJobsPage** – sortable list; actions: ▸ View, ⭳ Download .txt/.md, ↻ Restart, 🗑 Delete; filter textbox; stable URLs `/transcripts/{job_id}`.
+4. **TranscriptViewPage** – two‑pane: left time‑stamped transcript; right metadata sidebar; toolbar: Copy, Download, Ingest, Edit Notes.
+5. **Global UI & Responsiveness** – sticky top‑bar with brand + job counter; left drawer nav. **Mobile layout**: 375 px breakpoint collapses nav into bottom tab‑bar, cards stack vertically, progress bar becomes thin line under filename. WCAG‑AA colours (#2563eb primary, #facc15 accent); keyboard‑nav and ARIA labels placeholder tickets created.
+6. **Tutorial & FAQ** – *placeholders only* (hidden routes `/tutorial` & `/faq` for future enable).
+
+##### Administrator Experience
+
+1. **DashboardPage** – KPI cards (Active, Failed, Avg ETA, Storage Used) + 24 h throughput chart.
+2. **AdminLogsPage** – live tail via WebSocket, severity filter, log download, purge.
+3. **SettingsPage (Placeholder)** – env overrides, retention, concurrency, API keys.
+4. **Job Controls** – restart, force ingest, delete; batch select.
+
+##### Page Responsibility Clarifications
+
+| Page/Script       | Core Responsibilities                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------ |
+| UploadPage.jsx    | File selection/validation, POST `/jobs/`, optimistic UI card, redirect to ActiveJobsPage                     |
+| DashboardPage.jsx | Admin‑only KPI overview, throughput chart, top offenders list                                                |
+| orchestrate.py    | CLI batch runner: scans folder, POST `/jobs/` sequentially or in parallel, optional `--watch` for completion |
+
+🗄️ **Persistent Job History Through Restarts**
+
+* **Database** – SQLite `jobs.db` persists all job rows (`id`, `state`, `media_path`, `created_at`, `completed_at`, etc.).
+* **Startup Routine** – backend loads jobs where `state IN ('queued','processing','enriching')` and re‑queues them; `state='completed'|'failed'|'cancelled'` populate CompletedJobsPage.
+* **Frontend** – on app boot, React queries `/jobs/active` & `/jobs/completed` to hydrate tables.
+* **Graceful Shutdown** – workers trap SIGTERM, store heartbeat before exit.
+* **Migration Path** – if DB schema changes, Alembic migration scripts ensure historic rows survive.
+
+### Job State Machine & Controls
+
+| UI Chip          | Backend State | Description                                    | User Actions                                 |
+| ---------------- | ------------- | ---------------------------------------------- | -------------------------------------------- |
+| ▢ **Queued**     | `queued`      | Accepted, waiting for worker slot.             | **Cancel & Delete** (instant)                |
+| ◔ **Processing** | `processing`  | Whisper model running.                         | Cancel (until 75 % complete)                 |
+| … **Enriching**  | `enriching`   | `metadata_writer.py` generating meta + ingest. | No user action (ensures integrity)           |
+| ✔ **Done**       | `completed`   | Transcript + metadata written.                 | View ▸ Transcript, Download, Restart, Delete |
+| ✖ **Failed**     | `failed`      | Error, log available.                          | View details, Restart, Delete                |
+| ⊘ **Cancelled**  | `cancelled`   | User aborted before 75 %.                      | Restart, Delete                              |
+
+#### Restart Rules
+
+* Available for **Done**, **Failed**, **Cancelled**, and auto‑failed *Stalled* jobs via ↻ icon.
+* Endpoint: `POST /jobs/{id}/restart` → returns new `job_id`.
+* Backend guardrail: disallows >1 concurrent restart per source file.
+
+#### Delete Policy
+
+| State Group                  | Button Label      | Behaviour                                     |
+| ---------------------------- | ----------------- | --------------------------------------------- |
+| Queued / <75 % Processing    | Cancel & Delete   | Immediate cancel; data purged; row removed    |
+| ≥75 % Processing / Enriching | Mark for Deletion | Flag stored; purge once job completes         |
+| Done / Failed / Cancelled    | Delete            | Removes transcript + metadata; row disappears |
+| Admin override               | Force Delete      | Hard kill + disk purge regardless of state    |
+
+#### Stall Detection & Auto‑Recovery
+
+| Parameter                     | Default                         | Rationale                           |
+| ----------------------------- | ------------------------------- | ----------------------------------- |
+| Heartbeat interval            | 5 s                             | Worker sends `/jobs/{id}/heartbeat` |
+| Stall Warning Banner          | 60 s silence                    | Allows minor network hiccups        |
+| Stall Fail → `failed_stalled` | 15 min **or** 3× media duration | Prevents infinite locks             |
+| Auto‑Restart (admin opt‑in)   | off                             | Requires explicit user ↻ restart    |
+
+When a job flips to `failed_stalled`, the row shows ✖ Failed with tooltip *Stalled – no progress*; user may ↻ Restart.
+
+---
+
+### 🚑 Implementation Guarantees & Mitigation Paths
+
+#### Data Model & Alembic Migrations
+
+* **Schema** (`jobs`, `metadata`, `heartbeats`, `users` placeholder).
+* **Migration Tool**: Alembic; revision scripts live under `backend/migrations/`.
+* **Command**: `alembic upgrade head` on start‑up.
+* **CI Check**: GitHub Action runs `alembic check` to ensure models ↔ migrations parity.
+
+#### API Contract & Versioning
+
+* FastAPI auto‑generates **OpenAPI JSON** at `/openapi.json` and Swagger UI at `/docs`.
+* Freeze contract by exporting `openapi_v1.json` in repo; breaking changes require `v2` route prefix.
+
+#### Error‑Code Catalogue
+
+| Code  | Meaning                   | Frontend Toast                    |
+| ----- | ------------------------- | --------------------------------- |
+| 40001 | Unsupported media format  | "Format not supported. See help." |
+| 40002 | File too large (>2 GB)    | "File exceeds 2 GB limit."        |
+| 40401 | Job not found             | "Job no longer exists."           |
+| 40901 | Duplicate job in progress | "Already processing this file."   |
+| 50001 | Whisper runtime error     | "Transcription failed — retry."   |
+
+#### Test Strategy & CI/CD
+
+* **Unit Tests**: `pytest` targeting utils + endpoints (≥80 % coverage gate).
+* **Integration**: Docker‑compose up backend+worker; run `pytest tests/integration`.
+* **Continuous Integration**: GitHub Actions matrix (py3.10/3.11, Node 18), job phases lint → test → build.
+
+#### Security Posture (MVP)
+
+* **Deployment** behind university VPN or localhost only.
+* **Optional Token Auth**: `X‑API‑Token` header checked against env var; placeholder routes protected via FastAPI dependency.
+* **Future**: OAuth2/JWT with role claims.
+
+🧱 Future Features (post‑MVP) — **Placeholders already wired in code/UI**
+
+* 🔐 **Multi‑user authentication & role‑based access** – login page + protected routes stubbed.
+* ⚙️ **Queue scaling (Redis/RQ) & worker autoscaling** – env vars + Docker Compose placeholders.
+* 📊 **Observability (Prometheus metrics, Grafana dashboards)** – `/metrics` endpoint stub.
+* 🛠️ **CI/CD pipeline & automated tests** – GitHub Actions workflow present, tests TODO.
+* 🦾 **Accessibility (ARIA, keyboard‑nav audit)** – a11y tickets tracked.
+* 🍱 **Batch drag/drop multiple files** – **implemented** in UploadPage.
+* 📝 **Subtitle (SRT/VTT) export** – route `/jobs/{id}/subtitle` placeholder.
+* 🌐 **Tutorial, FAQ, Localization** – hidden routes `/tutorial`, `/faq`, `/i18n` ready but disabled.
+
+---
+
+🧭 Update Instructions
+
+
+== FILE: requirements.txt ==
+fastapi==0.110.0
+uvicorn==0.29.0
+python-multipart==0.0.9
+openai-whisper
+
+== FILE: .gitignore ==
+# =========================
+# Byte-compiled Python files
+# =========================
+__pycache__/
+*.py[cod]
+
+# =========================
+# Python Virtual Environment
+# =========================
+venv/
+.env
+
+# =========================
+# Project Folders — keep structure, ignore contents
+# Use .gitkeep to track folder presence
+# =========================
+uploads/*
+!uploads/.gitkeep
+
+transcripts/*
+!transcripts/.gitkeep
+
+logs/*
+!logs/.gitkeep
+
+models/*
+!models/.gitkeep
+
+metadata/*
+!metadata/.gitkeep
+
+# =========================
+# Whisper Artifacts
+# =========================
+*.srt
+*.vtt
+*.m4a
+*.mp3
+*.wav
+*.ogg
+*.zip
+*.log
+
+# =========================
+# Database — track jobs.db if desired
+# =========================
+# *.db         # Uncomment to ignore ALL .db files
+# !jobs.db     # Uncomment if you want to keep jobs.db only
+
+# =========================
+# Node & Frontend
+# =========================
+frontend/node_modules/
+frontend/dist/
+frontend/bin/tailwindcss
+
+# =========================
+# Editor/IDE/System Files
+# =========================
+.DS_Store
+.idea/
+.vscode/
+
+
+== FILE: jobs.db (error reading: 'utf-8' codec can't decode byte 0xf8 in position 102: invalid start byte) ==
+
+== FILE: api/main.py ==
+import os
+import uuid
+import time
+import shutil
+import logging
+import sqlite3
+from datetime import datetime
+from subprocess import Popen, PIPE
+
+from fastapi import FastAPI, UploadFile, File, Form, Request, Query
+from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse
+from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+
+UPLOAD_DIR = "uploads"
+OUTPUT_DIR = "outputs"
+MODEL_DIR = "models"
+LOG_DIR = "logs"
+ACCESS_LOG = os.path.join(LOG_DIR, "access.log")
+FRONTEND_LOG = os.path.join(LOG_DIR, "frontend.log")
+DB_PATH = "jobs.db"
+
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs(MODEL_DIR, exist_ok=True)
+os.makedirs(LOG_DIR, exist_ok=True)
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("whisper")
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.middleware("http")
+async def access_logger(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    log_line = f"[{datetime.utcnow().isoformat()}] {request.client.host} {request.method} {request.url.path} -> {response.status_code} in {duration:.2f}s\n"
+    with open(ACCESS_LOG, "a", encoding="utf-8") as f:
+        f.write(log_line)
+    return response
+
+@app.post("/log_event")
+async def log_frontend_event(payload: dict):
+    timestamp = datetime.utcnow().isoformat()
+    with open(FRONTEND_LOG, "a", encoding="utf-8") as f:
+        f.write(f"[{timestamp}] {jsonable_encoder(payload)}\n")
+    return {"status": "logged"}
+
+@app.get("/log/access")
+def read_access_log():
+    return PlainTextResponse(open(ACCESS_LOG, "r", encoding="utf-8").read())
+
+def handle_whisper_job(job_id: str, upload_path: str, log_path: str, transcript_path: str, model: str):
+    cmd = [
+        "whisper", upload_path,
+        "--model", model,
+        "--model_dir", MODEL_DIR,
+        "--output_dir", OUTPUT_DIR,
+        "--output_format", "txt",
+        "--language", "en",
+        "--verbose", "True"
+    ]
+
+    def run():
+        with open(log_path, "w", encoding="utf-8") as log_fp:
+            process = Popen(cmd, stdout=log_fp, stderr=log_fp)
+            process.wait()
+
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+        if os.path.exists(transcript_path):
+            cur.execute("UPDATE jobs SET status = ?, transcript_path = ? WHERE id = ?", ("completed", transcript_path, job_id))
+        else:
+            cur.execute("UPDATE jobs SET status = ?, error_message = ? WHERE id = ?", ("failed", "Transcript file not found", job_id))
+        conn.commit()
+        conn.close()
+
+    import threading
+    threading.Thread(target=run).start()
+
+@app.post("/jobs")
+async def submit_job(file: UploadFile = File(...), model: str = Form("tiny")):
+    job_id = str(uuid.uuid4())
+    timestamp = datetime.utcnow().isoformat()
+    saved_filename = f"{job_id}_{file.filename}"
+    upload_path = os.path.join(UPLOAD_DIR, saved_filename)
+    log_path = os.path.join(LOG_DIR, f"{job_id}.log")
+    transcript_path = os.path.join(OUTPUT_DIR, f"{saved_filename}.txt")
+
+    with open(upload_path, "wb") as out_file:
+        shutil.copyfileobj(file.file, out_file)
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO jobs (id, original_filename, saved_filename, model, created_at, status)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (job_id, file.filename, saved_filename, model, timestamp, "running"))
+    conn.commit()
+    conn.close()
+
+    handle_whisper_job(job_id, upload_path, log_path, transcript_path, model)
+    return {"job_id": job_id}
+
+@app.get("/jobs")
+def list_jobs(status: str = Query(None)):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    if status:
+        cur.execute("""
+            SELECT id, original_filename, saved_filename, model, created_at, status FROM jobs
+            WHERE status = ?
+            ORDER BY created_at DESC
+        """, (status,))
+    else:
+        cur.execute("""
+            SELECT id, original_filename, saved_filename, model, created_at, status FROM jobs
+            WHERE status != 'completed'
+            ORDER BY created_at DESC
+        """)
+
+    rows = cur.fetchall()
+    conn.close()
+    return jsonable_encoder([
+        {
+            "id": r[0],
+            "original_filename": r[1],
+            "saved_filename": r[2],
+            "model": r[3],
+            "created_at": r[4],
+            "status": r[5]
+        } for r in rows
+    ])
+
+@app.get("/transcript/{job_id}")
+def get_transcript(job_id: str):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT transcript_path FROM jobs WHERE id = ?", (job_id,))
+    row = cur.fetchone()
+    conn.close()
+    if not row or not row[0] or not os.path.exists(row[0]):
+        return JSONResponse(status_code=404, content={"error": "Transcript not found"})
+    return FileResponse(row[0], media_type="text/plain", filename=os.path.basename(row[0]))
+
+@app.get("/transcript/{job_id}/view")
+def get_transcript_text(job_id: str):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT transcript_path FROM jobs WHERE id = ?", (job_id,))
+    row = cur.fetchone()
+    conn.close()
+    if not row or not os.path.exists(row[0]):
+        return JSONResponse(status_code=404, content={"error": "Transcript not found"})
+    with open(row[0], "r", encoding="utf-8") as f:
+        return {"text": f.read()}
+
+@app.post("/jobs/{job_id}/restart")
+def restart_job(job_id: str, model: str = Form("tiny")):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT original_filename, saved_filename FROM jobs WHERE id = ?", (job_id,))
+    row = cur.fetchone()
+    conn.close()
+
+    if not row:
+        return JSONResponse(status_code=404, content={"error": "Original job not found"})
+
+    filename, saved = row
+    full_path = os.path.join(UPLOAD_DIR, saved)
+    log_path = os.path.join(LOG_DIR, f"{job_id}.log")
+    transcript_path = os.path.join(OUTPUT_DIR, f"{saved}.txt")
+
+    if not os.path.exists(full_path):
+        return JSONResponse(status_code=404, content={"error": "Original file missing"})
+
+    timestamp = datetime.utcnow().isoformat()
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("UPDATE jobs SET model = ?, created_at = ?, status = ?, transcript_path = NULL, error_message = NULL WHERE id = ?", (model, timestamp, "running", job_id))
+    conn.commit()
+    conn.close()
+
+    handle_whisper_job(job_id, full_path, log_path, transcript_path, model)
+    return {"status": "restarted"}
+
+@app.delete("/jobs/{job_id}")
+def delete_job(job_id: str):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT saved_filename, transcript_path FROM jobs WHERE id = ?", (job_id,))
+    row = cur.fetchone()
+    if not row:
+        conn.close()
+        return JSONResponse(status_code=404, content={"error": "Job not found"})
+
+    upload_path = os.path.join(UPLOAD_DIR, row[0])
+    if os.path.exists(upload_path): os.remove(upload_path)
+    if row[1] and os.path.exists(row[1]): os.remove(row[1])
+    cur.execute("DELETE FROM jobs WHERE id = ?", (job_id,))
+    conn.commit()
+    conn.close()
+    return {"status": "deleted"}
+
+@app.get("/audio/{job_id}")
+def get_original_audio(job_id: str):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT saved_filename FROM jobs WHERE id = ?", (job_id,))
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return JSONResponse(status_code=404, content={"error": "Audio not found"})
+    path = os.path.join(UPLOAD_DIR, row[0])
+    if not os.path.exists(path):
+        return JSONResponse(status_code=404, content={"error": "Audio file missing"})
+    return FileResponse(path, media_type="audio/mpeg", filename=os.path.basename(path))
+
+
+== FILE: api/utils/logger.py ==
+# api/utils/logger.py
+
+import os
+import logging
+from logging.handlers import RotatingFileHandler
+
+LOG_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../logs"))
+
+def get_logger(job_id: str) -> logging.Logger:
+    """Returns a rotating per-job logger."""
+    os.makedirs(LOG_DIR, exist_ok=True)
+    log_path = os.path.join(LOG_DIR, f"{job_id}.log")
+
+    logger = logging.getLogger(f"job_{job_id}")
+    logger.setLevel(logging.DEBUG)
+
+    # Avoid duplicate handlers
+    if not logger.handlers:
+        handler = RotatingFileHandler(
+            log_path,
+            maxBytes=10_000_000,
+            backupCount=3,
+            encoding="utf-8"
+        )
+        formatter = logging.Formatter("[%(asctime)s] %(levelname)s: %(message)s")
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+    return logger
+
+
+== FILE: api/metadata_writer.py (missing) ==
+
+== FILE: api/models.py (missing) ==
+
+== FILE: api/migrations/env.py (missing) ==
+
+== FILE: frontend/package.json ==
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "log:tail": "bash -c 'tail -n 50 ../../logs/*.log'",
+    "log:last": "bash -c 'ls -t ../../logs/*.log | head -n 1 | xargs tail -n 50'",
+    "meta:list": "bash -c 'ls -1 ../../outputs/*.json | tail -n 10'",
+    "meta:view": "bash -c 'ls -t ../../outputs/*.json | head -n 1 | xargs cat | jq'"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.0",
+    "@tailwindcss/postcss": "^4.1.7",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.7",
+    "vite": "^6.3.5"
+  }
+}
+
+
+== FILE: frontend/vite.config.js ==
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/log_event': 'http://localhost:8000',
+      '/jobs': 'http://localhost:8000'
+    }
+  }
+})
+
+
+== FILE: frontend/public/index.html (missing) ==
+
+== FILE: frontend/src/main.jsx ==
+import './index.css';
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+
+== FILE: frontend/src/App.jsx ==
+import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import CompletedJobsPage from "./CompletedJobsPage";
+import AdminLogsPage from "./AdminLogsPage";
+import ActiveJobsPage from "./ActiveJobsPage";
+import TranscriptViewPage from "./TranscriptViewPage";
+
+function UploadPage() {
+  const [file, setFile] = useState(null);
+  const [model, setModel] = useState("tiny");
+  const [status, setStatus] = useState(null);
+
+  const handleUpload = async () => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("model", model);
+
+    setStatus("Uploading and transcribing...");
+    try {
+      const res = await fetch("/jobs", { method: "POST", body: formData });
+      const data = await res.json();
+      if (res.ok) {
+        setStatus(`✅ Job started: ${data.job_id}`);
+      } else {
+        setStatus(`❌ Error: ${data.error}`);
+      }
+    } catch (err) {
+      setStatus(`❌ Network error`);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold">Upload Audio File for Transcription</h2>
+
+      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+
+      <div>
+        <label className="block mb-1">Select Model</label>
+        <select
+          className="text-black p-1"
+          value={model}
+          onChange={(e) => setModel(e.target.value)}
+        >
+          <option value="tiny">tiny</option>
+          <option value="base">base</option>
+          <option value="small">small</option>
+          <option value="medium">medium</option>
+          <option value="large">large</option>
+        </select>
+      </div>
+
+      <button
+        onClick={handleUpload}
+        className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
+      >
+        Transcribe
+      </button>
+
+      {status && <p>{status}</p>}
+    </div>
+  );
+}
+
+function AdminPage() {
+  const [logs, setLogs] = useState("");
+
+  useEffect(() => {
+    fetch("/log/access")
+      .then(res => res.text())
+      .then(data => setLogs(data))
+      .catch(() => setLogs("Unable to load logs."));
+  }, []);
+
+  return (
+    <div className="p-4 space-y-4">
+      <h2 className="text-xl font-bold">🛠️ Admin Logs</h2>
+      <pre className="bg-zinc-800 p-4 rounded overflow-x-auto whitespace-pre-wrap text-sm border border-zinc-700">
+        {logs || "No logs available."}
+      </pre>
+    </div>
+  );
+}
+
+export default function App() {
+  useEffect(() => {
+    fetch('/log_event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: 'frontend_loaded', timestamp: new Date().toISOString() })
+    }).catch(() => {});
+  }, []);
+
+  return (
+    <Router>
+      <div className="min-h-screen bg-zinc-900 text-white">
+        <nav className="bg-zinc-800 p-4 flex space-x-4 border-b border-zinc-700">
+          <Link className="hover:underline" to="/upload">Upload</Link>
+          <Link className="hover:underline" to="/active">Active Jobs</Link>
+          <Link className="hover:underline" to="/completed">Completed Jobs</Link>
+          <Link className="hover:underline" to="/admin">Admin</Link>
+        </nav>
+
+        <main className="p-6">
+          <Routes>
+            <Route path="/" element={<Navigate to="/upload" replace />} />
+            <Route path="/upload" element={<UploadPage />} />
+            <Route path="/active" element={<ActiveJobsPage />} />
+            <Route path="/completed" element={<CompletedJobsPage />} />
+            <Route path="/admin" element={<AdminLogsPage />} />
+            <Route path="/transcript/:jobId/view" element={<TranscriptViewPage />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
+  );
+}
+
+== FILE: frontend/src/pages/UploadPage.jsx (missing) ==
+
+== FILE: frontend/src/pages/AdminLogsPage.jsx (missing) ==
+
+== FILE: frontend/src/pages/ActiveJobsPage.jsx (missing) ==
+
+== FILE: frontend/src/pages/TranscriptViewPage.jsx (missing) ==

@@ -1,0 +1,62 @@
+# =========================
+# Byte-compiled Python files
+# =========================
+__pycache__/
+*.py[cod]
+
+# =========================
+# Python Virtual Environment
+# =========================
+venv/
+.env
+
+# =========================
+# Project Folders — keep structure, ignore contents
+# Use .gitkeep to track folder presence
+# =========================
+uploads/*
+!uploads/.gitkeep
+
+transcripts/*
+!transcripts/.gitkeep
+
+logs/*
+!logs/.gitkeep
+
+models/*
+!models/.gitkeep
+
+metadata/*
+!metadata/.gitkeep
+
+# =========================
+# Whisper Artifacts
+# =========================
+*.srt
+*.vtt
+*.m4a
+*.mp3
+*.wav
+*.ogg
+*.zip
+*.log
+
+# =========================
+# Database — track jobs.db if desired
+# =========================
+# *.db         # Uncomment to ignore ALL .db files
+# !jobs.db     # Uncomment if you want to keep jobs.db only
+
+# =========================
+# Node & Frontend
+# =========================
+frontend/node_modules/
+frontend/dist/
+frontend/bin/tailwindcss
+
+# =========================
+# Editor/IDE/System Files
+# =========================
+.DS_Store
+.idea/
+.vscode/

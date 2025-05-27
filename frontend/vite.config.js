@@ -7,7 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/log_event': 'http://localhost:8000',
-      '/jobs': 'http://localhost:8000'
+      '/jobs': 'http://localhost:8000',
+      '/transcript': 'http://localhost:8000',
+      '/audio': 'http://localhost:8000'
     }
   }
 })

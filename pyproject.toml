@@ -1,0 +1,26 @@
+[project]
+name = "whisper-transcriber"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi~=0.110",
+    "uvicorn[standard]~=0.30",
+    "sqlalchemy~=2.0",
+    "python-multipart",       # Required for file uploads
+    "pydantic",               # Used in FastAPI models
+    "alembic",                # Keep for DB migration
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "httpx<0.28",
+    "black",
+]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["api"]

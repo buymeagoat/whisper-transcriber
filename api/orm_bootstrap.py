@@ -29,7 +29,7 @@ def validate_or_initialize_database():
         log.info("Alembic migrations applied successfully.")
     except subprocess.CalledProcessError as e:
         log.critical(f"Alembic failed to apply migrations: {e}")
-        print(f"[CRITICAL] Alembic error: {e}", file=sys.stderr)
+        log.critical(f"Alembic error: {e}")
         sys.exit(1)
 
     # ── Step 3: Validate expected tables exist ──
@@ -39,7 +39,7 @@ def validate_or_initialize_database():
 
     if not expected.issubset(actual):
         log.critical(f"Schema mismatch: expected {expected}, found {actual}")
-        print(f"[CRITICAL] Schema invalid or incomplete.", file=sys.stderr)
+        log.critical("Schema invalid or incomplete.")
         sys.exit(1)
 
     # ── Step 4: Success ──

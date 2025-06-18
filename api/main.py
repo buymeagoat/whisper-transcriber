@@ -108,9 +108,11 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR, html=True), name="upload
 app.mount("/transcripts", StaticFiles(directory=TRANSCRIPTS_DIR, html=True), name="transcripts")
 
 # ─── Debug Output ───
-print("\nSTATIC ROUTE CHECK:")
+backend_log.debug("\nSTATIC ROUTE CHECK:")
 for route in app.routes:
-    print(f"Path: {getattr(route, 'path', 'n/a')}  →  Name: {getattr(route, 'name', 'n/a')}  →  Type: {type(route)}")
+    backend_log.debug(
+        f"Path: {getattr(route, 'path', 'n/a')}  →  Name: {getattr(route, 'name', 'n/a')}  →  Type: {type(route)}"
+    )
 
 from typing import Union
 def get_duration(path: Union[str, os.PathLike]) -> float:
@@ -494,12 +496,12 @@ def list_admin_files():
     uploads = sorted(f.name for f in UPLOAD_DIR.glob("*") if f.is_file())
     transcripts = sorted(str(f.relative_to(TRANSCRIPTS_DIR)) for f in TRANSCRIPTS_DIR.rglob("*") if f.is_file())
 
-    print("LOG_DIR:", LOG_DIR.resolve())
-    print("UPLOAD_DIR:", UPLOAD_DIR.resolve())
-    print("TRANSCRIPTS_DIR:", TRANSCRIPTS_DIR.resolve())
-    print("Logs found:", logs)
-    print("Uploads found:", uploads)
-    print("Transcripts found:", transcripts)
+    backend_log.debug("LOG_DIR: %s", LOG_DIR.resolve())
+    backend_log.debug("UPLOAD_DIR: %s", UPLOAD_DIR.resolve())
+    backend_log.debug("TRANSCRIPTS_DIR: %s", TRANSCRIPTS_DIR.resolve())
+    backend_log.debug("Logs found: %s", logs)
+    backend_log.debug("Uploads found: %s", uploads)
+    backend_log.debug("Transcripts found: %s", transcripts)
 
     return {
         "logs": logs,

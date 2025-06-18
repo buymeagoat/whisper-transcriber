@@ -61,10 +61,12 @@ WHISPER_BIN = shutil.which("whisper")
 from dotenv import load_dotenv
 load_dotenv()
 
-REQUIRED_ENV_VARS = ["VITE_API_HOST"]
-missing_env = [var for var in REQUIRED_ENV_VARS if not os.getenv(var)]
-if missing_env:
-    raise RuntimeError(f"Missing required environment variables: {', '.join(missing_env)}")
+# Read API host from environment with a default for local development.
+API_HOST = os.getenv("VITE_API_HOST", "http://localhost:8000")
+if os.getenv("VITE_API_HOST") is None:
+    system_log.warning(
+        "VITE_API_HOST not set, defaulting to http://localhost:8000"
+    )
 
 # ─── DB Lock ───
 db_lock = threading.RLock()

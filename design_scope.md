@@ -143,9 +143,6 @@ whisper-transcriber/
 ├── logs/
 ├── uploads/
 ├── transcripts/
-├── tests/
-│   ├── test_unit.py
-│   └── test_integration.py
 ├── alembic.ini
 ├── pyproject.toml
 ├── requirements.txt

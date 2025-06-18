@@ -596,4 +596,3 @@ def spa_fallback(full_path: str):
 
     # Everything else is a front-end route -> serve React bundle
     return FileResponse(static_dir / "index.html")
-# ─────────────────────────────────────────────────────────────────

@@ -44,4 +44,3 @@ def validate_or_initialize_database():
 
     # ── Step 4: Success ──
     log.info("Database bootstrapping complete — schema verified.")
-

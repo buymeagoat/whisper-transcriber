@@ -46,7 +46,7 @@ TRANSCRIPTS_DIR = ROOT.parent / "transcripts"
 MODEL_DIR = ROOT.parent / "models"
 LOG_DIR = ROOT.parent / "logs"
 ACCESS_LOG = LOG_DIR / "access.log"
-DB_PATH = ROOT / "jobs.db"
+DB_PATH = Path(os.getenv("DB", str(ROOT / "jobs.db")))
 
 
 # ─── Ensure Required Dirs Exist ───

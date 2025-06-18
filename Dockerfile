@@ -1,28 +1,20 @@
-# ───────────────────────────────────────────────────────────────
-# 1. Base image with Python and ffmpeg
 FROM python:3.11-slim
 
-# 2. System dependencies for Whisper + ffmpeg
-RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    git \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ffmpeg git && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 3. Working directory inside container
 WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# 4. Copy dependency definitions
-COPY requirements.txt ./
+COPY api         ./api
+COPY models      ./models
+COPY uploads     ./uploads
+COPY transcripts ./transcripts
+COPY frontend/dist ./api/static
 
-# 5. Install Python dependencies
-RUN pip install --upgrade pip && pip install -r requirements.txt
-
-# 6. Copy all project files
-COPY . .
-
-# 7. Expose FastAPI's default port
+ENV VITE_API_HOST=http://localhost:8000
 EXPOSE 8000
-
-# 8. Run the FastAPI app via Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn","api.main:app","--host","0.0.0.0","--port","8000"]

@@ -2,17 +2,18 @@ import os
 import uuid
 import time
 import shutil
-import sqlite3
 import threading
 import subprocess
 import zipfile
 import io
 
+from datetime import timezone
 from datetime import datetime
 from subprocess import Popen, PIPE
 from pathlib import Path
 from contextlib import asynccontextmanager
 
+from fastapi import HTTPException
 from fastapi import FastAPI, UploadFile, File, Form, Request, status
 from fastapi.responses import (
     FileResponse,
@@ -22,12 +23,21 @@ from fastapi.responses import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
 from api.metadata_writer import run_metadata_writer
 from api.errors import ErrorCode, http_error
 from api.utils.logger import get_logger
+from api.orm_bootstrap import SessionLocal
+from api.models import Job
+from api.models import JobStatusEnum 
+from api.utils.logger import get_system_logger
+from zoneinfo import ZoneInfo
+LOCAL_TZ = ZoneInfo("America/Chicago")
+import psutil
 
 # ─── Logging ───
 backend_log = get_logger("backend")
+system_log = get_system_logger()
 
 # ─── Paths ───
 ROOT = Path(__file__).parent
@@ -37,6 +47,7 @@ MODEL_DIR = ROOT.parent / "models"
 LOG_DIR = ROOT.parent / "logs"
 ACCESS_LOG = LOG_DIR / "access.log"
 DB_PATH = ROOT / "jobs.db"
+
 
 # ─── Ensure Required Dirs Exist ───
 for p in (UPLOAD_DIR, TRANSCRIPTS_DIR, MODEL_DIR, LOG_DIR):
@@ -57,19 +68,17 @@ if missing_env:
     raise RuntimeError(f"Missing required environment variables: {', '.join(missing_env)}")
 
 # ─── DB Lock ───
-db_lock = threading.Lock()
-
-def get_conn():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL;")
-    return conn
+db_lock = threading.RLock()
 
 # ─── Lifespan Hook ───
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    system_log.info("App startup — lifespan entering.")
     rehydrate_incomplete_jobs()
     yield
+    system_log.info("App shutdown — lifespan exiting.")
+
+system_log.info("FastAPI app initialization starting.")
 
 # ─── App Setup ───
 app = FastAPI(lifespan=lifespan)
@@ -83,23 +92,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── DB Schema ───
-def init_db():
-    with get_conn() as conn:
-        conn.execute("""
-        CREATE TABLE IF NOT EXISTS metadata (
-            job_id TEXT PRIMARY KEY,
-            tokens INTEGER,
-            duration REAL,
-            abstract TEXT,
-            sample_rate INTEGER,
-            generated_at TEXT
-        )
-        """)
-        conn.commit()
-
-init_db()
-
 @app.middleware("http")
 async def access_logger(request: Request, call_next):
     start = time.time()
@@ -107,7 +99,7 @@ async def access_logger(request: Request, call_next):
     dur = time.time() - start
     host = getattr(request.client, "host", "localtest")
     with ACCESS_LOG.open("a", encoding="utf-8") as fh:
-        fh.write(f"[{datetime.utcnow().isoformat()}] {host} "
+        fh.write(f"[{datetime.now(LOCAL_TZ).isoformat()}] {host} "
                  f"{request.method} {request.url.path} -> "
                  f"{resp.status_code} in {dur:.2f}s\n")
     return resp
@@ -140,9 +132,11 @@ def get_duration(path: Union[str, os.PathLike]) -> float:
 
 def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
     with db_lock:
-        with get_conn() as conn:
-            conn.execute("UPDATE jobs SET status = 'processing' WHERE id = ?", (job_id,))
-            conn.commit()
+        with SessionLocal() as db:
+            job = db.query(Job).filter_by(id=job_id).first()
+            if job:
+                job.status = JobStatusEnum.PROCESSING
+                db.commit()
 
     def _run():
         log_path = LOG_DIR / f"{job_id}.log"
@@ -185,23 +179,23 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
                 logger.error("Whisper timed out")
                 proc.kill()
                 with db_lock:
-                    with get_conn() as conn:
-                        conn.execute(
-                            "UPDATE jobs SET status = ?, log_path = ? WHERE id = ?",
-                            ("failed: timeout", str(log_path), job_id)
-                        )
-                        conn.commit()
+                    with SessionLocal() as db:
+                        job = db.query(Job).filter_by(id=job_id).first()
+                        if job:
+                            job.status = JobStatusEnum.FAILED_TIMEOUT
+                            job.log_path = str(log_path)
+                            db.commit()
                 return
 
             except Exception as e:
                 logger.error(f"Subprocess launch failed: {e}")
                 with db_lock:
-                    with get_conn() as conn:
-                        conn.execute(
-                            "UPDATE jobs SET status = ?, log_path = ? WHERE id = ?",
-                            (f"failed: launch error: {e}", str(log_path), job_id)
-                        )
-                        conn.commit()
+                    with SessionLocal() as db:
+                        job = db.query(Job).filter_by(id=job_id).first()
+                        if job:
+                            job.status = JobStatusEnum.FAILED_LAUNCH_ERROR
+                            job.log_path = str(log_path)
+                            db.commit()
                 return
 
             raw_txt_path = job_dir / (Path(upload).with_suffix(".srt").name)
@@ -209,41 +203,61 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
                 raise RuntimeError(f"[{job_id}] Expected .srt not found at {raw_txt_path}")
 
             with db_lock:
-                with get_conn() as conn:
+                with SessionLocal() as db:
                     if proc.returncode == 0:
                         try:
                             logger.info("Starting metadata_writer...")
                             duration = get_duration(upload)
-                            conn.execute("UPDATE jobs SET status = 'enriching' WHERE id = ?", (job_id,))
-                            conn.commit()
-                            run_metadata_writer(job_id, raw_txt_path, duration, 16000, db_lock)
-                            logger.info("metadata_writer complete.")
-                            conn.execute(
-                                "UPDATE jobs SET status = 'completed', transcript_path = ? WHERE id = ?",
-                                (str(raw_txt_path), job_id)
-                            )
+                            job = db.query(Job).filter_by(id=job_id).first()
+                            if job:
+                                job.status = JobStatusEnum.ENRICHING
+                                db.commit()
+                                run_metadata_writer(
+                                    job_id, 
+                                    raw_txt_path, 
+                                    duration, 
+                                    16000, 
+                                    db_lock  # type: ignore[arg-type] 
+                                )
+                                logger.info("metadata_writer complete.")
+                                with SessionLocal() as db2:                      # NEW clean session
+                                    job2 = db2.query(Job).filter_by(id=job_id).first()
+                                    if job2:
+                                        job2.status = JobStatusEnum.COMPLETED
+                                        job2.transcript_path = str(raw_txt_path)
+                                        db2.commit()
+                                        logger.info("status -> COMPLETED committed")   # debug breadcrumb
                         except Exception as e:
-                            logger.error(f"Metadata failure: {e}")
-                            conn.execute(
-                                "UPDATE jobs SET status = ?, log_path = ? WHERE id = ?",
-                                (f"failed: {e}", str(log_path), job_id)
-                            )
+                            job = db.query(Job).filter_by(id=job_id).first()
+                            if job:
+                                job.status = JobStatusEnum.FAILED_UNKNOWN
+                                job.log_path = str(log_path)
+                                logger.error(f"Metadata writer failed: {e}")
+                            db.commit()
+                    elif proc.returncode < 0:
+                        logger.error(f"Whisper process terminated with signal {-proc.returncode}")
+                        job = db.query(Job).filter_by(id=job_id).first()
+                        if job:
+                            job.status = JobStatusEnum.FAILED_WHISPER_ERROR
+                            job.log_path = str(log_path)
+                            db.commit()
+                        logger.error(f"Whisper process terminated with signal {-proc.returncode}")
                     else:
                         logger.error("Whisper process failed — not zero return code")
-                        conn.execute(
-                            "UPDATE jobs SET status = ?, log_path = ? WHERE id = ?",
-                            ("failed: whisper error", str(log_path), job_id)
-                        )
-                    conn.commit()
+                        job = db.query(Job).filter_by(id=job_id).first()
+                        if job:
+                            job.status = JobStatusEnum.FAILED_WHISPER_ERROR
+                            job.log_path = str(log_path)
         except Exception as e:
             logger.critical(f"CRITICAL thread error: {e}")
             with db_lock:
-                with get_conn() as conn:
-                    conn.execute(
-                        "UPDATE jobs SET status = ?, log_path = ? WHERE id = ?",
-                        (f"failed: thread exception: {e}", str(log_path), job_id)
-                    )
-                    conn.commit()
+                with SessionLocal() as db:
+                    with SessionLocal() as db:
+                        job = db.query(Job).filter_by(id=job_id).first()
+                        if job:
+                            job.status = JobStatusEnum.FAILED_THREAD_EXCEPTION
+                            job.log_path = str(log_path)
+                            db.commit()
 
 
 
@@ -263,71 +277,86 @@ async def submit_job(file: UploadFile = File(...), model: str = Form("base")):
         backend_log.error(f"File save failed for job {job_id}: {e}")
         raise http_error(ErrorCode.FILE_SAVE_FAILED)
 
-    ts = datetime.utcnow().isoformat()
+    ts = datetime.now(LOCAL_TZ)
     with db_lock:
-        with get_conn() as conn:
-            conn.execute(
-                "INSERT INTO jobs (id, original_filename, saved_filename, model, created_at, status) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
-                (job_id, file.filename, saved, model, ts, "queued")
+        with SessionLocal() as db:
+            job = Job(
+                id=job_id,
+                original_filename=file.filename,
+                saved_filename=saved,
+                model=model,
+                created_at=ts,
+                status=JobStatusEnum.QUEUED
             )
-            conn.commit()
+            db.add(job)
+            db.commit()
     backend_log.info(f"Job {job_id} created.")
     handle_whisper(job_id, upload_path, job_dir, model)
     return {"job_id": job_id}
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 @app.get("/jobs")
 def list_jobs():
-    with get_conn() as conn:
-        rows = conn.execute(
-            "SELECT id, original_filename, model, created_at, status FROM jobs ORDER BY created_at DESC"
-        ).fetchall()
-    return [dict(row) for row in rows]
+    with SessionLocal() as db:
+        jobs = db.query(Job).order_by(Job.created_at.desc()).all()
+        return [
+            {
+                "id": j.id,
+                "original_filename": j.original_filename,
+                "model": j.model,
+                "created_at": j.created_at.isoformat(),
+                "status": j.status.value,
+            }
+            for j in jobs
+        ]
 
 @app.get("/jobs/{job_id}")
 def get_job(job_id: str):
-    with get_conn() as conn:
-        row = conn.execute(
-            "SELECT id, original_filename, model, created_at, status FROM jobs WHERE id=?",
-            (job_id,)
-        ).fetchone()
-    if not row:
-        raise http_error(ErrorCode.JOB_NOT_FOUND)
-    return dict(row)
+    with SessionLocal() as db:
+        job = db.query(Job).filter_by(id=job_id).first()
+        if not job:
+            raise http_error(ErrorCode.JOB_NOT_FOUND)
+        return {
+            "id": job.id,
+            "original_filename": job.original_filename,
+            "model": job.model,
+            "created_at": job.created_at.isoformat(),
+            "status": job.status.value,
+        }
 
 @app.delete("/jobs/{job_id}")
 def delete_job(job_id: str):
     with db_lock:
-        with get_conn() as conn:
-            row = conn.execute("SELECT saved_filename FROM jobs WHERE id=?", (job_id,)).fetchone()
-            if not row:
+        with SessionLocal() as db:
+            job = db.query(Job).filter_by(id=job_id).first()
+            if not job:
                 raise http_error(ErrorCode.JOB_NOT_FOUND)
 
-            saved_filename = row["saved_filename"]
+            saved_filename = job.saved_filename
             transcript_dir = TRANSCRIPTS_DIR / job_id
             upload_path = UPLOAD_DIR / saved_filename
-            log_path = LOG_DIR / f"{job_id}.log"  # ✅ new line
+            log_path = LOG_DIR / f"{job_id}.log"
 
-            # Remove transcript folder (recursive)
             shutil.rmtree(transcript_dir, ignore_errors=True)
 
-            # Remove uploaded audio
             try:
                 upload_path.unlink()
             except FileNotFoundError:
                 pass
 
-            # ✅ Remove log file
             try:
                 log_path.unlink()
             except FileNotFoundError:
                 pass
 
-            conn.execute("DELETE FROM jobs WHERE id=?", (job_id,))
-            conn.commit()
+            db.delete(job)
+            db.commit()
 
-    backend_log.info(f"Deleted job {job_id} and associated files")
-    return {"status": "deleted"}
+        backend_log.info(f"Deleted job {job_id} and associated files")
+        return {"status": "deleted"}
 
 
 @app.get("/logs/access", response_class=PlainTextResponse)
@@ -335,53 +364,54 @@ def get_access_log():
     return ACCESS_LOG.read_text()
 
 def rehydrate_incomplete_jobs():
-    with get_conn() as conn:
-        cur = conn.cursor()
-        cur.execute(
-            "SELECT id, saved_filename, model FROM jobs "
-            "WHERE status IN ('queued', 'processing', 'enriching')"
-        )
-        for job_id, saved_filename, model in cur.fetchall():
-            backend_log.info(f"Rehydrating job {job_id} with model '{model}'")
+    with SessionLocal() as db:
+        jobs = db.query(Job).filter(Job.status.in_([
+            JobStatusEnum.QUEUED,
+            JobStatusEnum.PROCESSING,
+            JobStatusEnum.ENRICHING
+        ])).all()
+        for job in jobs:
+            backend_log.info(f"Rehydrating job {job.id} with model '{job.model}'")
             try:
-                upload_path = UPLOAD_DIR / saved_filename
-                job_dir = TRANSCRIPTS_DIR / job_id
-                handle_whisper(job_id, upload_path, job_dir, model)
+                upload_path = UPLOAD_DIR / job.saved_filename
+                job_dir = TRANSCRIPTS_DIR / job.id
+                handle_whisper(job.id, upload_path, job_dir, job.model)
             except Exception as e:
-                backend_log.error(f"Failed to rehydrate job {job_id}: {e}")
+                backend_log.error(f"Failed to rehydrate job {job.id}: {e}")
+
 
 @app.get("/jobs/{job_id}/download")
 def download_transcript(job_id: str):
-    with get_conn() as conn:
-        row = conn.execute(
-            "SELECT transcript_path, original_filename FROM jobs WHERE id=?",
-            (job_id,)
-        ).fetchone()
-    if not row:
-        backend_log.warning(f"Download failed: job {job_id} not found")
-        raise http_error(ErrorCode.JOB_NOT_FOUND)
+    with SessionLocal() as db:
+        job = db.query(Job).filter_by(id=job_id).first()
+        if not job:
+            backend_log.warning(f"Download failed: job {job_id} not found")
+            raise http_error(ErrorCode.JOB_NOT_FOUND)
 
-    srt_path = Path(row["transcript_path"])  # 🔥 Fix here
-    if not srt_path.exists():
-        backend_log.error(f"Transcript file missing for job {job_id} at {srt_path}")
-        raise http_error(ErrorCode.FILE_NOT_FOUND)
+        if not job.transcript_path:
+            backend_log.error(f"Transcript path is missing for job {job_id}")
+            raise http_error(ErrorCode.FILE_NOT_FOUND)
 
-    original_name = Path(row["original_filename"]).stem + ".srt"
-    return FileResponse(
-        path=srt_path,
-        media_type="text/plain",
-        filename=original_name  # ✅ matches upload name
-    )
+        srt_path = Path(job.transcript_path)
+        if not srt_path.exists():
+            backend_log.error(f"Transcript file missing for job {job_id} at {srt_path}")
+            raise http_error(ErrorCode.FILE_NOT_FOUND)
+
+        original_name = Path(job.original_filename).stem + ".srt"
+        return FileResponse(
+            path=srt_path,
+            media_type="text/plain",
+            filename=original_name
+        )
 
 @app.get("/transcript/{job_id}/view", response_class=HTMLResponse)
 def transcript_view(job_id: str, request: Request):
-    with get_conn() as conn:
-        row = conn.execute("SELECT transcript_path FROM jobs WHERE id=?", (job_id,)).fetchone()
+    with SessionLocal() as db:
+        job = db.query(Job).filter_by(id=job_id).first()
+        if not job:
+            return HTMLResponse(content=f"<h2>Job not found: {job_id}</h2>", status_code=404)
 
-    if not row:
-        return HTMLResponse(content=f"<h2>Job not found: {job_id}</h2>", status_code=404)
-
-    transcript_path = row["transcript_path"]
+        transcript_path = job.transcript_path
 
     if not transcript_path:
         return HTMLResponse(content=f"<h2>No transcript available for job {job_id}</h2>", status_code=404)
@@ -411,23 +441,23 @@ def transcript_view(job_id: str, request: Request):
 @app.post("/jobs/{job_id}/restart")
 def restart_job(job_id: str):
     with db_lock:
-        with get_conn() as conn:
-            row = conn.execute("SELECT saved_filename, model FROM jobs WHERE id=?", (job_id,)).fetchone()
-            if not row:
+        with SessionLocal() as db:
+            job = db.query(Job).filter_by(id=job_id).first()
+            if not job:
                 raise http_error(ErrorCode.JOB_NOT_FOUND)
 
-            saved_filename, model = row["saved_filename"], row["model"]
+            saved_filename = job.saved_filename
+            model = job.model
             upload_path = UPLOAD_DIR / saved_filename
             job_dir = TRANSCRIPTS_DIR / job_id
 
             if not upload_path.exists():
                 raise http_error(ErrorCode.FILE_NOT_FOUND)
 
-            # Clear old transcript folder if it exists
             shutil.rmtree(job_dir, ignore_errors=True)
 
-            conn.execute("UPDATE jobs SET status = 'queued' WHERE id = ?", (job_id,))
-            conn.commit()
+            job.status = JobStatusEnum.QUEUED
+            db.commit()
 
     backend_log.info(f"Restarting job {job_id}")
     handle_whisper(job_id, upload_path, job_dir, model)
@@ -495,9 +525,9 @@ def delete_admin_file(payload: dict):
 @app.post("/admin/reset")
 def reset_system():
     with db_lock:
-        with get_conn() as conn:
-            conn.execute("DELETE FROM jobs")
-            conn.commit()
+        with SessionLocal() as db:
+            db.query(Job).delete()
+            db.commit()
 
     for directory in [UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR]:
         for file in directory.rglob("*"):
@@ -523,6 +553,18 @@ def download_all():
     return StreamingResponse(mem_zip, media_type="application/zip", headers={
         "Content-Disposition": "attachment; filename=all_data.zip"
     })
+# ── NEW: /admin/stats ─────────────────────────────────────
+@app.get("/admin/stats")
+def admin_stats():
+    """Return simple CPU and memory metrics for the running container."""
+    cpu_percent = psutil.cpu_percent(interval=0.1)
+    mem = psutil.virtual_memory()
+    return {
+        "cpu_percent": cpu_percent,
+        "mem_used_mb": round(mem.used / (1024 * 1024), 1),
+        "mem_total_mb": round(mem.total / (1024 * 1024), 1)
+    }
+# ──────────────────────────────────────────────────────────
 
 @app.get("/logs/{filename}", response_class=PlainTextResponse)
 def get_log_file(filename: str):
@@ -530,3 +572,28 @@ def get_log_file(filename: str):
     if not path.exists():
         raise http_error(ErrorCode.FILE_NOT_FOUND)
     return path.read_text()
+
+# ── Serve React SPA ───────────────────────────────────────
+static_dir = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=static_dir, html=True), name="static")
+
+@app.get("/", include_in_schema=False)
+def spa_index():
+    return FileResponse(static_dir / "index.html")
+# ──────────────────────────────────────────────────────────
+
+# ── React-Router fallback ────────────────────────────────────────
+@app.get("/{full_path:path}", include_in_schema=False)
+def spa_fallback(full_path: str):
+    # Let real API and asset paths keep their normal behaviour
+    protected = (
+        "static", "uploads", "transcripts", "jobs",
+        "log", "admin/files", "admin/reset", "admin/download-all",
+        "health", "docs", "openapi.json"
+    )
+    if full_path.startswith(protected):
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    # Everything else is a front-end route -> serve React bundle
+    return FileResponse(static_dir / "index.html")
+# ─────────────────────────────────────────────────────────────────

@@ -13,6 +13,8 @@ from fastapi import HTTPException
 
 
 class ErrorCode(IntEnum):
+    def __str__(self):
+        return f"{self.name} ({self.value})"
     # 4xx – client
     UNSUPPORTED_MEDIA    = 40001  # Unsupported file format
     FILE_TOO_LARGE       = 40002  # > 2 GB limit
@@ -57,7 +59,9 @@ _HTTP_STATUS = {
 
 def http_error(code: ErrorCode) -> HTTPException:
     """Return FastAPI HTTPException with structured JSON body."""
+    status = _HTTP_STATUS.get(code, 500)
+    message = ERROR_MAP.get(code, "Unknown error occurred.")
     return HTTPException(
-        status_code=_HTTP_STATUS[code],
-        detail={"code": int(code), "message": ERROR_MAP[code]},
+        status_code=status,
+        detail={"code": int(code), "message": message},
     )

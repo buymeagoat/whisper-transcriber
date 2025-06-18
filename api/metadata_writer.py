@@ -1,11 +1,13 @@
 import json
 import re
 import os
-import sqlite3
+import threading
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
-from sqlalchemy.engine.url import make_url
+
+from api.orm_bootstrap import SessionLocal
+from api.models import TranscriptMetadata
 from api.utils.logger import get_logger
 
 TRANSCRIPTS_DIR = Path(__file__).parent.parent / "transcripts"
@@ -15,15 +17,14 @@ def clean_text(text: str) -> str:
 
 def run_metadata_writer(
     job_id: str,
-    transcript_txt_path: Path,
+    transcript_path: Path,
     duration_sec: float,
-    sample_rate: Optional[int] = None,
-    db_lock: Optional[object] = None,  # Unused in MVP
-) -> None:
+    sample_rate: int,
+    db_lock: threading.Lock
+):
     logger = get_logger(job_id)
 
-    txt_path = Path(transcript_txt_path)
-
+    txt_path = transcript_path
     if not txt_path.exists():
         logger.warning(f"Transcript path does not exist: {txt_path}")
         text = ""
@@ -33,7 +34,7 @@ def run_metadata_writer(
     tokens = len(text.split())
     abstract = f"{text[:500]}..." if text else "*No content*"
 
-    metadata = {
+    metadata_dict = {
         "job_id": job_id,
         "tokens": tokens,
         "duration": duration_sec,
@@ -46,37 +47,26 @@ def run_metadata_writer(
     job_dir = TRANSCRIPTS_DIR / job_id
     job_dir.mkdir(parents=True, exist_ok=True)
     output_path = job_dir / "metadata.json"
-    output_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+    output_path.write_text(json.dumps(metadata_dict, indent=2), encoding="utf-8")
 
     logger.info(f"[{job_id}] metadata_writer wrote {output_path}")
     logger.info(f"[{job_id}] transcript_txt_path exists: {txt_path.exists()}")
     logger.info(f"[{job_id}] abstract preview: {abstract[:80]}")
 
-    # Get SQLite DB path from URL string
-    db_url = os.environ.get("DB", "sqlite:///api/jobs.db")
-    db_path = make_url(db_url).database
-    if not db_path:
-        raise RuntimeError(f"[{job_id}] ERROR: Could not extract DB path from URL: {db_url}")
-
+    # Write to database via SQLAlchemy ORM
     try:
-        with sqlite3.connect(db_path) as conn:
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO metadata (
-                    job_id, tokens, duration, abstract,
-                    sample_rate, generated_at
-                ) VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    job_id,
-                    tokens,
-                    duration_sec,
-                    abstract,
-                    sample_rate,
-                    metadata["generated_at"]
-                )
-            )
-            conn.commit()
-            logger.info(f"[{job_id}] metadata inserted into DB: {db_path}")
+        with db_lock:
+            with SessionLocal() as session:
+                session.merge(TranscriptMetadata(
+                    job_id=job_id,
+                    tokens=tokens,
+                    duration=duration_sec,
+                    abstract=abstract,
+                    sample_rate=sample_rate,
+                    generated_at=datetime.fromisoformat(metadata_dict["generated_at"]),
+                ))
+                session.commit()
+                logger.info(f"[{job_id}] metadata inserted via ORM")
     except Exception as e:
-        logger.info(f"[{job_id}] ERROR inserting metadata into DB: {e}")
+        logger.exception(f"[{job_id}] ERROR inserting metadata into DB")
+        raise

@@ -10,6 +10,7 @@ export default function UploadPage() {
   const [model, setModel] = useState("tiny");
   const [status, setStatus] = useState(null);
   const [jobId, setJobId] = useState(null);
+  const [showNewJobBtn, setShowNewJobBtn] = useState(false);
   const inputRef = useRef();
   const navigate = useNavigate();
 
@@ -41,7 +42,15 @@ export default function UploadPage() {
   const handleDelete = (index) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
-
+// ── NEW handler (component scope) ─────────────────────────
+const handleNewJob = () => {
+  setFiles([]);
+  setJobId(null);
+  setStatus(null);
+  setShowNewJobBtn(false);
+  inputRef.current.value = "";
+};
+// ──────────────────────────────────────────────────────────
     const handleUploadAll = async () => {
     for (const { file, error } of files) {
       if (error) continue;
@@ -54,7 +63,7 @@ export default function UploadPage() {
       setJobId(null);
 
       try {
-        const res = await fetch("/jobs", { method: "POST", body: formData });
+        const res = await fetch(`${import.meta.env.VITE_API_HOST}/jobs`, { method: "POST", body: formData });
         let data = {};
         try {
           data = await res.json();
@@ -66,6 +75,7 @@ export default function UploadPage() {
         if (res.ok && data.job_id) {
           setStatus(`✅ Job started: ${file.name}`);
           setJobId(data.job_id);
+          setShowNewJobBtn(true);
         } else {
           setStatus(`❌ ${file.name}: ${data.error || "Unknown error"}`);
         }
@@ -165,21 +175,44 @@ export default function UploadPage() {
         <div style={{ fontSize: "0.85rem", color: "#ccc", marginTop: "0.75rem" }}>{status}</div>
       )}
 
+      {/* --- UploadPage action buttons ---------------------------------- */}
       {jobId && (
-        <button
-          onClick={() => navigate(ROUTES.STATUS.replace(":jobId", jobId))}
-          style={{
-            marginTop: "1.5rem",
-            padding: "0.5rem 1rem",
-            backgroundColor: "#16a34a",
-            color: "white",
-            borderRadius: "0.25rem",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          View Job Status
-        </button>
+        <>
+          {/* View Job Status */}
+          <button
+            onClick={() => navigate(ROUTES.STATUS.replace(":jobId", jobId))}
+            style={{
+              marginTop: "1.5rem",
+              padding: "0.5rem 1rem",
+              backgroundColor: "#16a34a",
+              color: "white",
+              borderRadius: "0.25rem",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            View Job Status
+          </button>
+
+          {/* Start a New Job (appears only after a successful upload) */}
+          {showNewJobBtn && (
+            <button
+              onClick={handleNewJob}
+              style={{
+                marginTop: "0.75rem",
+                marginLeft: "0.75rem",
+                padding: "0.5rem 1rem",
+                backgroundColor: "#0ea5e9",
+                color: "white",
+                borderRadius: "0.25rem",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              Start a New Job
+            </button>
+          )}
+        </>
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ROUTES } from "../routes";
 export default function AdminPage() {
   const [logs, setLogs] = useState([]);
@@ -7,7 +7,27 @@ export default function AdminPage() {
   const [error, setError] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [refreshToggle, setRefreshToggle] = useState(false);
+  const [stats, setStats] = useState(null);
  const API_HOST = ROUTES.API;
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch(`${API_HOST}/admin/stats`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setStats(data);
+    } catch {
+      setStats(null);
+      setFeedback("Failed to load server stats.");
+    }
+  };
+// NEW – poll every 30 s
+useEffect(() => {
+  fetchStats();                                // first call on mount
+  const id = setInterval(fetchStats, 30000);   // 30 000 ms = 30 s
+  return () => clearInterval(id);              // cleanup on unmount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   const fetchFiles = async () => {
     try {
@@ -136,6 +156,13 @@ export default function AdminPage() {
   return (
     <div style={{ padding: "2rem", color: "white", backgroundColor: "#18181b", minHeight: "100vh" }}>
       <h2 style={{ fontSize: "1.875rem", marginBottom: "1rem" }}>Admin Controls</h2>
+            {/* NEW stats read-out */}
+      {stats && (
+        <div style={{ marginTop:"1rem", color:"#a1a1aa" }}>
+          <strong>CPU&nbsp;Usage:</strong> {stats.cpu_percent}% &nbsp;|&nbsp;
+          <strong>Memory:</strong> {stats.mem_used_mb}/{stats.mem_total_mb}&nbsp;MB
+        </div>
+      )}
 
       {error && <p style={{ color: "red" }}>{error}</p>}
       {feedback && <p style={{ color: "#22c55e", marginBottom: "1rem" }}>{feedback}</p>}
@@ -145,33 +172,18 @@ export default function AdminPage() {
       {renderFileList("Transcripts", transcripts, "transcripts")}
 
       <div style={{ marginTop: "2rem", display: "flex", gap: "1rem" }}>
-        <button
-          onClick={handleReset}
-          style={{
-            backgroundColor: "#dc2626",
-            color: "white",
-            border: "none",
-            padding: "0.5rem 1rem",
-            borderRadius: "0.25rem",
-            cursor: "pointer"
-          }}
-        >
+        <button onClick={handleReset}
+          style={{ backgroundColor:"#dc2626", color:"white", border:"none",
+                  padding:"0.5rem 1rem", borderRadius:"0.25rem", cursor:"pointer" }}>
           Reset System
         </button>
 
-        <button
-          onClick={handleDownloadAll}
-          style={{
-            backgroundColor: "#2563eb",
-            color: "white",
-            border: "none",
-            padding: "0.5rem 1rem",
-            borderRadius: "0.25rem",
-            cursor: "pointer"
-          }}
-        >
+        <button onClick={handleDownloadAll}
+          style={{ backgroundColor:"#2563eb", color:"white", border:"none",
+                  padding:"0.5rem 1rem", borderRadius:"0.25rem", cursor:"pointer" }}>
           Download All Data (ZIP)
         </button>
+
       </div>
     </div>
   );

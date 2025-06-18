@@ -5,7 +5,7 @@ export default function ActiveJobsPage() {
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
   const fetchJobs = () => {
-    fetch("/jobs")
+    fetch(`${import.meta.env.VITE_API_HOST}/jobs`)
       .then(res => res.json())
       .then(data => {
         setJobs(data);

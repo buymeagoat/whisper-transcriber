@@ -36,9 +36,7 @@ python-dotenv>=1.1.0
 # --- JSON performance boost (optional but auto-detected by FastAPI) ---
 orjson>=3.10.0
 
-# --- Dev / test ---
-pytest>=8.2.0
-pytest-asyncio>=0.23.5
+# --- Dev tools ---
 watchdog>=4.0.0
 
 # ------------------------------------------------

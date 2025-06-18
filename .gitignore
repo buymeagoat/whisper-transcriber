@@ -49,7 +49,6 @@ coverage.xml
 *.cover
 *.py,cover
 .tox/
-.pytest_cache/
 
 # === Docker ===
 *.tar

@@ -17,7 +17,10 @@ def test_backend_job_lifecycle(client, submit_stub_job):
     assert resp.status_code == 200
     assert "stub transcript" in resp.text
 
-    # Metadata should exist
+    # Metadata should exist and come from DB
     resp = client.get(f"/metadata/{job_id}")
     assert resp.status_code == 200
-    assert resp.json()["tokens"] == 2
+    meta = resp.json()
+    assert meta["job_id"] == job_id
+    assert meta["tokens"] == 2
+    assert meta["duration"] == 30.0

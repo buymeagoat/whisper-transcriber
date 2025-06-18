@@ -438,6 +438,24 @@ def transcript_view(job_id: str, request: Request):
     """
     return HTMLResponse(content=html)
 
+# ── New: Transcript Metadata Endpoint ─────────────────────────────
+@app.get("/metadata/{job_id}")
+def get_metadata(job_id: str):
+    """Return metadata for a completed transcript."""
+    with SessionLocal() as db:
+        meta = db.query(TranscriptMetadata).filter_by(job_id=job_id).first()
+        if not meta:
+            raise http_error(ErrorCode.JOB_NOT_FOUND)
+
+        return {
+            "job_id": meta.job_id,
+            "tokens": meta.tokens,
+            "duration": meta.duration,
+            "abstract": meta.abstract,
+            "sample_rate": meta.sample_rate,
+            "generated_at": meta.generated_at.isoformat() if meta.generated_at else None,
+        }
+
 @app.post("/jobs/{job_id}/restart")
 def restart_job(job_id: str):
     with db_lock:

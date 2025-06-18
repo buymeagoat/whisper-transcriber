@@ -14,12 +14,6 @@ SessionLocal = sessionmaker(bind=engine)
 
 log = get_logger("orm")
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-DATABASE_URL = f"sqlite:///{DB_PATH}"
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(bind=engine)
 
 def validate_or_initialize_database():
     log.info("Bootstrapping database...")

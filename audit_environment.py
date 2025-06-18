@@ -10,6 +10,10 @@ from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
 
+from api.utils.logger import get_system_logger
+
+backend_log = get_system_logger("audit")
+
 PROJECT_ROOT = Path(__file__).resolve().parent
 EXCLUDED_DIRS = {"venv", "__pycache__"}
 KEY_DIRS = ["uploads", "transcripts", "logs", "models"]
@@ -43,7 +47,9 @@ def find_undefined_function_calls():
                     try:
                         tree = ast.parse(f.read())
                     except SyntaxError as e:
-                        print(f"⚠️ Skipping file with syntax error: {entry['path']} ({e})")
+                        backend_log.warning(
+                            "Skipping file with syntax error: %s (%s)", entry["path"], e
+                        )
                         continue
 
                     for node in ast.walk(tree):
@@ -71,7 +77,9 @@ def detect_duplicate_symbols():
                     try:
                         tree = ast.parse(f.read(), filename=entry["path"])
                     except SyntaxError as e:
-                        print(f"⚠️ Skipping file with syntax error: {entry['path']} ({e})")
+                        backend_log.warning(
+                            "Skipping file with syntax error: %s (%s)", entry["path"], e
+                        )
                         continue
 
                     for node in ast.walk(tree):
@@ -216,13 +224,26 @@ def main():
 
     out_path = PROJECT_ROOT / "environment_audit.json"
     out_path.write_text(json.dumps(report, indent=2))
-    print("\n🔍 Summary:")
-    print(f"- Python files scanned: {sum(report['py_file_counts_by_folder'].values())}")
-    print(f"- Duplicate symbols: {len(report['codebase_health']['duplicate_symbols'])}")
-    print(f"- Undefined calls: {len(report['codebase_health']['undefined_function_calls'])}")
-    print(f"- Orphaned modules: {len(report.get('orphaned_modules', []))}")
-    print(f"✅ Environment audit written to: {out_path}")
+    backend_log.info("\n🔍 Summary:")
+    backend_log.info(
+        "- Python files scanned: %s",
+        sum(report["py_file_counts_by_folder"].values()),
+    )
+    backend_log.info(
+        "- Duplicate symbols: %s",
+        len(report["codebase_health"]["duplicate_symbols"]),
+    )
+    backend_log.info(
+        "- Undefined calls: %s",
+        len(report["codebase_health"]["undefined_function_calls"]),
+    )
+    backend_log.info(
+        "- Orphaned modules: %s",
+        len(report.get("orphaned_modules", [])),
+    )
+    backend_log.info("✅ Environment audit written to: %s", out_path)
 
 
 if __name__ == "__main__":
     main()
+

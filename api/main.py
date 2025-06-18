@@ -54,9 +54,8 @@ for p in (UPLOAD_DIR, TRANSCRIPTS_DIR, MODEL_DIR, LOG_DIR):
     p.mkdir(parents=True, exist_ok=True)
 
 # ─── Whisper CLI Check ───
+# Only check for the whisper binary when needed.
 WHISPER_BIN = shutil.which("whisper")
-if not WHISPER_BIN:
-    raise RuntimeError("Whisper CLI not found in PATH. Is it installed and in the environment?")
 
 # ─── ENV SAFETY CHECK ───
 from dotenv import load_dotenv
@@ -131,6 +130,13 @@ def get_duration(path: Union[str, os.PathLike]) -> float:
         return 0.0
 
 def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
+    global WHISPER_BIN
+    WHISPER_BIN = WHISPER_BIN or shutil.which("whisper")
+    if not WHISPER_BIN:
+        raise RuntimeError(
+            "Whisper CLI not found in PATH. Is it installed and in the environment?"
+        )
+
     with db_lock:
         with SessionLocal() as db:
             job = db.query(Job).filter_by(id=job_id).first()

@@ -54,7 +54,6 @@ coverage.xml
 *.tar
 *.img
 docker-compose.override.yml
-.dockerignore
 
 # Prevent Docker checksum errors from local envs
 **/bin/

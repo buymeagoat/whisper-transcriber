@@ -1,10 +1,8 @@
 import json
 import re
-import os
 import threading
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from api.orm_bootstrap import SessionLocal
 from api.models import TranscriptMetadata

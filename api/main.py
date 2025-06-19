@@ -7,7 +7,6 @@ import subprocess
 import zipfile
 import io
 
-from datetime import timezone
 from datetime import datetime
 from subprocess import Popen, PIPE
 from pathlib import Path

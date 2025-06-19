@@ -1,0 +1,15 @@
+# virtual envs
+venv/
+testenv/
+
+# node cache
+**/node_modules/
+
+# python cache
+**/__pycache__/
+*.py[cod]
+
+# VCS & OS cruft
+.git/
+.DS_Store
+Thumbs.db

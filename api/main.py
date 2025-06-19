@@ -29,7 +29,7 @@ from api.errors import ErrorCode, http_error
 from api.utils.logger import get_logger
 from api.orm_bootstrap import SessionLocal
 from api.models import Job
-from api.models import JobStatusEnum 
+from api.models import JobStatusEnum, TranscriptMetadata
 from api.utils.logger import get_system_logger
 from zoneinfo import ZoneInfo
 LOCAL_TZ = ZoneInfo("America/Chicago")
@@ -335,6 +335,20 @@ def get_job(job_id: str):
             "model": job.model,
             "created_at": job.created_at.isoformat(),
             "status": job.status.value,
+        }
+
+@app.get("/metadata/{job_id}")
+def get_metadata(job_id: str):
+    with SessionLocal() as db:
+        metadata = db.query(TranscriptMetadata).filter_by(job_id=job_id).first()
+        if not metadata:
+            raise http_error(ErrorCode.JOB_NOT_FOUND)
+        return {
+            "tokens": metadata.tokens,
+            "duration": metadata.duration,
+            "abstract": metadata.abstract,
+            "sample_rate": metadata.sample_rate,
+            "generated_at": metadata.generated_at.isoformat(),
         }
 
 @app.delete("/jobs/{job_id}")

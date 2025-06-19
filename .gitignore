@@ -83,3 +83,4 @@ logs/
 *.bak
 *.orig
 *.rej
+models/

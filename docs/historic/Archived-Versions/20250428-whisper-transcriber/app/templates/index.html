@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Audio{% endblock %}
+
+{% block content %}
+<h1>Upload Audio</h1>
+<form method="POST" action="/upload" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="submit">Upload</button>
+</form>
+{% endblock %}
+

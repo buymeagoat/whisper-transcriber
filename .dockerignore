@@ -13,3 +13,17 @@ testenv/
 .git/
 .DS_Store
 Thumbs.db
+
+# project data
+uploads/
+transcripts/
+logs/
+
+# frontend
+frontend/node_modules/
+frontend/dist/
+
+# build artifacts
+build/
+dist/
+*.log

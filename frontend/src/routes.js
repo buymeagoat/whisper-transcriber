@@ -7,5 +7,5 @@ export const ROUTES = {
   TRANSCRIPT_VIEW: "/transcript/:jobId/view",
   STATUS: "/status/:jobId",
   PROGRESS: "/progress/:jobId",
-  API: "http://localhost:8000"
+  API: import.meta.env.VITE_API_HOST || "http://localhost:8000"
 };

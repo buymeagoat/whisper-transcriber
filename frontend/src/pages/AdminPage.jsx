@@ -34,19 +34,18 @@ useEffect(() => {
       const res = await fetch(`${API_HOST}/admin/files`);
       if (!res.ok) throw new Error();
       const raw = await res.text();
-      console.log("Raw /admin/files response:", raw);
 
       try {
         const data = JSON.parse(raw);
         setLogs(data.logs || []);
         setUploads(data.uploads || []);
         setTranscripts(data.transcripts || []);
-        setError(null);  // ✅ clear error if successful
-      } catch (parseError) {
-        console.error("JSON parse failed:", parseError);
+        setError(null);
+        setFeedback("File lists refreshed.");
+      } catch {
         setError("Failed to parse server response.");
+        return;
       }
-      setError(null); // clear any old error
     } catch {
       setError("Failed to load file listings.");
     }

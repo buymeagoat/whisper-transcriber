@@ -11,8 +11,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY api         ./api
 COPY models      ./models
-COPY uploads     ./uploads
-COPY transcripts ./transcripts
+RUN mkdir -p uploads transcripts
 COPY frontend/dist ./api/static
 
 ENV VITE_API_HOST=http://localhost:8000

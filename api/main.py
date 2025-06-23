@@ -262,12 +262,11 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
             logger.critical(f"CRITICAL thread error: {e}")
             with db_lock:
                 with SessionLocal() as db:
-                    with SessionLocal() as db:
-                        job = db.query(Job).filter_by(id=job_id).first()
-                        if job:
-                            job.status = JobStatusEnum.FAILED_THREAD_EXCEPTION
-                            job.log_path = str(log_path)
-                            db.commit()
+                    job = db.query(Job).filter_by(id=job_id).first()
+                    if job:
+                        job.status = JobStatusEnum.FAILED_THREAD_EXCEPTION
+                        job.log_path = str(log_path)
+                        db.commit()
 
 
 

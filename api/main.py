@@ -386,6 +386,10 @@ def delete_job(job_id: str):
 
 @app.get("/logs/access", response_class=PlainTextResponse)
 def get_access_log():
+    """Return the server access log or 404 if missing."""
+    if not ACCESS_LOG.exists():
+        backend_log.warning("Access log missing")
+        return PlainTextResponse("", status_code=404)
     return ACCESS_LOG.read_text()
 
 def rehydrate_incomplete_jobs():

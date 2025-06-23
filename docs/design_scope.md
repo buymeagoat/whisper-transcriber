@@ -66,3 +66,33 @@ The list below ranks future enhancements from simplest to most complex. Items ma
 8. **Web-based file manager for logs/uploads/transcripts** – Not yet
 9. **Shell access via web UI** – Not yet
 
+### Ideas from Historic Documents
+
+10. **Resume jobs after crash or cancel** – from archived designs
+11. **Stream logs to UI via WebSocket** – from handoff notes
+12. **Download job archive (.zip)** – transcripts and logs together
+13. **Role-based authentication** – admin can add users
+14. **Expose `/metrics` endpoint for monitoring**
+15. **Auto-delete old transcripts after 30 days**
+16. **Add `/health` and `/version` endpoints** – verify service status
+17. **Improve status messaging in UI** – show queueing/transcribing/saving
+18. **Provide CLI wrapper for non-UI usage**
+19. **Queue limit or concurrency throttle** – prevent overload
+20. **Support `.vtt` transcript export**
+21. **Docker Compose setup** – optional container orchestration
+22. **Admin panel health checks and job cleanup**
+23. **UI progress bars with word-level timestamps**
+
+
+24. **Allow multiple files per upload with validation** – upcoming UI change
+25. **Dashboard KPIs for throughput** – show metrics on admin page
+26. **Settings page to customize default model** – choose options
+27. **Enhance CLI orchestrate.py with watch mode** – monitor jobs from CLI
+28. **Heartbeat table and `/heartbeat` endpoint** – detect stalled workers
+29. **Web-based log viewer** – display logs in browser
+30. **Sortable and searchable job lists** – filter by file name or status
+31. **Status toasts for admin actions** – show success messages
+32. **Playback or text toggle for completed jobs** – media or text view
+33. **Use `updated_at` for job sorting/pagination** – future feature
+34. **Download transcripts as `.txt`** – preserve timestamps
+35. **Zip download of all data** – admin can export entire system

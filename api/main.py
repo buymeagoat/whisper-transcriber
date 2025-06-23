@@ -317,6 +317,7 @@ def list_jobs():
                 "original_filename": j.original_filename,
                 "model": j.model,
                 "created_at": j.created_at.isoformat(),
+                "updated": j.updated_at.isoformat(),
                 "status": j.status.value,
             }
             for j in jobs
@@ -333,6 +334,7 @@ def get_job(job_id: str):
             "original_filename": job.original_filename,
             "model": job.model,
             "created_at": job.created_at.isoformat(),
+            "updated": job.updated_at.isoformat(),
             "status": job.status.value,
         }
 

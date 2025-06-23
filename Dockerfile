@@ -5,12 +5,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+ARG MODELS_DIR=models
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY api         ./api
-COPY models      ./models
+COPY ${MODELS_DIR} ./models
+RUN test -d ./models && [ "$(ls -A ./models)" ]
 RUN mkdir -p uploads transcripts
 COPY frontend/dist ./api/static
 

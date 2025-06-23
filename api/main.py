@@ -1,11 +1,7 @@
 import os
 import time
-import shutil
-import threading
-import subprocess
 
 from datetime import datetime
-from subprocess import Popen, PIPE
 from pathlib import Path
 from contextlib import asynccontextmanager
 
@@ -16,13 +12,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from api.routes import jobs, admin, logs
 
-from api.metadata_writer import run_metadata_writer
-from api.errors import ErrorCode, http_error
 from api.utils.logger import get_logger
 from api.orm_bootstrap import SessionLocal, validate_or_initialize_database
 from api.models import Job
 from api.models import JobStatusEnum
 from api.utils.logger import get_system_logger
+from api.app_state import (
+    UPLOAD_DIR,
+    TRANSCRIPTS_DIR,
+    MODEL_DIR,
+    LOG_DIR,
+    db_lock,
+    handle_whisper,
+)
 from zoneinfo import ZoneInfo
 
 LOCAL_TZ = ZoneInfo("America/Chicago")
@@ -33,21 +35,7 @@ system_log = get_system_logger()
 
 # ─── Paths ───
 ROOT = Path(__file__).parent
-UPLOAD_DIR = ROOT.parent / "uploads"
-TRANSCRIPTS_DIR = ROOT.parent / "transcripts"
-MODEL_DIR = ROOT.parent / "models"
-LOG_DIR = ROOT.parent / "logs"
 ACCESS_LOG = LOG_DIR / "access.log"
-DB_PATH = Path(os.getenv("DB", str(ROOT / "jobs.db")))
-
-
-# ─── Ensure Required Dirs Exist ───
-for p in (UPLOAD_DIR, TRANSCRIPTS_DIR, MODEL_DIR, LOG_DIR):
-    p.mkdir(parents=True, exist_ok=True)
-
-# ─── Whisper CLI Check ───
-# Only check for the whisper binary when needed.
-WHISPER_BIN = shutil.which("whisper")
 
 # ─── ENV SAFETY CHECK ───
 from dotenv import load_dotenv
@@ -58,9 +46,6 @@ load_dotenv()
 API_HOST = os.getenv("VITE_API_HOST", "http://localhost:8000")
 if os.getenv("VITE_API_HOST") is None:
     system_log.warning("VITE_API_HOST not set, defaulting to http://localhost:8000")
-
-# ─── DB Lock ───
-db_lock = threading.RLock()
 
 
 def validate_models_dir():
@@ -126,191 +111,6 @@ for route in app.routes:
     backend_log.debug(
         f"Path: {getattr(route, 'path', 'n/a')}  →  Name: {getattr(route, 'name', 'n/a')}  →  Type: {type(route)}"
     )
-
-from typing import Union
-
-
-def get_duration(path: Union[str, os.PathLike]) -> float:
-    if shutil.which("ffprobe") is None:
-        raise RuntimeError("ffprobe not found in PATH. Required to determine duration.")
-
-    try:
-        out = subprocess.run(
-            [
-                "ffprobe",
-                "-v",
-                "error",
-                "-show_entries",
-                "format=duration",
-                "-of",
-                "default=noprint_wrappers=1:nokey=1",
-                str(path),
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-        )
-        return float(out.stdout.strip())
-    except Exception:
-        return 0.0
-
-
-def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
-    global WHISPER_BIN
-    WHISPER_BIN = WHISPER_BIN or shutil.which("whisper")
-    if not WHISPER_BIN:
-        raise RuntimeError(
-            "Whisper CLI not found in PATH. Is it installed and in the environment?"
-        )
-
-    with db_lock:
-        with SessionLocal() as db:
-            job = db.query(Job).filter_by(id=job_id).first()
-            if job:
-                job.status = JobStatusEnum.PROCESSING
-                db.commit()
-
-    def _run():
-        log_path = LOG_DIR / f"{job_id}.log"
-        logger = get_logger(job_id)
-        logger.info("_run() started")
-
-        try:
-            job_dir.mkdir(parents=True, exist_ok=True)
-            output_filename = Path(upload).stem + ".srt"
-
-            cmd = [
-                WHISPER_BIN,
-                str(upload),
-                "--model",
-                model,
-                "--model_dir",
-                str(MODEL_DIR),
-                "--output_dir",
-                str(job_dir),
-                "--output_format",
-                "srt",
-                "--language",
-                "en",
-                "--verbose",
-                "True",
-            ]
-            logger.info(f"Launching subprocess: {' '.join(cmd)}")
-            logger.info(f"FINAL CMD: {' '.join(cmd)}")
-
-            try:
-                with Popen(cmd, stdout=PIPE, stderr=PIPE, text=True, bufsize=1) as proc:
-
-                    def stream_output(stream, label):
-                        for line in iter(stream.readline, ""):
-                            logger.info(f"{label}: {line.strip()}")
-
-                    stdout_thread = threading.Thread(
-                        target=stream_output, args=(proc.stdout, "STDOUT")
-                    )
-                    stderr_thread = threading.Thread(
-                        target=stream_output, args=(proc.stderr, "STDERR")
-                    )
-                    stdout_thread.start()
-                    stderr_thread.start()
-
-                    proc.wait()
-                    stdout_thread.join()
-                    stderr_thread.join()
-                    logger.info(f"Whisper exited with code {proc.returncode}")
-
-            except subprocess.TimeoutExpired:
-                logger.error("Whisper timed out")
-                proc.kill()
-                with db_lock:
-                    with SessionLocal() as db:
-                        job = db.query(Job).filter_by(id=job_id).first()
-                        if job:
-                            job.status = JobStatusEnum.FAILED_TIMEOUT
-                            job.log_path = str(log_path)
-                            db.commit()
-                return
-
-            except Exception as e:
-                logger.error(f"Subprocess launch failed: {e}")
-                with db_lock:
-                    with SessionLocal() as db:
-                        job = db.query(Job).filter_by(id=job_id).first()
-                        if job:
-                            job.status = JobStatusEnum.FAILED_LAUNCH_ERROR
-                            job.log_path = str(log_path)
-                            db.commit()
-                return
-
-            raw_txt_path = job_dir / (Path(upload).with_suffix(".srt").name)
-            if not raw_txt_path.exists():
-                raise RuntimeError(
-                    f"[{job_id}] Expected .srt not found at {raw_txt_path}"
-                )
-
-            with db_lock:
-                with SessionLocal() as db:
-                    if proc.returncode == 0:
-                        try:
-                            logger.info("Starting metadata_writer...")
-                            duration = get_duration(upload)
-                            job = db.query(Job).filter_by(id=job_id).first()
-                            if job:
-                                job.status = JobStatusEnum.ENRICHING
-                                db.commit()
-                                run_metadata_writer(
-                                    job_id,
-                                    raw_txt_path,
-                                    duration,
-                                    16000,
-                                    db_lock,  # type: ignore[arg-type]
-                                )
-                                logger.info("metadata_writer complete.")
-                                with SessionLocal() as db2:  # NEW clean session
-                                    job2 = db2.query(Job).filter_by(id=job_id).first()
-                                    if job2:
-                                        job2.status = JobStatusEnum.COMPLETED
-                                        job2.transcript_path = str(raw_txt_path)
-                                        db2.commit()
-                                        logger.info(
-                                            "status -> COMPLETED committed"
-                                        )  # debug breadcrumb
-                        except Exception as e:
-                            job = db.query(Job).filter_by(id=job_id).first()
-                            if job:
-                                job.status = JobStatusEnum.FAILED_UNKNOWN
-                                job.log_path = str(log_path)
-                                logger.error(f"Metadata writer failed: {e}")
-                            db.commit()
-                    elif proc.returncode < 0:
-                        logger.error(
-                            f"Whisper process terminated with signal {-proc.returncode}"
-                        )
-                        job = db.query(Job).filter_by(id=job_id).first()
-                        if job:
-                            job.status = JobStatusEnum.FAILED_WHISPER_ERROR
-                            job.log_path = str(log_path)
-                            db.commit()
-                        logger.error(
-                            f"Whisper process terminated with signal {-proc.returncode}"
-                        )
-                    else:
-                        logger.error("Whisper process failed — not zero return code")
-                        job = db.query(Job).filter_by(id=job_id).first()
-                        if job:
-                            job.status = JobStatusEnum.FAILED_WHISPER_ERROR
-                            job.log_path = str(log_path)
-        except Exception as e:
-            logger.critical(f"CRITICAL thread error: {e}")
-            with db_lock:
-                with SessionLocal() as db:
-                    job = db.query(Job).filter_by(id=job_id).first()
-                    if job:
-                        job.status = JobStatusEnum.FAILED_THREAD_EXCEPTION
-                        job.log_path = str(log_path)
-                        db.commit()
-
-    threading.Thread(target=_run, daemon=True).start()
 
 
 @app.get("/health")

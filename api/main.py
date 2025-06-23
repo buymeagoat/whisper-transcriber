@@ -26,7 +26,7 @@ from fastapi.staticfiles import StaticFiles
 from api.metadata_writer import run_metadata_writer
 from api.errors import ErrorCode, http_error
 from api.utils.logger import get_logger
-from api.orm_bootstrap import SessionLocal
+from api.orm_bootstrap import SessionLocal, validate_or_initialize_database
 from api.models import Job
 from api.models import JobStatusEnum, TranscriptMetadata
 from api.utils.logger import get_system_logger
@@ -74,6 +74,7 @@ db_lock = threading.RLock()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     system_log.info("App startup — lifespan entering.")
+    validate_or_initialize_database()
     rehydrate_incomplete_jobs()
     yield
     system_log.info("App shutdown — lifespan exiting.")

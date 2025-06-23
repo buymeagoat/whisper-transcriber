@@ -63,11 +63,20 @@ if os.getenv("VITE_API_HOST") is None:
 db_lock = threading.RLock()
 
 
+def validate_models_dir():
+    if not MODEL_DIR.exists() or not any(MODEL_DIR.iterdir()):
+        system_log.critical(
+            "Missing or empty models directory. Populate models/ before running."
+        )
+        raise RuntimeError("Whisper models required; see download_models.sh")
+
+
 # ─── Lifespan Hook ───
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     system_log.info("App startup — lifespan entering.")
     validate_or_initialize_database()
+    validate_models_dir()
     rehydrate_incomplete_jobs()
     yield
     system_log.info("App shutdown — lifespan exiting.")

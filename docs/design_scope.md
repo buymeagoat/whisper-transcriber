@@ -22,7 +22,11 @@ The application is considered working once these basics are functional:
 - `uploads/` – user-uploaded audio files.
 - `transcripts/` – per‑job folders containing `.srt` results and metadata.
 - `logs/` – rotating log files for jobs and the system.
-- `models/` – where Whisper models are stored if downloaded.
+- `models/` – directory for Whisper models. The folder is intentionally excluded
+  from Git. Populate it by running `download_models.sh` or by supplying a models
+  directory when building the Docker image with
+  `--build-arg MODELS_DIR=/path/to/models`. Both the Docker build and
+  application startup fail if it is missing or empty.
 - `frontend/` – React app bundled into `api/static/` for the UI.
 
 Key environment files include `pyproject.toml`, `requirements.txt`, and the `Dockerfile` used to build a runnable image. The older `audit_environment.py` helper script is optional and may be removed.

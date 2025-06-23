@@ -40,6 +40,11 @@ This outputs static files under `api/static/`.
 
 ## Usage Notes
 
-- Run `./download_models.sh` to pre-download Whisper models. They are saved to the `models/` directory and the script writes to `logs/model_download.log`.
-- Uploaded files are stored under `uploads/` while transcripts and metadata are written to `transcripts/`. Per-job logs and the system log live in `logs/`.
+- `models/` is intentionally excluded from version control. Populate it by running
+  `./download_models.sh` or by providing a directory when building the Docker
+  image via `--build-arg MODELS_DIR=/path/to/models`. The Docker build and
+  application startup fail if this directory is missing or empty. The download
+  script writes progress to `logs/model_download.log`.
+- Uploaded files are stored under `uploads/` while transcripts and metadata are
+  written to `transcripts/`. Per-job logs and the system log live in `logs/`.
 

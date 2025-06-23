@@ -58,12 +58,12 @@ The list below ranks future enhancements from simplest to most complex. Items ma
 
 1. **Start a New Job button after upload** – **Done**
 2. **Replace default favicon** – **Done**
-3. **Show Docker stats in Admin** – Not yet
+3. **Show Docker stats in Admin** – **Done** (`/admin/stats`)
 4. **Local-time timestamps instead of UTC** – Not yet
 5. **Job runtime display (live & final)** – Not yet
 6. **Kill (cancel) a running job** – Not yet
 7. **Stop / Restart server from Admin** – Not yet
-8. **Web-based file manager for logs/uploads/transcripts** – Not yet
+8. **Web-based file manager for logs/uploads/transcripts** – **Done** (`/admin/files`)
 9. **Shell access via web UI** – Not yet
 
 ### Ideas from Historic Documents
@@ -95,4 +95,4 @@ The list below ranks future enhancements from simplest to most complex. Items ma
 32. **Playback or text toggle for completed jobs** – media or text view
 33. **Use `updated_at` for job sorting/pagination** – future feature
 34. **Download transcripts as `.txt`** – preserve timestamps
-35. **Zip download of all data** – admin can export entire system
+35. **Zip download of all data** – **Done** (`/admin/download-all`)

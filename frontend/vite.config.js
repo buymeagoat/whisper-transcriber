@@ -13,6 +13,7 @@ export default defineConfig({
       '/jobs': 'http://localhost:8000',
       '/audio': 'http://localhost:8000',
       '^/admin/(files|reset|download-all)$': 'http://localhost:8000',
+      '/admin/stats': 'http://localhost:8000',
       '/logs': 'http://localhost:8000',
       '/uploads': 'http://localhost:8000',
       '/transcripts': 'http://localhost:8000'

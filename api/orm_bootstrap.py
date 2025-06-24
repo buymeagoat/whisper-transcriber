@@ -14,6 +14,7 @@ SessionLocal = sessionmaker(bind=engine)
 
 log = get_logger("orm")
 
+
 def validate_or_initialize_database():
     log.info("Bootstrapping database...")
 

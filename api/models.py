@@ -6,6 +6,7 @@ from sqlalchemy import DateTime, Enum, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import ForeignKey
 
+
 # ─── Base Class ─────────────────────────────────────────────────────────
 class Base(DeclarativeBase):
     pass
@@ -35,13 +36,19 @@ class Job(Base):
     original_filename: Mapped[str] = mapped_column(String, nullable=False)
     saved_filename: Mapped[str] = mapped_column(String, nullable=False)
     model: Mapped[str] = mapped_column(String, nullable=False)
-    status: Mapped[JobStatusEnum] = mapped_column(Enum(JobStatusEnum), nullable=False, default=JobStatusEnum.QUEUED)
+    status: Mapped[JobStatusEnum] = mapped_column(
+        Enum(JobStatusEnum), nullable=False, default=JobStatusEnum.QUEUED
+    )
     # Filled after processing: should not be empty if status is COMPLETED
     transcript_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     # Path to job log file, created during whisper run or on failure
     log_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
 
     def __repr__(self):
         return f"<Job id={self.id} status={self.status.value}>"
@@ -61,7 +68,9 @@ class TranscriptMetadata(Base):
     duration: Mapped[int] = mapped_column(Integer, nullable=False)
     abstract: Mapped[str] = mapped_column(Text, nullable=False)
     sample_rate: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    generated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    generated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, nullable=False
+    )
 
     def __repr__(self):
         return f"<Metadata job_id={self.job_id} tokens={self.tokens} duration={self.duration}>"

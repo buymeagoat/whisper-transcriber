@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+ENV PYTHONPATH=/app
 COPY requirements.txt .
 COPY alembic.ini .
 RUN pip install --no-cache-dir --upgrade pip && \

@@ -28,8 +28,12 @@ def validate_or_initialize_database():
     log.info("Running Alembic migrations to ensure schema is current...")
     ALEMBIC_INI = Path(__file__).resolve().parent.parent / "alembic.ini"
     try:
+        env = os.environ.copy()
+        env.update({"PYTHONPATH": str(Path(__file__).resolve().parent.parent)})
         subprocess.run(
-            ["alembic", "-c", str(ALEMBIC_INI), "upgrade", "head"], check=True
+            ["alembic", "-c", str(ALEMBIC_INI), "upgrade", "head"],
+            check=True,
+            env=env,
         )
         log.info("Alembic migrations applied successfully.")
     except subprocess.CalledProcessError as e:

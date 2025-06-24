@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import os
+from pathlib import Path
 
 from sqlalchemy import inspect, create_engine
 from sqlalchemy.orm import sessionmaker
@@ -25,8 +26,11 @@ def validate_or_initialize_database():
 
     # ── Step 2: Run Alembic migrations ──
     log.info("Running Alembic migrations to ensure schema is current...")
+    ALEMBIC_INI = Path(__file__).resolve().parent.parent / "alembic.ini"
     try:
-        subprocess.run(["alembic", "upgrade", "head"], check=True)
+        subprocess.run(
+            ["alembic", "-c", str(ALEMBIC_INI), "upgrade", "head"], check=True
+        )
         log.info("Alembic migrations applied successfully.")
     except subprocess.CalledProcessError as e:
         log.critical(f"Alembic failed to apply migrations: {e}")

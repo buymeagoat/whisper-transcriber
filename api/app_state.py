@@ -8,19 +8,15 @@ from typing import Union
 from zoneinfo import ZoneInfo
 
 from api.metadata_writer import run_metadata_writer
-from api.orm_bootstrap import SessionLocal
 from api.models import Job, JobStatusEnum
+from api.paths import (
+    UPLOAD_DIR,
+    TRANSCRIPTS_DIR,
+    MODEL_DIR,
+    LOG_DIR,
+)
 
-# ─── Paths ───
-ROOT = Path(__file__).parent
-UPLOAD_DIR = ROOT.parent / "uploads"
-TRANSCRIPTS_DIR = ROOT.parent / "transcripts"
-MODEL_DIR = ROOT.parent / "models"
-LOG_DIR = ROOT.parent / "logs"
-
-# Ensure directories exist
-for p in (UPLOAD_DIR, TRANSCRIPTS_DIR, MODEL_DIR, LOG_DIR):
-    p.mkdir(parents=True, exist_ok=True)
+# ─── Paths ─── (imported from api.paths)
 
 # ─── Config ───
 LOCAL_TZ = ZoneInfo("America/Chicago")
@@ -63,6 +59,8 @@ def get_duration(path: Union[str, os.PathLike]) -> float:
 
 
 def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
+    from api.orm_bootstrap import SessionLocal
+
     global WHISPER_BIN
     WHISPER_BIN = WHISPER_BIN or shutil.which("whisper")
     if not WHISPER_BIN:

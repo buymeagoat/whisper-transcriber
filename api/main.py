@@ -13,9 +13,8 @@ from api.utils.logger import get_system_logger
 from api.utils.model_validation import validate_models_dir
 from api.router_setup import register_routes
 from api.middlewares.access_log import access_logger
+from api.paths import UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.app_state import (
-    UPLOAD_DIR,
-    TRANSCRIPTS_DIR,
     db_lock,
     handle_whisper,
     LOCAL_TZ,

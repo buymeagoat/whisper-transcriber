@@ -5,7 +5,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from api.app_state import LOG_DIR
+from api.paths import LOG_DIR
 
 
 def get_logger(job_id: str) -> logging.Logger:

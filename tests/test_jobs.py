@@ -12,12 +12,17 @@ def create_test_app(tmp_path):
     models.Base.metadata.create_all(orm_bootstrap.engine)
 
     from api import app_state
+    from api import paths
 
-    app_state.UPLOAD_DIR = tmp_path / "uploads"
-    app_state.TRANSCRIPTS_DIR = tmp_path / "transcripts"
-    app_state.LOG_DIR = tmp_path / "logs"
-    for p in (app_state.UPLOAD_DIR, app_state.TRANSCRIPTS_DIR, app_state.LOG_DIR):
+    paths.UPLOAD_DIR = tmp_path / "uploads"
+    paths.TRANSCRIPTS_DIR = tmp_path / "transcripts"
+    paths.LOG_DIR = tmp_path / "logs"
+    for p in (paths.UPLOAD_DIR, paths.TRANSCRIPTS_DIR, paths.LOG_DIR):
         p.mkdir(parents=True, exist_ok=True)
+
+    app_state.UPLOAD_DIR = paths.UPLOAD_DIR
+    app_state.TRANSCRIPTS_DIR = paths.TRANSCRIPTS_DIR
+    app_state.LOG_DIR = paths.LOG_DIR
 
     app_state.handle_whisper = lambda *a, **k: None
 
@@ -26,9 +31,9 @@ def create_test_app(tmp_path):
     importlib.reload(jobs)
 
     jobs.SessionLocal = orm_bootstrap.SessionLocal
-    jobs.UPLOAD_DIR = app_state.UPLOAD_DIR
-    jobs.TRANSCRIPTS_DIR = app_state.TRANSCRIPTS_DIR
-    jobs.LOG_DIR = app_state.LOG_DIR
+    jobs.UPLOAD_DIR = paths.UPLOAD_DIR
+    jobs.TRANSCRIPTS_DIR = paths.TRANSCRIPTS_DIR
+    jobs.LOG_DIR = paths.LOG_DIR
     jobs.handle_whisper = app_state.handle_whisper
 
     from fastapi import FastAPI

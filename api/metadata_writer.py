@@ -7,7 +7,7 @@ from pathlib import Path
 from api.orm_bootstrap import SessionLocal
 from api.models import TranscriptMetadata
 from api.utils.logger import get_logger
-from api.app_state import TRANSCRIPTS_DIR
+from api.paths import TRANSCRIPTS_DIR
 
 
 def clean_text(text: str) -> str:

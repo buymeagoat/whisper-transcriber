@@ -1,4 +1,4 @@
-"""Check status_enum completeness
+"""Add optional metadata fields
 
 Revision ID: e9a7d25a7408
 Revises: d99ff9e35597

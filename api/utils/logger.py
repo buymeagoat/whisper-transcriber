@@ -3,13 +3,15 @@
 import os
 import logging
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
-LOG_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../logs"))
+from api.app_state import LOG_DIR
+
 
 def get_logger(job_id: str) -> logging.Logger:
     """Returns a rotating per-job logger."""
-    os.makedirs(LOG_DIR, exist_ok=True)
-    log_path = os.path.join(LOG_DIR, f"{job_id}.log")
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    log_path = LOG_DIR / f"{job_id}.log"
 
     logger = logging.getLogger(f"job_{job_id}")
     level = os.getenv("LOG_LEVEL", "DEBUG").upper()
@@ -18,12 +20,11 @@ def get_logger(job_id: str) -> logging.Logger:
     # Avoid duplicate handlers
     if not logger.handlers:
         handler = RotatingFileHandler(
-            log_path,
-            maxBytes=10_000_000,
-            backupCount=3,
-            encoding="utf-8"
+            log_path, maxBytes=10_000_000, backupCount=3, encoding="utf-8"
         )
-        formatter = logging.Formatter(f"[%(asctime)s] %(levelname)s [{job_id}]: %(message)s")
+        formatter = logging.Formatter(
+            f"[%(asctime)s] %(levelname)s [{job_id}]: %(message)s"
+        )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
@@ -35,9 +36,10 @@ def get_logger(job_id: str) -> logging.Logger:
 
     return logger
 
+
 def get_system_logger(name="system") -> logging.Logger:
     """Logger for application-wide events not tied to a job."""
-    log_path = os.path.join(LOG_DIR, "system.log")
+    log_path = LOG_DIR / "system.log"
     logger = logging.getLogger(name)
     level = os.getenv("LOG_LEVEL", "DEBUG").upper()
     logger.setLevel(getattr(logging, level, logging.DEBUG))
@@ -45,12 +47,11 @@ def get_system_logger(name="system") -> logging.Logger:
 
     if not logger.handlers:
         handler = RotatingFileHandler(
-            log_path,
-            maxBytes=10_000_000,
-            backupCount=3,
-            encoding="utf-8"
+            log_path, maxBytes=10_000_000, backupCount=3, encoding="utf-8"
         )
-        formatter = logging.Formatter("[%(asctime)s] %(levelname)s [system]: %(message)s")
+        formatter = logging.Formatter(
+            "[%(asctime)s] %(levelname)s [system]: %(message)s"
+        )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 

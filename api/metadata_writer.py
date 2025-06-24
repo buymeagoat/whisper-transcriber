@@ -7,18 +7,19 @@ from pathlib import Path
 from api.orm_bootstrap import SessionLocal
 from api.models import TranscriptMetadata
 from api.utils.logger import get_logger
+from api.app_state import TRANSCRIPTS_DIR
 
-TRANSCRIPTS_DIR = Path(__file__).parent.parent / "transcripts"
 
 def clean_text(text: str) -> str:
     return re.sub(r"\s+", " ", text.strip())
+
 
 def run_metadata_writer(
     job_id: str,
     transcript_path: Path,
     duration_sec: float,
     sample_rate: int,
-    db_lock: threading.Lock
+    db_lock: threading.Lock,
 ):
     logger = get_logger(job_id)
 
@@ -55,14 +56,18 @@ def run_metadata_writer(
     try:
         with db_lock:
             with SessionLocal() as session:
-                session.merge(TranscriptMetadata(
-                    job_id=job_id,
-                    tokens=tokens,
-                    duration=duration_sec,
-                    abstract=abstract,
-                    sample_rate=sample_rate,
-                    generated_at=datetime.fromisoformat(metadata_dict["generated_at"]),
-                ))
+                session.merge(
+                    TranscriptMetadata(
+                        job_id=job_id,
+                        tokens=tokens,
+                        duration=duration_sec,
+                        abstract=abstract,
+                        sample_rate=sample_rate,
+                        generated_at=datetime.fromisoformat(
+                            metadata_dict["generated_at"]
+                        ),
+                    )
+                )
                 session.commit()
                 logger.info(f"[{job_id}] metadata inserted via ORM")
     except Exception as e:

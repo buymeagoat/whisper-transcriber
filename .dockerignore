@@ -24,5 +24,4 @@ frontend/node_modules/
 
 # build artifacts
 build/
-dist/
 *.log

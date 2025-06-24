@@ -10,18 +10,21 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 import os
+
 db_url = os.getenv("DB")
 if db_url:
     # Override sqlalchemy.url only if DB is set and valid
     config.set_main_option("sqlalchemy.url", db_url)
-    
+
 # === PATCH: enable autogeneration by pointing to SQLAlchemy metadata
 from api.models import Base
+
 target_metadata = Base.metadata
 
 # Other Alembic options
 # my_important_option = config.get_main_option("my_important_option")
 # ...
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode without a live DB connection."""
@@ -35,6 +38,7 @@ def run_migrations_offline() -> None:
 
     with context.begin_transaction():
         context.run_migrations()
+
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode with DB connection."""
@@ -52,6 +56,7 @@ def run_migrations_online() -> None:
 
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()

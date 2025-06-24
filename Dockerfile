@@ -5,14 +5,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-ARG MODELS_DIR=models
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY api         ./api
-COPY ${MODELS_DIR} ./models
-RUN test -d ./models && [ "$(ls -A ./models)" ]
+RUN test -d /models \
+ && test -f /models/base.pt \
+ && test -f /models/large-v3.pt \
+ && test -f /models/medium.pt \
+ && test -f /models/small.pt \
+ && test -f /models/tiny.pt \
+ || (echo "Required model files missing in /models" >&2 && exit 1)
 RUN mkdir -p uploads transcripts
 COPY frontend/dist ./api/static
 

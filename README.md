@@ -37,6 +37,8 @@ npm run build
 ```
 
 This outputs static files under `frontend/dist/`.
+The Dockerfile copies this directory into `api/static/` so the React
+application can be served with the backend.
 
 ## Usage Notes
 
@@ -47,7 +49,8 @@ This outputs static files under `frontend/dist/`.
 ## Docker Usage
 
 Docker builds expect a populated `models/` directory. Before building the image,
-run the frontend build so `frontend/dist/` exists:
+run the frontend build so `frontend/dist/` exists. These files are copied to
+`api/static/` by the Dockerfile:
 ```bash
 cd frontend
 npm run build

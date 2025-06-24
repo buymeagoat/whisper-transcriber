@@ -68,6 +68,11 @@ class TranscriptMetadata(Base):
     duration: Mapped[int] = mapped_column(Integer, nullable=False)
     abstract: Mapped[str] = mapped_column(Text, nullable=False)
     sample_rate: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    lang: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    wpm: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    keywords: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    vector_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     generated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
     )

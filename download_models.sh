@@ -24,8 +24,15 @@ fi
 
 # Download loop
 for MODEL in "${MODELS[@]}"; do
+  MODEL_FILE="$MODEL_DIR/${MODEL}.pt"
+
+  if [ -f "$MODEL_FILE" ]; then
+    log "⚡ Model '$MODEL' already cached at $MODEL_FILE — skipping"
+    continue
+  fi
+
   log "🔽 Attempting download for model: $MODEL"
-  
+
   whisper "$DUMMY_WAV" \
     --model "$MODEL" \
     --model_dir "$MODEL_DIR" \

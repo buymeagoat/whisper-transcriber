@@ -10,5 +10,4 @@
 
 ## Notes
 - No tests are present.
-- The contents of `docs/historic/` are archived and can be ignored.
 - Use `black .` to format the codebase.

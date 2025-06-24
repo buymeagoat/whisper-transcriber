@@ -31,7 +31,7 @@ jobs:
         working-directory: frontend
 
       - name: Black check
-        run: black --check --exclude '/docs/historic/' .
+        run: black --check .
 
       - name: Run tests
         run: pytest

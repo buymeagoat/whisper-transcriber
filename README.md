@@ -77,3 +77,19 @@ docker run -p 8000:8000 \
   whisper-app
 ```
 
+## Testing
+
+After installing the requirements, install the project in editable mode with the
+development extras:
+
+```bash
+pip install -e .[dev]
+```
+
+This installs `httpx` and other packages required by `pytest`.
+Run the test suite from the repository root with:
+
+```bash
+pytest
+```
+

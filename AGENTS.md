@@ -9,5 +9,4 @@
 - Build the React frontend with `npm run build`.
 
 ## Notes
-- No tests are present.
 - Use `black .` to format the codebase.

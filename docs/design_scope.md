@@ -23,7 +23,8 @@ The application is considered working once these basics are functional:
 - `transcripts/` – per‑job folders containing `.srt` results and metadata.
 - `logs/` – rotating log files for jobs and the system.
 - `models/` – directory for Whisper models. The folder is local only and never committed. It must contain `base.pt`, `large-v3.pt`, `medium.pt`, `small.pt`, and `tiny.pt` when building the image. The application checks for these files on startup. Use `download_models.sh` to fetch them and mount the directory when running a prebuilt image.
-- `frontend/` – React app bundled into `api/static/` for the UI.
+- `frontend/` – React app built into `frontend/dist/` and copied by the Dockerfile
+  to `api/static/` for the UI.
 
 Key environment files include `pyproject.toml`, `requirements.txt`, and the `Dockerfile` used to build a runnable image. The older `audit_environment.py` helper script is optional and may be removed.
 
@@ -41,7 +42,8 @@ This document summarizes the repository layout and how the core FastAPI service 
 ## Current Functionality
 
 ### Frontend
-- React-based single page app built with Vite and bundled under `api/static/`.
+- React-based single page app built with Vite. The build outputs `frontend/dist/`,
+  which the Dockerfile copies to `api/static/` for serving.
 - Upload page lets users choose audio files and Whisper model size, then starts jobs and links to a status view.
 - Active, Completed and Failed pages display jobs filtered by status with actions to view logs or restart/remove.
 - Transcript viewer shows the final text in a simple styled page.

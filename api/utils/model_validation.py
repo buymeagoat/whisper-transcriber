@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from api.app_state import MODEL_DIR
+from api.paths import MODEL_DIR
 from api.utils.logger import get_system_logger
 
 

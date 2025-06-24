@@ -5,7 +5,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from api.routes import jobs, admin, logs
-from api.app_state import UPLOAD_DIR, TRANSCRIPTS_DIR, backend_log
+from api.paths import UPLOAD_DIR, TRANSCRIPTS_DIR
+from api.app_state import backend_log
 
 
 def register_routes(app: FastAPI) -> None:

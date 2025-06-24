@@ -40,21 +40,16 @@ This outputs static files under `api/static/`.
 
 ## Usage Notes
 
-- `models/` is intentionally excluded from version control. Populate it by running
-  `./download_models.sh` or by providing a directory when building the Docker
-  image via `--build-arg MODELS_DIR=/path/to/models`. The Docker build and
-  application startup fail if this directory is missing or empty. The download
-  script writes progress to `logs/model_download.log`.
+- `models/` will never be checked into Git. Ensure the five Whisper model files (tiny, base, small, medium and large) exist locally before building or running the application. Populate the folder with `./download_models.sh` or supply a populated directory when running `docker build --build-arg MODELS_DIR=/path/to/models`. If using a prebuilt container, mount the same directory at runtime. The build and application fail if this directory is missing or empty. The download script writes progress to `logs/model_download.log`.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are
   written to `transcripts/`. Per-job logs and the system log live in `logs/`.
 
 ## Docker Usage
 
-To build the Docker image with pre-downloaded models, pass the models
-directory via a build argument:
-
+Docker builds require `--build-arg MODELS_DIR=/path/to/models` pointing to the populated models directory. If you use a prebuilt image instead, mount the same directory at runtime.
 ```bash
 docker build --build-arg MODELS_DIR=/path/to/models -t whisper-app .
+# The build will fail if the models directory is empty. When running an image built elsewhere, mount the populated models directory with `-v /path/to/models:/app/models`.
 ```
 
 Run the container with the application directories mounted so that

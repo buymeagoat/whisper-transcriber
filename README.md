@@ -36,7 +36,7 @@ cd frontend
 npm run build
 ```
 
-This outputs static files under `api/static/`.
+This outputs static files under `frontend/dist/`.
 
 ## Usage Notes
 
@@ -46,7 +46,14 @@ This outputs static files under `api/static/`.
 
 ## Docker Usage
 
-Docker builds expect a populated `models/` directory. Build with:
+Docker builds expect a populated `models/` directory. Before building the image,
+run the frontend build so `frontend/dist/` exists:
+```bash
+cd frontend
+npm run build
+cd ..
+```
+Build the image with:
 ```bash
 docker build -t whisper-app .
 ```

@@ -8,7 +8,7 @@ import uuid
 from api.errors import ErrorCode, http_error
 from api.models import Job, JobStatusEnum, TranscriptMetadata
 from api.orm_bootstrap import SessionLocal
-from api.main import LOCAL_TZ
+from api.app_state import LOCAL_TZ
 from api.app_state import (
     UPLOAD_DIR,
     TRANSCRIPTS_DIR,

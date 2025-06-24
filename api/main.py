@@ -12,7 +12,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from api.routes import jobs, admin, logs
 
-from api.utils.logger import get_logger
 from api.orm_bootstrap import SessionLocal, validate_or_initialize_database
 from api.models import Job
 from api.models import JobStatusEnum
@@ -24,18 +23,16 @@ from api.app_state import (
     LOG_DIR,
     db_lock,
     handle_whisper,
+    LOCAL_TZ,
+    backend_log,
+    ACCESS_LOG,
 )
-from zoneinfo import ZoneInfo
-
-LOCAL_TZ = ZoneInfo("America/Chicago")
 
 # ─── Logging ───
-backend_log = get_logger("backend")
 system_log = get_system_logger()
 
 # ─── Paths ───
 ROOT = Path(__file__).parent
-ACCESS_LOG = LOG_DIR / "access.log"
 
 # ─── ENV SAFETY CHECK ───
 from dotenv import load_dotenv

@@ -39,6 +39,9 @@ orjson>=3.10.0
 # --- Dev tools ---
 watchdog>=4.0.0
 
+# --- Testing (dev) ---
+pytest>=8.2.0
+
 # ------------------------------------------------
 # System prerequisite (not pip, required at runtime):
 #   sudo apt-get install -y ffmpeg

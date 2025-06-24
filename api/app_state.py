@@ -207,6 +207,7 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
                         if job:
                             job.status = JobStatusEnum.FAILED_WHISPER_ERROR
                             job.log_path = str(log_path)
+                            db.commit()
         except Exception as e:
             logger.critical(f"CRITICAL thread error: {e}")
             with db_lock:

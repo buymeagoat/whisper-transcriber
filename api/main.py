@@ -46,11 +46,33 @@ if os.getenv("VITE_API_HOST") is None:
 
 
 def validate_models_dir():
-    if not MODEL_DIR.exists() or not any(MODEL_DIR.iterdir()):
+    """Ensure MODEL_DIR contains all required Whisper model files."""
+
+    if not MODEL_DIR.exists():
         system_log.critical(
-            "Missing or empty models directory. Populate models/ before running."
+            "Missing models directory. Populate models/ before running."
         )
         raise RuntimeError("Whisper models required; see download_models.sh")
+
+    required_models = [
+        "base.pt",
+        "large-v3.pt",
+        "medium.pt",
+        "small.pt",
+        "tiny.pt",
+    ]
+
+    missing = [m for m in required_models if not (MODEL_DIR / m).is_file()]
+
+    if missing:
+        system_log.critical(
+            "Missing model files in %s: %s",
+            MODEL_DIR,
+            ", ".join(missing),
+        )
+        raise RuntimeError(
+            f"Required model files missing: {', '.join(missing)}; see download_models.sh"
+        )
 
 
 # ─── Lifespan Hook ───

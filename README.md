@@ -48,3 +48,25 @@ This outputs static files under `api/static/`.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are
   written to `transcripts/`. Per-job logs and the system log live in `logs/`.
 
+## Docker Usage
+
+To build the Docker image with pre-downloaded models, pass the models
+directory via a build argument:
+
+```bash
+docker build --build-arg MODELS_DIR=/path/to/models -t whisper-app .
+```
+
+Run the container with the application directories mounted so that
+uploads, transcripts and logs persist on the host. The front end needs
+`VITE_API_HOST` set to the URL where the backend is reachable:
+
+```bash
+docker run -p 8000:8000 \
+  -e VITE_API_HOST=http://localhost:8000 \
+  -v $(pwd)/uploads:/app/uploads \
+  -v $(pwd)/transcripts:/app/transcripts \
+  -v $(pwd)/logs:/app/logs \
+  whisper-app
+```
+

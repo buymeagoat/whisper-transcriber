@@ -5,11 +5,11 @@ import threading
 from pathlib import Path
 from subprocess import Popen, PIPE
 from typing import Union
+from zoneinfo import ZoneInfo
 
 from api.metadata_writer import run_metadata_writer
 from api.orm_bootstrap import SessionLocal
 from api.models import Job, JobStatusEnum
-from api.utils.logger import get_logger
 
 # ─── Paths ───
 ROOT = Path(__file__).parent
@@ -21,6 +21,14 @@ LOG_DIR = ROOT.parent / "logs"
 # Ensure directories exist
 for p in (UPLOAD_DIR, TRANSCRIPTS_DIR, MODEL_DIR, LOG_DIR):
     p.mkdir(parents=True, exist_ok=True)
+
+# ─── Config ───
+LOCAL_TZ = ZoneInfo("America/Chicago")
+
+from api.utils.logger import get_logger
+
+backend_log = get_logger("backend")
+ACCESS_LOG = LOG_DIR / "access.log"
 
 # ─── Whisper CLI Check ───
 WHISPER_BIN = shutil.which("whisper")

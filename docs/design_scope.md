@@ -26,6 +26,15 @@ The application is considered working once these basics are functional:
 - `frontend/` – React app built into `frontend/dist/` and copied by the Dockerfile
   to `api/static/` for the UI.
 
+Both `models/` and `frontend/dist/` are listed in `.gitignore`. They must exist
+before running `docker build`:
+```bash
+cd frontend
+npm run build
+cd ..
+./download_models.sh
+```
+
 Key environment files include `pyproject.toml`, `requirements.txt`, and the `Dockerfile` used to build a runnable image. The older `audit_environment.py` helper script is optional and may be removed.
 
 ## API Overview

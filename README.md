@@ -43,18 +43,20 @@ application can be served with the backend.
 ## Usage Notes
 
 - `models/` exists locally only and is never stored in Git. It must contain the Whisper `.pt` files before building or running the app. Populate it with `./download_models.sh` if needed.
+- `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are
   written to `transcripts/`. Per-job logs and the system log live in `logs/`.
 
 ## Docker Usage
 
-Docker builds expect a populated `models/` directory. Before building the image,
-run the frontend build so `frontend/dist/` exists. These files are copied to
-`api/static/` by the Dockerfile:
+Docker builds expect a populated `models/` directory and the compiled
+`frontend/dist/` folder. Both directories are ignored by Git so they must be
+prepared manually before running `docker build`. Example:
 ```bash
 cd frontend
 npm run build
 cd ..
+./download_models.sh
 ```
 Build the image with:
 ```bash

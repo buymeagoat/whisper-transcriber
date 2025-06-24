@@ -1,31 +1,25 @@
 import os
-import time
 
-from datetime import datetime
 from pathlib import Path
 from contextlib import asynccontextmanager
 
-from fastapi import HTTPException
-from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from api.routes import jobs, admin, logs
 
 from api.orm_bootstrap import SessionLocal, validate_or_initialize_database
 from api.models import Job
 from api.models import JobStatusEnum
 from api.utils.logger import get_system_logger
+from api.utils.model_validation import validate_models_dir
+from api.router_setup import register_routes
+from api.middlewares.access_log import access_logger
 from api.app_state import (
     UPLOAD_DIR,
     TRANSCRIPTS_DIR,
-    MODEL_DIR,
-    LOG_DIR,
     db_lock,
     handle_whisper,
     LOCAL_TZ,
     backend_log,
-    ACCESS_LOG,
 )
 
 # ─── Logging ───
@@ -43,36 +37,6 @@ load_dotenv()
 API_HOST = os.getenv("VITE_API_HOST", "http://localhost:8000")
 if os.getenv("VITE_API_HOST") is None:
     system_log.warning("VITE_API_HOST not set, defaulting to http://localhost:8000")
-
-
-def validate_models_dir():
-    """Ensure MODEL_DIR contains all required Whisper model files."""
-
-    if not MODEL_DIR.exists():
-        system_log.critical(
-            "Missing models directory. Populate models/ before running."
-        )
-        raise RuntimeError("Whisper models required; see download_models.sh")
-
-    required_models = [
-        "base.pt",
-        "large-v3.pt",
-        "medium.pt",
-        "small.pt",
-        "tiny.pt",
-    ]
-
-    missing = [m for m in required_models if not (MODEL_DIR / m).is_file()]
-
-    if missing:
-        system_log.critical(
-            "Missing model files in %s: %s",
-            MODEL_DIR,
-            ", ".join(missing),
-        )
-        raise RuntimeError(
-            f"Required model files missing: {', '.join(missing)}; see download_models.sh"
-        )
 
 
 # ─── Lifespan Hook ───
@@ -101,37 +65,10 @@ app.add_middleware(
 )
 
 
-@app.middleware("http")
-async def access_logger(request: Request, call_next):
-    start = time.time()
-    resp = await call_next(request)
-    dur = time.time() - start
-    host = getattr(request.client, "host", "localtest")
-    with ACCESS_LOG.open("a", encoding="utf-8") as fh:
-        fh.write(
-            f"[{datetime.now(LOCAL_TZ).isoformat()}] {host} "
-            f"{request.method} {request.url.path} -> "
-            f"{resp.status_code} in {dur:.2f}s\n"
-        )
-    return resp
+app.middleware("http")(access_logger)
 
 
 # ─── Static File Routes ───
-app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR, html=True), name="uploads")
-app.mount(
-    "/transcripts",
-    StaticFiles(directory=TRANSCRIPTS_DIR, html=True),
-    name="transcripts",
-)
-
-# ─── Debug Output ───
-backend_log.debug("\nSTATIC ROUTE CHECK:")
-for route in app.routes:
-    backend_log.debug(
-        f"Path: {getattr(route, 'path', 'n/a')}  →  Name: {getattr(route, 'name', 'n/a')}  →  Type: {type(route)}"
-    )
-
-
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
@@ -163,43 +100,4 @@ def rehydrate_incomplete_jobs():
 
 
 # ─── Register Routers ─────────────────────────────────────
-app.include_router(jobs.router)
-app.include_router(admin.router)
-app.include_router(logs.router)
-
-
-# ── Serve React SPA ───────────────────────────────────────
-static_dir = Path(__file__).parent / "static"
-app.mount("/static", StaticFiles(directory=static_dir, html=True), name="static")
-
-
-@app.get("/", include_in_schema=False)
-def spa_index():
-    return FileResponse(static_dir / "index.html")
-
-
-# ──────────────────────────────────────────────────────────
-
-
-# ── React-Router fallback ────────────────────────────────────────
-@app.get("/{full_path:path}", include_in_schema=False)
-def spa_fallback(full_path: str):
-    # Let real API and asset paths keep their normal behaviour
-    protected = (
-        "static",
-        "uploads",
-        "transcripts",
-        "jobs",
-        "log",
-        "admin/files",
-        "admin/reset",
-        "admin/download-all",
-        "health",
-        "docs",
-        "openapi.json",
-    )
-    if full_path.startswith(protected):
-        raise HTTPException(status_code=404, detail="Not Found")
-
-    # Everything else is a front-end route -> serve React bundle
-    return FileResponse(static_dir / "index.html")
+register_routes(app)

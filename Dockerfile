@@ -10,13 +10,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY api         ./api
-RUN test -d /models \
- && test -f /models/base.pt \
- && test -f /models/large-v3.pt \
- && test -f /models/medium.pt \
- && test -f /models/small.pt \
- && test -f /models/tiny.pt \
- || (echo "Required model files missing in /models" >&2 && exit 1)
 RUN mkdir -p uploads transcripts
 COPY frontend/dist ./api/static
 

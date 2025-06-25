@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 import threading
+from datetime import datetime
 from pathlib import Path
 from subprocess import Popen, PIPE
 from typing import Union
@@ -73,6 +74,7 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
             job = db.query(Job).filter_by(id=job_id).first()
             if job:
                 job.status = JobStatusEnum.PROCESSING
+                job.started_at = datetime.utcnow()
                 db.commit()
 
     def _run():
@@ -133,6 +135,7 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
                         if job:
                             job.status = JobStatusEnum.FAILED_TIMEOUT
                             job.log_path = str(log_path)
+                            job.finished_at = datetime.utcnow()
                             db.commit()
                 return
 
@@ -144,6 +147,7 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
                         if job:
                             job.status = JobStatusEnum.FAILED_LAUNCH_ERROR
                             job.log_path = str(log_path)
+                            job.finished_at = datetime.utcnow()
                             db.commit()
                 return
 
@@ -176,6 +180,7 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
                                     if job2:
                                         job2.status = JobStatusEnum.COMPLETED
                                         job2.transcript_path = str(raw_txt_path)
+                                        job2.finished_at = datetime.utcnow()
                                         db2.commit()
                                         logger.info(
                                             "status -> COMPLETED committed"
@@ -185,8 +190,9 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
                             if job:
                                 job.status = JobStatusEnum.FAILED_UNKNOWN
                                 job.log_path = str(log_path)
+                                job.finished_at = datetime.utcnow()
                                 logger.error(f"Metadata writer failed: {e}")
-                            db.commit()
+                                db.commit()
                     elif proc.returncode < 0:
                         logger.error(
                             f"Whisper process terminated with signal {-proc.returncode}"
@@ -195,6 +201,7 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
                         if job:
                             job.status = JobStatusEnum.FAILED_WHISPER_ERROR
                             job.log_path = str(log_path)
+                            job.finished_at = datetime.utcnow()
                             db.commit()
                         logger.error(
                             f"Whisper process terminated with signal {-proc.returncode}"
@@ -205,6 +212,7 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
                         if job:
                             job.status = JobStatusEnum.FAILED_WHISPER_ERROR
                             job.log_path = str(log_path)
+                            job.finished_at = datetime.utcnow()
                             db.commit()
         except Exception as e:
             logger.critical(f"CRITICAL thread error: {e}")
@@ -214,6 +222,7 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
                     if job:
                         job.status = JobStatusEnum.FAILED_THREAD_EXCEPTION
                         job.log_path = str(log_path)
+                        job.finished_at = datetime.utcnow()
                         db.commit()
 
     threading.Thread(target=_run, daemon=True).start()

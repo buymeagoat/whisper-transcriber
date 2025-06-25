@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from api.routes import jobs, admin, logs, metrics
-from api.paths import UPLOAD_DIR, TRANSCRIPTS_DIR
+from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.app_state import backend_log
 
 

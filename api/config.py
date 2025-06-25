@@ -16,5 +16,13 @@ LOG_TO_STDOUT = os.getenv("LOG_TO_STDOUT", "false").lower() == "true"
 # Limit for simultaneous transcription jobs
 MAX_CONCURRENT_JOBS = int(os.getenv("MAX_CONCURRENT_JOBS", "2"))
 
+# Backend options: 'thread' uses the internal queue, others may point to
+# external systems like Celery.
+JOB_QUEUE_BACKEND = os.getenv("JOB_QUEUE_BACKEND", "thread")
+
+# Storage options: 'local' stores files on disk. Other backends can use cloud
+# providers. Only 'local' is implemented here.
+STORAGE_BACKEND = os.getenv("STORAGE_BACKEND", "local")
+
 # Optional token required to access the /metrics endpoint
 METRICS_TOKEN = os.getenv("METRICS_TOKEN")

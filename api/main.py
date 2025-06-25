@@ -13,7 +13,7 @@ from api.utils.logger import get_system_logger
 from api.utils.model_validation import validate_models_dir
 from api.router_setup import register_routes
 from api.middlewares.access_log import access_logger
-from api.paths import UPLOAD_DIR, TRANSCRIPTS_DIR
+from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.app_state import (
     db_lock,
     handle_whisper,
@@ -98,8 +98,8 @@ def rehydrate_incomplete_jobs():
         for job in jobs:
             backend_log.info(f"Rehydrating job {job.id} with model '{job.model}'")
             try:
-                upload_path = UPLOAD_DIR / job.saved_filename
-                job_dir = TRANSCRIPTS_DIR / job.id
+                upload_path = storage.get_upload_path(job.saved_filename)
+                job_dir = storage.get_transcript_dir(job.id)
                 handle_whisper(job.id, upload_path, job_dir, job.model)
             except Exception as e:
                 backend_log.error(f"Failed to rehydrate job {job.id}: {e}")

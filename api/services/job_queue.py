@@ -3,9 +3,22 @@ from __future__ import annotations
 import threading
 from queue import Queue
 from typing import Callable
+from abc import ABC, abstractmethod
 
 
-class JobQueue:
+class JobQueue(ABC):
+    """Interface for job queues."""
+
+    @abstractmethod
+    def enqueue(self, func: Callable[[], None]) -> None:
+        """Queue a job for execution."""
+
+    @abstractmethod
+    def shutdown(self) -> None:
+        """Cleanly shutdown the queue."""
+
+
+class ThreadJobQueue(JobQueue):
     """Simple worker queue that limits concurrent job execution."""
 
     def __init__(self, max_workers: int) -> None:
@@ -38,3 +51,13 @@ class JobQueue:
             self.enqueue(lambda: None)
         for t in self._threads:
             t.join()
+
+
+class BrokerJobQueue(JobQueue):
+    """Placeholder for external job broker integration."""
+
+    def enqueue(self, func: Callable[[], None]) -> None:  # pragma: no cover - stub
+        raise NotImplementedError("Broker based queue not implemented")
+
+    def shutdown(self) -> None:  # pragma: no cover - stub
+        pass

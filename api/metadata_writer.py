@@ -7,7 +7,7 @@ from pathlib import Path
 from api.orm_bootstrap import SessionLocal
 from api.models import TranscriptMetadata
 from api.utils.logger import get_logger
-from api.paths import TRANSCRIPTS_DIR
+from api.paths import storage, TRANSCRIPTS_DIR
 
 
 def clean_text(text: str) -> str:
@@ -43,8 +43,7 @@ def run_metadata_writer(
     }
 
     # Write metadata.json to transcript directory
-    job_dir = TRANSCRIPTS_DIR / job_id
-    job_dir.mkdir(parents=True, exist_ok=True)
+    job_dir = storage.get_transcript_dir(job_id)
     output_path = job_dir / "metadata.json"
     output_path.write_text(json.dumps(metadata_dict, indent=2), encoding="utf-8")
 

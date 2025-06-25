@@ -16,7 +16,7 @@ from api.services.jobs import (
     delete_job as service_delete_job,
     update_job_status,
 )
-from api.paths import UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
+from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
 
 router = APIRouter()
 
@@ -25,14 +25,11 @@ router = APIRouter()
 async def submit_job(file: UploadFile = File(...), model: str = Form("base")):
     job_id = uuid.uuid4().hex
     saved = f"{job_id}_{file.filename}"
-    upload_path = UPLOAD_DIR / saved
-    job_dir = TRANSCRIPTS_DIR / job_id
-
     try:
-        with upload_path.open("wb") as dst:
-            shutil.copyfileobj(file.file, dst)
+        upload_path = storage.save_upload(file.file, saved)
     except Exception:
         raise http_error(ErrorCode.FILE_SAVE_FAILED)
+    job_dir = storage.get_transcript_dir(job_id)
 
     ts = datetime.now(LOCAL_TZ)
     create_job(job_id, file.filename, saved, model, ts)
@@ -95,16 +92,11 @@ def delete_job(job_id: str):
         raise http_error(ErrorCode.JOB_NOT_FOUND)
 
     saved_filename = job.saved_filename
-    transcript_dir = TRANSCRIPTS_DIR / job_id
-    upload_path = UPLOAD_DIR / saved_filename
     log_path = LOG_DIR / f"{job_id}.log"
 
-    shutil.rmtree(transcript_dir, ignore_errors=True)
+    storage.delete_transcript_dir(job_id)
 
-    try:
-        upload_path.unlink()
-    except FileNotFoundError:
-        pass
+    storage.delete_upload(saved_filename)
 
     try:
         log_path.unlink()
@@ -202,13 +194,14 @@ def restart_job(job_id: str):
 
     saved_filename = job.saved_filename
     model = job.model
-    upload_path = UPLOAD_DIR / saved_filename
-    job_dir = TRANSCRIPTS_DIR / job_id
+    upload_path = storage.get_upload_path(saved_filename)
+    job_dir = storage.get_transcript_dir(job_id)
 
     if not upload_path.exists():
         raise http_error(ErrorCode.FILE_NOT_FOUND)
 
-    shutil.rmtree(job_dir, ignore_errors=True)
+    storage.delete_transcript_dir(job_id)
+    job_dir = storage.get_transcript_dir(job_id)
 
     update_job_status(job_id, JobStatusEnum.QUEUED)
 

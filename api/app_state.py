@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 from api.metadata_writer import run_metadata_writer
 from api.models import Job, JobStatusEnum
 from api.paths import (
+    storage,
     UPLOAD_DIR,
     TRANSCRIPTS_DIR,
     MODEL_DIR,
@@ -22,7 +23,7 @@ from api.paths import (
 # ─── Config ───
 LOCAL_TZ = ZoneInfo("America/Chicago")
 from api import config
-from api.services.job_queue import JobQueue
+from api.services.job_queue import JobQueue, ThreadJobQueue, BrokerJobQueue
 
 from api.utils.logger import get_logger
 
@@ -36,7 +37,10 @@ WHISPER_BIN = shutil.which("whisper")
 db_lock = threading.RLock()
 
 # ─── Job Queue ───
-job_queue = JobQueue(config.MAX_CONCURRENT_JOBS)
+if config.JOB_QUEUE_BACKEND == "thread":
+    job_queue: JobQueue = ThreadJobQueue(config.MAX_CONCURRENT_JOBS)
+else:
+    job_queue = BrokerJobQueue()
 
 
 def get_duration(path: Union[str, os.PathLike]) -> float:

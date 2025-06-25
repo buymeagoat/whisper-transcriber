@@ -10,7 +10,7 @@ import psutil
 from api.errors import ErrorCode, http_error
 from api.models import Job
 from api.orm_bootstrap import SessionLocal
-from api.paths import UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
+from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
 from api.app_state import db_lock
 
 router = APIRouter(prefix="/admin")

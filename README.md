@@ -79,4 +79,28 @@ docker run -p 8000:8000 \
   whisper-app
 ```
 
+## Docker Compose
+
+A `docker-compose.yml` is included to start the API together with example
+PostgreSQL and RabbitMQ services. These additional services are placeholders for
+future features but are not required today.
+
+Prepare the models and build the frontend before running compose:
+
+```bash
+cd frontend
+npm run build
+cd ..
+```
+
+Build and start all services with:
+
+```bash
+docker compose up --build
+```
+
+The compose file mounts the `uploads`, `transcripts` and `logs` directories so
+data persists between runs. Once running, access the API at
+`http://localhost:8000`.
+
 

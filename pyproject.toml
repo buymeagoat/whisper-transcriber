@@ -9,6 +9,7 @@ dependencies = [
     "python-multipart",       # Required for file uploads
     "pydantic",               # Used in FastAPI models
     "alembic",                # Keep for DB migration
+    "psycopg2-binary",
 ]
 
 [build-system]

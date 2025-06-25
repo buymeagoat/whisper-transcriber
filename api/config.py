@@ -15,3 +15,6 @@ LOG_TO_STDOUT = os.getenv("LOG_TO_STDOUT", "false").lower() == "true"
 
 # Limit for simultaneous transcription jobs
 MAX_CONCURRENT_JOBS = int(os.getenv("MAX_CONCURRENT_JOBS", "2"))
+
+# Optional token required to access the /metrics endpoint
+METRICS_TOKEN = os.getenv("METRICS_TOKEN")

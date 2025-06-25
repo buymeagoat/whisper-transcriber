@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY api         ./api
+COPY models      ./models
 RUN mkdir -p uploads transcripts
 COPY frontend/dist ./api/static
 

@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from api.paths import MODEL_DIR
 from api.utils.logger import get_system_logger
 
@@ -13,7 +11,9 @@ def validate_models_dir():
         system_log.critical(
             "Missing models directory. Populate models/ before running."
         )
-        raise RuntimeError("Whisper models required; see download_models.sh")
+        raise RuntimeError(
+            "Whisper models directory missing. Ensure models/ contains the required files."
+        )
 
     required_models = [
         "base.pt",
@@ -32,5 +32,5 @@ def validate_models_dir():
             ", ".join(missing),
         )
         raise RuntimeError(
-            f"Required model files missing: {', '.join(missing)}; see download_models.sh"
+            f"Required model files missing: {', '.join(missing)}. Add them to models/."
         )

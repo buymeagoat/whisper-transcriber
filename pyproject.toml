@@ -11,12 +11,6 @@ dependencies = [
     "alembic",                # Keep for DB migration
 ]
 
-[project.optional-dependencies]
-dev = [
-    "httpx<0.28",
-    "black",
-]
-
 [build-system]
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"

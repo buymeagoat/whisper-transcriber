@@ -42,7 +42,7 @@ application can be served with the backend.
 
 ## Usage Notes
 
-- `models/` exists locally only and is never stored in Git. It must contain the Whisper `.pt` files before building or running the app. Populate it with `./download_models.sh` if needed.
+- `models/` exists locally only and is never stored in Git. It must contain the Whisper `.pt` files before building or running the app. Ensure the files are present before building the Docker image.
 - `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are
   written to `transcripts/`. Per-job logs and the system log live in `logs/`.
@@ -56,7 +56,6 @@ prepared manually before running `docker build`. Example:
 cd frontend
 npm run build
 cd ..
-./download_models.sh
 ```
 Build the image with:
 ```bash
@@ -77,19 +76,4 @@ docker run -p 8000:8000 \
   whisper-app
 ```
 
-## Testing
-
-After installing the requirements, install the project in editable mode with the
-development extras:
-
-```bash
-pip install -e .[dev]
-```
-
-This installs `httpx` and other packages required by `pytest`.
-Run the test suite from the repository root with:
-
-```bash
-pytest
-```
 

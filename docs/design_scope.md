@@ -89,12 +89,12 @@ This document summarizes the repository layout and how the core FastAPI service 
 
 ## Additional Tweaks and Features
 ### Completed Items
-Start a New Job button after upload
-Replace default favicon
-Show Docker stats in Admin (`/admin/stats`)
-Web-based file manager for logs/uploads/transcripts (`/admin/files`)
-Zip download of all data (`/admin/download-all`)
-Expose `/metrics` endpoint for monitoring
+- Start a New Job button after upload
+- Replace default favicon
+- Show Docker stats in Admin (`/admin/stats`)
+- Web-based file manager for logs/uploads/transcripts (`/admin/files`)
+- Zip download of all data (`/admin/download-all`)
+- Expose `/metrics` endpoint for monitoring
 
 ### Upcoming Ideas
 

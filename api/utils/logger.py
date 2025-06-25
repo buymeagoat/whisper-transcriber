@@ -6,6 +6,7 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from api.paths import LOG_DIR
+from api import config
 
 
 def get_logger(job_id: str) -> logging.Logger:
@@ -14,7 +15,7 @@ def get_logger(job_id: str) -> logging.Logger:
     log_path = LOG_DIR / f"{job_id}.log"
 
     logger = logging.getLogger(f"job_{job_id}")
-    level = os.getenv("LOG_LEVEL", "DEBUG").upper()
+    level = config.LOG_LEVEL
     logger.setLevel(getattr(logging, level, logging.DEBUG))
 
     # Avoid duplicate handlers
@@ -29,7 +30,7 @@ def get_logger(job_id: str) -> logging.Logger:
         logger.addHandler(handler)
 
         # Optional: also log to console if enabled in .env
-        if os.getenv("LOG_TO_STDOUT", "false").lower() == "true":
+        if config.LOG_TO_STDOUT:
             stream_handler = logging.StreamHandler()
             stream_handler.setFormatter(formatter)
             logger.addHandler(stream_handler)
@@ -41,7 +42,7 @@ def get_system_logger(name="system") -> logging.Logger:
     """Logger for application-wide events not tied to a job."""
     log_path = LOG_DIR / "system.log"
     logger = logging.getLogger(name)
-    level = os.getenv("LOG_LEVEL", "DEBUG").upper()
+    level = config.LOG_LEVEL
     logger.setLevel(getattr(logging, level, logging.DEBUG))
     logger.propagate = False
 
@@ -55,7 +56,7 @@ def get_system_logger(name="system") -> logging.Logger:
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-        if os.getenv("LOG_TO_STDOUT", "false").lower() == "true":
+        if config.LOG_TO_STDOUT:
             stream_handler = logging.StreamHandler()
             stream_handler.setFormatter(formatter)
             logger.addHandler(stream_handler)

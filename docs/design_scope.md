@@ -54,6 +54,8 @@ object used throughout the code base. Available variables are:
 - `MAX_CONCURRENT_JOBS` – worker thread count for the internal queue.
 - `JOB_QUEUE_BACKEND` – queue implementation (`thread` by default).
 - `STORAGE_BACKEND` – where uploads and transcripts are stored.
+- `CELERY_BROKER_URL` and `CELERY_BACKEND_URL` – URLs for the broker and
+  result backend when using the `broker` queue backend.
 
 ## API Overview
 - **Job management**: `POST /jobs` to upload, `GET /jobs` and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.

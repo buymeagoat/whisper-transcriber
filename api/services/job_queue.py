@@ -54,10 +54,20 @@ class ThreadJobQueue(JobQueue):
 
 
 class BrokerJobQueue(JobQueue):
-    """Placeholder for external job broker integration."""
+    """Queue jobs by delegating execution to a Celery worker."""
 
-    def enqueue(self, func: Callable[[], None]) -> None:  # pragma: no cover - stub
-        raise NotImplementedError("Broker based queue not implemented")
+    def __init__(self) -> None:
+        from .celery_app import celery_app, run_callable
+
+        self._celery_app = celery_app
+        self._task_name = run_callable.name
+
+    def enqueue(self, func: Callable[[], None]) -> None:
+        """Serialize the callable and submit it to Celery."""
+        import pickle
+
+        payload = pickle.dumps(func)
+        self._celery_app.send_task(self._task_name, args=(payload,))
 
     def shutdown(self) -> None:  # pragma: no cover - stub
         pass

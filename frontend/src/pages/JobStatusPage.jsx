@@ -57,9 +57,9 @@ export default function JobStatusPage() {
           <p><strong>Updated:</strong> {job.updated ? new Date(job.updated).toLocaleString() : "N/A"}</p>
 
           {job.status === "completed" && (
-            <a
-              href={`${ROUTES.API}/jobs/${jobId}/download`}
-              download
+              <a
+                href={`${ROUTES.API}/jobs/${jobId}/download?format=txt`}
+                download
               style={{
                 display: "inline-block",
                 marginTop: "1rem",

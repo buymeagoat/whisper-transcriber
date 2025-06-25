@@ -17,7 +17,7 @@ export default function CompletedJobsPage() {
   };
 
   const handleDownloadTranscript = (jobId) => {
-    window.open(`${ROUTES.API}/jobs/${jobId}/download`, "_blank");
+    window.open(`${ROUTES.API}/jobs/${jobId}/download?format=txt`, "_blank");
   };
 
   const handleDelete = async (jobId) => {

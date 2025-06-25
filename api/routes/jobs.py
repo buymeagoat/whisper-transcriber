@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form, Request, status
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, Response
 from datetime import datetime
 from pathlib import Path
 import shutil
@@ -114,7 +114,7 @@ def delete_job(job_id: str):
 
 
 @router.get("/jobs/{job_id}/download")
-def download_transcript(job_id: str):
+def download_transcript(job_id: str, format: str = "srt"):
     job = service_get_job(job_id)
     if not job:
         raise http_error(ErrorCode.JOB_NOT_FOUND)
@@ -126,7 +126,27 @@ def download_transcript(job_id: str):
     if not srt_path.exists():
         raise http_error(ErrorCode.FILE_NOT_FOUND)
 
-    original_name = Path(job.original_filename).stem + ".srt"
+    base_name = Path(job.original_filename).stem
+    if format == "txt":
+        from api.exporters import srt_to_txt
+
+        content = srt_to_txt(srt_path)
+        return Response(
+            content,
+            media_type="text/plain",
+            headers={"Content-Disposition": f"attachment; filename={base_name}.txt"},
+        )
+    if format == "vtt":
+        from api.exporters import srt_to_vtt
+
+        content = srt_to_vtt(srt_path)
+        return Response(
+            content,
+            media_type="text/vtt",
+            headers={"Content-Disposition": f"attachment; filename={base_name}.vtt"},
+        )
+
+    original_name = f"{base_name}.srt"
     return FileResponse(path=srt_path, media_type="text/plain", filename=original_name)
 
 

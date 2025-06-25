@@ -12,3 +12,6 @@ DB_PATH = os.getenv("DB", "api/jobs.db")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG").upper()
 LOG_TO_STDOUT = os.getenv("LOG_TO_STDOUT", "false").lower() == "true"
+
+# Limit for simultaneous transcription jobs
+MAX_CONCURRENT_JOBS = int(os.getenv("MAX_CONCURRENT_JOBS", "2"))

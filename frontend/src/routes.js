@@ -1,4 +1,5 @@
 export const ROUTES = {
+  LOGIN: "/login",
   UPLOAD: "/upload",
   ACTIVE: "/active",
   COMPLETED: "/completed",

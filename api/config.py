@@ -29,3 +29,11 @@ STORAGE_BACKEND = os.getenv("STORAGE_BACKEND", "local")
 
 # Optional token required to access the /metrics endpoint
 METRICS_TOKEN = os.getenv("METRICS_TOKEN")
+
+# Authentication settings
+AUTH_USERNAME = os.getenv("AUTH_USERNAME", "admin")
+AUTH_PASSWORD = os.getenv("AUTH_PASSWORD", "admin")
+
+SECRET_KEY = os.getenv("SECRET_KEY", "change-me")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))

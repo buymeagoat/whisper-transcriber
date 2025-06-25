@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, WebSocket, WebSocketDisconnect, Depends
+from api.routes.auth import get_current_user
+import asyncio
 from fastapi.responses import PlainTextResponse
 
 from api.errors import ErrorCode, http_error
@@ -14,6 +16,27 @@ def get_job_log(job_id: str):
     if not log_path.exists():
         return PlainTextResponse("No log yet.", status_code=404)
     return log_path.read_text(encoding="utf-8")
+
+
+@router.websocket("/ws/logs/{job_id}")
+async def websocket_job_log(
+    websocket: WebSocket, job_id: str, user: str = Depends(get_current_user)
+):
+    await websocket.accept()
+    log_path = LOG_DIR / f"{job_id}.log"
+    position = 0
+    try:
+        while True:
+            if log_path.exists():
+                with log_path.open("r", encoding="utf-8") as f:
+                    f.seek(position)
+                    data = f.read()
+                    if data:
+                        await websocket.send_text(data)
+                        position = f.tell()
+            await asyncio.sleep(1)
+    except WebSocketDisconnect:
+        pass
 
 
 @router.post("/log_event")

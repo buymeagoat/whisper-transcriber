@@ -3,22 +3,19 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from api.settings import settings
 from api.schemas import TokenOut
+from api.services.users import (
+    create_user,
+    get_user_by_username,
+    verify_password,
+)
 
 router = APIRouter()
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-hashed_password = pwd_context.hash(settings.auth_password)
-
-
-def verify_password(plain_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
@@ -32,15 +29,29 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
 @router.post("/token", response_model=TokenOut)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenOut:
-    if form_data.username != settings.auth_username or not verify_password(
-        form_data.password
-    ):
+    user = get_user_by_username(form_data.username)
+    if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    token = create_access_token({"sub": settings.auth_username})
+    token = create_access_token({"sub": user.username})
+    return TokenOut(access_token=token, token_type="bearer")
+
+
+@router.post("/register", response_model=TokenOut, status_code=status.HTTP_201_CREATED)
+async def register(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenOut:
+    if not settings.allow_registration:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Registration disabled"
+        )
+    if get_user_by_username(form_data.username):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="User already exists"
+        )
+    user = create_user(form_data.username, form_data.password)
+    token = create_access_token({"sub": user.username})
     return TokenOut(access_token=token, token_type="bearer")
 
 
@@ -55,8 +66,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
             token, settings.secret_key, algorithms=[settings.algorithm]
         )
         username: str = payload.get("sub")
-        if username != settings.auth_username:
+        if not username:
             raise credentials_exception
     except JWTError:
+        raise credentials_exception
+    if not get_user_by_username(username):
         raise credentials_exception
     return username

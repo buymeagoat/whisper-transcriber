@@ -102,6 +102,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 - Zip download of all data (`/admin/download-all`)
 - Expose `/metrics` endpoint for monitoring
 - Progress WebSocket (`/ws/progress/{job_id}`) sends status updates
+- Health check (`/health`) and version info (`/version`)
 
 ### Upcoming Ideas
 
@@ -109,7 +110,6 @@ This document summarizes the repository layout and how the core FastAPI service 
 
 | Rank | Feature Idea                                    | Reasoning                      | Considerations                  | Roadblocks                    |
 | ---- | ----------------------------------------------- | ------------------------------ | ------------------------------- | ----------------------------- |
-| 000  | Add `/health` and `/version` endpoints          | Just return status data        | Decide output format            | None                          |
 | 001  | Local-time timestamps instead of UTC            | Convert timestamps on display  | Timezone handling               | None                          |
 | 002  | Download transcripts as `.txt`                  | Plain text export from SRT     | Maintain timestamp accuracy     | None                          |
 | 003  | Download job archive (.zip)                     | Zip existing logs and results  | Avoid large file memory use     | None                          |

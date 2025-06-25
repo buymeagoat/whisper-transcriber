@@ -80,6 +80,10 @@ The backend exposes Prometheus metrics at `/metrics`. Authenticate with the JWT
 token obtained from the `/token` endpoint and send it as `Authorization: Bearer
 <token>`.
 
+### Health & Version
+
+Use `/health` to check server status. `/version` returns the current application version.
+
 ### Progress WebSocket
 
 Connect to `/ws/progress/{job_id}` with the same JWT credentials as other

@@ -26,7 +26,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
 - `LOG_TO_STDOUT` – set to `true` to also mirror logs to the console.
 - `METRICS_TOKEN` – optional bearer token required to access `/metrics`.
-- `AUTH_USERNAME` and `AUTH_PASSWORD` – credentials for obtaining JWT tokens (defaults `admin`/`admin`).
+- `AUTH_USERNAME` and `AUTH_PASSWORD` – *(deprecated)* previous static credentials.
+- `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
 - `SECRET_KEY` – secret used to sign JWT tokens.
 - `ACCESS_TOKEN_EXPIRE_MINUTES` – token lifetime in minutes.
 - `MAX_CONCURRENT_JOBS` – number of worker threads when using the built-in job
@@ -65,6 +66,12 @@ npm run build
 This outputs static files under `frontend/dist/`.
 The Dockerfile copies this directory into `api/static/` so the React
 application can be served with the backend.
+
+### User Registration
+
+Create an account by sending your desired username and password to `/register`.
+Set `ALLOW_REGISTRATION=false` in production to disable this endpoint. Obtain a
+token from `/token` using the same credentials.
 
 ## Metrics
 

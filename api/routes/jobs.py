@@ -17,12 +17,17 @@ from api.services.jobs import (
     update_job_status,
 )
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
+from api.schemas import JobOut, JobListOut, MetadataOut, JobCreatedOut, StatusOut
 
 router = APIRouter()
 
 
-@router.post("/jobs", status_code=status.HTTP_202_ACCEPTED)
-async def submit_job(file: UploadFile = File(...), model: str = Form("base")):
+@router.post(
+    "/jobs", status_code=status.HTTP_202_ACCEPTED, response_model=JobCreatedOut
+)
+async def submit_job(
+    file: UploadFile = File(...), model: str = Form("base")
+) -> JobCreatedOut:
     job_id = uuid.uuid4().hex
     saved = f"{job_id}_{file.filename}"
     try:
@@ -37,56 +42,56 @@ async def submit_job(file: UploadFile = File(...), model: str = Form("base")):
     job_queue.enqueue(
         lambda: handle_whisper(job_id, upload_path, job_dir, model, start_thread=False)
     )
-    return {"job_id": job_id}
+    return JobCreatedOut(job_id=job_id)
 
 
-@router.get("/jobs")
-def list_jobs():
+@router.get("/jobs", response_model=list[JobListOut])
+def list_jobs() -> list[JobListOut]:
     jobs = service_list_jobs()
     return [
-        {
-            "id": j.id,
-            "original_filename": j.original_filename,
-            "model": j.model,
-            "created_at": j.created_at.isoformat(),
-            "updated": j.updated_at.isoformat(),
-            "status": j.status.value,
-        }
+        JobListOut(
+            id=j.id,
+            original_filename=j.original_filename,
+            model=j.model,
+            created_at=j.created_at,
+            updated=j.updated_at,
+            status=j.status,
+        )
         for j in jobs
     ]
 
 
-@router.get("/jobs/{job_id}")
-def get_job(job_id: str):
+@router.get("/jobs/{job_id}", response_model=JobOut)
+def get_job(job_id: str) -> JobOut:
     job = service_get_job(job_id)
     if not job:
         raise http_error(ErrorCode.JOB_NOT_FOUND)
-    return {
-        "id": job.id,
-        "original_filename": job.original_filename,
-        "model": job.model,
-        "created_at": job.created_at.isoformat(),
-        "updated": job.updated_at.isoformat(),
-        "status": job.status.value,
-    }
+    return JobOut(
+        id=job.id,
+        original_filename=job.original_filename,
+        model=job.model,
+        created_at=job.created_at,
+        updated=job.updated_at,
+        status=job.status,
+    )
 
 
-@router.get("/metadata/{job_id}")
-def get_metadata(job_id: str):
+@router.get("/metadata/{job_id}", response_model=MetadataOut)
+def get_metadata(job_id: str) -> MetadataOut:
     metadata = service_get_metadata(job_id)
     if not metadata:
         raise http_error(ErrorCode.JOB_NOT_FOUND)
-    return {
-        "tokens": metadata.tokens,
-        "duration": metadata.duration,
-        "abstract": metadata.abstract,
-        "sample_rate": metadata.sample_rate,
-        "generated_at": metadata.generated_at.isoformat(),
-    }
+    return MetadataOut(
+        tokens=metadata.tokens,
+        duration=metadata.duration,
+        abstract=metadata.abstract,
+        sample_rate=metadata.sample_rate,
+        generated_at=metadata.generated_at,
+    )
 
 
-@router.delete("/jobs/{job_id}")
-def delete_job(job_id: str):
+@router.delete("/jobs/{job_id}", response_model=StatusOut)
+def delete_job(job_id: str) -> StatusOut:
     job = service_get_job(job_id)
     if not job:
         raise http_error(ErrorCode.JOB_NOT_FOUND)
@@ -104,7 +109,7 @@ def delete_job(job_id: str):
         pass
 
     service_delete_job(job_id)
-    return {"status": "deleted"}
+    return StatusOut(status="deleted")
 
 
 @router.get("/jobs/{job_id}/download")
@@ -186,8 +191,8 @@ def transcript_view(job_id: str, request: Request):
     return HTMLResponse(content=html)
 
 
-@router.post("/jobs/{job_id}/restart")
-def restart_job(job_id: str):
+@router.post("/jobs/{job_id}/restart", response_model=StatusOut)
+def restart_job(job_id: str) -> StatusOut:
     job = service_get_job(job_id)
     if not job:
         raise http_error(ErrorCode.JOB_NOT_FOUND)
@@ -208,4 +213,4 @@ def restart_job(job_id: str):
     job_queue.enqueue(
         lambda: handle_whisper(job_id, upload_path, job_dir, model, start_thread=False)
     )
-    return {"status": "restarted"}
+    return StatusOut(status="restarted")

@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum as PyEnum
 from typing import Optional
 
-from sqlalchemy import DateTime, Enum, Integer, String, Text
+from sqlalchemy import DateTime, Enum, Integer, String, Text, Float
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import ForeignKey
 
@@ -10,6 +10,18 @@ from sqlalchemy import ForeignKey
 # ─── Base Class ─────────────────────────────────────────────────────────
 class Base(DeclarativeBase):
     pass
+
+
+# ─── Users Table ─────────────────────────────────────────────────────────
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    username: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, nullable=False
+    )
 
 
 # ─── Enum Class ─────────────────────────────────────────────────────────
@@ -75,6 +87,9 @@ class TranscriptMetadata(Base):
     keywords: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     vector_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    language: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    sentiment: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     generated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
     )

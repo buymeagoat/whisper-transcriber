@@ -9,9 +9,11 @@ from api.models import Base
 from api.utils.logger import get_logger
 from api import config
 
-DB_PATH = config.DB_PATH
-DATABASE_URL = f"sqlite:///{DB_PATH}"
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+DB_URL = config.DB_URL
+engine_kwargs = {}
+if DB_URL.startswith("sqlite"):
+    engine_kwargs["connect_args"] = {"check_same_thread": False}
+engine = create_engine(DB_URL, **engine_kwargs)
 SessionLocal = sessionmaker(bind=engine)
 
 log = get_logger("orm")
@@ -20,10 +22,12 @@ log = get_logger("orm")
 def validate_or_initialize_database():
     log.info("Bootstrapping database...")
 
-    # ── Step 1: Create DB file if missing ──
-    if not os.path.exists(DB_PATH):
-        log.info("jobs.db does not exist — creating empty file.")
-        open(DB_PATH, "a").close()
+    # ── Step 1: Create DB file if using SQLite and file missing ──
+    if DB_URL.startswith("sqlite"):
+        db_path = DB_URL.split("sqlite:///", 1)[-1]
+        if not os.path.exists(db_path):
+            log.info("jobs.db does not exist — creating empty file.")
+            open(db_path, "a").close()
 
     # ── Step 2: Run Alembic migrations ──
     log.info("Running Alembic migrations to ensure schema is current...")

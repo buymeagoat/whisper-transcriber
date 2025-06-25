@@ -16,7 +16,10 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 
 ## Optional Environment Variables
 
-- `DB` – path to the SQLite database file (defaults to `api/jobs.db`).
+- `DB_URL` – SQLAlchemy database URL for the main database. Defaults to
+  `postgresql+psycopg2://whisper:whisper@db:5432/whisper`.
+- `DB` – path to a SQLite database file used mainly for tests. When set it
+  overrides `DB_URL`.
 - `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://localhost:8000`).
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
 - `LOG_TO_STDOUT` – set to `true` to also mirror logs to the console.

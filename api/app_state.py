@@ -26,6 +26,7 @@ from api.settings import settings
 from api.services.job_queue import JobQueue, ThreadJobQueue, BrokerJobQueue
 
 from api.utils.logger import get_logger
+from api.routes.progress import send_progress_update
 
 backend_log = get_logger("backend")
 ACCESS_LOG = LOG_DIR / "access.log"
@@ -80,6 +81,9 @@ def handle_whisper(
             "Whisper CLI not found in PATH. Is it installed and in the environment?"
         )
 
+    # Notify clients that the job is queued
+    send_progress_update(job_id, JobStatusEnum.QUEUED.value)
+
     with db_lock:
         with SessionLocal() as db:
             job = db.query(Job).filter_by(id=job_id).first()
@@ -87,6 +91,7 @@ def handle_whisper(
                 job.status = JobStatusEnum.PROCESSING
                 job.started_at = datetime.utcnow()
                 db.commit()
+                send_progress_update(job_id, JobStatusEnum.PROCESSING.value)
 
     def _run():
         log_path = LOG_DIR / f"{job_id}.log"
@@ -148,6 +153,7 @@ def handle_whisper(
                             job.log_path = str(log_path)
                             job.finished_at = datetime.utcnow()
                             db.commit()
+                            send_progress_update(job_id, JobStatusEnum.FAILED.value)
                 return
 
             except Exception as e:
@@ -160,6 +166,7 @@ def handle_whisper(
                             job.log_path = str(log_path)
                             job.finished_at = datetime.utcnow()
                             db.commit()
+                            send_progress_update(job_id, JobStatusEnum.FAILED.value)
                 return
 
             raw_txt_path = job_dir / (Path(upload).with_suffix(".srt").name)
@@ -178,6 +185,9 @@ def handle_whisper(
                             if job:
                                 job.status = JobStatusEnum.ENRICHING
                                 db.commit()
+                                send_progress_update(
+                                    job_id, JobStatusEnum.ENRICHING.value
+                                )
                                 run_metadata_writer(
                                     job_id,
                                     raw_txt_path,
@@ -193,6 +203,9 @@ def handle_whisper(
                                         job2.transcript_path = str(raw_txt_path)
                                         job2.finished_at = datetime.utcnow()
                                         db2.commit()
+                                        send_progress_update(
+                                            job_id, JobStatusEnum.COMPLETED.value
+                                        )
                                         logger.info(
                                             "status -> COMPLETED committed"
                                         )  # debug breadcrumb
@@ -204,6 +217,7 @@ def handle_whisper(
                                 job.finished_at = datetime.utcnow()
                                 logger.error(f"Metadata writer failed: {e}")
                                 db.commit()
+                                send_progress_update(job_id, JobStatusEnum.FAILED.value)
                     elif proc.returncode < 0:
                         logger.error(
                             f"Whisper process terminated with signal {-proc.returncode}"
@@ -214,6 +228,7 @@ def handle_whisper(
                             job.log_path = str(log_path)
                             job.finished_at = datetime.utcnow()
                             db.commit()
+                            send_progress_update(job_id, JobStatusEnum.FAILED.value)
                         logger.error(
                             f"Whisper process terminated with signal {-proc.returncode}"
                         )
@@ -225,6 +240,7 @@ def handle_whisper(
                             job.log_path = str(log_path)
                             job.finished_at = datetime.utcnow()
                             db.commit()
+                            send_progress_update(job_id, JobStatusEnum.FAILED.value)
         except Exception as e:
             logger.critical(f"CRITICAL thread error: {e}")
             with db_lock:
@@ -235,6 +251,7 @@ def handle_whisper(
                         job.log_path = str(log_path)
                         job.finished_at = datetime.utcnow()
                         db.commit()
+                        send_progress_update(job_id, JobStatusEnum.FAILED.value)
 
     if start_thread:
         threading.Thread(target=_run, daemon=True).start()

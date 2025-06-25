@@ -80,6 +80,12 @@ The backend exposes Prometheus metrics at `/metrics`. Authenticate with the JWT
 token obtained from the `/token` endpoint and send it as `Authorization: Bearer
 <token>`.
 
+### Progress WebSocket
+
+Connect to `/ws/progress/{job_id}` with the same JWT credentials as other
+endpoints. The server sends JSON messages when a job moves through the
+`queued`, `processing`, `enriching` and final `completed` or `failed` states.
+
 ### Example Job Response
 
 Calls like `GET /jobs/{id}` now return Pydantic models. A typical response

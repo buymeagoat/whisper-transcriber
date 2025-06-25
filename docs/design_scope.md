@@ -62,9 +62,8 @@ This document summarizes the repository layout and how the core FastAPI service 
 - Whisper runs in a background thread writing transcripts to `transcripts/` and logs to `logs/`.
 - Metadata is extracted from each transcript and persisted to SQLite.
 - Jobs survive server restarts by being rehydrated on startup if processing was incomplete.
-## Additional Tweaks and Features
 
-The list below ranks future enhancements from simplest to most complex. Items marked **Done** are present in the current codebase.
+## Additional Tweaks and Features
 
 1. **Start a New Job button after upload** – **Done**
 2. **Replace default favicon** – **Done**
@@ -75,9 +74,6 @@ The list below ranks future enhancements from simplest to most complex. Items ma
 7. **Stop / Restart server from Admin** – Not yet
 8. **Web-based file manager for logs/uploads/transcripts** – **Done** (`/admin/files`)
 9. **Shell access via web UI** – Not yet
-
-### Ideas from Historic Documents
-
 10. **Resume jobs after crash or cancel** – from archived designs
 11. **Stream logs to UI via WebSocket** – from handoff notes
 12. **Download job archive (.zip)** – transcripts and logs together
@@ -92,8 +88,6 @@ The list below ranks future enhancements from simplest to most complex. Items ma
 21. **Docker Compose setup** – optional container orchestration
 22. **Admin panel health checks and job cleanup**
 23. **UI progress bars with word-level timestamps**
-
-
 24. **Allow multiple files per upload with validation** – upcoming UI change
 25. **Dashboard KPIs for throughput** – show metrics on admin page
 26. **Settings page to customize default model** – choose options
@@ -106,26 +100,23 @@ The list below ranks future enhancements from simplest to most complex. Items ma
 33. **Use `updated_at` for job sorting/pagination** – future feature
 34. **Download transcripts as `.txt`** – preserve timestamps
 35. **Zip download of all data** – **Done** (`/admin/download-all`)
-
-## Codex's Idea Evaluation
-
-- **Live streaming transcription** – transcribe audio streams in real time using WebSockets.
-- **Automatic language translation** – convert transcripts into multiple languages.
-- **Summarization and keyword extraction** – generate concise summaries and highlight key points.
-- **Speaker diarization support** – distinguish speakers and label dialogue.
-- **Searchable transcript archive** – index transcripts with full-text search capabilities.
-- **Audio cleanup utilities** – optional noise reduction, trimming, and normalization.
-- **Integration with meeting platforms** – ingest recordings from Zoom or Google Meet directly.
-- **AI-powered sentiment analysis** – gauge tone or emotion from speech segments.
-- **Voice cloning for playback** – regenerate audio with corrected text or alternate voices.
-- **Workflow automation hooks** – trigger webhooks or notifications when jobs complete.
-- **Audio format conversion** – encode or decode files to and from various audio types.
-- **Comprehensive audio toolbox** – offer trimming, noise reduction, conversion and transcription from one upload screen.
-- **Text-to-speech from documents** – upload text files in different formats and generate spoken audio.
-- **Mobile voice memo support** – mobile-friendly interface for sending voice memos (e.g., from iPhone).
-- **LLM-powered transcript insights** – allow users to submit transcripts with a prompt to large language models for analysis.
-- **Collaborative transcript editing** – let multiple users edit, comment and highlight transcripts in real time.
-- **Automated meeting minutes** – generate summaries with action items and calendar links.
-- **Cloud storage sync** – automatically archive uploads and transcripts to Dropbox, Drive or iCloud.
-- **Personalized speech models** – train recognition on user-provided samples for improved accuracy.
-- **Sign language video generation** – create ASL or other sign language renditions of transcripts for accessibility.
+36. **Live streaming transcription** – transcribe audio streams in real time using WebSockets.
+37. **Automatic language translation** – convert transcripts into multiple languages.
+38. **Summarization and keyword extraction** – generate concise summaries and highlight key points.
+39. **Speaker diarization support** – distinguish speakers and label dialogue.
+40. **Searchable transcript archive** – index transcripts with full-text search capabilities.
+41. **Audio cleanup utilities** – optional noise reduction, trimming, and normalization.
+42. **Integration with meeting platforms** – ingest recordings from Zoom or Google Meet directly.
+43. **AI-powered sentiment analysis** – gauge tone or emotion from speech segments.
+44. **Voice cloning for playback** – regenerate audio with corrected text or alternate voices.
+45. **Workflow automation hooks** – trigger webhooks or notifications when jobs complete.
+46. **Audio format conversion** – encode or decode files to and from various audio types.
+47. **Comprehensive audio toolbox** – offer trimming, noise reduction, conversion and transcription from one upload screen.
+48. **Text-to-speech from documents** – upload text files in different formats and generate spoken audio.
+49. **Mobile voice memo support** – mobile-friendly interface for sending voice memos (e.g., from iPhone).
+50. **LLM-powered transcript insights** – allow users to submit transcripts with a prompt to large language models for analysis.
+51. **Collaborative transcript editing** – let multiple users edit, comment and highlight transcripts in real time.
+52. **Automated meeting minutes** – generate summaries with action items and calendar links.
+53. **Cloud storage sync** – automatically archive uploads and transcripts to Dropbox, Drive or iCloud.
+54. **Personalized speech models** – train recognition on user-provided samples for improved accuracy.
+55. **Sign language video generation** – create ASL or other sign language renditions of transcripts for accessibility.

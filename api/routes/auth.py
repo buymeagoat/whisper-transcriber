@@ -6,6 +6,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from api.settings import settings
+from api.schemas import TokenOut
 
 router = APIRouter()
 
@@ -29,8 +30,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 
-@router.post("/token")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+@router.post("/token", response_model=TokenOut)
+async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenOut:
     if form_data.username != settings.auth_username or not verify_password(
         form_data.password
     ):
@@ -40,7 +41,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = create_access_token({"sub": settings.auth_username})
-    return {"access_token": token, "token_type": "bearer"}
+    return TokenOut(access_token=token, token_type="bearer")
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:

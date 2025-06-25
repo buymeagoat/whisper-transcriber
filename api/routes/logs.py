@@ -6,6 +6,7 @@ from fastapi.responses import PlainTextResponse
 from api.errors import ErrorCode, http_error
 from api.paths import storage, LOG_DIR
 from api.app_state import ACCESS_LOG, backend_log
+from api.schemas import StatusOut
 
 router = APIRouter()
 
@@ -39,17 +40,17 @@ async def websocket_job_log(
         pass
 
 
-@router.post("/log_event")
-async def log_event(request: Request):
+@router.post("/log_event", response_model=StatusOut)
+async def log_event(request: Request) -> StatusOut:
     try:
         payload = await request.json()
         event = payload.get("event", "unknown")
         context = payload.get("context", {})
         backend_log.info(f"Client Event: {event} | Context: {context}")
-        return {"status": "logged"}
+        return StatusOut(status="logged")
     except Exception as e:
         backend_log.error(f"Failed to log client event: {e}")
-        return {"status": "error", "message": str(e)}
+        return StatusOut(status="error", message=str(e))
 
 
 @router.get("/logs/access", response_class=PlainTextResponse)

@@ -12,12 +12,13 @@ from api.models import Job
 from api.orm_bootstrap import SessionLocal
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
 from api.app_state import db_lock
+from api.schemas import FileListOut, StatusOut, AdminStatsOut
 
 router = APIRouter(prefix="/admin")
 
 
-@router.get("/files")
-def list_admin_files():
+@router.get("/files", response_model=FileListOut)
+def list_admin_files() -> FileListOut:
     logs = sorted(f.name for f in LOG_DIR.glob("*") if f.is_file())
     uploads = sorted(f.name for f in UPLOAD_DIR.glob("*") if f.is_file())
     transcripts = sorted(
@@ -25,11 +26,11 @@ def list_admin_files():
         for f in TRANSCRIPTS_DIR.rglob("*")
         if f.is_file()
     )
-    return {"logs": logs, "uploads": uploads, "transcripts": transcripts}
+    return FileListOut(logs=logs, uploads=uploads, transcripts=transcripts)
 
 
-@router.delete("/files")
-def delete_admin_file(payload: dict):
+@router.delete("/files", response_model=StatusOut)
+def delete_admin_file(payload: dict) -> StatusOut:
     folder = payload.get("folder")
     filename = payload.get("filename")
     folder_map = {
@@ -43,11 +44,11 @@ def delete_admin_file(payload: dict):
     if not target.exists() or not target.is_file():
         raise http_error(ErrorCode.FILE_NOT_FOUND)
     target.unlink()
-    return {"status": "deleted"}
+    return StatusOut(status="deleted")
 
 
-@router.post("/reset")
-def reset_system():
+@router.post("/reset", response_model=StatusOut)
+def reset_system() -> StatusOut:
     with db_lock:
         with SessionLocal() as db:
             db.query(Job).delete()
@@ -58,7 +59,7 @@ def reset_system():
                 file.unlink()
             elif file.is_dir():
                 shutil.rmtree(file, ignore_errors=True)
-    return {"status": "reset complete"}
+    return StatusOut(status="reset complete")
 
 
 @router.get("/download-all")
@@ -82,12 +83,12 @@ def download_all():
     )
 
 
-@router.get("/stats")
-def admin_stats():
+@router.get("/stats", response_model=AdminStatsOut)
+def admin_stats() -> AdminStatsOut:
     cpu_percent = psutil.cpu_percent(interval=0.1)
     mem = psutil.virtual_memory()
-    return {
-        "cpu_percent": cpu_percent,
-        "mem_used_mb": round(mem.used / (1024 * 1024), 1),
-        "mem_total_mb": round(mem.total / (1024 * 1024), 1),
-    }
+    return AdminStatsOut(
+        cpu_percent=cpu_percent,
+        mem_used_mb=round(mem.used / (1024 * 1024), 1),
+        mem_total_mb=round(mem.total / (1024 * 1024), 1),
+    )

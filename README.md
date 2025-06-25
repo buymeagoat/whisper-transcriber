@@ -68,9 +68,26 @@ application can be served with the backend.
 
 ## Metrics
 
+
 The backend exposes Prometheus metrics at `/metrics`. Authenticate with the JWT
 token obtained from the `/token` endpoint and send it as `Authorization: Bearer
 <token>`.
+
+### Example Job Response
+
+Calls like `GET /jobs/{id}` now return Pydantic models. A typical response
+resembles:
+
+```json
+{
+  "id": "123abc",
+  "original_filename": "audio.wav",
+  "model": "base",
+  "created_at": "2024-01-01T12:00:00",
+  "updated": "2024-01-01T12:05:00",
+  "status": "completed"
+}
+```
 
 ## Usage Notes
 

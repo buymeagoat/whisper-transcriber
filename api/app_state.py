@@ -22,7 +22,7 @@ from api.paths import (
 
 # ─── Config ───
 LOCAL_TZ = ZoneInfo("America/Chicago")
-from api import config
+from api.settings import settings
 from api.services.job_queue import JobQueue, ThreadJobQueue, BrokerJobQueue
 
 from api.utils.logger import get_logger
@@ -37,8 +37,8 @@ WHISPER_BIN = shutil.which("whisper")
 db_lock = threading.RLock()
 
 # ─── Job Queue ───
-if config.JOB_QUEUE_BACKEND == "thread":
-    job_queue: JobQueue = ThreadJobQueue(config.MAX_CONCURRENT_JOBS)
+if settings.job_queue_backend == "thread":
+    job_queue: JobQueue = ThreadJobQueue(settings.max_concurrent_jobs)
 else:
     job_queue = BrokerJobQueue()
 

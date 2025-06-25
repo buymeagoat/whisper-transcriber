@@ -7,9 +7,9 @@ from sqlalchemy import inspect, create_engine
 from sqlalchemy.orm import sessionmaker
 from api.models import Base
 from api.utils.logger import get_logger
-from api import config
+from api.settings import settings
 
-DB_URL = config.DB_URL
+DB_URL = settings.db_url
 engine_kwargs = {}
 if DB_URL.startswith("sqlite"):
     engine_kwargs["connect_args"] = {"check_same_thread": False}

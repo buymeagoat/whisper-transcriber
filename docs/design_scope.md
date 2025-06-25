@@ -36,6 +36,25 @@ cd ..
 
 Key environment files include `pyproject.toml`, `requirements.txt`, and the `Dockerfile` used to build a runnable image. The older `audit_environment.py` helper script is optional and may be removed.
 
+## Configuration
+
+Application settings come from `api/settings.py`. It reads environment
+variables once using `pydantic.BaseSettings` and exposes a `settings`
+object used throughout the code base. Available variables are:
+
+- `DB_URL` – database URL.
+- `DB` – SQLite path overriding `DB_URL`.
+- `VITE_API_HOST` – base URL for the frontend to reach the API.
+- `LOG_LEVEL` – log level for backend loggers.
+- `LOG_TO_STDOUT` – mirror logs to the console when `true`.
+- `METRICS_TOKEN` – optional bearer token for `/metrics`.
+- `AUTH_USERNAME` / `AUTH_PASSWORD` – login credentials.
+- `SECRET_KEY` – secret for JWT signing.
+- `ACCESS_TOKEN_EXPIRE_MINUTES` – JWT lifetime.
+- `MAX_CONCURRENT_JOBS` – worker thread count for the internal queue.
+- `JOB_QUEUE_BACKEND` – queue implementation (`thread` by default).
+- `STORAGE_BACKEND` – where uploads and transcripts are stored.
+
 ## API Overview
 - **Job management**: `POST /jobs` to upload, `GET /jobs` and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.
 - **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts, resetting the system, and retrieving basic stats.

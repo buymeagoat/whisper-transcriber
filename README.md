@@ -16,6 +16,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 
 ## Optional Environment Variables
 
+`api/settings.py` reads the following environment variables at startup:
+
 - `DB_URL` – SQLAlchemy database URL for the main database. Defaults to
   `postgresql+psycopg2://whisper:whisper@db:5432/whisper`.
 - `DB` – path to a SQLite database file used mainly for tests. When set it
@@ -36,8 +38,9 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
   default `local` backend writes to the filesystem. A placeholder `cloud`
   backend can be added for remote buckets.
 
-All configuration values are parsed once in `api/config.py` and imported by the
-rest of the application instead of calling `os.getenv` directly.
+Configuration values are provided by `api/settings.py` using Pydantic's
+`BaseSettings`. An instance named `settings` is imported by the rest of the
+application so environment variables are loaded only once.
 
 ## Running
 

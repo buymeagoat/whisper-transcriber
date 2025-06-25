@@ -13,7 +13,13 @@ def _init_storage() -> Storage:
     if settings.storage_backend == "local":
         return LocalStorage(BASE_DIR)
     elif settings.storage_backend == "cloud":
-        return CloudStorage()
+        if not settings.s3_bucket:
+            raise ValueError("S3_BUCKET must be set for cloud storage")
+        return CloudStorage(
+            settings.s3_bucket,
+            aws_access_key_id=settings.aws_access_key_id,
+            aws_secret_access_key=settings.aws_secret_access_key,
+        )
     else:
         raise ValueError(f"Unknown STORAGE_BACKEND: {settings.storage_backend}")
 

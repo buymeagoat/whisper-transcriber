@@ -35,8 +35,11 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
   internal worker pool while `broker` allows hooking into an external system
   like Celery.
 - `STORAGE_BACKEND` – choose where uploads and transcripts are stored. The
-  default `local` backend writes to the filesystem. A placeholder `cloud`
-  backend can be added for remote buckets.
+  default `local` backend writes to the filesystem. Set `cloud` to use an
+  S3 bucket via the `CloudStorage` backend.
+- `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` – credentials for accessing
+  the bucket when using the cloud backend.
+- `S3_BUCKET` – name of the bucket to store uploads and transcripts.
 - `CELERY_BROKER_URL` and `CELERY_BACKEND_URL` – message broker and result
   backend used when `JOB_QUEUE_BACKEND` is set to `broker`.
 

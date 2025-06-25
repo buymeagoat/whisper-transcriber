@@ -54,6 +54,9 @@ object used throughout the code base. Available variables are:
 - `MAX_CONCURRENT_JOBS` – worker thread count for the internal queue.
 - `JOB_QUEUE_BACKEND` – queue implementation (`thread` by default).
 - `STORAGE_BACKEND` – where uploads and transcripts are stored.
+- `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` – credentials for the cloud
+  storage backend.
+- `S3_BUCKET` – name of the bucket used by `CloudStorage`.
 - `CELERY_BROKER_URL` and `CELERY_BACKEND_URL` – URLs for the broker and
   result backend when using the `broker` queue backend.
 

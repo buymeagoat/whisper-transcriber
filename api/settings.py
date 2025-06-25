@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     max_concurrent_jobs: int = Field(2, env="MAX_CONCURRENT_JOBS")
     job_queue_backend: str = Field("thread", env="JOB_QUEUE_BACKEND")
     storage_backend: str = Field("local", env="STORAGE_BACKEND")
+    aws_access_key_id: str | None = Field(None, env="AWS_ACCESS_KEY_ID")
+    aws_secret_access_key: str | None = Field(None, env="AWS_SECRET_ACCESS_KEY")
+    s3_bucket: str | None = Field(None, env="S3_BUCKET")
     celery_broker_url: str = Field(
         "amqp://guest:guest@broker:5672//", env="CELERY_BROKER_URL"
     )

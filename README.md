@@ -163,3 +163,6 @@ data persists between runs. Once running, access the API at
 `http://localhost:8000`.
 
 
+## Contributing
+
+Run `black .` before committing changes. When adding features or changing configuration, update both `docs/design_scope.md` and `README.md` so the documentation stays consistent.

@@ -2,6 +2,10 @@
 
 This repository implements a self‑contained audio transcription service. A FastAPI backend wraps the OpenAI Whisper command line tool and exposes endpoints for uploading audio, tracking progress, and retrieving transcripts.
 
+## Documentation Policy
+
+All contributors—including Codex—must update this document and `README.md` whenever features or configuration change. Keeping both files synchronized ensures the instructions remain accurate.
+
 ## Minimum Viable Product
 The application is considered working once these basics are functional:
 - Jobs can be submitted with `/jobs` and processed with the Whisper CLI.

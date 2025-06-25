@@ -70,6 +70,7 @@ Replace default favicon
 Show Docker stats in Admin (`/admin/stats`)
 Web-based file manager for logs/uploads/transcripts (`/admin/files`)
 Zip download of all data (`/admin/download-all`)
+Expose `/metrics` endpoint for monitoring
 
 ### Upcoming Ideas
 
@@ -77,53 +78,52 @@ Zip download of all data (`/admin/download-all`)
 
 | Rank | Feature Idea                                    | Reasoning                      | Considerations                  | Roadblocks                    |
 | ---- | ----------------------------------------------- | ------------------------------ | ------------------------------- | ----------------------------- |
-| 000  | Expose `/metrics` endpoint for monitoring       | Simple Prometheus integration  | Keep endpoint secured           | None                          |
-| 001  | Add `/health` and `/version` endpoints          | Just return status data        | Decide output format            | None                          |
-| 002  | Local-time timestamps instead of UTC            | Convert timestamps on display  | Timezone handling               | None                          |
-| 003  | Download transcripts as `.txt`                  | Plain text export from SRT     | Maintain timestamp accuracy     | None                          |
-| 004  | Download job archive (.zip)                     | Zip existing logs and results  | Avoid large file memory use     | None                          |
-| 005  | Support `.vtt` transcript export                | Convert from SRT to VTT        | Extra dependency for conversion | None                          |
-| 006  | Provide CLI wrapper for non-UI usage            | Wrapper script around API calls| Package distribution            | None                          |
-| 007  | Improve status messaging in UI                  | Better frontend labels         | Localization, UX tweaks         | None                          |
-| 008  | Job runtime display (live & final)              | Track job start and end times  | Store runtime data              | None                          |
-| 009  | Admin panel health checks and job cleanup       | Add checks and cleanup hooks   | Permission checks               | None                          |
-| 010  | Queue limit or concurrency throttle             | Throttle worker count          | Configurable limits             | None                          |
-| 011  | Docker Compose setup                            | Provide sample compose file    | Keep dev/prod parity            | None                          |
-| 012  | Dashboard KPIs for throughput                   | Show totals and averages       | Pull metrics from DB            | None                          |
-| 013  | Role-based authentication                       | Add user roles table           | Password storage, security      | User management complexity    |
-| 014  | Settings page to customize default model        | UI for selecting models        | Persist user prefs              | None                          |
-| 015  | Allow multiple files per upload with validation | Adjust upload handler          | File size and concurrency       | None                          |
-| 016  | Web-based log viewer                            | Simple log tail view           | Log file rotation               | Large logs                    |
-| 017  | Sortable and searchable job lists               | Add filters on table views     | DB query optimization           | None                          |
-| 018  | Status toasts for admin actions                 | Display toast on success/failure| Frontend state management       | None                          |
-| 019  | Playback or text toggle for completed jobs      | Switch between audio and text  | Media player integration        | None                          |
-| 020  | Use `updated_at` for job sorting/pagination     | Modify queries                 | Add index                       | None                          |
-| 021  | Enhance CLI orchestrate.py with watch mode      | Poll API in loop               | Handle auth tokens              | None                          |
-| 022  | Heartbeat table and `/heartbeat` endpoint       | Record worker heartbeats       | Extra DB writes                 | None                          |
-| 023  | Kill (cancel) a running job                     | Send termination signal        | Handle partial output           | Process management            |
-| 024  | Stop / Restart server from Admin                | Admin commands to stop and start| Risk of accidental shutdown     | Requires elevated permissions |
-| 025  | Shell access via web UI                         | Web terminal component         | Security and sandboxing         | Major security risk           |
-| 026  | Resume jobs after crash or cancel               | Persist intermediate state     | Robust job recovery             | Complex state handling        |
-| 027  | Stream logs to UI via WebSocket                 | Push log lines live            | Scalability of sockets          | None                          |
-| 028  | UI progress bars with word-level timestamps     | Parse SRT positions            | Frequent UI updates             | None                          |
-| 029  | Auto-delete old transcripts after 30 days       | Background cleanup task        | Configurable retention          | None                          |
-| 030  | Workflow automation hooks                       | Fire webhook on job completion | Configurable URLs               | Security of hooks             |
-| 031  | Audio format conversion                         | Use ffmpeg for re-encoding     | Manage codecs                   | None                          |
-| 032  | Audio cleanup utilities                         | Noise reduction pipeline       | CPU usage                       | External libs                 |
-| 033  | Integration with meeting platforms              | OAuth with Zoom/Meet APIs      | API rate limits                 | Authentication complexity     |
-| 034  | Searchable transcript archive                   | Full-text search index         | Storage footprint               | Search engine setup           |
-| 035  | Speaker diarization support                     | Use speaker detection models   | Model accuracy                  | Heavy processing              |
-| 036  | Summarization and keyword extraction            | NLP summarizer models          | Prompt quality                  | Compute load                  |
-| 037  | Automatic language translation                  | Translate final text           | Choose translation service      | API cost                      |
-| 038  | AI-powered sentiment analysis                   | Run sentiment model on segments| Language coverage               | Accuracy                      |
-| 039  | Live streaming transcription                    | Transcribe streaming audio     | Buffer management               | Real-time latency             |
-| 040  | Voice cloning for playback                      | Synthesize corrected speech    | Ethical concerns                | Requires heavy models         |
-| 041  | Comprehensive audio toolbox                     | Combine many tools in UI       | Complexity of options           | Maintenance burden            |
-| 042  | Text-to-speech from documents                   | Generate audio from text       | Multi-language support          | TTS model size                |
-| 043  | Mobile voice memo support                       | Mobile upload workflow         | Touch-friendly UI               | None                          |
-| 044  | LLM-powered transcript insights                 | Send transcript to LLM service | Token limits, privacy           | API cost                      |
-| 045  | Collaborative transcript editing                | Multi-user editing UI          | Real-time sync                  | Conflict resolution           |
-| 046  | Automated meeting minutes                       | Compose summary + action items | Integration with calendars      | Summarization accuracy        |
-| 047  | Cloud storage sync                              | Upload artifacts to cloud drives| OAuth + API quotas              | Reliability of sync           |
-| 048  | Personalized speech models                      | Fine-tune recognition per user | Training data storage           | Model training cost           |
-| 049  | Sign language video generation                  | Generate sign language videos  | Signer avatar quality           | Very heavy compute            |
+| 000  | Add `/health` and `/version` endpoints          | Just return status data        | Decide output format            | None                          |
+| 001  | Local-time timestamps instead of UTC            | Convert timestamps on display  | Timezone handling               | None                          |
+| 002  | Download transcripts as `.txt`                  | Plain text export from SRT     | Maintain timestamp accuracy     | None                          |
+| 003  | Download job archive (.zip)                     | Zip existing logs and results  | Avoid large file memory use     | None                          |
+| 004  | Support `.vtt` transcript export                | Convert from SRT to VTT        | Extra dependency for conversion | None                          |
+| 005  | Provide CLI wrapper for non-UI usage            | Wrapper script around API calls| Package distribution            | None                          |
+| 006  | Improve status messaging in UI                  | Better frontend labels         | Localization, UX tweaks         | None                          |
+| 007  | Job runtime display (live & final)              | Track job start and end times  | Store runtime data              | None                          |
+| 008  | Admin panel health checks and job cleanup       | Add checks and cleanup hooks   | Permission checks               | None                          |
+| 009  | Queue limit or concurrency throttle             | Throttle worker count          | Configurable limits             | None                          |
+| 010  | Docker Compose setup                            | Provide sample compose file    | Keep dev/prod parity            | None                          |
+| 011  | Dashboard KPIs for throughput                   | Show totals and averages       | Pull metrics from DB            | None                          |
+| 012  | Role-based authentication                       | Add user roles table           | Password storage, security      | User management complexity    |
+| 013  | Settings page to customize default model        | UI for selecting models        | Persist user prefs              | None                          |
+| 014  | Allow multiple files per upload with validation | Adjust upload handler          | File size and concurrency       | None                          |
+| 015  | Web-based log viewer                            | Simple log tail view           | Log file rotation               | Large logs                    |
+| 016  | Sortable and searchable job lists               | Add filters on table views     | DB query optimization           | None                          |
+| 017  | Status toasts for admin actions                 | Display toast on success/failure| Frontend state management       | None                          |
+| 018  | Playback or text toggle for completed jobs      | Switch between audio and text  | Media player integration        | None                          |
+| 019  | Use `updated_at` for job sorting/pagination     | Modify queries                 | Add index                       | None                          |
+| 020  | Enhance CLI orchestrate.py with watch mode      | Poll API in loop               | Handle auth tokens              | None                          |
+| 021  | Heartbeat table and `/heartbeat` endpoint       | Record worker heartbeats       | Extra DB writes                 | None                          |
+| 022  | Kill (cancel) a running job                     | Send termination signal        | Handle partial output           | Process management            |
+| 023  | Stop / Restart server from Admin                | Admin commands to stop and start| Risk of accidental shutdown     | Requires elevated permissions |
+| 024  | Shell access via web UI                         | Web terminal component         | Security and sandboxing         | Major security risk           |
+| 025  | Resume jobs after crash or cancel               | Persist intermediate state     | Robust job recovery             | Complex state handling        |
+| 026  | Stream logs to UI via WebSocket                 | Push log lines live            | Scalability of sockets          | None                          |
+| 027  | UI progress bars with word-level timestamps     | Parse SRT positions            | Frequent UI updates             | None                          |
+| 028  | Auto-delete old transcripts after 30 days       | Background cleanup task        | Configurable retention          | None                          |
+| 029  | Workflow automation hooks                       | Fire webhook on job completion | Configurable URLs               | Security of hooks             |
+| 030  | Audio format conversion                         | Use ffmpeg for re-encoding     | Manage codecs                   | None                          |
+| 031  | Audio cleanup utilities                         | Noise reduction pipeline       | CPU usage                       | External libs                 |
+| 032  | Integration with meeting platforms              | OAuth with Zoom/Meet APIs      | API rate limits                 | Authentication complexity     |
+| 033  | Searchable transcript archive                   | Full-text search index         | Storage footprint               | Search engine setup           |
+| 034  | Speaker diarization support                     | Use speaker detection models   | Model accuracy                  | Heavy processing              |
+| 035  | Summarization and keyword extraction            | NLP summarizer models          | Prompt quality                  | Compute load                  |
+| 036  | Automatic language translation                  | Translate final text           | Choose translation service      | API cost                      |
+| 037  | AI-powered sentiment analysis                   | Run sentiment model on segments| Language coverage               | Accuracy                      |
+| 038  | Live streaming transcription                    | Transcribe streaming audio     | Buffer management               | Real-time latency             |
+| 039  | Voice cloning for playback                      | Synthesize corrected speech    | Ethical concerns                | Requires heavy models         |
+| 040  | Comprehensive audio toolbox                     | Combine many tools in UI       | Complexity of options           | Maintenance burden            |
+| 041  | Text-to-speech from documents                   | Generate audio from text       | Multi-language support          | TTS model size                |
+| 042  | Mobile voice memo support                       | Mobile upload workflow         | Touch-friendly UI               | None                          |
+| 043  | LLM-powered transcript insights                 | Send transcript to LLM service | Token limits, privacy           | API cost                      |
+| 044  | Collaborative transcript editing                | Multi-user editing UI          | Real-time sync                  | Conflict resolution           |
+| 045  | Automated meeting minutes                       | Compose summary + action items | Integration with calendars      | Summarization accuracy        |
+| 046  | Cloud storage sync                              | Upload artifacts to cloud drives| OAuth + API quotas              | Reliability of sync           |
+| 047  | Personalized speech models                      | Fine-tune recognition per user | Training data storage           | Model training cost           |
+| 048  | Sign language video generation                  | Generate sign language videos  | Signer avatar quality           | Very heavy compute            |

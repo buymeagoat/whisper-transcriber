@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from api.routes import jobs, admin, logs
+from api.routes import jobs, admin, logs, metrics
 from api.paths import UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.app_state import backend_log
 
@@ -14,6 +14,7 @@ def register_routes(app: FastAPI) -> None:
     app.include_router(jobs.router)
     app.include_router(admin.router)
     app.include_router(logs.router)
+    app.include_router(metrics.router)
 
     app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR, html=True), name="uploads")
     app.mount(

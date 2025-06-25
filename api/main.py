@@ -69,6 +69,17 @@ def health_check():
     return {"status": "ok"}
 
 
+@app.get("/version")
+def version() -> dict:
+    """Return the application version from pyproject.toml."""
+    pyproject = ROOT.parent / "pyproject.toml"
+    import tomllib
+
+    data = tomllib.loads(pyproject.read_text())
+    version = data.get("project", {}).get("version", "unknown")
+    return {"version": version}
+
+
 def rehydrate_incomplete_jobs():
     with SessionLocal() as db:
         jobs = (

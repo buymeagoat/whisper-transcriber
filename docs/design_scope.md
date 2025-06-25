@@ -106,3 +106,26 @@ The list below ranks future enhancements from simplest to most complex. Items ma
 33. **Use `updated_at` for job sorting/pagination** – future feature
 34. **Download transcripts as `.txt`** – preserve timestamps
 35. **Zip download of all data** – **Done** (`/admin/download-all`)
+
+## Codex's Idea Evaluation
+
+- **Live streaming transcription** – transcribe audio streams in real time using WebSockets.
+- **Automatic language translation** – convert transcripts into multiple languages.
+- **Summarization and keyword extraction** – generate concise summaries and highlight key points.
+- **Speaker diarization support** – distinguish speakers and label dialogue.
+- **Searchable transcript archive** – index transcripts with full-text search capabilities.
+- **Audio cleanup utilities** – optional noise reduction, trimming, and normalization.
+- **Integration with meeting platforms** – ingest recordings from Zoom or Google Meet directly.
+- **AI-powered sentiment analysis** – gauge tone or emotion from speech segments.
+- **Voice cloning for playback** – regenerate audio with corrected text or alternate voices.
+- **Workflow automation hooks** – trigger webhooks or notifications when jobs complete.
+- **Audio format conversion** – encode or decode files to and from various audio types.
+- **Comprehensive audio toolbox** – offer trimming, noise reduction, conversion and transcription from one upload screen.
+- **Text-to-speech from documents** – upload text files in different formats and generate spoken audio.
+- **Mobile voice memo support** – mobile-friendly interface for sending voice memos (e.g., from iPhone).
+- **LLM-powered transcript insights** – allow users to submit transcripts with a prompt to large language models for analysis.
+- **Collaborative transcript editing** – let multiple users edit, comment and highlight transcripts in real time.
+- **Automated meeting minutes** – generate summaries with action items and calendar links.
+- **Cloud storage sync** – automatically archive uploads and transcripts to Dropbox, Drive or iCloud.
+- **Personalized speech models** – train recognition on user-provided samples for improved accuracy.
+- **Sign language video generation** – create ASL or other sign language renditions of transcripts for accessibility.

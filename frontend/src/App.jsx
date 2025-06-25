@@ -9,6 +9,7 @@ import TranscriptViewPage from "./pages/TranscriptViewPage";
 import JobStatusPage from "./pages/JobStatusPage";
 import FailedJobsPage from "./pages/FailedJobsPage";
 import JobProgressPage from "./pages/JobProgressPage";
+import LoginPage from "./pages/LoginPage";
 
 export default function App() {
   useEffect(() => {
@@ -18,6 +19,12 @@ export default function App() {
       body: JSON.stringify({ event: 'frontend_loaded', timestamp: new Date().toISOString() })
     }).catch(() => {});
   }, []);
+
+  const token = localStorage.getItem("token");
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = ROUTES.LOGIN;
+  };
 
   return (
     <Router>
@@ -34,22 +41,28 @@ export default function App() {
           <Link to={ROUTES.COMPLETED} style={linkStyle}>Completed Jobs</Link>
           <Link to={ROUTES.FAILED} style={linkStyle}>Failed Jobs</Link>
           <Link to={ROUTES.ADMIN} style={linkStyle}>Admin</Link>
+          {token ? (
+            <button onClick={handleLogout} style={linkStyle}>Logout</button>
+          ) : (
+            <Link to={ROUTES.LOGIN} style={linkStyle}>Login</Link>
+          )}
         </nav>
 
         <main style={{ padding: "1.5rem" }}>
           {/* Removed Tailwind test block */}
 
           <Routes>
-            <Route path="/" element={<Navigate to={ROUTES.UPLOAD} replace />} />
-            <Route path={ROUTES.UPLOAD} element={<UploadPage />} />
-            <Route path={ROUTES.ACTIVE} element={<ActiveJobsPage />} />
-            <Route path={ROUTES.COMPLETED} element={<CompletedJobsPage />} />
-            <Route path={ROUTES.ADMIN} element={<AdminPage />} />
-            <Route path={ROUTES.TRANSCRIPT_VIEW} element={<TranscriptViewPage />} />
-            <Route path={ROUTES.STATUS} element={<JobStatusPage />} />
+            <Route path="/" element={<Navigate to={token ? ROUTES.UPLOAD : ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+            <Route path={ROUTES.UPLOAD} element={token ? <UploadPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.ACTIVE} element={token ? <ActiveJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.COMPLETED} element={token ? <CompletedJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.ADMIN} element={token ? <AdminPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.TRANSCRIPT_VIEW} element={token ? <TranscriptViewPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.STATUS} element={token ? <JobStatusPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.FAILED} element={token ? <FailedJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.PROGRESS} element={token ? <JobProgressPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
             <Route path="*" element={<div style={{ color: "red" }}>404 — Page Not Found</div>} />
-            <Route path={ROUTES.FAILED} element={<FailedJobsPage />} />
-            <Route path={ROUTES.PROGRESS} element={<JobProgressPage />} />
           </Routes>
         </main>
       </div>

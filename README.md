@@ -24,6 +24,9 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
 - `LOG_TO_STDOUT` – set to `true` to also mirror logs to the console.
 - `METRICS_TOKEN` – optional bearer token required to access `/metrics`.
+- `AUTH_USERNAME` and `AUTH_PASSWORD` – credentials for obtaining JWT tokens (defaults `admin`/`admin`).
+- `SECRET_KEY` – secret used to sign JWT tokens.
+- `ACCESS_TOKEN_EXPIRE_MINUTES` – token lifetime in minutes.
 - `MAX_CONCURRENT_JOBS` – number of worker threads when using the built-in job
   queue. Defaults to `2`.
 - `JOB_QUEUE_BACKEND` – select the queue implementation. `thread` uses an
@@ -57,8 +60,9 @@ application can be served with the backend.
 
 ## Metrics
 
-The backend exposes Prometheus metrics at `/metrics`. When `METRICS_TOKEN` is
-set, requests must include `Authorization: Bearer <token>`.
+The backend exposes Prometheus metrics at `/metrics`. Authenticate with the JWT
+token obtained from the `/token` endpoint and send it as `Authorization: Bearer
+<token>`.
 
 ## Usage Notes
 

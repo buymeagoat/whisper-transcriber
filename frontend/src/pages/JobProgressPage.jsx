@@ -8,10 +8,13 @@ export default function JobProgressPage() {
   const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
+    let ws;
+    const token = localStorage.getItem("token");
+
     const fetchLog = () => {
       fetch(`${ROUTES.API}/log/${jobId}`)
-        .then(res => res.text())
-        .then(data => {
+        .then((res) => res.text())
+        .then((data) => {
           setLog(data);
           setLastUpdated(new Date().toLocaleTimeString());
         })
@@ -19,15 +22,24 @@ export default function JobProgressPage() {
     };
 
     fetchLog();
-    const interval = setInterval(fetchLog, 30000); // 30 sec refresh
-    return () => clearInterval(interval);
+
+    const wsUrl = `${ROUTES.API.replace(/^http/, "ws")}/ws/logs/${jobId}?token=${token}`;
+    ws = new WebSocket(wsUrl);
+    ws.onmessage = (ev) => {
+      setLog((prev) => prev + ev.data);
+      setLastUpdated(new Date().toLocaleTimeString());
+    };
+
+    return () => {
+      if (ws) ws.close();
+    };
   }, [jobId]);
 
   return (
     <div style={{ padding: "2rem", backgroundColor: "#111", color: "#eee", fontFamily: "monospace" }}>
       <h2>Log for Job {jobId}</h2>
       <div style={{ fontSize: "0.85rem", color: "#a1a1aa", marginBottom: "1rem" }}>
-        Auto-refreshing every 30 seconds
+        Streaming log via WebSocket
         {lastUpdated && <span> — Last updated at {lastUpdated}</span>}
       </div>
       <pre style={{

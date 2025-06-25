@@ -7,8 +7,9 @@ from sqlalchemy import inspect, create_engine
 from sqlalchemy.orm import sessionmaker
 from api.models import Base
 from api.utils.logger import get_logger
+from api import config
 
-DB_PATH = os.getenv("DB", "api/jobs.db")
+DB_PATH = config.DB_PATH
 DATABASE_URL = f"sqlite:///{DB_PATH}"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine)

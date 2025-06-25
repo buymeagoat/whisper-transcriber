@@ -1,4 +1,4 @@
-import os
+from api import config
 
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -28,13 +28,9 @@ system_log = get_system_logger()
 ROOT = Path(__file__).parent
 
 # ─── ENV SAFETY CHECK ───
-from dotenv import load_dotenv
-
-load_dotenv()
-
 # Read API host from environment with a default for local development.
-API_HOST = os.getenv("VITE_API_HOST", "http://localhost:8000")
-if os.getenv("VITE_API_HOST") is None:
+API_HOST = config.API_HOST
+if config.RAW_VITE_API_HOST is None:
     system_log.warning("VITE_API_HOST not set, defaulting to http://localhost:8000")
 
 

@@ -21,6 +21,9 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
 - `LOG_TO_STDOUT` – set to `true` to also mirror logs to the console.
 
+All configuration values are parsed once in `api/config.py` and imported by the
+rest of the application instead of calling `os.getenv` directly.
+
 ## Running
 
 Start the backend with `uvicorn`:

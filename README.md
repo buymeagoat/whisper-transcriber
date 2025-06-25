@@ -33,10 +33,12 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
   queue. Defaults to `2`.
 - `JOB_QUEUE_BACKEND` – select the queue implementation. `thread` uses an
   internal worker pool while `broker` allows hooking into an external system
-  like Celery. Only `thread` is implemented by default.
+  like Celery.
 - `STORAGE_BACKEND` – choose where uploads and transcripts are stored. The
   default `local` backend writes to the filesystem. A placeholder `cloud`
   backend can be added for remote buckets.
+- `CELERY_BROKER_URL` and `CELERY_BACKEND_URL` – message broker and result
+  backend used when `JOB_QUEUE_BACKEND` is set to `broker`.
 
 Configuration values are provided by `api/settings.py` using Pydantic's
 `BaseSettings`. An instance named `settings` is imported by the rest of the

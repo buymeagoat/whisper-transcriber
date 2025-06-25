@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     max_concurrent_jobs: int = Field(2, env="MAX_CONCURRENT_JOBS")
     job_queue_backend: str = Field("thread", env="JOB_QUEUE_BACKEND")
     storage_backend: str = Field("local", env="STORAGE_BACKEND")
+    celery_broker_url: str = Field(
+        "amqp://guest:guest@broker:5672//", env="CELERY_BROKER_URL"
+    )
+    celery_backend_url: str = Field("rpc://", env="CELERY_BACKEND_URL")
 
     # Not configurable via environment
     algorithm: str = "HS256"

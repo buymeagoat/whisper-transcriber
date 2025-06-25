@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from api import config
+from api.settings import settings
 
 router = APIRouter()
 
@@ -13,7 +13,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-hashed_password = pwd_context.hash(config.AUTH_PASSWORD)
+hashed_password = pwd_context.hash(settings.auth_password)
 
 
 def verify_password(plain_password: str) -> bool:
@@ -23,15 +23,15 @@ def verify_password(plain_password: str) -> bool:
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + (
-        expires_delta or timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
+        expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
     )
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.ALGORITHM)
+    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 
 @router.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    if form_data.username != config.AUTH_USERNAME or not verify_password(
+    if form_data.username != settings.auth_username or not verify_password(
         form_data.password
     ):
         raise HTTPException(
@@ -39,7 +39,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    token = create_access_token({"sub": config.AUTH_USERNAME})
+    token = create_access_token({"sub": settings.auth_username})
     return {"access_token": token, "token_type": "bearer"}
 
 
@@ -50,9 +50,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM])
+        payload = jwt.decode(
+            token, settings.secret_key, algorithms=[settings.algorithm]
+        )
         username: str = payload.get("sub")
-        if username != config.AUTH_USERNAME:
+        if username != settings.auth_username:
             raise credentials_exception
     except JWTError:
         raise credentials_exception

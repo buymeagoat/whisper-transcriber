@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Response, Request, Depends
 from api.routes.auth import get_current_user
 
-from api import config
 from prometheus_client import CONTENT_TYPE_LATEST, REGISTRY, generate_latest
 
 router = APIRouter()

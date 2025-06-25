@@ -1,3 +1,10 @@
+"""Deprecated module kept for backward compatibility.
+
+Use :mod:`api.settings` instead. This file now simply loads environment
+variables the old way so legacy imports keep working. New code should import
+``settings`` from ``api.settings``.
+"""
+
 import os
 from dotenv import load_dotenv
 

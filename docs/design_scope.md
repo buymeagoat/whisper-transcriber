@@ -97,6 +97,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 - Web-based file manager for logs/uploads/transcripts (`/admin/files`)
 - Zip download of all data (`/admin/download-all`)
 - Expose `/metrics` endpoint for monitoring
+- Progress WebSocket (`/ws/progress/{job_id}`) sends status updates
 
 ### Upcoming Ideas
 

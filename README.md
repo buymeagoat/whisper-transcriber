@@ -21,6 +21,14 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
 - `LOG_TO_STDOUT` – set to `true` to also mirror logs to the console.
 - `METRICS_TOKEN` – optional bearer token required to access `/metrics`.
+- `MAX_CONCURRENT_JOBS` – number of worker threads when using the built-in job
+  queue. Defaults to `2`.
+- `JOB_QUEUE_BACKEND` – select the queue implementation. `thread` uses an
+  internal worker pool while `broker` allows hooking into an external system
+  like Celery. Only `thread` is implemented by default.
+- `STORAGE_BACKEND` – choose where uploads and transcripts are stored. The
+  default `local` backend writes to the filesystem. A placeholder `cloud`
+  backend can be added for remote buckets.
 
 All configuration values are parsed once in `api/config.py` and imported by the
 rest of the application instead of calling `os.getenv` directly.

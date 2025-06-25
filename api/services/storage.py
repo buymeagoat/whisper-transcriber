@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import BinaryIO
 import shutil
+import tempfile
+import boto3
 
 
 class Storage(ABC):
@@ -77,6 +79,15 @@ class LocalStorage(Storage):
     def get_transcript_dir(self, job_id: str) -> Path:
         path = self._transcripts_dir / job_id
         path.mkdir(parents=True, exist_ok=True)
+        prefix = f"transcripts/{job_id}/"
+        paginator = self.s3.get_paginator("list_objects_v2")
+        for page in paginator.paginate(Bucket=self.bucket, Prefix=prefix):
+            for obj in page.get("Contents", []):
+                key = obj["Key"]
+                rel = key[len(prefix) :]
+                local = path / rel
+                local.parent.mkdir(parents=True, exist_ok=True)
+                self.s3.download_file(self.bucket, key, str(local))
         return path
 
     def delete_transcript_dir(self, job_id: str) -> None:
@@ -84,34 +95,68 @@ class LocalStorage(Storage):
 
 
 class CloudStorage(Storage):
-    """Placeholder for a cloud backed storage implementation."""
+    """S3 backed storage using boto3 with a local cache directory."""
 
-    def __init__(self) -> None:
-        pass
+    def __init__(
+        self,
+        bucket: str,
+        aws_access_key_id: str | None = None,
+        aws_secret_access_key: str | None = None,
+    ) -> None:
+        session = boto3.session.Session(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+        )
+        self.s3 = session.client("s3")
+        self.bucket = bucket
+        base = Path(tempfile.gettempdir()) / "whisper_cache"
+        self._upload_dir = base / "uploads"
+        self._transcripts_dir = base / "transcripts"
+        self._log_dir = base / "logs"
+        for path in (self._upload_dir, self._transcripts_dir, self._log_dir):
+            path.mkdir(parents=True, exist_ok=True)
 
     @property
     def upload_dir(self) -> Path:
-        raise NotImplementedError
+        return self._upload_dir
 
     @property
     def transcripts_dir(self) -> Path:
-        raise NotImplementedError
+        return self._transcripts_dir
 
     @property
     def log_dir(self) -> Path:
-        raise NotImplementedError
+        return self._log_dir
 
     def save_upload(self, source: BinaryIO, filename: str) -> Path:
-        raise NotImplementedError
+        dest = self._upload_dir / filename
+        with dest.open("wb") as dst:
+            shutil.copyfileobj(source, dst)
+        self.s3.upload_file(str(dest), self.bucket, f"uploads/{filename}")
+        return dest
 
     def delete_upload(self, filename: str) -> None:
-        raise NotImplementedError
+        try:
+            (self._upload_dir / filename).unlink()
+        except FileNotFoundError:
+            pass
+        self.s3.delete_object(Bucket=self.bucket, Key=f"uploads/{filename}")
 
     def get_upload_path(self, filename: str) -> Path:
-        raise NotImplementedError
+        path = self._upload_dir / filename
+        if not path.exists():
+            self.s3.download_file(self.bucket, f"uploads/{filename}", str(path))
+        return path
 
     def get_transcript_dir(self, job_id: str) -> Path:
-        raise NotImplementedError
+        path = self._transcripts_dir / job_id
+        path.mkdir(parents=True, exist_ok=True)
+        return path
 
     def delete_transcript_dir(self, job_id: str) -> None:
-        raise NotImplementedError
+        shutil.rmtree(self._transcripts_dir / job_id, ignore_errors=True)
+        paginator = self.s3.get_paginator("list_objects_v2")
+        prefix = f"transcripts/{job_id}/"
+        for page in paginator.paginate(Bucket=self.bucket, Prefix=prefix):
+            for obj in page.get("Contents", []):
+                self.s3.delete_object(Bucket=self.bucket, Key=obj["Key"])

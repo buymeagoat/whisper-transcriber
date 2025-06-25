@@ -94,7 +94,7 @@ export default function FailedJobsPage() {
               >
                 <td style={{ ...tdStyle, color: "#f87171" }}>{job.original_filename}</td>
                 <td style={tdStyle}>{job.model}</td>
-                <td style={tdStyle}>{new Date(job.created_at).toLocaleString()}</td>
+                <td style={tdStyle}>{new Date(job.created_at + 'Z').toLocaleString()}</td>
                 <td style={tdStyle}>{job.status}</td>
                 <td style={{ ...tdStyle, display: "flex", gap: "0.5rem" }}>
                   <button style={buttonStyle("#2563eb")} onClick={() => handleRestart(job.id)}>Restart</button>

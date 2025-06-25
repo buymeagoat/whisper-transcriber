@@ -91,7 +91,7 @@ export default function CompletedJobsPage() {
                   {job.original_filename}
                 </td>
                 <td style={tdStyle}>{job.model}</td>
-                <td style={tdStyle}>{new Date(job.created_at).toLocaleString()}</td>
+                <td style={tdStyle}>{new Date(job.created_at + 'Z').toLocaleString()}</td>
                 <td style={{ ...tdStyle, display: "flex", gap: "0.5rem" }}>
                   <button title={`Job ID: ${job.id}`} style={buttonStyle("#2563eb")} onClick={() => handleView(job.id)}>View</button>
                   <button style={buttonStyle("#16a34a")} onClick={() => handleDownloadTranscript(job.id)}>Download</button>

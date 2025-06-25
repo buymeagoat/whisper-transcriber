@@ -100,11 +100,14 @@ resembles:
   "id": "123abc",
   "original_filename": "audio.wav",
   "model": "base",
-  "created_at": "2024-01-01T12:00:00",
-  "updated": "2024-01-01T12:05:00",
+  "created_at": "2024-01-01T12:00:00Z",
+  "updated": "2024-01-01T12:05:00Z",
   "status": "completed"
 }
 ```
+
+Timestamps returned by the API are in UTC (note the trailing `Z`).
+The web UI converts them to your local timezone for display.
 
 ## Usage Notes
 

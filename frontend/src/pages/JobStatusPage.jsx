@@ -53,8 +53,8 @@ export default function JobStatusPage() {
           <p><strong>Filename:</strong> {job.original_filename}</p>
           <p><strong>Model:</strong> {job.model}</p>
           <p><strong>Status:</strong> {job.status}</p>
-          <p><strong>Created:</strong> {new Date(job.created_at).toLocaleString()}</p>
-          <p><strong>Updated:</strong> {job.updated ? new Date(job.updated).toLocaleString() : "N/A"}</p>
+          <p><strong>Created:</strong> {new Date(job.created_at + 'Z').toLocaleString()}</p>
+          <p><strong>Updated:</strong> {job.updated ? new Date(job.updated + 'Z').toLocaleString() : "N/A"}</p>
 
           {job.status === "completed" && (
               <a

@@ -103,6 +103,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 - Expose `/metrics` endpoint for monitoring
 - Progress WebSocket (`/ws/progress/{job_id}`) sends status updates
 - Health check (`/health`) and version info (`/version`)
+- Local-time timestamps shown in the UI
 
 ### Upcoming Ideas
 
@@ -110,7 +111,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 
 | Rank | Feature Idea                                    | Reasoning                      | Considerations                  | Roadblocks                    |
 | ---- | ----------------------------------------------- | ------------------------------ | ------------------------------- | ----------------------------- |
-| 001  | Local-time timestamps instead of UTC            | Convert timestamps on display  | Timezone handling               | None                          |
+| 001  | Local-time timestamps shown (done)              | Converted on display           | Timezone handling               | None                          |
 | 002  | Download transcripts as `.txt`                  | Plain text export from SRT     | Maintain timestamp accuracy     | None                          |
 | 003  | Download job archive (.zip)                     | Zip existing logs and results  | Avoid large file memory use     | None                          |
 | 004  | Support `.vtt` transcript export                | Convert from SRT to VTT        | Extra dependency for conversion | None                          |

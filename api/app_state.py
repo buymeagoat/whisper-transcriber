@@ -21,6 +21,8 @@ from api.paths import (
 
 # ─── Config ───
 LOCAL_TZ = ZoneInfo("America/Chicago")
+from api import config
+from api.services.job_queue import JobQueue
 
 from api.utils.logger import get_logger
 
@@ -32,6 +34,9 @@ WHISPER_BIN = shutil.which("whisper")
 
 # ─── DB Lock ───
 db_lock = threading.RLock()
+
+# ─── Job Queue ───
+job_queue = JobQueue(config.MAX_CONCURRENT_JOBS)
 
 
 def get_duration(path: Union[str, os.PathLike]) -> float:
@@ -59,7 +64,9 @@ def get_duration(path: Union[str, os.PathLike]) -> float:
         return 0.0
 
 
-def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
+def handle_whisper(
+    job_id: str, upload: Path, job_dir: Path, model: str, *, start_thread: bool = True
+):
     from api.orm_bootstrap import SessionLocal
 
     global WHISPER_BIN
@@ -225,4 +232,7 @@ def handle_whisper(job_id: str, upload: Path, job_dir: Path, model: str):
                         job.finished_at = datetime.utcnow()
                         db.commit()
 
-    threading.Thread(target=_run, daemon=True).start()
+    if start_thread:
+        threading.Thread(target=_run, daemon=True).start()
+    else:
+        _run()

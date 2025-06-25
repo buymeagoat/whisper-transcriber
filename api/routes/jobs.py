@@ -7,7 +7,7 @@ import uuid
 
 from api.errors import ErrorCode, http_error
 from api.models import JobStatusEnum
-from api.app_state import LOCAL_TZ, handle_whisper
+from api.app_state import LOCAL_TZ, handle_whisper, job_queue
 from api.services.jobs import (
     create_job,
     list_jobs as service_list_jobs,
@@ -37,7 +37,9 @@ async def submit_job(file: UploadFile = File(...), model: str = Form("base")):
     ts = datetime.now(LOCAL_TZ)
     create_job(job_id, file.filename, saved, model, ts)
 
-    handle_whisper(job_id, upload_path, job_dir, model)
+    job_queue.enqueue(
+        lambda: handle_whisper(job_id, upload_path, job_dir, model, start_thread=False)
+    )
     return {"job_id": job_id}
 
 
@@ -210,5 +212,7 @@ def restart_job(job_id: str):
 
     update_job_status(job_id, JobStatusEnum.QUEUED)
 
-    handle_whisper(job_id, upload_path, job_dir, model)
+    job_queue.enqueue(
+        lambda: handle_whisper(job_id, upload_path, job_dir, model, start_thread=False)
+    )
     return {"status": "restarted"}

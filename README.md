@@ -20,6 +20,7 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://localhost:8000`).
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
 - `LOG_TO_STDOUT` – set to `true` to also mirror logs to the console.
+- `METRICS_TOKEN` – optional bearer token required to access `/metrics`.
 
 All configuration values are parsed once in `api/config.py` and imported by the
 rest of the application instead of calling `os.getenv` directly.
@@ -42,6 +43,11 @@ npm run build
 This outputs static files under `frontend/dist/`.
 The Dockerfile copies this directory into `api/static/` so the React
 application can be served with the backend.
+
+## Metrics
+
+The backend exposes Prometheus metrics at `/metrics`. When `METRICS_TOKEN` is
+set, requests must include `Authorization: Bearer <token>`.
 
 ## Usage Notes
 

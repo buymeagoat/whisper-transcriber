@@ -94,7 +94,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 - Metadata is extracted from each transcript and persisted to SQLite.
 - Jobs survive server restarts by being rehydrated on startup if processing was incomplete.
 
-## Additional Tweaks and Features
+## Future Updates
 
 <!-- Codex: Keep table cells padded to uniform column widths when updating. -->
 

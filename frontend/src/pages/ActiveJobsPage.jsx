@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { ROUTES } from "../routes";
 import { STATUS_LABELS } from "../statusLabels";
+import Button from "../components/Button";
+import { Table, Th, Td } from "../components/Table";
 export default function ActiveJobsPage() {
   const [jobs, setJobs] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(new Date());
@@ -27,18 +29,14 @@ export default function ActiveJobsPage() {
         ⏳ Active Jobs <span style={{ fontSize: "0.875rem", color: "#a1a1aa" }}>(auto-refreshing every 30s)</span>
       </h2>
 
-      <table style={{
-        width: "100%",
-        borderCollapse: "collapse",
-        fontSize: "0.875rem"
-      }}>
+      <Table>
         <thead>
           <tr style={{ backgroundColor: "#27272a" }}>
-            <th style={thStyle}>Filename</th>
-            <th style={thStyle}>Model</th>
-            <th style={thStyle}>Status</th>
-            <th style={thStyle}>Created</th>
-            <th style={thStyle}>Actions</th>
+            <Th>Filename</Th>
+            <Th>Model</Th>
+            <Th>Status</Th>
+            <Th>Created</Th>
+            <Th>Actions</Th>
           </tr>
         </thead>
         <tbody>
@@ -62,32 +60,25 @@ export default function ActiveJobsPage() {
                 onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#3f3f46"}
                 onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
               >
-                <td style={tdStyle}>{job.original_filename}</td>
-                <td style={tdStyle}>{job.model}</td>
-                <td style={tdStyle}>{STATUS_LABELS[job.status] || job.status}</td>
-                <td style={tdStyle}>{new Date(job.created_at + 'Z').toLocaleString()}</td>
-                <td style={{ ...tdStyle, display: "flex", gap: "0.5rem" }}>
-                  <button
+                <Td>{job.original_filename}</Td>
+                <Td>{job.model}</Td>
+                <Td>{STATUS_LABELS[job.status] || job.status}</Td>
+                <Td>{new Date(job.created_at + 'Z').toLocaleString()}</Td>
+                <Td style={{ display: "flex", gap: "0.5rem" }}>
+                  <Button
+                    color="#eab308"
                     title={`Job ID: ${job.id}`}
-                    style={{
-                      backgroundColor: "#eab308", // amber-500
-                      color: "white",
-                      border: "none",
-                      borderRadius: "0.25rem",
-                      padding: "0.4rem 0.6rem",
-                      cursor: "pointer",
-                      fontSize: "0.8rem",
-                    }}
+                    style={{ padding: "0.4rem 0.6rem", fontSize: "0.8rem" }}
                     onClick={() => window.open(ROUTES.PROGRESS.replace(":jobId", job.id), "_blank")}
                   >
                     View Progress
-                  </button>
-                </td>
+                  </Button>
+                </Td>
               </tr>
             ))
           )}
         </tbody>
-      </table>
+      </Table>
 
       <p style={{ marginTop: "1rem", fontSize: "0.75rem", color: "#a1a1aa" }}>
         Last updated: {lastUpdated.toLocaleTimeString()}
@@ -96,14 +87,3 @@ export default function ActiveJobsPage() {
   );
 }
 
-const thStyle = {
-  padding: "0.5rem",
-  textAlign: "left",
-  border: "1px solid #3f3f46",
-  color: "#d4d4d8"
-};
-
-const tdStyle = {
-  padding: "0.5rem",
-  border: "1px solid #3f3f46"
-};

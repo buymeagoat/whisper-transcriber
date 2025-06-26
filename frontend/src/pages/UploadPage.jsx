@@ -11,6 +11,7 @@ export default function UploadPage() {
   const [status, setStatus] = useState(null);
   const [jobId, setJobId] = useState(null);
   const [showNewJobBtn, setShowNewJobBtn] = useState(false);
+  const [submittedJobs, setSubmittedJobs] = useState([]);
   const inputRef = useRef();
   const navigate = useNavigate();
 
@@ -48,6 +49,7 @@ const handleNewJob = () => {
   setJobId(null);
   setStatus(null);
   setShowNewJobBtn(false);
+  setSubmittedJobs([]);
   inputRef.current.value = "";
 };
 // ──────────────────────────────────────────────────────────
@@ -56,11 +58,25 @@ const handleNewJob = () => {
       if (error) continue;
 
       const formData = new FormData();
-      formData.append("file", file);            // ✅ fixed key
+      formData.append("file", file); // ✅ fixed key
       formData.append("model", model);
+
+      let entryIndex;
+      setSubmittedJobs((prev) => {
+        const newJobs = [...prev, { fileName: file.name, jobId: null, status: "Uploading..." }];
+        entryIndex = newJobs.length - 1;
+        return newJobs;
+      });
 
       setStatus(`Uploading: ${file.name}`);
       setJobId(null);
+
+      const updateJob = (updates) =>
+        setSubmittedJobs((prev) => {
+          const copy = [...prev];
+          copy[entryIndex] = { ...copy[entryIndex], ...updates };
+          return copy;
+        });
 
       try {
         const res = await fetch(`${import.meta.env.VITE_API_HOST}/jobs`, { method: "POST", body: formData });
@@ -69,18 +85,23 @@ const handleNewJob = () => {
           data = await res.json();
         } catch {
           setStatus(`❌ ${file.name}: Invalid JSON response`);
+          updateJob({ status: "❌ Invalid JSON response" });
           continue;
-}
+        }
 
         if (res.ok && data.job_id) {
           setStatus(`✅ Job started: ${file.name}`);
           setJobId(data.job_id);
           setShowNewJobBtn(true);
+          updateJob({ jobId: data.job_id, status: "✅ Started" });
         } else {
-          setStatus(`❌ ${file.name}: ${data.error || "Unknown error"}`);
+          const msg = `❌ ${file.name}: ${data.error || "Unknown error"}`;
+          setStatus(msg);
+          updateJob({ status: msg });
         }
       } catch {
         setStatus(`❌ Network error for ${file.name}`);
+        updateJob({ status: "❌ Network error" });
       }
     }
   };
@@ -173,6 +194,30 @@ const handleNewJob = () => {
 
       {status && (
         <div style={{ fontSize: "0.85rem", color: "#ccc", marginTop: "0.75rem" }}>{status}</div>
+      )}
+
+      {submittedJobs.length > 0 && (
+        <div style={{ marginTop: "1.5rem" }}>
+          <h3 style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "0.5rem" }}>
+            Submitted Jobs
+          </h3>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {submittedJobs.map((job, i) => (
+              <li key={i} style={{ marginBottom: "0.5rem" }}>
+                <span style={{ marginRight: "0.5rem" }}>{job.fileName}:</span>
+                <span>{job.status}</span>
+                {job.jobId && (
+                  <a
+                    href={ROUTES.STATUS.replace(":jobId", job.jobId)}
+                    style={{ marginLeft: "0.5rem", color: "#60a5fa", textDecoration: "underline" }}
+                  >
+                    View Status
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {/* --- UploadPage action buttons ---------------------------------- */}

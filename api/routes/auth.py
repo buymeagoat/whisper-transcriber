@@ -6,11 +6,8 @@ from jose import JWTError, jwt
 
 from api.settings import settings
 from api.schemas import TokenOut
-from api.services.users import (
-    create_user,
-    get_user_by_username,
-    verify_password,
-)
+from api.models import User
+from api.services.users import create_user, get_user_by_username, verify_password
 
 router = APIRouter()
 
@@ -36,7 +33,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenOut:
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    token = create_access_token({"sub": user.username})
+    token = create_access_token({"sub": user.username, "role": user.role})
     return TokenOut(access_token=token, token_type="bearer")
 
 
@@ -51,11 +48,11 @@ async def register(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenOut
             status_code=status.HTTP_409_CONFLICT, detail="User already exists"
         )
     user = create_user(form_data.username, form_data.password)
-    token = create_access_token({"sub": user.username})
+    token = create_access_token({"sub": user.username, "role": user.role})
     return TokenOut(access_token=token, token_type="bearer")
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -70,6 +67,15 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    if not get_user_by_username(username):
+    user = get_user_by_username(username)
+    if not user:
         raise credentials_exception
-    return username
+    return user
+
+
+def require_admin(user: User = Depends(get_current_user)) -> User:
+    if user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required"
+        )
+    return user

@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 import io
 import shutil
@@ -16,12 +16,13 @@ from api.orm_bootstrap import SessionLocal
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
 from api.app_state import db_lock
 from api.schemas import FileListOut, StatusOut, AdminStatsOut
+from api.routes.auth import require_admin
 
 router = APIRouter(prefix="/admin")
 
 
 @router.get("/files", response_model=FileListOut)
-def list_admin_files() -> FileListOut:
+def list_admin_files(user=Depends(require_admin)) -> FileListOut:
     logs = sorted(f.name for f in LOG_DIR.glob("*") if f.is_file())
     uploads = sorted(f.name for f in UPLOAD_DIR.glob("*") if f.is_file())
     transcripts = sorted(
@@ -33,7 +34,7 @@ def list_admin_files() -> FileListOut:
 
 
 @router.delete("/files", response_model=StatusOut)
-def delete_admin_file(payload: dict) -> StatusOut:
+def delete_admin_file(payload: dict, user=Depends(require_admin)) -> StatusOut:
     folder = payload.get("folder")
     filename = payload.get("filename")
     folder_map = {
@@ -51,7 +52,7 @@ def delete_admin_file(payload: dict) -> StatusOut:
 
 
 @router.post("/reset", response_model=StatusOut)
-def reset_system() -> StatusOut:
+def reset_system(user=Depends(require_admin)) -> StatusOut:
     with db_lock:
         with SessionLocal() as db:
             db.query(Job).delete()
@@ -66,7 +67,7 @@ def reset_system() -> StatusOut:
 
 
 @router.get("/download-all")
-def download_all():
+def download_all(user=Depends(require_admin)):
     mem_zip = io.BytesIO()
     with zipfile.ZipFile(mem_zip, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
         for dir_path, prefix in [
@@ -87,7 +88,7 @@ def download_all():
 
 
 @router.get("/stats", response_model=AdminStatsOut)
-def admin_stats() -> AdminStatsOut:
+def admin_stats(user=Depends(require_admin)) -> AdminStatsOut:
     cpu_percent = psutil.cpu_percent(interval=0.1)
     mem = psutil.virtual_memory()
     return AdminStatsOut(
@@ -98,7 +99,7 @@ def admin_stats() -> AdminStatsOut:
 
 
 @router.post("/shutdown", response_model=StatusOut)
-def shutdown_server() -> StatusOut:
+def shutdown_server(user=Depends(require_admin)) -> StatusOut:
     """Shut down the running server process."""
 
     def _exit():
@@ -109,7 +110,7 @@ def shutdown_server() -> StatusOut:
 
 
 @router.post("/restart", response_model=StatusOut)
-def restart_server() -> StatusOut:
+def restart_server(user=Depends(require_admin)) -> StatusOut:
     """Restart the running server process."""
 
     def _restart():

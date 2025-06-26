@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, WebSocket, WebSocketDisconnect, Depends
 from api.routes.auth import get_current_user
+from api.models import User
 import asyncio
 from fastapi.responses import PlainTextResponse
 
@@ -21,7 +22,7 @@ def get_job_log(job_id: str):
 
 @router.websocket("/ws/logs/{job_id}")
 async def websocket_job_log(
-    websocket: WebSocket, job_id: str, user: str = Depends(get_current_user)
+    websocket: WebSocket, job_id: str, user: User = Depends(get_current_user)
 ):
     await websocket.accept()
     log_path = LOG_DIR / f"{job_id}.log"

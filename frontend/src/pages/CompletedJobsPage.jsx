@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ROUTES, getTranscriptDownloadUrl } from "../routes";
+import { STATUS_LABELS } from "../statusLabels";
 
 export default function CompletedJobsPage() {
   const [jobs, setJobs] = useState([]);

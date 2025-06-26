@@ -5,6 +5,9 @@ import shutil
 import zipfile
 from pathlib import Path
 
+import os
+import sys
+import threading
 import psutil
 
 from api.errors import ErrorCode, http_error
@@ -92,3 +95,25 @@ def admin_stats() -> AdminStatsOut:
         mem_used_mb=round(mem.used / (1024 * 1024), 1),
         mem_total_mb=round(mem.total / (1024 * 1024), 1),
     )
+
+
+@router.post("/shutdown", response_model=StatusOut)
+def shutdown_server() -> StatusOut:
+    """Shut down the running server process."""
+
+    def _exit():
+        os._exit(0)
+
+    threading.Thread(target=_exit, daemon=True).start()
+    return StatusOut(status="shutting down")
+
+
+@router.post("/restart", response_model=StatusOut)
+def restart_server() -> StatusOut:
+    """Restart the running server process."""
+
+    def _restart():
+        os.execv(sys.executable, [sys.executable] + sys.argv)
+
+    threading.Thread(target=_restart, daemon=True).start()
+    return StatusOut(status="restarting")

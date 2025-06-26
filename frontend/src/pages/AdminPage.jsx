@@ -98,6 +98,30 @@ useEffect(() => {
     window.open(`${API_HOST}/admin/download-all`);
   };
 
+  const handleShutdown = async () => {
+    const confirmed = window.confirm("Shut down the server?");
+    if (!confirmed) return;
+    try {
+      const res = await fetch(`${API_HOST}/admin/shutdown`, { method: "POST" });
+      if (!res.ok) throw new Error();
+      setFeedback("Server shutting down...");
+    } catch {
+      setFeedback("Failed to shut down server.");
+    }
+  };
+
+  const handleRestart = async () => {
+    const confirmed = window.confirm("Restart the server?");
+    if (!confirmed) return;
+    try {
+      const res = await fetch(`${API_HOST}/admin/restart`, { method: "POST" });
+      if (!res.ok) throw new Error();
+      setFeedback("Server restarting...");
+    } catch {
+      setFeedback("Failed to restart server.");
+    }
+  };
+
   const renderFileList = (title, list, dir) => (
     <div style={{ marginBottom: "2rem" }}>
       <h3 style={{ fontSize: "1.125rem", marginBottom: "0.5rem" }}>{title}</h3>
@@ -181,6 +205,18 @@ useEffect(() => {
           style={{ backgroundColor:"#2563eb", color:"white", border:"none",
                   padding:"0.5rem 1rem", borderRadius:"0.25rem", cursor:"pointer" }}>
           Download All Data (ZIP)
+        </button>
+
+        <button onClick={handleShutdown}
+          style={{ backgroundColor:"#6b7280", color:"white", border:"none",
+                  padding:"0.5rem 1rem", borderRadius:"0.25rem", cursor:"pointer" }}>
+          Shutdown Server
+        </button>
+
+        <button onClick={handleRestart}
+          style={{ backgroundColor:"#6b7280", color:"white", border:"none",
+                  padding:"0.5rem 1rem", borderRadius:"0.25rem", cursor:"pointer" }}>
+          Restart Server
         </button>
 
       </div>

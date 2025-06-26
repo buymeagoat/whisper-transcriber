@@ -44,6 +44,8 @@ def register_routes(app: FastAPI) -> None:
             "admin/files",
             "admin/reset",
             "admin/download-all",
+            "admin/shutdown",
+            "admin/restart",
             "health",
             "docs",
             "openapi.json",

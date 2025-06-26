@@ -12,6 +12,10 @@ export default function JobStatusPage() {
 
   useEffect(() => {
     let isCancelled = false;
+    let interval;
+    let ws;
+
+    const token = localStorage.getItem("token");
 
     const fetchJob = async () => {
       try {
@@ -31,12 +35,42 @@ export default function JobStatusPage() {
       }
     };
 
+    const connectWs = () => {
+      const wsUrl = `${ROUTES.API.replace(/^http/, "ws")}/ws/progress/${jobId}?token=${token}`;
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        clearInterval(interval); // stop polling when socket connected
+      };
+
+      ws.onmessage = (ev) => {
+        try {
+          const data = JSON.parse(ev.data);
+          if (data.status && !isCancelled) {
+            setJob((prev) => (prev ? { ...prev, status: data.status } : { status: data.status }));
+            setError(null);
+          }
+        } catch {
+          // ignore malformed messages
+        }
+      };
+
+      ws.onclose = () => {
+        if (!isCancelled) {
+          // fallback to polling if connection closed
+          interval = setInterval(fetchJob, 3000);
+        }
+      };
+    };
+
     fetchJob();
-    const interval = setInterval(fetchJob, 3000);
+    interval = setInterval(fetchJob, 3000);
+    connectWs();
 
     return () => {
       isCancelled = true;
       clearInterval(interval);
+      if (ws) ws.close();
     };
   }, [jobId]);
 

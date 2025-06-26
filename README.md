@@ -184,6 +184,16 @@ The compose file mounts the `uploads`, `transcripts` and `logs` directories so
 data persists between runs. Once running, access the API at
 `http://localhost:8000`.
 
+## Testing
+
+Install the development requirements and run the test suite with coverage:
+
+```bash
+pip install -r requirements-dev.txt
+coverage run -m pytest
+coverage report
+```
+
 
 ## Contributing
 

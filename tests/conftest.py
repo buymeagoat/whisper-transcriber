@@ -1,5 +1,70 @@
+import os
+import importlib
 import wave
+
 import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
+from api import models, orm_bootstrap, paths, app_state
+from api.services.storage import LocalStorage
+from api.routes import jobs, auth, logs, metrics, progress
+from api.services.job_queue import ThreadJobQueue
+
+
+@pytest.fixture
+def temp_db(tmp_path):
+    db_file = tmp_path / "test.db"
+    os.environ["DB"] = str(db_file)
+    import api.settings as settings
+
+    importlib.reload(settings)
+    importlib.reload(orm_bootstrap)
+    models.Base.metadata.create_all(orm_bootstrap.engine)
+    return db_file
+
+
+@pytest.fixture
+def temp_dirs(tmp_path):
+    storage = LocalStorage(tmp_path)
+    paths.storage = storage
+    paths.UPLOAD_DIR = storage.upload_dir
+    paths.TRANSCRIPTS_DIR = storage.transcripts_dir
+    paths.LOG_DIR = storage.log_dir
+    return storage
+
+
+@pytest.fixture
+def client(temp_db, temp_dirs):
+    importlib.reload(app_state)
+    app_state.job_queue = ThreadJobQueue(1)
+    app_state.handle_whisper = lambda *a, **k: None
+    app_state.UPLOAD_DIR = paths.UPLOAD_DIR
+    app_state.TRANSCRIPTS_DIR = paths.TRANSCRIPTS_DIR
+    app_state.LOG_DIR = paths.LOG_DIR
+
+    importlib.reload(jobs)
+    jobs.SessionLocal = orm_bootstrap.SessionLocal
+    jobs.UPLOAD_DIR = paths.UPLOAD_DIR
+    jobs.TRANSCRIPTS_DIR = paths.TRANSCRIPTS_DIR
+    jobs.LOG_DIR = paths.LOG_DIR
+    jobs.handle_whisper = app_state.handle_whisper
+
+    app = FastAPI()
+    for router in (
+        jobs.router,
+        auth.router,
+        logs.router,
+        metrics.router,
+        progress.router,
+    ):
+        app.include_router(router)
+
+    app.dependency_overrides[auth.get_current_user] = lambda: "testuser"
+    client = TestClient(app)
+    yield client
+    app.dependency_overrides.clear()
+    app_state.job_queue.shutdown()
 
 
 @pytest.fixture
@@ -7,7 +72,7 @@ def sample_wav(tmp_path):
     path = tmp_path / "sample.wav"
     with wave.open(path, "wb") as wf:
         wf.setnchannels(1)
-        wf.setsampwidth(2)  # 16-bit samples
+        wf.setsampwidth(2)
         wf.setframerate(16000)
-        wf.writeframes(b"\x00\x00" * 16000)  # 1 second of silence
+        wf.writeframes(b"\x00\x00" * 16000)
     return path

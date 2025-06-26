@@ -113,8 +113,6 @@ This document summarizes the repository layout and how the core FastAPI service 
 
 | Rank | Feature Idea                                    | Reasoning                      | Considerations                  | Roadblocks                    |
 | ---- | ----------------------------------------------- | ------------------------------ | ------------------------------- | ----------------------------- |
-| 001  | Local-time timestamps shown (done)              | Converted on display           | Timezone handling               | None                          |
-| 002  | Download transcripts as `.txt` (done, default UI format)           | Plain text export from SRT     | Maintain timestamp accuracy     | None                          |
 | 003  | Download job archive (.zip)                     | Zip existing logs and results  | Avoid large file memory use     | None                          |
 | 004  | Support `.vtt` transcript export                | Convert from SRT to VTT        | Extra dependency for conversion | None                          |
 | 005  | Provide CLI wrapper for non-UI usage            | Wrapper script around API calls| Package distribution            | None                          |

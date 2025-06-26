@@ -10,9 +10,10 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
    ```
 2. Install frontend dependencies from the `frontend` directory:
    ```bash
-   cd frontend
-   npm install
-   ```
+ cd frontend
+  npm install
+  ```
+   # install Redux packages for global state and toasts
 
 ## Optional Environment Variables
 
@@ -124,6 +125,7 @@ build variable or by storing a `downloadFormat` value in `localStorage`.
 
 - Real-time job status messages appear in the UI via the progress WebSocket with
   friendlier labels for each state.
+- Toast notifications show the result of actions across all pages.
 - `models/` exists locally only and is never stored in Git. It must contain the Whisper `.pt` files before building or running the app. Ensure the files are present before building the Docker image.
 - `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are

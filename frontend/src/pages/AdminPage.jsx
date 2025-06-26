@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { ROUTES } from "../routes";
 import { useApi } from "../api";
+import { useDispatch } from "react-redux";
+import { addToast } from "../store";
 export default function AdminPage() {
   const api = useApi();
+  const dispatch = useDispatch();
   const [logs, setLogs] = useState([]);
   const [uploads, setUploads] = useState([]);
   const [transcripts, setTranscripts] = useState([]);
-  const [error, setError] = useState(null);
-  const [feedback, setFeedback] = useState(null);
-  const [refreshToggle, setRefreshToggle] = useState(false);
   const [stats, setStats] = useState(null);
+  const [refreshToggle, setRefreshToggle] = useState(false);
  const API_HOST = ROUTES.API;
 
   const fetchStats = async () => {
@@ -18,7 +19,7 @@ export default function AdminPage() {
       setStats(data);
     } catch {
       setStats(null);
-      setFeedback("Failed to load server stats.");
+      dispatch(addToast("Failed to load server stats.", "error"));
     }
   };
 // NEW – poll every 30 s
@@ -35,10 +36,9 @@ useEffect(() => {
       setLogs(data.logs || []);
       setUploads(data.uploads || []);
       setTranscripts(data.transcripts || []);
-      setError(null);
-      setFeedback("File lists refreshed.");
+      dispatch(addToast("File lists refreshed.", "success"));
     } catch {
-      setError("Failed to load file listings.");
+      dispatch(addToast("Failed to load file listings.", "error"));
     }
   };
 
@@ -46,12 +46,6 @@ useEffect(() => {
     fetchFiles();
   }, [refreshToggle]);
 
-  useEffect(() => {
-    if (feedback) {
-      const timeout = setTimeout(() => setFeedback(null), 5000);
-      return () => clearTimeout(timeout);
-    }
-  }, [feedback]);
 
   const handleDelete = async (dir, filename) => {
     const confirmed = window.confirm(`Delete ${filename} from ${dir}?`);
@@ -61,10 +55,10 @@ useEffect(() => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ folder: dir, filename })
       });
-      setFeedback(`Deleted ${filename} from ${dir}.`);
+      dispatch(addToast(`Deleted ${filename} from ${dir}.`, "success"));
       setRefreshToggle(prev => !prev);
     } catch {
-      setFeedback(`Failed to delete ${filename} from ${dir}.`);
+      dispatch(addToast(`Failed to delete ${filename} from ${dir}.`, "error"));
     }
   };
 
@@ -75,10 +69,10 @@ useEffect(() => {
     if (!confirmed) return;
     try {
       await api.post("/admin/reset");
-      setFeedback("System reset complete.");
+      dispatch(addToast("System reset complete.", "success"));
       setRefreshToggle(prev => !prev);
     } catch {
-      setFeedback("Reset failed.");
+      dispatch(addToast("Reset failed.", "error"));
     }
   };
 
@@ -91,9 +85,9 @@ useEffect(() => {
     if (!confirmed) return;
     try {
       await api.post("/admin/shutdown");
-      setFeedback("Server shutting down...");
+      dispatch(addToast("Server shutting down...", "success"));
     } catch {
-      setFeedback("Failed to shut down server.");
+      dispatch(addToast("Failed to shut down server.", "error"));
     }
   };
 
@@ -102,9 +96,9 @@ useEffect(() => {
     if (!confirmed) return;
     try {
       await api.post("/admin/restart");
-      setFeedback("Server restarting...");
+      dispatch(addToast("Server restarting...", "success"));
     } catch {
-      setFeedback("Failed to restart server.");
+      dispatch(addToast("Failed to restart server.", "error"));
     }
   };
 
@@ -173,8 +167,7 @@ useEffect(() => {
         </div>
       )}
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {feedback && <p style={{ color: "#22c55e", marginBottom: "1rem" }}>{feedback}</p>}
+
 
       {renderFileList("Logs", logs, "logs")}
       {renderFileList("Uploads", uploads, "uploads")}

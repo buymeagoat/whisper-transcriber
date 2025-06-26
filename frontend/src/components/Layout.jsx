@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../routes";
 import { AuthContext } from "../context/AuthContext";
+import ToastContainer from "./ToastContainer";
 
 export default function Layout({ children }) {
   const { logout, isAuthenticated } = useContext(AuthContext);
@@ -13,6 +14,7 @@ export default function Layout({ children }) {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#18181b", color: "white" }}>
+      <ToastContainer />
       <nav
         style={{
           backgroundColor: "#27272a",

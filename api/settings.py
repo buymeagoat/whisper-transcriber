@@ -29,6 +29,8 @@ class Settings(BaseSettings):
         "amqp://guest:guest@broker:5672//", env="CELERY_BROKER_URL"
     )
     celery_backend_url: str = Field("rpc://", env="CELERY_BACKEND_URL")
+    cleanup_enabled: bool = Field(True, env="CLEANUP_ENABLED")
+    cleanup_days: int = Field(30, env="CLEANUP_DAYS")
 
     # Not configurable via environment
     algorithm: str = "HS256"

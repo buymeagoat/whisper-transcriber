@@ -65,6 +65,9 @@ object used throughout the code base. Available variables are:
 - `S3_BUCKET` – name of the bucket used by `CloudStorage`.
 - `CELERY_BROKER_URL` and `CELERY_BACKEND_URL` – URLs for the broker and
   result backend when using the `broker` queue backend.
+- `CLEANUP_ENABLED` – toggle periodic cleanup of old transcripts (default `true`).
+- `CLEANUP_DAYS` – number of days to retain transcripts when cleanup is enabled
+  (defaults to `30`).
 
 ## API Overview
 - **Job management**: `POST /jobs` to upload, `GET /jobs` and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.

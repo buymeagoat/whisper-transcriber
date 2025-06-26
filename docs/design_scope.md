@@ -95,10 +95,6 @@ This document summarizes the repository layout and how the core FastAPI service 
 - Jobs survive server restarts by being rehydrated on startup if processing was incomplete.
 
 ## Future Updates
-
-### Upcoming Tasks
-The next milestone focuses on foundational improvements to the web UI.
-
 <!-- Codex: Keep table cells padded to uniform column widths when updating. -->
 
 | Feature Idea                                                         | Status    | Reasoning                        | Considerations                 | Roadblocks                    |

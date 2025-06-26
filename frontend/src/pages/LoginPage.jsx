@@ -1,28 +1,27 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { ROUTES } from "../routes";
+import { AuthContext } from "../context/AuthContext";
+import { useApi } from "../api";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const { setToken } = useContext(AuthContext);
+  const api = useApi();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     try {
       const body = new URLSearchParams({ username, password });
-      const res = await fetch(`${ROUTES.API}/token`, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      const data = await api.post(
+        "/token",
         body,
-      });
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("token", data.access_token);
-        window.location.href = ROUTES.UPLOAD;
-      } else {
-        setError("Invalid credentials");
-      }
+        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+      );
+      setToken(data.access_token);
+      window.location.href = ROUTES.UPLOAD;
     } catch {
       setError("Network error");
     }

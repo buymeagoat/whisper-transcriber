@@ -2,19 +2,21 @@
 import { useEffect, useState } from "react";
 import { ROUTES } from "../routes";
 import { useParams } from "react-router-dom";
+import { useApi } from "../api";
 
 export default function TranscriptViewPage() {
   const { jobId } = useParams();
+  const api = useApi();
   const [transcript, setTranscript] = useState("");
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${ROUTES.API}/transcript/${jobId}/view`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Transcript not found");
-        return res.text();
+    api
+      .get(`/transcript/${jobId}/view`)
+      .then((data) => {
+        if (typeof data === "string") setTranscript(data);
+        else setTranscript(JSON.stringify(data));
       })
-      .then(setTranscript)
       .catch((err) => setError(err.message));
   }, [jobId]);
 

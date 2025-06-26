@@ -1,11 +1,13 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../routes";
+import { useApi } from "../api";
 const MAX_FILES = 10;
 const MAX_SIZE_MB = 2048;
 const ALLOWED_TYPES = ["audio/wav", "audio/mpeg", "audio/mp3", "audio/x-m4a", "audio/mp4", "audio/x-wav"];
 
 export default function UploadPage() {
+  const api = useApi();
   const [files, setFiles] = useState([]);
   const [model, setModel] = useState("tiny");
   const [status, setStatus] = useState(null);
@@ -79,17 +81,8 @@ const handleNewJob = () => {
         });
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_HOST}/jobs`, { method: "POST", body: formData });
-        let data = {};
-        try {
-          data = await res.json();
-        } catch {
-          setStatus(`❌ ${file.name}: Invalid JSON response`);
-          updateJob({ status: "❌ Invalid JSON response" });
-          continue;
-        }
-
-        if (res.ok && data.job_id) {
+        const data = await api.post("/jobs", formData);
+        if (data.job_id) {
           setStatus(`✅ Job started: ${file.name}`);
           setJobId(data.job_id);
           setShowNewJobBtn(true);

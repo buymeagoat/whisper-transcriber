@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { ROUTES } from "./routes";
 import UploadPage from "./pages/UploadPage";
@@ -10,19 +10,21 @@ import JobStatusPage from "./pages/JobStatusPage";
 import FailedJobsPage from "./pages/FailedJobsPage";
 import JobProgressPage from "./pages/JobProgressPage";
 import LoginPage from "./pages/LoginPage";
+import { AuthContext } from "./context/AuthContext";
+import { useApi } from "./api";
 
 export default function App() {
+  const api = useApi();
   useEffect(() => {
-    fetch('/log_event', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event: 'frontend_loaded', timestamp: new Date().toISOString() })
+    api.post('/log_event', {
+      event: 'frontend_loaded',
+      timestamp: new Date().toISOString()
     }).catch(() => {});
   }, []);
 
-  const token = localStorage.getItem("token");
+  const { token, setToken } = useContext(AuthContext);
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    setToken(null);
     window.location.href = ROUTES.LOGIN;
   };
 

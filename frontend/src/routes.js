@@ -10,3 +10,15 @@ export const ROUTES = {
   PROGRESS: "/progress/:jobId",
   API: import.meta.env.VITE_API_HOST || "http://localhost:8000"
 };
+
+export const DEFAULT_DOWNLOAD_FORMAT =
+  localStorage.getItem("downloadFormat") ||
+  import.meta.env.VITE_DEFAULT_TRANSCRIPT_FORMAT ||
+  "txt";
+
+export function getTranscriptDownloadUrl(
+  jobId,
+  format = DEFAULT_DOWNLOAD_FORMAT
+) {
+  return `${ROUTES.API}/jobs/${jobId}/download?format=${format}`;
+}

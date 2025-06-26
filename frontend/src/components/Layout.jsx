@@ -20,6 +20,7 @@ export default function Layout({ children }) {
           display: "flex",
           gap: "1rem",
           borderBottom: "1px solid #3f3f46",
+          flexWrap: "wrap",
         }}
       >
         <Link to={ROUTES.UPLOAD} style={linkStyle}>
@@ -47,7 +48,7 @@ export default function Layout({ children }) {
           </Link>
         )}
       </nav>
-      <main style={{ padding: "1.5rem" }}>{children}</main>
+      <main className="page-content">{children}</main>
     </div>
   );
 }

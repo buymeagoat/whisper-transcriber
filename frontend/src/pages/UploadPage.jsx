@@ -100,7 +100,7 @@ const handleNewJob = () => {
   };
 
   return (
-    <div style={{ padding: "1.5rem" }}>
+    <div className="page-content">
       <h2 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>Upload Audio Files</h2>
 
       <input
@@ -112,16 +112,18 @@ const handleNewJob = () => {
         style={{ display: "block", marginTop: "1rem", marginBottom: "1rem" }}
       />
 
-      <div style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "1rem",
-      }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "1rem",
+        }}
+      >
         {files.map(({ file, error }, i) => (
           <div
             key={i}
+            className="upload-file-card"
             style={{
-              width: "300px",
               position: "relative",
               padding: "1rem",
               backgroundColor: "#27272a",

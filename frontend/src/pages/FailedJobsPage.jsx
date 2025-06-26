@@ -42,12 +42,10 @@ export default function FailedJobsPage() {
   }
 
   return (
-    <div style={{
-      backgroundColor: "#18181b",
-      color: "white",
-      padding: "2rem",
-      minHeight: "100vh"
-    }}>
+    <div
+      className="page-content"
+      style={{ backgroundColor: "#18181b", color: "white", minHeight: "100vh" }}
+    >
       <h2 style={{
         fontSize: "1.875rem",
         fontWeight: "bold",

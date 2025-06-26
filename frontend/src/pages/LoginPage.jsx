@@ -7,7 +7,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const { setToken } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const api = useApi();
 
   const handleSubmit = async (e) => {
@@ -20,7 +20,7 @@ export default function LoginPage() {
         body,
         { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
       );
-      setToken(data.access_token);
+      login(data.access_token);
       window.location.href = ROUTES.UPLOAD;
     } catch {
       setError("Network error");

@@ -45,6 +45,10 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `S3_BUCKET` – name of the bucket to store uploads and transcripts.
 - `CELERY_BROKER_URL` and `CELERY_BACKEND_URL` – message broker and result
   backend used when `JOB_QUEUE_BACKEND` is set to `broker`.
+- `CLEANUP_ENABLED` – toggle periodic cleanup of old transcripts. Defaults to
+  `true`.
+- `CLEANUP_DAYS` – how many days to keep transcripts when cleanup is enabled
+  (defaults to `30`).
 
 Configuration values are provided by `api/settings.py` using Pydantic's
 `BaseSettings`. An instance named `settings` is imported by the rest of the

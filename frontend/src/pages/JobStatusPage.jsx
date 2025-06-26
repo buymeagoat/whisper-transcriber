@@ -1,7 +1,7 @@
 // frontend/src/pages/JobStatusPage.jsx
 
 import { useEffect, useState } from "react";
-import { ROUTES } from "../routes";
+import { ROUTES, getTranscriptDownloadUrl } from "../routes";
 import { useParams } from "react-router-dom";
 
 export default function JobStatusPage() {
@@ -58,7 +58,7 @@ export default function JobStatusPage() {
 
           {job.status === "completed" && (
               <a
-                href={`${ROUTES.API}/jobs/${jobId}/download?format=txt`}
+                href={getTranscriptDownloadUrl(jobId)}
                 download
               style={{
                 display: "inline-block",

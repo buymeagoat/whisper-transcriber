@@ -22,17 +22,6 @@ export default function TranscriptViewPage() {
 
   return (
     <div style={{ padding: "1.5rem", color: "white" }}>
-      <div
-        style={{
-          backgroundColor: "red",
-          color: "white",
-          padding: "1rem",
-          borderRadius: "0.5rem",
-          marginBottom: "1rem"
-        }}
-      >
-        🧪 Forced Style Test — no Tailwind involved
-      </div>
 
       <h1 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1rem" }}>
         Transcript Viewer

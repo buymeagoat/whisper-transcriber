@@ -103,7 +103,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Download job archive (.zip)                                          | Open      | Zip existing logs and results    | Avoid large file memory use     | None                          |
 | Support `.vtt` transcript export                                     | Open      | Convert from SRT to VTT          | Extra dependency for conversion | None                          |
 | Provide CLI wrapper for non-UI usage                                 | Open      | Wrapper script around API calls  | Package distribution            | None                          |
-| Improve status messaging in UI                                       | Open      | Better frontend labels           | Localization, UX tweaks         | None                          |
+| Improve status messaging in UI                                       | Done      | Real-time updates via progress WebSocket | Friendlier labels, localization | None                          |
 | Job runtime display (live & final)                                   | Open      | Track job start and end times    | Store runtime data              | None                          |
 | Admin panel health checks and job cleanup                            | Open      | Add checks and cleanup hooks     | Permission checks               | None                          |
 | Queue limit or concurrency throttle                                  | Open      | Throttle worker count            | Configurable limits             | None                          |

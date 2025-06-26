@@ -88,8 +88,9 @@ Use `/health` to check server status. `/version` returns the current application
 ### Progress WebSocket
 
 Connect to `/ws/progress/{job_id}` with the same JWT credentials as other
-endpoints. The server sends JSON messages when a job moves through the
-`queued`, `processing`, `enriching` and final `completed` or `failed` states.
+endpoints. The server now pushes real-time status messages so the UI updates
+immediately with friendlier labels. Messages reflect the `queued`, `processing`,
+`enriching` and final `completed` or `failed` states.
 
 ### Example Job Response
 
@@ -121,6 +122,8 @@ build variable or by storing a `downloadFormat` value in `localStorage`.
 
 ## Usage Notes
 
+- Real-time job status messages appear in the UI via the progress WebSocket with
+  friendlier labels for each state.
 - `models/` exists locally only and is never stored in Git. It must contain the Whisper `.pt` files before building or running the app. Ensure the files are present before building the Docker image.
 - `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are

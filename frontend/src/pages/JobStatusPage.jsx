@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ROUTES, getTranscriptDownloadUrl } from "../routes";
 import { STATUS_LABELS } from "../statusLabels";
+import Spinner from "../Spinner";
 import { useParams } from "react-router-dom";
 
 export default function JobStatusPage() {
@@ -90,6 +91,12 @@ export default function JobStatusPage() {
           <p><strong>Status:</strong> {STATUS_LABELS[job.status] || job.status}</p>
           <p><strong>Created:</strong> {new Date(job.created_at + 'Z').toLocaleString()}</p>
           <p><strong>Updated:</strong> {job.updated ? new Date(job.updated + 'Z').toLocaleString() : "N/A"}</p>
+
+          {[
+            "queued",
+            "processing",
+            "enriching",
+          ].includes(job.status) && <Spinner />}
 
           {job.status === "completed" && (
               <a

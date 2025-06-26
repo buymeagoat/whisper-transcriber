@@ -1,22 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ROUTES, getTranscriptDownloadUrl } from "../routes";
-import { useApi } from "../api";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchJobs, deleteJob, selectJobs, addToast } from "../store";
 import { STATUS_LABELS } from "../statusLabels";
 import PageContainer from "../components/PageContainer";
 import Button from "../components/Button";
 import { Table, Th, Td } from "../components/Table";
 
 export default function CompletedJobsPage() {
-  const api = useApi();
-  const [jobs, setJobs] = useState([]);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const jobs = useSelector(selectJobs).filter((j) => j.status === "completed");
 
   useEffect(() => {
-    api
-      .get("/jobs")
-      .then((data) => setJobs(data.filter((job) => job.status === "completed")))
-      .catch(() => setError("Failed to load completed jobs"));
-  }, []);
+    dispatch(fetchJobs()).unwrap().catch(() => dispatch(addToast("Failed to load completed jobs", "error")));
+  }, [dispatch]);
 
   const handleView = (jobId) => {
     window.open(`${ROUTES.API}/transcript/${jobId}/view`, "_blank");
@@ -27,21 +24,11 @@ export default function CompletedJobsPage() {
   };
 
   const handleDelete = async (jobId) => {
-    try {
-      await api.del(`/jobs/${jobId}`);
-      setJobs(jobs.filter((job) => job.id !== jobId));
-    } catch {
-      alert("Error deleting job");
-    }
+    dispatch(deleteJob(jobId))
+      .unwrap()
+      .then(() => dispatch(addToast("Job deleted", "success")))
+      .catch(() => dispatch(addToast("Error deleting job", "error")));
   };
-
-  if (error) {
-    return (
-      <div style={{ color: "red", padding: "1rem" }}>
-        {error}
-      </div>
-    );
-  }
 
   return (
     <PageContainer>

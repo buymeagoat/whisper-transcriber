@@ -1,29 +1,25 @@
 import { useEffect, useState } from "react";
 import { ROUTES } from "../routes";
-import { useApi } from "../api";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchJobs, selectJobs, addToast } from "../store";
 import { STATUS_LABELS } from "../statusLabels";
 import Button from "../components/Button";
 import { Table, Th, Td } from "../components/Table";
 export default function ActiveJobsPage() {
-  const api = useApi();
-  const [jobs, setJobs] = useState([]);
+  const dispatch = useDispatch();
+  const jobs = useSelector(selectJobs);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  const fetchJobs = () => {
-    api
-      .get("/jobs")
-      .then((data) => {
-        setJobs(data);
-        setLastUpdated(new Date());
-      })
-      .catch(() => setJobs([]));
-  };
-
   useEffect(() => {
-    fetchJobs();
-    const interval = setInterval(fetchJobs, 30000); // refresh every 30 seconds
+    const load = () =>
+      dispatch(fetchJobs())
+        .unwrap()
+        .then(() => setLastUpdated(new Date()))
+        .catch(() => dispatch(addToast("Failed to load jobs", "error")));
+    load();
+    const interval = setInterval(load, 30000); // refresh every 30 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className="page-content">

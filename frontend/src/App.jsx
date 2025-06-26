@@ -22,9 +22,9 @@ export default function App() {
     }).catch(() => {});
   }, []);
 
-  const { token, setToken } = useContext(AuthContext);
+  const { token, logout, isAuthenticated } = useContext(AuthContext);
   const handleLogout = () => {
-    setToken(null);
+    logout();
     window.location.href = ROUTES.LOGIN;
   };
 
@@ -43,7 +43,7 @@ export default function App() {
           <Link to={ROUTES.COMPLETED} style={linkStyle}>Completed Jobs</Link>
           <Link to={ROUTES.FAILED} style={linkStyle}>Failed Jobs</Link>
           <Link to={ROUTES.ADMIN} style={linkStyle}>Admin</Link>
-          {token ? (
+          {isAuthenticated ? (
             <button onClick={handleLogout} style={linkStyle}>Logout</button>
           ) : (
             <Link to={ROUTES.LOGIN} style={linkStyle}>Login</Link>
@@ -54,16 +54,16 @@ export default function App() {
           {/* Removed Tailwind test block */}
 
           <Routes>
-            <Route path="/" element={<Navigate to={token ? ROUTES.UPLOAD : ROUTES.LOGIN} replace />} />
+            <Route path="/" element={<Navigate to={isAuthenticated ? ROUTES.UPLOAD : ROUTES.LOGIN} replace />} />
             <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-            <Route path={ROUTES.UPLOAD} element={token ? <UploadPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
-            <Route path={ROUTES.ACTIVE} element={token ? <ActiveJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
-            <Route path={ROUTES.COMPLETED} element={token ? <CompletedJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
-            <Route path={ROUTES.ADMIN} element={token ? <AdminPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
-            <Route path={ROUTES.TRANSCRIPT_VIEW} element={token ? <TranscriptViewPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
-            <Route path={ROUTES.STATUS} element={token ? <JobStatusPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
-            <Route path={ROUTES.FAILED} element={token ? <FailedJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
-            <Route path={ROUTES.PROGRESS} element={token ? <JobProgressPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.UPLOAD} element={isAuthenticated ? <UploadPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.ACTIVE} element={isAuthenticated ? <ActiveJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.COMPLETED} element={isAuthenticated ? <CompletedJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.ADMIN} element={isAuthenticated ? <AdminPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.TRANSCRIPT_VIEW} element={isAuthenticated ? <TranscriptViewPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.STATUS} element={isAuthenticated ? <JobStatusPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.FAILED} element={isAuthenticated ? <FailedJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+            <Route path={ROUTES.PROGRESS} element={isAuthenticated ? <JobProgressPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
             <Route path="*" element={<div style={{ color: "red" }}>404 — Page Not Found</div>} />
           </Routes>
         </main>

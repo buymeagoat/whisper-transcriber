@@ -1,9 +1,22 @@
 import { createContext, useState, useEffect } from "react";
 
-export const AuthContext = createContext({ token: null, setToken: () => {} });
+export const AuthContext = createContext({
+  token: null,
+  login: () => {},
+  logout: () => {},
+  isAuthenticated: false,
+});
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
+
+  const login = (newToken) => {
+    setToken(newToken);
+  };
+
+  const logout = () => {
+    setToken(null);
+  };
 
   useEffect(() => {
     if (token) {
@@ -14,7 +27,9 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   return (
-    <AuthContext.Provider value={{ token, setToken }}>
+    <AuthContext.Provider
+      value={{ token, login, logout, isAuthenticated: Boolean(token) }}
+    >
       {children}
     </AuthContext.Provider>
   );

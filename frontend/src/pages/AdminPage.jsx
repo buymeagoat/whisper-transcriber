@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { ROUTES } from "../routes";
+import { useApi } from "../api";
 export default function AdminPage() {
+  const api = useApi();
   const [logs, setLogs] = useState([]);
   const [uploads, setUploads] = useState([]);
   const [transcripts, setTranscripts] = useState([]);
@@ -12,9 +14,7 @@ export default function AdminPage() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch(`${API_HOST}/admin/stats`);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const data = await api.get("/admin/stats");
       setStats(data);
     } catch {
       setStats(null);
@@ -31,21 +31,12 @@ useEffect(() => {
 
   const fetchFiles = async () => {
     try {
-      const res = await fetch(`${API_HOST}/admin/files`);
-      if (!res.ok) throw new Error();
-      const raw = await res.text();
-
-      try {
-        const data = JSON.parse(raw);
-        setLogs(data.logs || []);
-        setUploads(data.uploads || []);
-        setTranscripts(data.transcripts || []);
-        setError(null);
-        setFeedback("File lists refreshed.");
-      } catch {
-        setError("Failed to parse server response.");
-        return;
-      }
+      const data = await api.get("/admin/files");
+      setLogs(data.logs || []);
+      setUploads(data.uploads || []);
+      setTranscripts(data.transcripts || []);
+      setError(null);
+      setFeedback("File lists refreshed.");
     } catch {
       setError("Failed to load file listings.");
     }
@@ -66,12 +57,10 @@ useEffect(() => {
     const confirmed = window.confirm(`Delete ${filename} from ${dir}?`);
     if (!confirmed) return;
     try {
-      const res = await fetch(`${API_HOST}/admin/files`, {
-        method: "DELETE",
+      await api.del("/admin/files", {
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folder: dir, filename }),
+        body: JSON.stringify({ folder: dir, filename })
       });
-      if (!res.ok) throw new Error();
       setFeedback(`Deleted ${filename} from ${dir}.`);
       setRefreshToggle(prev => !prev);
     } catch {
@@ -85,8 +74,7 @@ useEffect(() => {
     );
     if (!confirmed) return;
     try {
-      const res = await fetch(`${API_HOST}/admin/reset`, { method: "POST" });
-      if (!res.ok) throw new Error();
+      await api.post("/admin/reset");
       setFeedback("System reset complete.");
       setRefreshToggle(prev => !prev);
     } catch {
@@ -102,8 +90,7 @@ useEffect(() => {
     const confirmed = window.confirm("Shut down the server?");
     if (!confirmed) return;
     try {
-      const res = await fetch(`${API_HOST}/admin/shutdown`, { method: "POST" });
-      if (!res.ok) throw new Error();
+      await api.post("/admin/shutdown");
       setFeedback("Server shutting down...");
     } catch {
       setFeedback("Failed to shut down server.");
@@ -114,8 +101,7 @@ useEffect(() => {
     const confirmed = window.confirm("Restart the server?");
     if (!confirmed) return;
     try {
-      const res = await fetch(`${API_HOST}/admin/restart`, { method: "POST" });
-      if (!res.ok) throw new Error();
+      await api.post("/admin/restart");
       setFeedback("Server restarting...");
     } catch {
       setFeedback("Failed to restart server.");

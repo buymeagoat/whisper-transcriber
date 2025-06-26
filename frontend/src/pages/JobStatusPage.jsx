@@ -1,13 +1,17 @@
 // frontend/src/pages/JobStatusPage.jsx
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { ROUTES, getTranscriptDownloadUrl } from "../routes";
 import { STATUS_LABELS } from "../statusLabels";
 import Spinner from "../Spinner";
 import { useParams } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { useApi } from "../api";
 
 export default function JobStatusPage() {
   const { jobId } = useParams();
+  const { token } = useContext(AuthContext);
+  const api = useApi();
   const [job, setJob] = useState(null);
   const [error, setError] = useState(null);
 
@@ -16,23 +20,15 @@ export default function JobStatusPage() {
     let interval;
     let ws;
 
-    const token = localStorage.getItem("token");
-
     const fetchJob = async () => {
       try {
-        const res = await fetch(`${ROUTES.API}/jobs/${jobId}`);
-        const data = await res.json();
-
+        const data = await api.get(`/jobs/${jobId}`);
         if (!isCancelled) {
-          if (res.ok) {
-            setJob(data);
-            setError(null);
-          } else {
-            setError(data.error || "Failed to fetch job");
-          }
+          setJob(data);
+          setError(null);
         }
-      } catch {
-        if (!isCancelled) setError("Network error");
+      } catch (err) {
+        if (!isCancelled) setError(err.message || "Network error");
       }
     };
 

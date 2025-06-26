@@ -1,24 +1,23 @@
 import { useEffect, useState } from "react";
 import { ROUTES } from "../routes";
 import { STATUS_LABELS } from "../statusLabels";
+import { useApi } from "../api";
 
 export default function FailedJobsPage() {
+  const api = useApi();
   const [jobs, setJobs] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${ROUTES.API}/jobs`)
-      .then(res => res.json())
-      .then(data => setJobs(data.filter(job => job.status.startsWith("failed"))))
+    api
+      .get("/jobs")
+      .then((data) => setJobs(data.filter((job) => job.status.startsWith("failed"))))
       .catch(() => setError("Failed to load failed jobs"));
   }, []);
 
   const handleRestart = async (jobId) => {
     try {
-      const res = await fetch(`${ROUTES.API}/jobs/${jobId}/restart`, {
-        method: "POST",
-      });
-      if (!res.ok) throw new Error();
+      await api.post(`/jobs/${jobId}/restart`);
       setJobs(jobs.filter(job => job.id !== jobId));
     } catch {
       alert("Error restarting job");
@@ -27,10 +26,7 @@ export default function FailedJobsPage() {
 
   const handleDelete = async (jobId) => {
     try {
-      const res = await fetch(`${ROUTES.API}/jobs/${jobId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error();
+      await api.del(`/jobs/${jobId}`);
       setJobs(jobs.filter(job => job.id !== jobId));
     } catch {
       alert("Error deleting job");

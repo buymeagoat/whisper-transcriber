@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { ROUTES } from "../routes";
+import { useApi } from "../api";
 import { STATUS_LABELS } from "../statusLabels";
 import Button from "../components/Button";
 import { Table, Th, Td } from "../components/Table";
 export default function ActiveJobsPage() {
+  const api = useApi();
   const [jobs, setJobs] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
   const fetchJobs = () => {
-    fetch(`${import.meta.env.VITE_API_HOST}/jobs`)
-      .then(res => res.json())
-      .then(data => {
+    api
+      .get("/jobs")
+      .then((data) => {
         setJobs(data);
         setLastUpdated(new Date());
       })

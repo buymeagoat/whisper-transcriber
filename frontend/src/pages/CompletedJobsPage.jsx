@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { ROUTES, getTranscriptDownloadUrl } from "../routes";
+import { useApi } from "../api";
 import { STATUS_LABELS } from "../statusLabels";
 import PageContainer from "../components/PageContainer";
 import Button from "../components/Button";
 import { Table, Th, Td } from "../components/Table";
 
 export default function CompletedJobsPage() {
+  const api = useApi();
   const [jobs, setJobs] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${ROUTES.API}/jobs`)
-      .then(res => res.json())
-      .then(data => setJobs(data.filter(job => job.status === "completed")))
+    api
+      .get("/jobs")
+      .then((data) => setJobs(data.filter((job) => job.status === "completed")))
       .catch(() => setError("Failed to load completed jobs"));
   }, []);
 
@@ -26,11 +28,8 @@ export default function CompletedJobsPage() {
 
   const handleDelete = async (jobId) => {
     try {
-      const res = await fetch(`${ROUTES.API}/jobs/${jobId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error();
-      setJobs(jobs.filter(job => job.id !== jobId));
+      await api.del(`/jobs/${jobId}`);
+      setJobs(jobs.filter((job) => job.id !== jobId));
     } catch {
       alert("Error deleting job");
     }

@@ -28,7 +28,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div className="page-content" style={{ maxWidth: "400px", margin: "0 auto" }}>
       <h2>Login</h2>
       <form onSubmit={handleSubmit} style={{ marginTop: "1rem" }}>
         <div style={{ marginBottom: "0.5rem" }}>
@@ -36,7 +36,7 @@ export default function LoginPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Username"
-            style={{ padding: "0.5rem", width: "200px" }}
+            style={{ padding: "0.5rem", width: "100%" }}
           />
         </div>
         <div style={{ marginBottom: "0.5rem" }}>
@@ -45,7 +45,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            style={{ padding: "0.5rem", width: "200px" }}
+            style={{ padding: "0.5rem", width: "100%" }}
           />
         </div>
         <button type="submit" style={{ padding: "0.5rem 1rem" }}>Login</button>

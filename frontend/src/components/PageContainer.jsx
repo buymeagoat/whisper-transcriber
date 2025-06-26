@@ -4,9 +4,12 @@ export default function PageContainer({ style = {}, children }) {
   const containerStyle = {
     backgroundColor: "#18181b",
     color: "white",
-    padding: "2rem",
     minHeight: "100vh",
     ...style,
   };
-  return <div style={containerStyle}>{children}</div>;
+  return (
+    <div className="page-content" style={containerStyle}>
+      {children}
+    </div>
+  );
 }

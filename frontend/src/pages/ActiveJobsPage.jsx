@@ -26,7 +26,7 @@ export default function ActiveJobsPage() {
   }, []);
 
   return (
-    <div style={{ padding: "1rem" }}>
+    <div className="page-content">
       <h2 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "1rem" }}>
         ⏳ Active Jobs <span style={{ fontSize: "0.875rem", color: "#a1a1aa" }}>(auto-refreshing every 30s)</span>
       </h2>

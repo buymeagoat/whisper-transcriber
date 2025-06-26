@@ -163,7 +163,7 @@ useEffect(() => {
   );
 
   return (
-    <div style={{ padding: "2rem", color: "white", backgroundColor: "#18181b", minHeight: "100vh" }}>
+    <div className="page-content" style={{ color: "white", backgroundColor: "#18181b", minHeight: "100vh" }}>
       <h2 style={{ fontSize: "1.875rem", marginBottom: "1rem" }}>Admin Controls</h2>
             {/* NEW stats read-out */}
       {stats && (

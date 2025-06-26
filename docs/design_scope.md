@@ -121,7 +121,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Heartbeat table and `/heartbeat` endpoint                            | Open      | Record worker heartbeats         | Extra DB writes                 | None                          |
 | Kill (cancel) a running job                                          | Open      | Send termination signal          | Handle partial output           | Process management            |
 | Stop / Restart server from Admin                                     | Open      | Admin commands to stop and start | Risk of accidental shutdown     | Requires elevated permissions |
-| Shell access via web UI                                              | Open      | Web terminal component           | Security and sandboxing         | Major security risk           |
+| Shell/CLI access from admin page                                     | Open      | Web terminal component           | Security and sandboxing         | Major security risk           |
 | Resume jobs after crash or cancel                                    | Open      | Persist intermediate state       | Robust job recovery             | Complex state handling        |
 | Stream logs to UI via WebSocket                                      | Open      | Push log lines live              | Scalability of sockets          | None                          |
 | UI progress bars with word-level timestamps                          | Open      | Parse SRT positions              | Frequent UI updates             | None                          |

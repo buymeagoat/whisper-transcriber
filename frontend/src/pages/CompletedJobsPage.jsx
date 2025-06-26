@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ROUTES } from "../routes";
+import { ROUTES, getTranscriptDownloadUrl } from "../routes";
 
 export default function CompletedJobsPage() {
   const [jobs, setJobs] = useState([]);
@@ -17,7 +17,7 @@ export default function CompletedJobsPage() {
   };
 
   const handleDownloadTranscript = (jobId) => {
-    window.open(`${ROUTES.API}/jobs/${jobId}/download?format=txt`, "_blank");
+    window.open(getTranscriptDownloadUrl(jobId), "_blank");
   };
 
   const handleDelete = async (jobId) => {

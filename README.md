@@ -23,6 +23,7 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `DB` – path to a SQLite database file used mainly for tests. When set it
   overrides `DB_URL`.
 - `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://localhost:8000`).
+- `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
 - `LOG_TO_STDOUT` – set to `true` to also mirror logs to the console.
 - `METRICS_TOKEN` – optional bearer token required to access `/metrics`.
@@ -108,6 +109,15 @@ resembles:
 
 Timestamps returned by the API are in UTC (note the trailing `Z`).
 The web UI converts them to your local timezone for display.
+
+### Transcript Downloads
+
+Use `/jobs/{id}/download` to retrieve the transcript. The optional `format`
+parameter supports `srt` (default), `txt` for plain text, and `vtt` for WebVTT.
+
+The React UI downloads transcripts in plain text by default using
+`?format=txt`. This default can be overridden with the `VITE_DEFAULT_TRANSCRIPT_FORMAT`
+build variable or by storing a `downloadFormat` value in `localStorage`.
 
 ## Usage Notes
 

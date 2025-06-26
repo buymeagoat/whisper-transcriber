@@ -49,6 +49,7 @@ object used throughout the code base. Available variables are:
 - `DB_URL` – database URL.
 - `DB` – SQLite path overriding `DB_URL`.
 - `VITE_API_HOST` – base URL for the frontend to reach the API.
+- `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – log level for backend loggers.
 - `LOG_TO_STDOUT` – mirror logs to the console when `true`.
 - `METRICS_TOKEN` – optional bearer token for `/metrics`.
@@ -104,6 +105,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 - Progress WebSocket (`/ws/progress/{job_id}`) sends status updates
 - Health check (`/health`) and version info (`/version`)
 - Local-time timestamps shown in the UI
+- Download transcripts as `.txt` (default in UI)
 
 ### Upcoming Ideas
 
@@ -112,7 +114,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Rank | Feature Idea                                    | Reasoning                      | Considerations                  | Roadblocks                    |
 | ---- | ----------------------------------------------- | ------------------------------ | ------------------------------- | ----------------------------- |
 | 001  | Local-time timestamps shown (done)              | Converted on display           | Timezone handling               | None                          |
-| 002  | Download transcripts as `.txt`                  | Plain text export from SRT     | Maintain timestamp accuracy     | None                          |
+| 002  | Download transcripts as `.txt` (done, default UI format)           | Plain text export from SRT     | Maintain timestamp accuracy     | None                          |
 | 003  | Download job archive (.zip)                     | Zip existing logs and results  | Avoid large file memory use     | None                          |
 | 004  | Support `.vtt` transcript export                | Convert from SRT to VTT        | Extra dependency for conversion | None                          |
 | 005  | Provide CLI wrapper for non-UI usage            | Wrapper script around API calls| Package distribution            | None                          |

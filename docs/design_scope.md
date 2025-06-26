@@ -96,10 +96,18 @@ This document summarizes the repository layout and how the core FastAPI service 
 
 ## Future Updates
 
+### Upcoming Tasks
+The next milestone focuses on foundational improvements to the web UI.
+
 <!-- Codex: Keep table cells padded to uniform column widths when updating. -->
 
 | Feature Idea                                                         | Status    | Reasoning                        | Considerations                 | Roadblocks                    |
 | -------------------------------------------------------------------- | --------- | -------------------------------- | ------------------------------- | ----------------------------- |
+| Global state management                                              | Open   | Share job data across components | Choose state library            | Data sync complexity        |
+| Sortable job table component                                        | Open   | Track jobs more easily            | Table library, UI state         | None                        |
+| Notification/toast system                                           | Open   | Surface status messages          | Auto-dismiss timing             | None                        |
+| Admin dashboard KPIs                                                | Open   | Monitor throughput               | Metrics queries                 | None                        |
+| Role-based auth with settings page                                  | Open   | Restrict features per role       | Session handling, UI            | User management complexity    |
 | Download job archive (.zip)                                          | Open      | Zip existing logs and results    | Avoid large file memory use     | None                          |
 | Support `.vtt` transcript export                                     | Open      | Convert from SRT to VTT          | Extra dependency for conversion | None                          |
 | Provide CLI wrapper for non-UI usage                                 | Open      | Wrapper script around API calls  | Package distribution            | None                          |

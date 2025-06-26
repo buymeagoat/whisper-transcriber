@@ -6,6 +6,7 @@ from typing import Dict, Set
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
 from api.routes.auth import get_current_user
+from api.models import User
 
 router = APIRouter()
 
@@ -41,7 +42,7 @@ def send_progress_update(job_id: str, status: str) -> None:
 
 @router.websocket("/ws/progress/{job_id}")
 async def websocket_progress(
-    websocket: WebSocket, job_id: str, user: str = Depends(get_current_user)
+    websocket: WebSocket, job_id: str, user: User = Depends(get_current_user)
 ) -> None:
     await websocket.accept()
     progress_connections.setdefault(job_id, set()).add(websocket)

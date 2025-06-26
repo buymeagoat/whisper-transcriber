@@ -12,13 +12,16 @@ from api.app_state import db_lock
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def create_user(username: str, password: str) -> User:
+def create_user(username: str, password: str, role: str = "user") -> User:
     """Create and persist a new user."""
     hashed = pwd_context.hash(password)
     with db_lock:
         with SessionLocal() as db:
             user = User(
-                username=username, hashed_password=hashed, created_at=datetime.utcnow()
+                username=username,
+                hashed_password=hashed,
+                role=role,
+                created_at=datetime.utcnow(),
             )
             db.add(user)
             db.commit()

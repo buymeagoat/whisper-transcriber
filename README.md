@@ -72,15 +72,17 @@ application can be served with the backend.
 ### User Registration
 
 Create an account by sending your desired username and password to `/register`.
-Set `ALLOW_REGISTRATION=false` in production to disable this endpoint. Obtain a
-token from `/token` using the same credentials.
+Every account has a role of either `user` or `admin`. Registration always
+creates regular users. Set `ALLOW_REGISTRATION=false` in production to disable
+this endpoint. Obtain a token from `/token` using the same credentials. JWT
+payloads now include the user role so clients can inspect their privileges.
 
 ## Metrics
 
 
-The backend exposes Prometheus metrics at `/metrics`. Authenticate with the JWT
-token obtained from the `/token` endpoint and send it as `Authorization: Bearer
-<token>`.
+The backend exposes Prometheus metrics at `/metrics`. This and all `/admin`
+endpoints require an `admin` role. Authenticate with the JWT token obtained from
+the `/token` endpoint and send it as `Authorization: Bearer <token>`.
 
 ### Health & Version
 

@@ -106,7 +106,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Role-based auth with settings page                                  | Open   | Restrict features per role       | Session handling, UI            | User management complexity    |
 | Download job archive (.zip)                                          | Open      | Zip existing logs and results    | Avoid large file memory use     | None                          |
 | Support `.vtt` transcript export                                     | Open      | Convert from SRT to VTT          | Extra dependency for conversion | None                          |
-| Provide CLI wrapper for non-UI usage                                 | Open      | Wrapper script around API calls  | Package distribution            | None                          |
+| Provide CLI wrapper for non-UI usage                                 | On Hold      | Wrapper script around API calls  | Package distribution            | None                          |
 | Improve status messaging in UI                                       | Done      | Real-time updates via progress WebSocket | Friendlier labels, localization | None                          |
 | Job runtime display (live & final)                                   | Open      | Track job start and end times    | Store runtime data              | None                          |
 | Admin panel health checks and job cleanup                            | Open      | Add checks and cleanup hooks     | Permission checks               | None                          |
@@ -129,7 +129,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Resume jobs after crash or cancel                                    | Open      | Persist intermediate state       | Robust job recovery             | Complex state handling        |
 | Stream logs to UI via WebSocket                                      | Open      | Push log lines live              | Scalability of sockets          | None                          |
 | UI progress bars with word-level timestamps                          | Open      | Parse SRT positions              | Frequent UI updates             | None                          |
-| Auto-delete old transcripts after 30 days                            | Open      | Background cleanup task          | Configurable retention          | None                          |
+| Auto-delete old transcripts after 30 days                            | On Hold      | Background cleanup task          | Configurable retention          | None                          |
 | Workflow automation hooks                                            | Open      | Fire webhook on job completion   | Configurable URLs               | Security of hooks             |
 | Audio format conversion                                              | Open      | Use ffmpeg for re-encoding       | Manage codecs                   | None                          |
 | Audio cleanup utilities                                              | Open      | Noise reduction pipeline         | CPU usage                       | External libs                 |

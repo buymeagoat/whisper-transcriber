@@ -153,7 +153,9 @@ def handle_whisper(
                             job.log_path = str(log_path)
                             job.finished_at = datetime.utcnow()
                             db.commit()
-                            send_progress_update(job_id, JobStatusEnum.FAILED.value)
+                            send_progress_update(
+                                job_id, JobStatusEnum.FAILED_TIMEOUT.value
+                            )
                 return
 
             except Exception as e:
@@ -166,7 +168,9 @@ def handle_whisper(
                             job.log_path = str(log_path)
                             job.finished_at = datetime.utcnow()
                             db.commit()
-                            send_progress_update(job_id, JobStatusEnum.FAILED.value)
+                            send_progress_update(
+                                job_id, JobStatusEnum.FAILED_LAUNCH_ERROR.value
+                            )
                 return
 
             raw_txt_path = job_dir / (Path(upload).with_suffix(".srt").name)
@@ -217,7 +221,9 @@ def handle_whisper(
                                 job.finished_at = datetime.utcnow()
                                 logger.error(f"Metadata writer failed: {e}")
                                 db.commit()
-                                send_progress_update(job_id, JobStatusEnum.FAILED.value)
+                                send_progress_update(
+                                    job_id, JobStatusEnum.FAILED_UNKNOWN.value
+                                )
                     elif proc.returncode < 0:
                         logger.error(
                             f"Whisper process terminated with signal {-proc.returncode}"
@@ -228,7 +234,9 @@ def handle_whisper(
                             job.log_path = str(log_path)
                             job.finished_at = datetime.utcnow()
                             db.commit()
-                            send_progress_update(job_id, JobStatusEnum.FAILED.value)
+                            send_progress_update(
+                                job_id, JobStatusEnum.FAILED_WHISPER_ERROR.value
+                            )
                         logger.error(
                             f"Whisper process terminated with signal {-proc.returncode}"
                         )
@@ -240,7 +248,9 @@ def handle_whisper(
                             job.log_path = str(log_path)
                             job.finished_at = datetime.utcnow()
                             db.commit()
-                            send_progress_update(job_id, JobStatusEnum.FAILED.value)
+                            send_progress_update(
+                                job_id, JobStatusEnum.FAILED_WHISPER_ERROR.value
+                            )
         except Exception as e:
             logger.critical(f"CRITICAL thread error: {e}")
             with db_lock:
@@ -251,7 +261,9 @@ def handle_whisper(
                         job.log_path = str(log_path)
                         job.finished_at = datetime.utcnow()
                         db.commit()
-                        send_progress_update(job_id, JobStatusEnum.FAILED.value)
+                        send_progress_update(
+                            job_id, JobStatusEnum.FAILED_THREAD_EXCEPTION.value
+                        )
 
     if start_thread:
         threading.Thread(target=_run, daemon=True).start()

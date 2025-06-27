@@ -38,3 +38,22 @@ def get_user_by_username(username: str) -> Optional[User]:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Return True if password matches hashed password."""
     return pwd_context.verify(plain_password, hashed_password)
+
+
+def list_users() -> list[User]:
+    """Return all users."""
+    with SessionLocal() as db:
+        return db.query(User).order_by(User.id).all()
+
+
+def update_user_role(user_id: int, role: str) -> Optional[User]:
+    """Update a user's role and return the updated user or None."""
+    with db_lock:
+        with SessionLocal() as db:
+            user = db.query(User).get(user_id)
+            if not user:
+                return None
+            user.role = role
+            db.commit()
+            db.refresh(user)
+            return user

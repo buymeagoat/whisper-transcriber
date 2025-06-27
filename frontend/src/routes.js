@@ -5,6 +5,7 @@ export const ROUTES = {
   COMPLETED: "/completed",
   FAILED: "/failed",
   ADMIN: "/admin",
+  SETTINGS: "/settings",
   TRANSCRIPT_VIEW: "/transcript/:jobId/view",
   STATUS: "/status/:jobId",
   PROGRESS: "/progress/:jobId",

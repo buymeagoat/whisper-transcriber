@@ -7,7 +7,7 @@ from sqlalchemy import or_
 
 from api.models import Job, JobStatusEnum, TranscriptMetadata
 from api.orm_bootstrap import SessionLocal
-from api.app_state import db_lock
+from api.utils.db_lock import db_lock
 
 
 def create_job(

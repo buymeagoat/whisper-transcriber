@@ -4,7 +4,7 @@ from typing import Dict
 
 from api.models import UserSetting
 from api.orm_bootstrap import SessionLocal
-from api.app_state import db_lock
+from api.utils.db_lock import db_lock
 
 
 def get_settings(user_id: int) -> Dict[str, str]:

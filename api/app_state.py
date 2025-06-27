@@ -36,7 +36,7 @@ ACCESS_LOG = LOG_DIR / "access.log"
 WHISPER_BIN = shutil.which(settings.whisper_bin)
 
 # ─── DB Lock ───
-db_lock = threading.RLock()
+from api.utils.db_lock import db_lock
 
 # ─── Job Queue ───
 if settings.job_queue_backend == "thread":

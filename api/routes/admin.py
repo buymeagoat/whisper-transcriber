@@ -14,7 +14,7 @@ from api.errors import ErrorCode, http_error
 from api.models import Job, JobStatusEnum
 from api.orm_bootstrap import SessionLocal
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
-from api.app_state import db_lock
+from api.utils.db_lock import db_lock
 import api.app_state as app_state
 from api.services.job_queue import ThreadJobQueue
 from api.schemas import FileListOut, StatusOut, AdminStatsOut, BrowseOut

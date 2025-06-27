@@ -16,6 +16,7 @@ export default function AdminPage() {
   const [stats, setStats] = useState(null);
   const [cleanupEnabled, setCleanupEnabled] = useState(false);
   const [cleanupDays, setCleanupDays] = useState(30);
+  const [concurrency, setConcurrency] = useState(2);
   const [systemLog, setSystemLog] = useState("Loading log...");
   const [systemUpdated, setSystemUpdated] = useState(null);
  const API_HOST = ROUTES.API;
@@ -44,6 +45,15 @@ useEffect(() => {
       setCleanupDays(data.cleanup_days);
     } catch {
       dispatch(addToast("Failed to load cleanup settings.", "error"));
+    }
+  };
+
+  const fetchConcurrency = async () => {
+    try {
+      const data = await api.get("/admin/concurrency");
+      setConcurrency(data.max_concurrent_jobs);
+    } catch {
+      dispatch(addToast("Failed to load concurrency settings.", "error"));
     }
   };
 
@@ -82,6 +92,7 @@ useEffect(() => {
 
   useEffect(() => {
     fetchCleanupConfig();
+    fetchConcurrency();
   }, []);
 
 
@@ -140,6 +151,18 @@ useEffect(() => {
     }
   };
 
+  const handleSaveConcurrency = async () => {
+    try {
+      const data = await api.post("/admin/concurrency", {
+        max_concurrent_jobs: concurrency,
+      });
+      setConcurrency(data.max_concurrent_jobs);
+      dispatch(addToast("Concurrency limit saved.", "success"));
+    } catch {
+      dispatch(addToast("Failed to save concurrency limit.", "error"));
+    }
+  };
+
 
   return (
     <PageContainer>
@@ -195,6 +218,22 @@ useEffect(() => {
         </Button>
       </div>
 
+      <div style={{ marginTop: "2rem" }}>
+        <h3 style={{ fontSize: "1.125rem", marginBottom: "0.5rem" }}>Concurrency</h3>
+        <label style={{ display: "block", marginBottom: "0.5rem" }}>
+          Max Concurrent Jobs:
+          <input
+            type="number"
+            value={concurrency}
+            onChange={(e) => setConcurrency(Number(e.target.value))}
+            style={{ marginLeft: "0.5rem", width: "80px" }}
+          />
+        </label>
+        <Button onClick={handleSaveConcurrency} style={{ marginTop: "0.5rem" }}>
+          Save Concurrency
+        </Button>
+      </div>
+
       <div style={{ marginTop: "2rem", display: "flex", gap: "1rem" }}>
         <Button onClick={handleReset} color="#dc2626">
           Reset System
@@ -215,3 +254,4 @@ useEffect(() => {
     </PageContainer>
   );
 }
+

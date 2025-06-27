@@ -31,6 +31,7 @@ The application is considered working once these basics are functional:
  - `MODEL_DIR` specifies where the Whisper models are stored. By default this directory is `models/` which is local only and never committed. It must contain `base.pt`, `large-v3.pt`, `medium.pt`, `small.pt`, and `tiny.pt` when building the image. The application checks for these files on startup.
 - `frontend/` – React app built into `frontend/dist/` and copied by the Dockerfile
   to `api/static/` for the UI.
+- `scripts/` – packaging helpers that generate `dist/whisper-transcriber.exe` and `dist/whisper-transcriber.rpm`.
 
 Both `models/` and `frontend/dist/` are listed in `.gitignore`. They must exist
 before running `docker build`:
@@ -86,7 +87,7 @@ object used throughout the code base. Available variables are:
 
 ## API Overview
 - **Job management**: `POST /jobs` to upload, `GET /jobs` (with optional `search` query filtering by ID, filename or keywords) and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.
-- **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts, resetting the system, configuring cleanup via `/admin/cleanup-config`, and retrieving CPU/memory stats plus job KPIs.
+- **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts and packaged binaries via `/admin/download-app/{os}`, resetting the system, configuring cleanup via `/admin/cleanup-config`, and retrieving CPU/memory stats plus job KPIs.
 - **Logging endpoints** expose job logs and the access log. If the access log does not exist, `/logs/access` returns a `404` with an empty body. Static files under `/uploads`, `/transcripts`, and `/static` are served directly.
 - **Log streaming**: connect to `/ws/logs/{job_id}` to receive new log lines in real time. The frontend's job log view opens this socket and appends each message as it arrives.
 - **System log streaming**: connect to `/ws/logs/system` to watch the access log or `system.log` in real time from the Admin page.
@@ -176,6 +177,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Show Docker stats in Admin (`/admin/stats`)                          | Done      |                                  |                                 |                               |
 | Web-based file browser for logs/uploads/transcripts (`/admin/browse`) | Done      | Replaces inline lists with a navigable UI | Delete/download actions in UI |                        |
 | Zip download of all data (`/admin/download-all`)                     | Done      |                                  |                                 |                               |
+| Downloadable packages (`/admin/download-app/{os}`)                  | Done      |                                  |                                 |                        |
 | Expose `/metrics` endpoint for monitoring                            | Done      |                                  |                                 |                               |
 | Progress WebSocket (`/ws/progress/{job_id}`) sends status updates    | Done      |                                  |                                 |                               |
 | Health check (`/health`) and version info (`/version`)               | Done      |                                  |                                 |                               |

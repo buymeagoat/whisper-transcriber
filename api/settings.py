@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     celery_backend_url: str = Field("rpc://", env="CELERY_BACKEND_URL")
     cleanup_enabled: bool = Field(True, env="CLEANUP_ENABLED")
     cleanup_days: int = Field(30, env="CLEANUP_DAYS")
+    enable_server_control: bool = Field(False, env="ENABLE_SERVER_CONTROL")
 
     # Not configurable via environment
     algorithm: str = "HS256"

@@ -212,6 +212,8 @@ displayed all files at once.
 - Admins can manage user roles from the Settings page.
 - The Completed Jobs page provides a search box that filters results using the
   `search` query parameter on `/jobs`.
+- The Transcript Viewer page includes a search field to highlight text and can
+  optionally display only matching lines.
 - Cleanup options can be toggled and saved from the Admin page.
 - `MODEL_DIR` points to the directory that holds the Whisper `.pt` files. The default is `models/`, ignored by Git. Populate this directory before building or running the application.
 - `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.

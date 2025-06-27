@@ -4,6 +4,10 @@ import { useApi } from "../api";
 import { useDispatch } from "react-redux";
 import { addToast } from "../store";
 import StatsPanel from "../components/StatsPanel";
+import Button from "../components/Button";
+import LinkButton from "../components/LinkButton";
+import { List, ListItem } from "../components/List";
+import PageContainer from "../components/PageContainer";
 import { AuthContext } from "../context/AuthContext";
 export default function AdminPage() {
   const api = useApi();
@@ -173,11 +177,11 @@ useEffect(() => {
       {list.length === 0 ? (
         <p style={{ color: "#a1a1aa" }}>No files in {dir}/</p>
       ) : (
-        <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+        <List>
           {list.map((name) => (
-            <li key={`${dir}-${name}`} style={{ marginBottom: "0.25rem" }}>
+            <ListItem key={`${dir}-${name}`}>
               {name}
-              <a
+              <LinkButton
                 href={
                   dir === "logs"
                     ? `${API_HOST}/logs/${encodeURIComponent(name)}`
@@ -187,44 +191,29 @@ useEffect(() => {
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  marginLeft: "1rem",
-                  backgroundColor: "#10b981", // green
-                  color: "white",
-                  border: "none",
-                  padding: "0.25rem 0.5rem",
-                  borderRadius: "0.25rem",
-                  textDecoration: "none",
-                  cursor: "pointer"
-                }}
+                color="#10b981"
+                style={{ marginLeft: "1rem", padding: "0.25rem 0.5rem" }}
               >
                 View
-              </a>
-              <button
+              </LinkButton>
+              <Button
                 onClick={() => handleDelete(dir, name)}
-                style={{
-                  marginLeft: "0.5rem",
-                  backgroundColor: "#dc2626",
-                  color: "white",
-                  border: "none",
-                  padding: "0.25rem 0.5rem",
-                  borderRadius: "0.25rem",
-                  cursor: "pointer"
-                }}
+                color="#dc2626"
+                style={{ marginLeft: "0.5rem", padding: "0.25rem 0.5rem" }}
               >
                 Delete
-              </button>
-            </li>
+              </Button>
+            </ListItem>
           ))}
-        </ul>
+        </List>
       )}
     </div>
   );
 
   return (
-    <div className="page-content" style={{ color: "white", backgroundColor: "#18181b", minHeight: "100vh" }}>
-      <h2 style={{ fontSize: "1.875rem", marginBottom: "1rem" }}>Admin Controls</h2>
-            {/* NEW stats read-out */}
+    <PageContainer>
+      <h2 className="page-title">Admin Controls</h2>
+        {/* NEW stats read-out */}
       <StatsPanel stats={stats} />
 
       <div style={{ marginTop: "1rem" }}>
@@ -271,47 +260,28 @@ useEffect(() => {
             style={{ marginLeft: "0.5rem", width: "80px" }}
           />
         </label>
-        <button
-          onClick={handleSaveCleanup}
-          style={{
-            backgroundColor: "#2563eb",
-            color: "white",
-            border: "none",
-            padding: "0.5rem 1rem",
-            borderRadius: "0.25rem",
-            cursor: "pointer",
-          }}
-        >
+        <Button onClick={handleSaveCleanup} style={{ marginTop: "0.5rem" }}>
           Save Cleanup Settings
-        </button>
+        </Button>
       </div>
 
       <div style={{ marginTop: "2rem", display: "flex", gap: "1rem" }}>
-        <button onClick={handleReset}
-          style={{ backgroundColor:"#dc2626", color:"white", border:"none",
-                  padding:"0.5rem 1rem", borderRadius:"0.25rem", cursor:"pointer" }}>
+        <Button onClick={handleReset} color="#dc2626">
           Reset System
-        </button>
+        </Button>
 
-        <button onClick={handleDownloadAll}
-          style={{ backgroundColor:"#2563eb", color:"white", border:"none",
-                  padding:"0.5rem 1rem", borderRadius:"0.25rem", cursor:"pointer" }}>
+        <Button onClick={handleDownloadAll}>
           Download All Data (ZIP)
-        </button>
+        </Button>
 
-        <button onClick={handleShutdown}
-          style={{ backgroundColor:"#6b7280", color:"white", border:"none",
-                  padding:"0.5rem 1rem", borderRadius:"0.25rem", cursor:"pointer" }}>
+        <Button onClick={handleShutdown} color="#6b7280">
           Shutdown Server
-        </button>
+        </Button>
 
-        <button onClick={handleRestart}
-          style={{ backgroundColor:"#6b7280", color:"white", border:"none",
-                  padding:"0.5rem 1rem", borderRadius:"0.25rem", cursor:"pointer" }}>
+        <Button onClick={handleRestart} color="#6b7280">
           Restart Server
-        </button>
-
+        </Button>
       </div>
-    </div>
+    </PageContainer>
   );
 }

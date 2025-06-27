@@ -75,3 +75,20 @@ class CleanupConfigOut(BaseModel):
 class CleanupConfigIn(BaseModel):
     cleanup_enabled: Optional[bool] = None
     cleanup_days: Optional[int] = None
+
+
+class UserOut(BaseModel):
+    id: int
+    username: str
+    role: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserListOut(BaseModel):
+    users: list[UserOut]
+
+
+class UserUpdateIn(BaseModel):
+    role: str

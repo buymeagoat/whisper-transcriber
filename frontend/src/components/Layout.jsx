@@ -5,7 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 import ToastContainer from "./ToastContainer";
 
 export default function Layout({ children }) {
-  const { logout, isAuthenticated } = useContext(AuthContext);
+  const { logout, isAuthenticated, role } = useContext(AuthContext);
 
   const handleLogout = () => {
     logout();
@@ -40,6 +40,11 @@ export default function Layout({ children }) {
         <Link to={ROUTES.ADMIN} style={linkStyle}>
           Admin
         </Link>
+        {role === "admin" && (
+          <Link to={ROUTES.SETTINGS} style={linkStyle}>
+            Settings
+          </Link>
+        )}
         {isAuthenticated ? (
           <button onClick={handleLogout} style={linkStyle}>
             Logout

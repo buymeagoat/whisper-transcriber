@@ -81,6 +81,15 @@ creates regular users. Set `ALLOW_REGISTRATION=false` in production to disable
 this endpoint. Obtain a token from `/token` using the same credentials. JWT
 payloads now include the user role so clients can inspect their privileges.
 
+### User Management
+
+Admins can manage accounts via two endpoints:
+
+- `GET /users` lists all users.
+- `PUT /users/{id}` updates a user's role.
+
+The React Settings page at `/settings` provides a simple interface for these actions.
+
 ## Metrics
 
 
@@ -132,6 +141,7 @@ build variable or by storing a `downloadFormat` value in `localStorage`.
 - Real-time job status messages appear in the UI via the progress WebSocket with
   friendlier labels for each state.
 - Toast notifications show the result of actions across all pages.
+- Admins can manage user roles from the Settings page.
 - `models/` exists locally only and is never stored in Git. It must contain the Whisper `.pt` files before building or running the app. Ensure the files are present before building the Docker image.
 - `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are

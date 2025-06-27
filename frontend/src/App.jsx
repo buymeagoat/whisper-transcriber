@@ -4,6 +4,7 @@ import { ROUTES } from "./routes";
 import UploadPage from "./pages/UploadPage";
 import CompletedJobsPage from "./pages/CompletedJobsPage";
 import AdminPage from "./pages/AdminPage";
+import SettingsPage from "./pages/SettingsPage";
 import ActiveJobsPage from "./pages/ActiveJobsPage";
 import TranscriptViewPage from "./pages/TranscriptViewPage";
 import JobStatusPage from "./pages/JobStatusPage";
@@ -23,7 +24,7 @@ export default function App() {
     }).catch(() => {});
   }, []);
 
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, role } = useContext(AuthContext);
 
   return (
     <Router>
@@ -35,6 +36,7 @@ export default function App() {
           <Route path={ROUTES.ACTIVE} element={isAuthenticated ? <ActiveJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
           <Route path={ROUTES.COMPLETED} element={isAuthenticated ? <CompletedJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
           <Route path={ROUTES.ADMIN} element={isAuthenticated ? <AdminPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+          <Route path={ROUTES.SETTINGS} element={isAuthenticated && role === "admin" ? <SettingsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
           <Route path={ROUTES.TRANSCRIPT_VIEW} element={isAuthenticated ? <TranscriptViewPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
           <Route path={ROUTES.STATUS} element={isAuthenticated ? <JobStatusPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
           <Route path={ROUTES.FAILED} element={isAuthenticated ? <FailedJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />

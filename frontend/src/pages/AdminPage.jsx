@@ -11,6 +11,8 @@ export default function AdminPage() {
   const [transcripts, setTranscripts] = useState([]);
   const [stats, setStats] = useState(null);
   const [refreshToggle, setRefreshToggle] = useState(false);
+  const [cleanupEnabled, setCleanupEnabled] = useState(false);
+  const [cleanupDays, setCleanupDays] = useState(30);
  const API_HOST = ROUTES.API;
 
   const fetchStats = async () => {
@@ -42,8 +44,19 @@ useEffect(() => {
     }
   };
 
+  const fetchCleanupConfig = async () => {
+    try {
+      const data = await api.get("/admin/cleanup-config");
+      setCleanupEnabled(data.cleanup_enabled);
+      setCleanupDays(data.cleanup_days);
+    } catch {
+      dispatch(addToast("Failed to load cleanup settings.", "error"));
+    }
+  };
+
   useEffect(() => {
     fetchFiles();
+    fetchCleanupConfig();
   }, [refreshToggle]);
 
 
@@ -99,6 +112,20 @@ useEffect(() => {
       dispatch(addToast("Server restarting...", "success"));
     } catch {
       dispatch(addToast("Failed to restart server.", "error"));
+    }
+  };
+
+  const handleSaveCleanup = async () => {
+    try {
+      const data = await api.post("/admin/cleanup-config", {
+        cleanup_enabled: cleanupEnabled,
+        cleanup_days: cleanupDays,
+      });
+      setCleanupEnabled(data.cleanup_enabled);
+      setCleanupDays(data.cleanup_days);
+      dispatch(addToast("Cleanup settings saved.", "success"));
+    } catch {
+      dispatch(addToast("Failed to save cleanup settings.", "error"));
     }
   };
 
@@ -172,6 +199,41 @@ useEffect(() => {
       {renderFileList("Logs", logs, "logs")}
       {renderFileList("Uploads", uploads, "uploads")}
       {renderFileList("Transcripts", transcripts, "transcripts")}
+
+      <div style={{ marginTop: "2rem" }}>
+        <h3 style={{ fontSize: "1.125rem", marginBottom: "0.5rem" }}>Cleanup Settings</h3>
+        <label style={{ display: "block", marginBottom: "0.5rem" }}>
+          <input
+            type="checkbox"
+            checked={cleanupEnabled}
+            onChange={(e) => setCleanupEnabled(e.target.checked)}
+            style={{ marginRight: "0.5rem" }}
+          />
+          Enable automatic cleanup
+        </label>
+        <label style={{ display: "block", marginBottom: "0.5rem" }}>
+          Retention Days:
+          <input
+            type="number"
+            value={cleanupDays}
+            onChange={(e) => setCleanupDays(Number(e.target.value))}
+            style={{ marginLeft: "0.5rem", width: "80px" }}
+          />
+        </label>
+        <button
+          onClick={handleSaveCleanup}
+          style={{
+            backgroundColor: "#2563eb",
+            color: "white",
+            border: "none",
+            padding: "0.5rem 1rem",
+            borderRadius: "0.25rem",
+            cursor: "pointer",
+          }}
+        >
+          Save Cleanup Settings
+        </button>
+      </div>
 
       <div style={{ marginTop: "2rem", display: "flex", gap: "1rem" }}>
         <button onClick={handleReset}

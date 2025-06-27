@@ -27,7 +27,6 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
 - `LOG_TO_STDOUT` – set to `true` to also mirror logs to the console.
-- `METRICS_TOKEN` – optional bearer token required to access `/metrics`.
 - `AUTH_USERNAME` and `AUTH_PASSWORD` – *(deprecated)* previous static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
 - `SECRET_KEY` – secret used to sign JWT tokens.

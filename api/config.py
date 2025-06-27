@@ -34,9 +34,6 @@ JOB_QUEUE_BACKEND = os.getenv("JOB_QUEUE_BACKEND", "thread")
 # providers. Only 'local' is implemented here.
 STORAGE_BACKEND = os.getenv("STORAGE_BACKEND", "local")
 
-# Optional token required to access the /metrics endpoint
-METRICS_TOKEN = os.getenv("METRICS_TOKEN")
-
 # Authentication settings
 AUTH_USERNAME = os.getenv("AUTH_USERNAME", "admin")
 AUTH_PASSWORD = os.getenv("AUTH_PASSWORD", "admin")

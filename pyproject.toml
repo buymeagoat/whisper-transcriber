@@ -8,6 +8,7 @@ dependencies = [
     "sqlalchemy~=2.0",
     "python-multipart",       # Required for file uploads
     "pydantic",               # Used in FastAPI models
+    "pydantic-settings",
     "alembic",                # Keep for DB migration
     "psycopg2-binary",
 ]

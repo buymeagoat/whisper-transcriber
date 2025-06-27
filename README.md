@@ -64,8 +64,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `WHISPER_LANGUAGE` – language code passed to Whisper (defaults to `en`).
 - `MODEL_DIR` – directory containing Whisper model files (defaults to `models/`).
 
-Configuration values are provided by `api/settings.py` using Pydantic's
-`BaseSettings`. An instance named `settings` is imported by the rest of the
+Configuration values are provided by `api/settings.py` using
+`pydantic_settings.BaseSettings`. An instance named `settings` is imported by the rest of the
 application so environment variables are loaded only once.
 
 ## Running

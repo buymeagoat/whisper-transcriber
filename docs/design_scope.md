@@ -45,7 +45,7 @@ Key environment files include `pyproject.toml`, `requirements.txt`, and the `Doc
 ## Configuration
 
 Application settings come from `api/settings.py`. It reads environment
-variables once using `pydantic.BaseSettings` and exposes a `settings`
+variables once using `pydantic_settings.BaseSettings` and exposes a `settings`
 object used throughout the code base. Available variables are:
 
 - `DB_URL` – database URL.

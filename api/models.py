@@ -97,3 +97,16 @@ class TranscriptMetadata(Base):
 
     def __repr__(self):
         return f"<Metadata job_id={self.job_id} tokens={self.tokens} duration={self.duration}>"
+
+
+# ─── Simple Config Table ─────────────────────────────────────────────────────
+class ConfigEntry(Base):
+    """Key/value storage for small configuration items."""
+
+    __tablename__ = "config"
+
+    key: Mapped[str] = mapped_column(String, primary_key=True)
+    value: Mapped[str] = mapped_column(String, nullable=False)
+
+    def __repr__(self) -> str:  # pragma: no cover - trivial
+        return f"<Config {self.key}={self.value}>"

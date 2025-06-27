@@ -180,6 +180,13 @@ build variable or by storing a `downloadFormat` value in `localStorage`.
 To obtain all artifacts for a single job, call `/jobs/{id}/archive`. This returns
  a `.zip` file containing the transcript, metadata and job log.
 
+### Audio Editing
+
+Send a file to `/edit` to perform basic operations on the clip. Provide optional
+`trim_start` and `trim_end` values (seconds) to crop the audio and `volume` to
+adjust loudness. The endpoint saves the modified file under `uploads/` and
+returns the path to this new file.
+
 ### Admin Endpoints
 
 - The API offers several management routes that are restricted to users with the

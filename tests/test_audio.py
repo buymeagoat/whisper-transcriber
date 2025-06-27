@@ -34,3 +34,21 @@ def test_convert_unsupported_format(client, sample_wav):
     assert resp.status_code == 415
     detail = resp.json()
     assert detail["code"] == ErrorCode.UNSUPPORTED_MEDIA
+
+
+def test_edit_trim_volume(client, sample_wav, monkeypatch):
+    def fake_run(cmd, check, stdout=None, stderr=None):
+        dest = Path(cmd[-1])
+        shutil.copy(sample_wav, dest)
+        return subprocess.CompletedProcess(cmd, 0, b"", b"")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/edit",
+            data={"trim_start": "0", "trim_end": "1", "volume": "1.5"},
+            files={"file": ("clip.wav", f, "audio/wav")},
+        )
+    assert resp.status_code == 200
+    path = Path(resp.json()["path"])
+    assert path.exists()

@@ -73,6 +73,7 @@ object used throughout the code base. Available variables are:
   (defaults to `30`).
 - `ENABLE_SERVER_CONTROL` – allow `/admin/shutdown` and `/admin/restart`
   endpoints (defaults to `false`).
+- `TIMEZONE` – local timezone name used for log timestamps (defaults to `UTC`).
 
 ## API Overview
 - **Job management**: `POST /jobs` to upload, `GET /jobs` and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.

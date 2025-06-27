@@ -53,6 +53,7 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
   (defaults to `30`).
 - `ENABLE_SERVER_CONTROL` – allow `/admin/shutdown` and `/admin/restart`
   endpoints (defaults to `false`).
+- `TIMEZONE` – local timezone name used for log timestamps (defaults to `UTC`).
 
 Configuration values are provided by `api/settings.py` using Pydantic's
 `BaseSettings`. An instance named `settings` is imported by the rest of the

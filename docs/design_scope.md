@@ -85,7 +85,7 @@ object used throughout the code base. Available variables are:
 - `MODEL_DIR` – directory containing Whisper models (defaults to `models/`).
 
 ## API Overview
-- **Job management**: `POST /jobs` to upload, `GET /jobs` and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.
+- **Job management**: `POST /jobs` to upload, `GET /jobs` (with optional `search` query filtering by ID, filename or keywords) and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.
 - **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts, resetting the system, configuring cleanup via `/admin/cleanup-config`, and retrieving CPU/memory stats plus job KPIs.
 - **Logging endpoints** expose job logs and the access log. If the access log does not exist, `/logs/access` returns a `404` with an empty body. Static files under `/uploads`, `/transcripts`, and `/static` are served directly.
 - **Log streaming**: connect to `/ws/logs/{job_id}` to receive new log lines in real time. The frontend's job log view opens this socket and appends each message as it arrives.
@@ -105,6 +105,7 @@ This document summarizes the repository layout and how the core FastAPI service 
   which the Dockerfile copies to `api/static/` for serving.
 - Upload page lets users choose audio files and Whisper model size, then starts jobs and links to a status view.
 - Active, Completed and Failed pages display jobs filtered by status with actions to view logs or restart/remove.
+- Completed Jobs now includes a search box that filters results via the `/jobs` `search` query, matching job IDs, filenames or metadata keywords.
 - Transcript viewer shows the final text in a simple styled page.
 - Admin page lists server files, shows CPU/memory usage and KPIs (completed job count, average job time and queue length), and provides buttons to reset the system or download all data.
 
@@ -137,7 +138,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Settings page to customize default model                             | Open      | UI for selecting models          | Persist user prefs              | None                          |
 | Allow multiple files per upload with validation                      | Open      | Adjust upload handler            | File size and concurrency       | None                          |
 | Web-based log viewer                                                 | Open      | Simple log tail view             | Log file rotation               | Large logs                    |
-| Sortable and searchable job lists                                    | Open      | Add filters on table views       | DB query optimization           | None                          |
+| Sortable and searchable job lists                                    | Partial   | Search filter added via `/jobs`  | Sorting not implemented        | None                          |
 | Status toasts for admin actions                                      | Open      | Display toast on success/failure | Frontend state management       | None                          |
 | Playback or text toggle for completed jobs                           | Open      | Switch between audio and text    | Media player integration        | None                          |
 | Use `updated_at` for job sorting/pagination                          | Open      | Modify queries                   | Add index                       | None                          |

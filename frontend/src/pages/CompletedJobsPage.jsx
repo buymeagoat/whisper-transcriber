@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ROUTES, getTranscriptDownloadUrl } from "../routes";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchJobs, deleteJob, selectJobs, addToast } from "../store";
@@ -9,11 +9,12 @@ import { Table, Th, Td } from "../components/Table";
 
 export default function CompletedJobsPage() {
   const dispatch = useDispatch();
+  const [search, setSearch] = useState("");
   const jobs = useSelector(selectJobs).filter((j) => j.status === "completed");
 
   useEffect(() => {
-    dispatch(fetchJobs()).unwrap().catch(() => dispatch(addToast("Failed to load completed jobs", "error")));
-  }, [dispatch]);
+    dispatch(fetchJobs(search)).unwrap().catch(() => dispatch(addToast("Failed to load completed jobs", "error")));
+  }, [dispatch, search]);
 
   const handleView = (jobId) => {
     window.open(`${ROUTES.API}/transcript/${jobId}/view`, "_blank");
@@ -33,6 +34,12 @@ export default function CompletedJobsPage() {
   return (
     <PageContainer>
       <h2 className="page-title">Completed Jobs</h2>
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search jobs or keywords..."
+        style={{ marginTop: "1rem", padding: "0.5rem", width: "100%" }}
+      />
 
       <Table style={{ marginTop: "2rem" }}>
         <thead style={{ backgroundColor: "#27272a" }}> {/* zinc-800 */}

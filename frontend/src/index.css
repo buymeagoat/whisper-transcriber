@@ -31,6 +31,13 @@ nav {
   flex-wrap: wrap;
 }
 
+.side-nav {
+  width: 200px;
+  background-color: #27272a;
+  padding: 1rem;
+  border-right: 1px solid #3f3f46;
+}
+
 @media (max-width: 600px) {
   table {
     display: block;

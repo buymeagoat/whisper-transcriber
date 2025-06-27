@@ -227,6 +227,7 @@ displayed all files at once.
 - The Admin page shows the system log via `/ws/logs/system`.
 - Toast notifications show the result of actions across all pages.
 - Admins can manage user roles from the Settings page.
+- A left-side navigation bar lists each section, including a **Download Desktop App** tab linking to `/download-app`.
 - The Completed Jobs page provides a search box that filters results using the
   `search` query parameter on `/jobs`.
 - The Transcript Viewer page includes a search field to highlight text and can

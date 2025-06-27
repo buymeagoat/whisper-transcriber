@@ -13,49 +13,54 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#18181b", color: "white" }}>
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        backgroundColor: "#18181b",
+        color: "white",
+      }}
+    >
       <ToastContainer />
-      <nav
-        style={{
-          backgroundColor: "#27272a",
-          padding: "1rem",
-          display: "flex",
-          gap: "1rem",
-          borderBottom: "1px solid #3f3f46",
-          flexWrap: "wrap",
-        }}
-      >
-        <Link to={ROUTES.UPLOAD} style={linkStyle}>
-          Upload
-        </Link>
-        <Link to={ROUTES.ACTIVE} style={linkStyle}>
-          Active Jobs
-        </Link>
-        <Link to={ROUTES.COMPLETED} style={linkStyle}>
-          Completed Jobs
-        </Link>
-        <Link to={ROUTES.FAILED} style={linkStyle}>
-          Failed Jobs
-        </Link>
-        <Link to={ROUTES.ADMIN} style={linkStyle}>
-          Admin
-        </Link>
-        {role === "admin" && (
-          <Link to={ROUTES.SETTINGS} style={linkStyle}>
-            Settings
+      <aside className="side-nav">
+        <nav style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <Link to={ROUTES.UPLOAD} style={linkStyle}>
+            Upload
           </Link>
-        )}
-        {isAuthenticated ? (
-          <button onClick={handleLogout} style={linkStyle}>
-            Logout
-          </button>
-        ) : (
-          <Link to={ROUTES.LOGIN} style={linkStyle}>
-            Login
+          <Link to={ROUTES.ACTIVE} style={linkStyle}>
+            Active Jobs
           </Link>
-        )}
-      </nav>
-      <main className="page-content">{children}</main>
+          <Link to={ROUTES.COMPLETED} style={linkStyle}>
+            Completed Jobs
+          </Link>
+          <Link to={ROUTES.FAILED} style={linkStyle}>
+            Failed Jobs
+          </Link>
+          <Link to={ROUTES.ADMIN} style={linkStyle}>
+            Admin
+          </Link>
+          <a href="/download-app" style={linkStyle}>
+            Download Desktop App
+          </a>
+          {role === "admin" && (
+            <Link to={ROUTES.SETTINGS} style={linkStyle}>
+              Settings
+            </Link>
+          )}
+          {isAuthenticated ? (
+            <button onClick={handleLogout} style={linkStyle}>
+              Logout
+            </button>
+          ) : (
+            <Link to={ROUTES.LOGIN} style={linkStyle}>
+              Login
+            </Link>
+          )}
+        </nav>
+      </aside>
+      <main className="page-content" style={{ flex: 1 }}>
+        {children}
+      </main>
     </div>
   );
 }

@@ -111,6 +111,13 @@ Admins can manage accounts via two endpoints:
 
 The React Settings page at `/settings` provides a simple interface for these actions.
 
+### User Settings
+
+Authenticated users can store personal defaults.
+- `GET /user/settings` – retrieve saved preferences.
+- `POST /user/settings` – update preference values.
+The upload page uses the returned `default_model` to choose the Whisper model automatically.
+
 ## Metrics
 
 

@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     vite_api_host: str = Field("http://localhost:8000", env="VITE_API_HOST")
     log_level: str = Field("DEBUG", env="LOG_LEVEL")
     log_to_stdout: bool = Field(False, env="LOG_TO_STDOUT")
+    log_max_bytes: int = Field(10_000_000, env="LOG_MAX_BYTES")
+    log_backup_count: int = Field(3, env="LOG_BACKUP_COUNT")
     allow_registration: bool = Field(True, env="ALLOW_REGISTRATION")
     auth_username: str = Field("admin", env="AUTH_USERNAME")
     auth_password: str = Field("admin", env="AUTH_PASSWORD")

@@ -21,7 +21,10 @@ def get_logger(job_id: str) -> logging.Logger:
     # Avoid duplicate handlers
     if not logger.handlers:
         handler = RotatingFileHandler(
-            log_path, maxBytes=10_000_000, backupCount=3, encoding="utf-8"
+            log_path,
+            maxBytes=settings.log_max_bytes,
+            backupCount=settings.log_backup_count,
+            encoding="utf-8",
         )
         formatter = logging.Formatter(
             f"[%(asctime)s] %(levelname)s [{job_id}]: %(message)s"
@@ -48,7 +51,10 @@ def get_system_logger(name="system") -> logging.Logger:
 
     if not logger.handlers:
         handler = RotatingFileHandler(
-            log_path, maxBytes=10_000_000, backupCount=3, encoding="utf-8"
+            log_path,
+            maxBytes=settings.log_max_bytes,
+            backupCount=settings.log_backup_count,
+            encoding="utf-8",
         )
         formatter = logging.Formatter(
             "[%(asctime)s] %(levelname)s [system]: %(message)s"

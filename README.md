@@ -169,6 +169,8 @@ The API offers several management routes that are restricted to users with the
 - `GET /admin/files` – list log, upload and transcript files on the server.
 - `POST /admin/reset` – remove all jobs and related files.
 - `GET /admin/download-all` – download every file as a single ZIP archive.
+- `GET /admin/cleanup-config` – retrieve current cleanup settings.
+- `POST /admin/cleanup-config` – update cleanup settings.
 - `GET /admin/stats` – return CPU/memory usage along with completed job count, average processing time and queue length.
 - `POST /admin/shutdown` – stop the server process.
 - `POST /admin/restart` – restart the running server.
@@ -181,6 +183,7 @@ The API offers several management routes that are restricted to users with the
 - The Admin page shows the system log via `/ws/logs/system`.
 - Toast notifications show the result of actions across all pages.
 - Admins can manage user roles from the Settings page.
+- Cleanup options can be toggled and saved from the Admin page.
 - `models/` exists locally only and is never stored in Git. It must contain the Whisper `.pt` files before building or running the app. Ensure the files are present before building the Docker image.
 - `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are

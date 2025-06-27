@@ -17,6 +17,9 @@ from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
 from api.app_state import db_lock
 from api.schemas import FileListOut, StatusOut, AdminStatsOut
 from api.routes.auth import require_admin
+from api.schemas import CleanupConfigOut, CleanupConfigIn
+from api.services import config as config_service
+from api.settings import settings
 
 router = APIRouter(prefix="/admin")
 
@@ -118,3 +121,29 @@ def restart_server(user=Depends(require_admin)) -> StatusOut:
 
     threading.Thread(target=_restart, daemon=True).start()
     return StatusOut(status="restarting")
+
+
+# ─── Cleanup Config Endpoints ────────────────────────────────────────────────
+
+
+@router.get("/cleanup-config", response_model=CleanupConfigOut)
+def get_cleanup_config() -> CleanupConfigOut:
+    values = config_service.get_cleanup_config(
+        settings.cleanup_enabled, settings.cleanup_days
+    )
+    return CleanupConfigOut(**values)
+
+
+@router.post("/cleanup-config", response_model=CleanupConfigOut)
+def update_cleanup_config(
+    payload: CleanupConfigIn, user=Depends(require_admin)
+) -> CleanupConfigOut:
+    values = config_service.update_cleanup_config(
+        payload.cleanup_enabled,
+        payload.cleanup_days,
+        default_enabled=settings.cleanup_enabled,
+        default_days=settings.cleanup_days,
+    )
+    settings.cleanup_enabled = values["cleanup_enabled"]
+    settings.cleanup_days = values["cleanup_days"]
+    return CleanupConfigOut(**values)

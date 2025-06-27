@@ -65,3 +65,13 @@ class AdminStatsOut(BaseModel):
 class TokenOut(BaseModel):
     access_token: str
     token_type: str
+
+
+class CleanupConfigOut(BaseModel):
+    cleanup_enabled: bool
+    cleanup_days: int
+
+
+class CleanupConfigIn(BaseModel):
+    cleanup_enabled: Optional[bool] = None
+    cleanup_days: Optional[int] = None

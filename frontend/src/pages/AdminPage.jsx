@@ -5,19 +5,15 @@ import { useDispatch } from "react-redux";
 import { addToast } from "../store";
 import StatsPanel from "../components/StatsPanel";
 import Button from "../components/Button";
-import LinkButton from "../components/LinkButton";
-import { List, ListItem } from "../components/List";
 import PageContainer from "../components/PageContainer";
 import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 export default function AdminPage() {
   const api = useApi();
   const dispatch = useDispatch();
   const { token } = useContext(AuthContext);
-  const [logs, setLogs] = useState([]);
-  const [uploads, setUploads] = useState([]);
-  const [transcripts, setTranscripts] = useState([]);
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
-  const [refreshToggle, setRefreshToggle] = useState(false);
   const [cleanupEnabled, setCleanupEnabled] = useState(false);
   const [cleanupDays, setCleanupDays] = useState(30);
   const [systemLog, setSystemLog] = useState("Loading log...");
@@ -40,18 +36,6 @@ useEffect(() => {
   return () => clearInterval(id);              // cleanup on unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
-
-  const fetchFiles = async () => {
-    try {
-      const data = await api.get("/admin/files");
-      setLogs(data.logs || []);
-      setUploads(data.uploads || []);
-      setTranscripts(data.transcripts || []);
-      dispatch(addToast("File lists refreshed.", "success"));
-    } catch {
-      dispatch(addToast("Failed to load file listings.", "error"));
-    }
-  };
 
   const fetchCleanupConfig = async () => {
     try {
@@ -97,25 +81,10 @@ useEffect(() => {
   }, [token]);
 
   useEffect(() => {
-    fetchFiles();
     fetchCleanupConfig();
-  }, [refreshToggle]);
+  }, []);
 
 
-  const handleDelete = async (dir, filename) => {
-    const confirmed = window.confirm(`Delete ${filename} from ${dir}?`);
-    if (!confirmed) return;
-    try {
-      await api.del("/admin/files", {
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folder: dir, filename })
-      });
-      dispatch(addToast(`Deleted ${filename} from ${dir}.`, "success"));
-      setRefreshToggle(prev => !prev);
-    } catch {
-      dispatch(addToast(`Failed to delete ${filename} from ${dir}.`, "error"));
-    }
-  };
 
   const handleReset = async () => {
     const confirmed = window.confirm(
@@ -125,7 +94,7 @@ useEffect(() => {
     try {
       await api.post("/admin/reset");
       dispatch(addToast("System reset complete.", "success"));
-      setRefreshToggle(prev => !prev);
+      fetchCleanupConfig();
     } catch {
       dispatch(addToast("Reset failed.", "error"));
     }
@@ -171,44 +140,6 @@ useEffect(() => {
     }
   };
 
-  const renderFileList = (title, list, dir) => (
-    <div style={{ marginBottom: "2rem" }}>
-      <h3 style={{ fontSize: "1.125rem", marginBottom: "0.5rem" }}>{title}</h3>
-      {list.length === 0 ? (
-        <p style={{ color: "#a1a1aa" }}>No files in {dir}/</p>
-      ) : (
-        <List>
-          {list.map((name) => (
-            <ListItem key={`${dir}-${name}`}>
-              {name}
-              <LinkButton
-                href={
-                  dir === "logs"
-                    ? `${API_HOST}/logs/${encodeURIComponent(name)}`
-                    : dir === "transcripts"
-                      ? `${API_HOST}/transcript/${encodeURIComponent(name.split("/")[0])}/view`
-                      : `${API_HOST}/${dir}/${encodeURIComponent(name)}`
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                color="#10b981"
-                style={{ marginLeft: "1rem", padding: "0.25rem 0.5rem" }}
-              >
-                View
-              </LinkButton>
-              <Button
-                onClick={() => handleDelete(dir, name)}
-                color="#dc2626"
-                style={{ marginLeft: "0.5rem", padding: "0.25rem 0.5rem" }}
-              >
-                Delete
-              </Button>
-            </ListItem>
-          ))}
-        </List>
-      )}
-    </div>
-  );
 
   return (
     <PageContainer>
@@ -235,10 +166,9 @@ useEffect(() => {
         </pre>
       </div>
 
-
-      {renderFileList("Logs", logs, "logs")}
-      {renderFileList("Uploads", uploads, "uploads")}
-      {renderFileList("Transcripts", transcripts, "transcripts")}
+      <Button onClick={() => navigate(ROUTES.FILE_BROWSER)} style={{ marginTop: "1rem" }}>
+        Browse Files
+      </Button>
 
       <div style={{ marginTop: "2rem" }}>
         <h3 style={{ fontSize: "1.125rem", marginBottom: "0.5rem" }}>Cleanup Settings</h3>

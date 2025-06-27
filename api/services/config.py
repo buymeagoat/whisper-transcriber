@@ -51,3 +51,17 @@ def update_cleanup_config(
         "cleanup_enabled": default_enabled,
         "cleanup_days": default_days,
     }
+
+
+def get_concurrency(default: int) -> int:
+    """Return the stored concurrency value or the provided default."""
+
+    value = get_value("max_concurrent_jobs")
+    return default if value is None else int(value)
+
+
+def update_concurrency(value: int) -> int:
+    """Persist and return the new concurrency limit."""
+
+    set_value("max_concurrent_jobs", str(value))
+    return value

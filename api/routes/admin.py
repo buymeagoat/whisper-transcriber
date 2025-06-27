@@ -15,9 +15,16 @@ from api.models import Job, JobStatusEnum
 from api.orm_bootstrap import SessionLocal
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
 from api.app_state import db_lock
+import api.app_state as app_state
+from api.services.job_queue import ThreadJobQueue
 from api.schemas import FileListOut, StatusOut, AdminStatsOut, BrowseOut
 from api.routes.auth import require_admin
-from api.schemas import CleanupConfigOut, CleanupConfigIn
+from api.schemas import (
+    CleanupConfigOut,
+    CleanupConfigIn,
+    ConcurrencyConfigOut,
+    ConcurrencyConfigIn,
+)
 from api.services import config as config_service
 from api.settings import settings
 
@@ -235,3 +242,26 @@ def update_cleanup_config(
     settings.cleanup_enabled = values["cleanup_enabled"]
     settings.cleanup_days = values["cleanup_days"]
     return CleanupConfigOut(**values)
+
+
+# ─── Concurrency Config Endpoints ───────────────────────────────────────────
+
+
+@router.get("/concurrency", response_model=ConcurrencyConfigOut)
+def get_concurrency() -> ConcurrencyConfigOut:
+    value = config_service.get_concurrency(settings.max_concurrent_jobs)
+    return ConcurrencyConfigOut(max_concurrent_jobs=value)
+
+
+@router.post("/concurrency", response_model=ConcurrencyConfigOut)
+def update_concurrency(
+    payload: ConcurrencyConfigIn, user=Depends(require_admin)
+) -> ConcurrencyConfigOut:
+    value = config_service.update_concurrency(payload.max_concurrent_jobs)
+    settings.max_concurrent_jobs = value
+    if settings.job_queue_backend == "thread" and isinstance(
+        app_state.job_queue, ThreadJobQueue
+    ):
+        app_state.job_queue.shutdown()
+        app_state.job_queue = ThreadJobQueue(value)
+    return ConcurrencyConfigOut(max_concurrent_jobs=value)

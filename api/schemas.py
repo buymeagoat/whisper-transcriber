@@ -85,6 +85,16 @@ class CleanupConfigIn(BaseModel):
     cleanup_days: Optional[int] = None
 
 
+class ConcurrencyConfigOut(BaseModel):
+    """Current concurrency setting."""
+
+    max_concurrent_jobs: int
+
+
+class ConcurrencyConfigIn(BaseModel):
+    max_concurrent_jobs: int
+
+
 class UserOut(BaseModel):
     id: int
     username: str

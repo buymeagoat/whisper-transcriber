@@ -62,7 +62,7 @@ object used throughout the code base. Available variables are:
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint.
 - `SECRET_KEY` – secret for JWT signing.
 - `ACCESS_TOKEN_EXPIRE_MINUTES` – JWT lifetime.
-- `MAX_CONCURRENT_JOBS` – worker thread count for the internal queue.
+- `MAX_CONCURRENT_JOBS` – worker thread count for the internal queue. This value can be changed at runtime via `/admin/concurrency`.
 - `JOB_QUEUE_BACKEND` – queue implementation (`thread` by default).
 - `STORAGE_BACKEND` – where uploads and transcripts are stored.
 - `LOCAL_STORAGE_DIR` – base directory for the local storage backend. Defaults
@@ -87,7 +87,7 @@ object used throughout the code base. Available variables are:
 
 ## API Overview
 - **Job management**: `POST /jobs` to upload, `GET /jobs` (with optional `search` query filtering by ID, filename or keywords) and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.
-- **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts and packaged binaries via `/admin/download-app/{os}`, resetting the system, configuring cleanup via `/admin/cleanup-config`, and retrieving CPU/memory stats plus job KPIs.
+- **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts and packaged binaries via `/admin/download-app/{os}`, resetting the system, configuring cleanup via `/admin/cleanup-config`, adjusting concurrency via `/admin/concurrency`, and retrieving CPU/memory stats plus job KPIs.
 - **Logging endpoints** expose job logs and the access log. If the access log does not exist, `/logs/access` returns a `404` with an empty body. Static files under `/uploads`, `/transcripts`, and `/static` are served directly.
 - **Log streaming**: connect to `/ws/logs/{job_id}` to receive new log lines in real time. The frontend's job log view opens this socket and appends each message as it arrives.
 - **System log streaming**: connect to `/ws/logs/system` to watch the access log or `system.log` in real time from the Admin page.
@@ -185,4 +185,5 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Local-time timestamps shown in the UI                                | Done      |                                  |                                 |                               |
 | Download transcripts as `.txt` (default in UI)                       | Done      |                                  |                                 |                               |
 | Directory browser API (`/admin/browse`)                              | Done   |                                  |                                 |                        |
-\nCleanup retention can be configured via the `/admin/cleanup-config` endpoint.
+Cleanup retention can be configured via the `/admin/cleanup-config` endpoint.
+The concurrency limit can be adjusted at runtime using `/admin/concurrency`.

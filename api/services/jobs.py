@@ -103,3 +103,31 @@ def update_job_status(job_id: str, status: JobStatusEnum) -> Optional[Job]:
             db.commit()
             db.refresh(job)
             return job
+
+
+def update_analysis(
+    job_id: str, summary: str, keywords: list[str] | str
+) -> TranscriptMetadata:
+    """Store analysis results in the metadata table."""
+    with db_lock:
+        with SessionLocal() as db:
+            metadata = db.query(TranscriptMetadata).filter_by(job_id=job_id).first()
+            if not metadata:
+                metadata = TranscriptMetadata(
+                    job_id=job_id,
+                    tokens=0,
+                    duration=0,
+                    abstract="",
+                    generated_at=datetime.utcnow(),
+                )
+                db.add(metadata)
+            metadata.summary = summary
+            kw_list = (
+                [k.strip() for k in keywords.split(",") if k.strip()]
+                if isinstance(keywords, str)
+                else keywords
+            )
+            metadata.keywords = ", ".join(kw_list)
+            db.commit()
+            db.refresh(metadata)
+            return metadata

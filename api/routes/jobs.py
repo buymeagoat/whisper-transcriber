@@ -15,9 +15,18 @@ from api.services.jobs import (
     get_metadata as service_get_metadata,
     delete_job as service_delete_job,
     update_job_status,
+    update_analysis,
 )
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
-from api.schemas import JobOut, JobListOut, MetadataOut, JobCreatedOut, StatusOut
+from api.schemas import (
+    JobOut,
+    JobListOut,
+    MetadataOut,
+    JobCreatedOut,
+    StatusOut,
+    AnalysisOut,
+)
+from api.services.analysis import analyze_text
 
 router = APIRouter()
 
@@ -147,6 +156,22 @@ def download_transcript(job_id: str, format: str = "srt"):
 
     original_name = f"{base_name}.srt"
     return FileResponse(path=srt_path, media_type="text/plain", filename=original_name)
+
+
+@router.post("/jobs/{job_id}/analyze", response_model=AnalysisOut)
+def analyze_job(job_id: str) -> AnalysisOut:
+    job = service_get_job(job_id)
+    if not job:
+        raise http_error(ErrorCode.JOB_NOT_FOUND)
+    if not job.transcript_path:
+        raise http_error(ErrorCode.FILE_NOT_FOUND)
+    path = Path(job.transcript_path)
+    if not path.exists():
+        raise http_error(ErrorCode.FILE_NOT_FOUND)
+    text = path.read_text(encoding="utf-8")
+    summary, keywords = analyze_text(text)
+    update_analysis(job_id, summary, keywords)
+    return AnalysisOut(summary=summary, keywords=keywords)
 
 
 @router.get("/transcript/{job_id}/view", response_class=HTMLResponse)

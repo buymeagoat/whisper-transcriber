@@ -56,6 +56,7 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `ENABLE_SERVER_CONTROL` – allow `/admin/shutdown` and `/admin/restart`
   endpoints (defaults to `false`).
 - `TIMEZONE` – local timezone name used for log timestamps (defaults to `UTC`).
+- `CORS_ORIGINS` – comma-separated list of origins allowed for CORS (defaults to `*`).
 - `WHISPER_BIN` – path to the Whisper CLI executable (defaults to `whisper`).
 - `WHISPER_LANGUAGE` – language code passed to Whisper (defaults to `en`).
 - `MODEL_DIR` – directory containing Whisper model files (defaults to `models/`).

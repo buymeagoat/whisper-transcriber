@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     cleanup_interval_seconds: int = Field(86400, env="CLEANUP_INTERVAL_SECONDS")
     enable_server_control: bool = Field(False, env="ENABLE_SERVER_CONTROL")
     timezone: str = Field("UTC", env="TIMEZONE")
+    cors_origins: str = Field("*", env="CORS_ORIGINS")
 
     # Not configurable via environment
     algorithm: str = "HS256"

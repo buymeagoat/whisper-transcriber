@@ -33,7 +33,7 @@ backend_log = get_logger("backend")
 ACCESS_LOG = LOG_DIR / "access.log"
 
 # ─── Whisper CLI Check ───
-WHISPER_BIN = shutil.which("whisper")
+WHISPER_BIN = shutil.which(settings.whisper_bin)
 
 # ─── DB Lock ───
 db_lock = threading.RLock()
@@ -76,7 +76,7 @@ def handle_whisper(
     from api.orm_bootstrap import SessionLocal
 
     global WHISPER_BIN
-    WHISPER_BIN = WHISPER_BIN or shutil.which("whisper")
+    WHISPER_BIN = WHISPER_BIN or shutil.which(settings.whisper_bin)
     if not WHISPER_BIN:
         raise RuntimeError(
             "Whisper CLI not found in PATH. Is it installed and in the environment?"
@@ -115,7 +115,7 @@ def handle_whisper(
                 "--output_format",
                 "srt",
                 "--language",
-                "en",
+                settings.whisper_language,
                 "--verbose",
                 "True",
             ]

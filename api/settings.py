@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     local_storage_dir: str = Field(
         default=str(Path(__file__).resolve().parent.parent), env="LOCAL_STORAGE_DIR"
     )
+    whisper_bin: str = Field("whisper", env="WHISPER_BIN")
+    whisper_language: str = Field("en", env="WHISPER_LANGUAGE")
+    model_dir: str = Field(
+        default=str(Path(__file__).resolve().parent.parent / "models"),
+        env="MODEL_DIR",
+    )
     aws_access_key_id: str | None = Field(None, env="AWS_ACCESS_KEY_ID")
     aws_secret_access_key: str | None = Field(None, env="AWS_SECRET_ACCESS_KEY")
     s3_bucket: str | None = Field(None, env="S3_BUCKET")

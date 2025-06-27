@@ -56,6 +56,9 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `ENABLE_SERVER_CONTROL` – allow `/admin/shutdown` and `/admin/restart`
   endpoints (defaults to `false`).
 - `TIMEZONE` – local timezone name used for log timestamps (defaults to `UTC`).
+- `WHISPER_BIN` – path to the Whisper CLI executable (defaults to `whisper`).
+- `WHISPER_LANGUAGE` – language code passed to Whisper (defaults to `en`).
+- `MODEL_DIR` – directory containing Whisper model files (defaults to `models/`).
 
 Configuration values are provided by `api/settings.py` using Pydantic's
 `BaseSettings`. An instance named `settings` is imported by the rest of the
@@ -187,7 +190,7 @@ The API offers several management routes that are restricted to users with the
 - Toast notifications show the result of actions across all pages.
 - Admins can manage user roles from the Settings page.
 - Cleanup options can be toggled and saved from the Admin page.
-- `models/` exists locally only and is never stored in Git. It must contain the Whisper `.pt` files before building or running the app. Ensure the files are present before building the Docker image.
+- `MODEL_DIR` points to the directory that holds the Whisper `.pt` files. The default is `models/`, ignored by Git. Populate this directory before building or running the application.
 - `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are
   written to `transcripts/`. Per-job logs and the system log live in `logs/`.
@@ -196,9 +199,9 @@ When `STORAGE_BACKEND=cloud`, these folders act as a cache and transcript files
 
 ## Docker Usage
 
-Docker builds expect a populated `models/` directory and the compiled
+Docker builds expect a populated directory containing the Whisper models specified by `MODEL_DIR` along with the compiled
 `frontend/dist/` folder. During the build the Python script
-`validate_models_dir()` checks the `models/` directory so missing Whisper
+`validate_models_dir()` checks this directory so missing Whisper
 models fail the build early. Both directories are ignored by Git so they must
 be prepared manually before running `docker build`. Example:
 ```bash

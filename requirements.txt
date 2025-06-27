@@ -27,6 +27,7 @@ torch>=2.2.2
 
 # --- Audio helpers ---
 pydub>=0.25.1
+pyttsx3>=2.90
 
 # --- .env file support ---
 python-dotenv>=1.1.0

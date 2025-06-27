@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { ROUTES } from "../routes";
 import { useApi } from "../api";
 import { useDispatch } from "react-redux";
 import { addToast } from "../store";
 import StatsPanel from "../components/StatsPanel";
+import { AuthContext } from "../context/AuthContext";
 export default function AdminPage() {
   const api = useApi();
   const dispatch = useDispatch();
+  const { token } = useContext(AuthContext);
   const [logs, setLogs] = useState([]);
   const [uploads, setUploads] = useState([]);
   const [transcripts, setTranscripts] = useState([]);
@@ -14,6 +16,8 @@ export default function AdminPage() {
   const [refreshToggle, setRefreshToggle] = useState(false);
   const [cleanupEnabled, setCleanupEnabled] = useState(false);
   const [cleanupDays, setCleanupDays] = useState(30);
+  const [systemLog, setSystemLog] = useState("Loading log...");
+  const [systemUpdated, setSystemUpdated] = useState(null);
  const API_HOST = ROUTES.API;
 
   const fetchStats = async () => {
@@ -54,6 +58,39 @@ useEffect(() => {
       dispatch(addToast("Failed to load cleanup settings.", "error"));
     }
   };
+
+  useEffect(() => {
+    let ws;
+    const fetchLog = async () => {
+      try {
+        const data = await api.get("/logs/access");
+        if (typeof data === "string") {
+          setSystemLog(data);
+        }
+      } catch {
+        try {
+          const data = await api.get("/logs/system.log");
+          if (typeof data === "string") {
+            setSystemLog(data);
+          }
+        } catch {
+          setSystemLog("Failed to load log");
+        }
+      }
+    };
+
+    fetchLog();
+
+    const wsUrl = `${ROUTES.API.replace(/^http/, "ws")}/ws/logs/system?token=${token}`;
+    ws = new WebSocket(wsUrl);
+    ws.onmessage = (ev) => {
+      setSystemLog((prev) => prev + ev.data);
+      setSystemUpdated(new Date().toLocaleTimeString());
+    };
+    return () => {
+      if (ws) ws.close();
+    };
+  }, [token]);
 
   useEffect(() => {
     fetchFiles();
@@ -190,6 +227,24 @@ useEffect(() => {
             {/* NEW stats read-out */}
       <StatsPanel stats={stats} />
 
+      <div style={{ marginTop: "1rem" }}>
+        <h3 style={{ fontSize: "1.125rem", marginBottom: "0.5rem" }}>System Log</h3>
+        <div style={{ fontSize: "0.85rem", color: "#a1a1aa", marginBottom: "0.5rem" }}>
+          Streaming log via WebSocket
+          {systemUpdated && <span> — Last updated at {systemUpdated}</span>}
+        </div>
+        <pre
+          style={{
+            backgroundColor: "#27272a",
+            padding: "1rem",
+            maxHeight: "40vh",
+            overflowY: "scroll",
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {systemLog}
+        </pre>
+      </div>
 
 
       {renderFileList("Logs", logs, "logs")}

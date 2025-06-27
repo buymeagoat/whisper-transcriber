@@ -41,6 +41,28 @@ async def websocket_job_log(
         pass
 
 
+@router.websocket("/ws/logs/system")
+async def websocket_system_log(
+    websocket: WebSocket, user: User = Depends(get_current_user)
+):
+    """Stream the access log or fallback system log to the client."""
+    await websocket.accept()
+    position = 0
+    try:
+        while True:
+            log_path = ACCESS_LOG if ACCESS_LOG.exists() else LOG_DIR / "system.log"
+            if log_path.exists():
+                with log_path.open("r", encoding="utf-8") as f:
+                    f.seek(position)
+                    data = f.read()
+                    if data:
+                        await websocket.send_text(data)
+                        position = f.tell()
+            await asyncio.sleep(1)
+    except WebSocketDisconnect:
+        pass
+
+
 @router.post("/log_event", response_model=StatusOut)
 async def log_event(request: Request) -> StatusOut:
     try:

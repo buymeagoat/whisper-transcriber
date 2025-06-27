@@ -15,8 +15,8 @@ from api.utils.model_validation import validate_models_dir
 from api.router_setup import register_routes
 from api.middlewares.access_log import access_logger
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
+from api.utils.db_lock import db_lock
 from api.app_state import (
-    db_lock,
     handle_whisper,
     LOCAL_TZ,
     backend_log,

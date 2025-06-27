@@ -4,7 +4,7 @@ from typing import Optional
 
 from api.models import ConfigEntry
 from api.orm_bootstrap import SessionLocal
-from api.app_state import db_lock
+from api.utils.db_lock import db_lock
 
 
 def get_value(key: str) -> Optional[str]:

@@ -124,6 +124,10 @@ endpoints. The server now pushes real-time status messages so the UI updates
 immediately with friendlier labels. Messages reflect the `queued`, `processing`,
 `enriching` and final `completed` or `failed` states.
 
+### Logs WebSocket
+
+Open `/ws/logs/{job_id}` to stream log output for a running job. The frontend's log viewer subscribes to this socket and appends new lines as they arrive.
+
 ### Example Job Response
 
 Calls like `GET /jobs/{id}` now return Pydantic models. A typical response
@@ -168,6 +172,7 @@ The API offers several management routes that are restricted to users with the
 
 - Real-time job status messages appear in the UI via the progress WebSocket with
   friendlier labels for each state.
+- Job logs stream live to the browser using `/ws/logs/{job_id}` on the log view page.
 - Toast notifications show the result of actions across all pages.
 - Admins can manage user roles from the Settings page.
 - `models/` exists locally only and is never stored in Git. It must contain the Whisper `.pt` files before building or running the app. Ensure the files are present before building the Docker image.

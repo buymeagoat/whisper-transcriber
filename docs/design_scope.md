@@ -76,6 +76,7 @@ object used throughout the code base. Available variables are:
 - **Job management**: `POST /jobs` to upload, `GET /jobs` and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.
 - **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts, resetting the system, and retrieving CPU/memory stats plus job KPIs.
 - **Logging endpoints** expose job logs and the access log. If the access log does not exist, `/logs/access` returns a `404` with an empty body. Static files under `/uploads`, `/transcripts`, and `/static` are served directly.
+- **Log streaming**: connect to `/ws/logs/{job_id}` to receive new log lines in real time. The frontend's job log view opens this socket and appends each message as it arrives.
 - **Authentication**: obtain tokens via `/token` using credentials stored in the `users` table. Accounts can be created through `/register` when enabled. Each user has a `role` of `admin` or `user`. The `/admin` and `/metrics` routes are restricted to admins.
 
 ## Migrations and Logging
@@ -133,7 +134,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Stop / Restart server from Admin                                     | Open      | Admin commands to stop and start | Risk of accidental shutdown     | Requires elevated permissions |
 | Shell/CLI access from admin page                                     | Open      | Web terminal component           | Security and sandboxing         | Major security risk           |
 | Resume jobs after crash or cancel                                    | Open      | Persist intermediate state       | Robust job recovery             | Complex state handling        |
-| Stream logs to UI via WebSocket                                      | Open      | Push log lines live              | Scalability of sockets          | None                          |
+| Stream logs to UI via WebSocket                                      | Done      | Push log lines live              | Scalability of sockets          | None                          |
 | UI progress bars with word-level timestamps                          | Open      | Parse SRT positions              | Frequent UI updates             | None                          |
 | Auto-delete old transcripts after 30 days                            | On Hold      | Background cleanup task          | Configurable retention          | None                          |
 | Workflow automation hooks                                            | Open      | Fire webhook on job completion   | Configurable URLs               | Security of hooks             |

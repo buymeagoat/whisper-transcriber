@@ -235,18 +235,19 @@ Build and start all services with:
 docker compose up --build
 ```
 
-To use Celery for job processing, set `JOB_QUEUE_BACKEND=broker` and start the
-`worker` service defined in `docker-compose.yml`:
+The compose file mounts the `uploads`, `transcripts`, `logs` and `models`
+directories so data and models persist between runs. It also configures
+Celery with RabbitMQ by setting `JOB_QUEUE_BACKEND=broker`,
+`CELERY_BROKER_URL` and `CELERY_BACKEND_URL` on the API and worker services.
+
+Start everything with:
 
 ```bash
-JOB_QUEUE_BACKEND=broker docker compose up --build api worker broker db
+docker compose up --build api worker broker db
 ```
 
-The worker container runs `python worker.py` and listens for tasks from RabbitMQ.
-
-The compose file mounts the `uploads`, `transcripts` and `logs` directories so
-data persists between runs. Once running, access the API at
-`http://localhost:8000`.
+The worker container runs `celery -A api.services.celery_app worker` to process
+jobs from RabbitMQ. Once running, access the API at `http://localhost:8000`.
 
 ## Testing
 

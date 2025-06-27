@@ -108,15 +108,15 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Admin dashboard KPIs                                                | Open   | Monitor throughput               | Metrics queries                 | None                        |
 | Role-based auth with settings page                                  | Open   | Restrict features per role       | Session handling, UI            | User management complexity    |
 | Download job archive (.zip)                                          | Open      | Zip existing logs and results    | Avoid large file memory use     | None                          |
-| Support `.vtt` transcript export                                     | Open      | Convert from SRT to VTT          | Extra dependency for conversion | None                          |
+| Support `.vtt` transcript export                                     | Done      | Convert from SRT to VTT          | Extra dependency for conversion | None                          |
 | Provide CLI wrapper for non-UI usage                                 | On Hold      | Wrapper script around API calls  | Package distribution            | None                          |
 | Improve status messaging in UI                                       | Done      | Real-time updates via progress WebSocket | Friendlier labels, localization | None                          |
 | Job runtime display (live & final)                                   | Open      | Track job start and end times    | Store runtime data              | None                          |
 | Admin panel health checks and job cleanup                            | Open      | Add checks and cleanup hooks     | Permission checks               | None                          |
-| Queue limit or concurrency throttle                                  | Open      | Throttle worker count            | Configurable limits             | None                          |
-| Docker Compose setup                                                 | Open      | Provide sample compose file      | Keep dev/prod parity            | None                          |
+| Queue limit or concurrency throttle                                  | Done      | Throttle worker count            | Configurable limits             | None                          |
+| Docker Compose setup                                                 | Done      | Provide sample compose file      | Keep dev/prod parity            | None                          |
 | Dashboard KPIs for throughput                                        | Open      | Show totals and averages         | Pull metrics from DB            | None                          |
-| Role-based authentication                                            | Open      | Add user roles table             | Password storage, security      | User management complexity    |
+| Role-based authentication                                            | Done      | Add user roles table             | Password storage, security      | User management complexity    |
 | Settings page to customize default model                             | Open      | UI for selecting models          | Persist user prefs              | None                          |
 | Allow multiple files per upload with validation                      | Open      | Adjust upload handler            | File size and concurrency       | None                          |
 | Web-based log viewer                                                 | Open      | Simple log tail view             | Log file rotation               | Large logs                    |

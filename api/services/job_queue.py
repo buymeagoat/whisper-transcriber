@@ -3,6 +3,16 @@ from __future__ import annotations
 import threading
 from queue import Queue
 from typing import Callable
+import time
+
+from prometheus_client import Counter, Gauge, Histogram
+
+# Prometheus metrics
+jobs_queued_total = Counter("jobs_queued_total", "Total jobs queued")
+jobs_in_progress = Gauge("jobs_in_progress", "Jobs currently executing")
+job_duration_seconds = Histogram(
+    "job_duration_seconds", "Time spent executing job in seconds"
+)
 from abc import ABC, abstractmethod
 
 
@@ -34,12 +44,18 @@ class ThreadJobQueue(JobQueue):
         while not self._shutdown.is_set():
             func = self._queue.get()
             try:
+                jobs_in_progress.inc()
+                start = time.perf_counter()
                 func()
             finally:
+                duration = time.perf_counter() - start
+                job_duration_seconds.observe(duration)
+                jobs_in_progress.dec()
                 self._queue.task_done()
 
     def enqueue(self, func: Callable[[], None]) -> None:
         """Add a callable to be executed by the worker pool."""
+        jobs_queued_total.inc()
         self._queue.put(func)
 
     def join(self) -> None:

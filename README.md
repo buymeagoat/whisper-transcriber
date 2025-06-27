@@ -98,6 +98,12 @@ The backend exposes Prometheus metrics at `/metrics`. This and all `/admin`
 endpoints require an `admin` role. Authenticate with the JWT token obtained from
 the `/token` endpoint and send it as `Authorization: Bearer <token>`.
 
+Available metrics:
+
+- `jobs_queued_total` – Counter of jobs submitted to the queue
+- `jobs_in_progress` – Gauge tracking currently executing jobs
+- `job_duration_seconds` – Histogram of job execution time
+
 ### Health & Version
 
 Use `/health` to check server status. `/version` returns the current application version.

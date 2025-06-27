@@ -1,11 +1,20 @@
 import pickle
 from unittest.mock import patch
 
-from api.services.job_queue import ThreadJobQueue, BrokerJobQueue
+from api.services.job_queue import (
+    ThreadJobQueue,
+    BrokerJobQueue,
+    jobs_queued_total,
+    jobs_in_progress,
+    job_duration_seconds,
+)
 
 
 def test_thread_job_queue_executes_job():
     calls = []
+
+    start_queued = jobs_queued_total._value.get()
+    start_duration = job_duration_seconds._count.get()
 
     def task():
         calls.append(1)
@@ -13,7 +22,11 @@ def test_thread_job_queue_executes_job():
     q = ThreadJobQueue(1)
     q.enqueue(task)
     q.join()
+
     assert calls == [1]
+    assert jobs_queued_total._value.get() == start_queued + 1
+    assert jobs_in_progress._value.get() == 0
+    assert job_duration_seconds._count.get() == start_duration + 1
 
 
 def sample_task():

@@ -173,11 +173,15 @@ To obtain all artifacts for a single job, call `/jobs/{id}/archive`. This return
 
 ### Admin Endpoints
 
-The API offers several management routes that are restricted to users with the
+- The API offers several management routes that are restricted to users with the
 `admin` role:
 
-- `GET /admin/files` – list log, upload and transcript files on the server.
-- `GET /admin/browse` – inspect directories under logs, uploads or transcripts.
+- `GET /admin/files` – list top-level folders for logs, uploads and transcripts.
+- `GET /admin/browse` – return the contents of a folder. Pass `folder` (`logs`,
+  `uploads` or `transcripts`) and an optional `path` to drill down into
+  subdirectories. The Admin page now features a file browser powered by this
+  endpoint where files can be viewed, downloaded or deleted. The previous inline
+  file lists have been removed.
 - `POST /admin/reset` – remove all jobs and related files.
 - `GET /admin/download-all` – download every file as a single ZIP archive.
 - `GET /admin/cleanup-config` – retrieve current cleanup settings.
@@ -185,6 +189,11 @@ The API offers several management routes that are restricted to users with the
 - `GET /admin/stats` – return CPU/memory usage along with completed job count, average processing time and queue length.
 - `POST /admin/shutdown` – stop the server process.
 - `POST /admin/restart` – restart the running server.
+
+The Admin page provides a full file browser built on these endpoints. Choose a
+folder and click directories to drill down. Each file entry includes buttons to
+view, download or delete it. This replaces the old inline lists that previously
+displayed all files at once.
 
 ## Usage Notes
 

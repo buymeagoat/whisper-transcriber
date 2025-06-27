@@ -32,7 +32,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `SECRET_KEY` – secret used to sign JWT tokens.
 - `ACCESS_TOKEN_EXPIRE_MINUTES` – token lifetime in minutes.
 - `MAX_CONCURRENT_JOBS` – number of worker threads when using the built-in job
-  queue. Defaults to `2`.
+  queue. Defaults to `2`. This value limits how many jobs can run in parallel
+  so heavy workloads don't overwhelm the host.
 - `JOB_QUEUE_BACKEND` – select the queue implementation. `thread` uses an
   internal worker pool while `broker` allows hooking into an external system
   like Celery.
@@ -156,6 +157,9 @@ parameter supports `srt` (default), `txt` for plain text, and `vtt` for WebVTT.
 The React UI downloads transcripts in plain text by default using
 `?format=txt`. This default can be overridden with the `VITE_DEFAULT_TRANSCRIPT_FORMAT`
 build variable or by storing a `downloadFormat` value in `localStorage`.
+
+To obtain all artifacts for a single job, call `/jobs/{id}/archive`. This returns
+ a `.zip` file containing the transcript, metadata and job log.
 
 ### Admin Endpoints
 

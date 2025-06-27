@@ -1,7 +1,9 @@
 from pathlib import Path
 
+from datetime import datetime
+
 from api.orm_bootstrap import SessionLocal
-from api.models import Job, JobStatusEnum
+from api.models import Job, JobStatusEnum, TranscriptMetadata
 from api.paths import TRANSCRIPTS_DIR
 
 
@@ -41,3 +43,60 @@ def test_job_lifecycle(client, sample_wav):
     assert resp.json()["status"] == "deleted"
     with SessionLocal() as db:
         assert db.query(Job).get(job_id) is None
+
+
+def test_list_jobs_search_filter(client, sample_wav):
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/jobs",
+            data={"model": "base"},
+            files={"file": ("alpha.wav", f, "audio/wav")},
+        )
+    job_id_a = resp.json()["job_id"]
+
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/jobs",
+            data={"model": "base"},
+            files={"file": ("beta.wav", f, "audio/wav")},
+        )
+    job_id_b = resp.json()["job_id"]
+
+    with SessionLocal() as db:
+        db.add(
+            TranscriptMetadata(
+                job_id=job_id_a,
+                tokens=1,
+                duration=1,
+                abstract="a",
+                keywords="meeting alpha",
+                generated_at=datetime.utcnow(),
+            )
+        )
+        db.add(
+            TranscriptMetadata(
+                job_id=job_id_b,
+                tokens=1,
+                duration=1,
+                abstract="b",
+                keywords="beta notes",
+                generated_at=datetime.utcnow(),
+            )
+        )
+        db.commit()
+
+    resp = client.get("/jobs?search=alpha")
+    assert len(resp.json()) == 1
+    assert resp.json()[0]["id"] == job_id_a
+
+    resp = client.get(f"/jobs?search={job_id_b[:8]}")
+    assert len(resp.json()) == 1
+    assert resp.json()[0]["id"] == job_id_b
+
+    resp = client.get("/jobs?search=meeting")
+    assert len(resp.json()) == 1
+    assert resp.json()[0]["id"] == job_id_a
+
+    resp = client.get("/jobs?search=notes")
+    assert len(resp.json()) == 1
+    assert resp.json()[0]["id"] == job_id_b

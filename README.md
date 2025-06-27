@@ -159,6 +159,13 @@ resembles:
 Timestamps returned by the API are in UTC (note the trailing `Z`).
 The web UI converts them to your local timezone for display.
 
+### Listing Jobs
+
+`GET /jobs` now accepts an optional `search` query parameter. When provided, the
+backend filters jobs whose ID, original filename or transcript keywords contain
+the given value (case-insensitive). The Completed Jobs page includes a search
+box that submits this parameter.
+
 ### Transcript Downloads
 
 Use `/jobs/{id}/download` to retrieve the transcript. The optional `format`
@@ -203,6 +210,8 @@ displayed all files at once.
 - The Admin page shows the system log via `/ws/logs/system`.
 - Toast notifications show the result of actions across all pages.
 - Admins can manage user roles from the Settings page.
+- The Completed Jobs page provides a search box that filters results using the
+  `search` query parameter on `/jobs`.
 - Cleanup options can be toggled and saved from the Admin page.
 - `MODEL_DIR` points to the directory that holds the Whisper `.pt` files. The default is `models/`, ignored by Git. Populate this directory before building or running the application.
 - `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.

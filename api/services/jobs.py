@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List, Optional
 
+from sqlalchemy import or_
+
 from api.models import Job, JobStatusEnum, TranscriptMetadata
 from api.orm_bootstrap import SessionLocal
 from api.app_state import db_lock
@@ -32,10 +34,22 @@ def create_job(
             return job
 
 
-def list_jobs() -> List[Job]:
-    """Return all jobs ordered by creation time descending."""
+def list_jobs(search: Optional[str] = None) -> List[Job]:
+    """Return jobs optionally filtered by search string."""
     with SessionLocal() as db:
-        return db.query(Job).order_by(Job.created_at.desc()).all()
+        query = db.query(Job).outerjoin(
+            TranscriptMetadata, Job.id == TranscriptMetadata.job_id
+        )
+        if search:
+            pattern = f"%{search}%"
+            query = query.filter(
+                or_(
+                    Job.original_filename.ilike(pattern),
+                    Job.id.ilike(pattern),
+                    TranscriptMetadata.keywords.ilike(pattern),
+                )
+            )
+        return query.order_by(Job.created_at.desc()).all()
 
 
 def get_job(job_id: str) -> Optional[Job]:

@@ -191,6 +191,7 @@ To obtain all artifacts for a single job, call `/jobs/{id}/archive`. This return
   file lists have been removed.
 - `POST /admin/reset` – remove all jobs and related files.
 - `GET /admin/download-all` – download every file as a single ZIP archive.
+- `GET /admin/download-app/{os}` – download a packaged binary for `windows` or `linux`.
 - `GET /admin/cleanup-config` – retrieve current cleanup settings.
 - `POST /admin/cleanup-config` – update cleanup settings.
 - `GET /admin/stats` – return CPU/memory usage along with completed job count, average processing time and queue length.
@@ -221,6 +222,18 @@ displayed all files at once.
   written to `transcripts/`. Per-job logs and the system log live in `logs/`.
 When `STORAGE_BACKEND=cloud`, these folders act as a cache and transcript files
   are downloaded from S3 when accessed.
+
+## Building Packages
+
+Helper scripts under `scripts/` produce distributable binaries:
+
+```bash
+scripts/build_windows_exe.sh  # creates dist/whisper-transcriber.exe
+scripts/build_rpm.sh          # creates dist/whisper-transcriber.rpm
+```
+
+Admins can fetch these files from `/admin/download-app/{os}` by specifying
+`windows` or `linux`.
 
 ## Docker Usage
 

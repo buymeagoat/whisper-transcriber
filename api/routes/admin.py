@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
 import io
 import shutil
 import zipfile
@@ -123,6 +123,25 @@ def download_all(user=Depends(require_admin)):
         media_type="application/zip",
         headers={"Content-Disposition": "attachment; filename=all_data.zip"},
     )
+
+
+@router.get("/download-app/{os}")
+def download_app(os: str, user=Depends(require_admin)):
+    """Serve prebuilt binaries for admins."""
+    name_map = {
+        "windows": "whisper-transcriber.exe",
+        "linux": "whisper-transcriber.rpm",
+    }
+    if os not in name_map:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Unsupported OS"
+        )
+    file_path = Path("dist") / name_map[os]
+    if not file_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Package not found"
+        )
+    return FileResponse(file_path, filename=file_path.name)
 
 
 @router.get("/stats", response_model=AdminStatsOut)

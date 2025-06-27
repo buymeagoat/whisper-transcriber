@@ -35,8 +35,9 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `SECRET_KEY` – secret used to sign JWT tokens.
 - `ACCESS_TOKEN_EXPIRE_MINUTES` – token lifetime in minutes.
 - `MAX_CONCURRENT_JOBS` – number of worker threads when using the built-in job
-  queue. Defaults to `2`. This value limits how many jobs can run in parallel
-  so heavy workloads don't overwhelm the host.
+  queue. Defaults to `2`. The value can also be changed at runtime via
+  `/admin/concurrency` and limits how many jobs can run in parallel so heavy
+  workloads don't overwhelm the host.
 - `JOB_QUEUE_BACKEND` – select the queue implementation. `thread` uses an
   internal worker pool while `broker` allows hooking into an external system
   like Celery.
@@ -210,6 +211,8 @@ returns the path to this new file.
 - `GET /admin/download-app/{os}` – download a packaged binary for `windows` or `linux`.
 - `GET /admin/cleanup-config` – retrieve current cleanup settings.
 - `POST /admin/cleanup-config` – update cleanup settings.
+- `GET /admin/concurrency` – show the current worker concurrency limit.
+- `POST /admin/concurrency` – update the concurrency limit.
 - `GET /admin/stats` – return CPU/memory usage along with completed job count, average processing time and queue length.
 - `POST /admin/shutdown` – stop the server process.
 - `POST /admin/restart` – restart the running server.

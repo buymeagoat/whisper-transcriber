@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ROUTES, getTranscriptDownloadUrl } from "../routes";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchJobs, deleteJob, selectJobs, addToast } from "../store";
+import { useApi } from "../api";
 import { STATUS_LABELS } from "../statusLabels";
 import PageContainer from "../components/PageContainer";
 import Button from "../components/Button";
@@ -9,6 +10,7 @@ import { Table, Th, Td } from "../components/Table";
 
 export default function CompletedJobsPage() {
   const dispatch = useDispatch();
+  const api = useApi();
   const [search, setSearch] = useState("");
   const jobs = useSelector(selectJobs);
 
@@ -24,6 +26,16 @@ export default function CompletedJobsPage() {
 
   const handleDownloadTranscript = (jobId) => {
     window.open(getTranscriptDownloadUrl(jobId), "_blank");
+  };
+
+  const handleListen = async (jobId) => {
+    try {
+      const data = await api.post(`/tts/${jobId}`);
+      const audio = new Audio(`${ROUTES.API}${data.path}`);
+      audio.play();
+    } catch {
+      dispatch(addToast("Failed to generate audio", "error"));
+    }
   };
 
   const handleDelete = async (jobId) => {
@@ -78,6 +90,7 @@ export default function CompletedJobsPage() {
                 <Td style={{ display: "flex", gap: "0.5rem" }}>
                   <Button title={`Job ID: ${job.id}`} onClick={() => handleView(job.id)}>View</Button>
                   <Button color="#16a34a" onClick={() => handleDownloadTranscript(job.id)}>Download</Button>
+                  <Button color="#0ea5e9" onClick={() => handleListen(job.id)}>Listen</Button>
                   <Button color="#dc2626" onClick={() => handleDelete(job.id)}>Delete</Button>
                 </Td>
               </tr>

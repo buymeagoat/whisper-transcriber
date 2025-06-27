@@ -15,7 +15,7 @@ from api.models import Job, JobStatusEnum
 from api.orm_bootstrap import SessionLocal
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
 from api.app_state import db_lock
-from api.schemas import FileListOut, StatusOut, AdminStatsOut
+from api.schemas import FileListOut, StatusOut, AdminStatsOut, BrowseOut
 from api.routes.auth import require_admin
 from api.schemas import CleanupConfigOut, CleanupConfigIn
 from api.services import config as config_service
@@ -36,6 +36,36 @@ def list_admin_files(user=Depends(require_admin)) -> FileListOut:
     return FileListOut(logs=logs, uploads=uploads, transcripts=transcripts)
 
 
+@router.get("/browse", response_model=BrowseOut)
+def browse_files(
+    folder: str, path: str | None = None, user=Depends(require_admin)
+) -> BrowseOut:
+    folder_map = {
+        "logs": LOG_DIR,
+        "uploads": UPLOAD_DIR,
+        "transcripts": TRANSCRIPTS_DIR,
+    }
+    if folder not in folder_map:
+        raise http_error(ErrorCode.FILE_SAVE_FAILED)
+    base = folder_map[folder].resolve()
+    target = (base / path).resolve() if path else base
+    try:
+        target.relative_to(base)
+    except ValueError:
+        raise http_error(ErrorCode.FILE_NOT_FOUND)
+    if not target.exists() or not target.is_dir():
+        raise http_error(ErrorCode.FILE_NOT_FOUND)
+
+    directories = []
+    files = []
+    for entry in target.iterdir():
+        if entry.is_dir():
+            directories.append(entry.name)
+        elif entry.is_file():
+            files.append(entry.name)
+    return BrowseOut(directories=sorted(directories), files=sorted(files))
+
+
 @router.delete("/files", response_model=StatusOut)
 def delete_admin_file(payload: dict, user=Depends(require_admin)) -> StatusOut:
     folder = payload.get("folder")
@@ -47,7 +77,12 @@ def delete_admin_file(payload: dict, user=Depends(require_admin)) -> StatusOut:
     }
     if folder not in folder_map or not filename:
         raise http_error(ErrorCode.FILE_SAVE_FAILED)
-    target = folder_map[folder] / filename
+    base = folder_map[folder].resolve()
+    target = (base / filename).resolve()
+    try:
+        target.relative_to(base)
+    except ValueError:
+        raise http_error(ErrorCode.FILE_NOT_FOUND)
     if not target.exists() or not target.is_file():
         raise http_error(ErrorCode.FILE_NOT_FOUND)
     target.unlink()

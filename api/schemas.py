@@ -56,6 +56,11 @@ class FileListOut(BaseModel):
     transcripts: list[str]
 
 
+class BrowseOut(BaseModel):
+    directories: list[str]
+    files: list[str]
+
+
 class AdminStatsOut(BaseModel):
     cpu_percent: float
     mem_used_mb: float

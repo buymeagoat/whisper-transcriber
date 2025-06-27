@@ -54,6 +54,9 @@ object used throughout the code base. Available variables are:
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – log level for backend loggers.
 - `LOG_TO_STDOUT` – mirror logs to the console when `true`.
+- `LOG_MAX_BYTES` – maximum size of log files before rotation (defaults to
+  `10000000`).
+- `LOG_BACKUP_COUNT` – number of rotated files to keep (defaults to `3`).
 - `AUTH_USERNAME` / `AUTH_PASSWORD` – *(deprecated)* old static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint.
 - `SECRET_KEY` – secret for JWT signing.

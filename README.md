@@ -39,6 +39,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `STORAGE_BACKEND` – choose where uploads and transcripts are stored. The
   default `local` backend writes to the filesystem. Set `cloud` to use an
   S3 bucket via the `CloudStorage` backend.
+- `LOCAL_STORAGE_DIR` – base directory used by the local backend. Defaults to
+  the repository root when unset.
 - `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` – credentials for accessing
   the bucket when using the cloud backend.
 - `S3_BUCKET` – name of the bucket to store uploads and transcripts.
@@ -172,6 +174,8 @@ The API offers several management routes that are restricted to users with the
 - `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are
   written to `transcripts/`. Per-job logs and the system log live in `logs/`.
+When `STORAGE_BACKEND=cloud`, these folders act as a cache and transcript files
+  are downloaded from S3 when accessed.
 
 ## Docker Usage
 

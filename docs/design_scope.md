@@ -26,6 +26,8 @@ The application is considered working once these basics are functional:
 - `uploads/` – user-uploaded audio files.
 - `transcripts/` – per‑job folders containing `.srt` results and metadata.
 - `logs/` – rotating log files for jobs and the system.
+- When `STORAGE_BACKEND=cloud` these directories serve as a local cache and
+  transcript files are synchronized from S3 when requested.
 - `models/` – directory for Whisper models. The folder is local only and never committed. It must contain `base.pt`, `large-v3.pt`, `medium.pt`, `small.pt`, and `tiny.pt` when building the image. The application checks for these files on startup. Ensure the directory contains the required models before running or building the container.
 - `frontend/` – React app built into `frontend/dist/` and copied by the Dockerfile
   to `api/static/` for the UI.
@@ -59,6 +61,8 @@ object used throughout the code base. Available variables are:
 - `MAX_CONCURRENT_JOBS` – worker thread count for the internal queue.
 - `JOB_QUEUE_BACKEND` – queue implementation (`thread` by default).
 - `STORAGE_BACKEND` – where uploads and transcripts are stored.
+- `LOCAL_STORAGE_DIR` – base directory for the local storage backend. Defaults
+  to the repository root.
 - `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` – credentials for the cloud
   storage backend.
 - `S3_BUCKET` – name of the bucket used by `CloudStorage`.

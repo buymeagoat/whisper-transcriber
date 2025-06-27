@@ -79,15 +79,6 @@ class LocalStorage(Storage):
     def get_transcript_dir(self, job_id: str) -> Path:
         path = self._transcripts_dir / job_id
         path.mkdir(parents=True, exist_ok=True)
-        prefix = f"transcripts/{job_id}/"
-        paginator = self.s3.get_paginator("list_objects_v2")
-        for page in paginator.paginate(Bucket=self.bucket, Prefix=prefix):
-            for obj in page.get("Contents", []):
-                key = obj["Key"]
-                rel = key[len(prefix) :]
-                local = path / rel
-                local.parent.mkdir(parents=True, exist_ok=True)
-                self.s3.download_file(self.bucket, key, str(local))
         return path
 
     def delete_transcript_dir(self, job_id: str) -> None:
@@ -151,6 +142,15 @@ class CloudStorage(Storage):
     def get_transcript_dir(self, job_id: str) -> Path:
         path = self._transcripts_dir / job_id
         path.mkdir(parents=True, exist_ok=True)
+        prefix = f"transcripts/{job_id}/"
+        paginator = self.s3.get_paginator("list_objects_v2")
+        for page in paginator.paginate(Bucket=self.bucket, Prefix=prefix):
+            for obj in page.get("Contents", []):
+                key = obj["Key"]
+                rel = key[len(prefix) :]
+                local = path / rel
+                local.parent.mkdir(parents=True, exist_ok=True)
+                self.s3.download_file(self.bucket, key, str(local))
         return path
 
     def delete_transcript_dir(self, job_id: str) -> None:

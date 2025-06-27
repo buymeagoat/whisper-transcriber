@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from pydantic import BaseSettings, Field, model_validator
+from pydantic import Field, model_validator
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):

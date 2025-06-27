@@ -30,6 +30,7 @@ pydub>=0.25.1
 
 # --- .env file support ---
 python-dotenv>=1.1.0
+pydantic-settings>=2.2.1
 
 # --- JSON performance boost (optional but auto-detected by FastAPI) ---
 orjson>=3.10.0

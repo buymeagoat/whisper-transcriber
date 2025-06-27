@@ -6,10 +6,12 @@ import { fetchJobs, deleteJob, restartJob, selectJobs, addToast } from "../store
 
 export default function FailedJobsPage() {
   const dispatch = useDispatch();
-  const jobs = useSelector(selectJobs).filter((j) => j.status.startsWith("failed"));
+  const jobs = useSelector(selectJobs);
 
   useEffect(() => {
-    dispatch(fetchJobs()).unwrap().catch(() => dispatch(addToast("Failed to load failed jobs", "error")));
+    dispatch(fetchJobs({ status: "failed" }))
+      .unwrap()
+      .catch(() => dispatch(addToast("Failed to load failed jobs", "error")));
   }, [dispatch]);
 
   const handleRestart = async (jobId) => {

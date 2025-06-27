@@ -12,7 +12,7 @@ export default function ActiveJobsPage() {
 
   useEffect(() => {
     const load = () =>
-      dispatch(fetchJobs())
+      dispatch(fetchJobs({ status: 'queued|processing|enriching' }))
         .unwrap()
         .then(() => setLastUpdated(new Date()))
         .catch(() => dispatch(addToast("Failed to load jobs", "error")));

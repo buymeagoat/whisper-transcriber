@@ -100,3 +100,48 @@ def test_list_jobs_search_filter(client, sample_wav):
     resp = client.get("/jobs?search=notes")
     assert len(resp.json()) == 1
     assert resp.json()[0]["id"] == job_id_b
+
+
+def test_list_jobs_status_filter(client, sample_wav):
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/jobs",
+            data={"model": "base"},
+            files={"file": ("a.wav", f, "audio/wav")},
+        )
+    job_a = resp.json()["job_id"]
+
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/jobs",
+            data={"model": "base"},
+            files={"file": ("b.wav", f, "audio/wav")},
+        )
+    job_b = resp.json()["job_id"]
+
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/jobs",
+            data={"model": "base"},
+            files={"file": ("c.wav", f, "audio/wav")},
+        )
+    job_c = resp.json()["job_id"]
+
+    with SessionLocal() as db:
+        db.query(Job).filter_by(id=job_b).update({"status": JobStatusEnum.COMPLETED})
+        db.query(Job).filter_by(id=job_c).update(
+            {"status": JobStatusEnum.FAILED_TIMEOUT}
+        )
+        db.commit()
+
+    resp = client.get("/jobs?status=queued")
+    assert [j["id"] for j in resp.json()] == [job_a]
+
+    resp = client.get("/jobs?status=completed")
+    assert [j["id"] for j in resp.json()] == [job_b]
+
+    resp = client.get("/jobs?status=failed")
+    assert [j["id"] for j in resp.json()] == [job_c]
+
+    resp = client.get("/jobs?status=queued|completed")
+    assert {j["id"] for j in resp.json()} == {job_a, job_b}

@@ -10,10 +10,12 @@ import { Table, Th, Td } from "../components/Table";
 export default function CompletedJobsPage() {
   const dispatch = useDispatch();
   const [search, setSearch] = useState("");
-  const jobs = useSelector(selectJobs).filter((j) => j.status === "completed");
+  const jobs = useSelector(selectJobs);
 
   useEffect(() => {
-    dispatch(fetchJobs(search)).unwrap().catch(() => dispatch(addToast("Failed to load completed jobs", "error")));
+    dispatch(fetchJobs({ search, status: "completed" }))
+      .unwrap()
+      .catch(() => dispatch(addToast("Failed to load completed jobs", "error")));
   }, [dispatch, search]);
 
   const handleView = (jobId) => {

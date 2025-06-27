@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     celery_backend_url: str = Field("rpc://", env="CELERY_BACKEND_URL")
     cleanup_enabled: bool = Field(True, env="CLEANUP_ENABLED")
     cleanup_days: int = Field(30, env="CLEANUP_DAYS")
+    cleanup_interval_seconds: int = Field(86400, env="CLEANUP_INTERVAL_SECONDS")
     enable_server_control: bool = Field(False, env="ENABLE_SERVER_CONTROL")
     timezone: str = Field("UTC", env="TIMEZONE")
 

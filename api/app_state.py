@@ -301,11 +301,11 @@ def cleanup_once() -> None:
             pass
 
 
-def _cleanup_task(interval: int = 86400) -> None:
+def _cleanup_task(interval: int = settings.cleanup_interval_seconds) -> None:
     while True:
         cleanup_once()
         threading.Event().wait(interval)
 
 
-def start_cleanup_thread(interval: int = 86400) -> None:
+def start_cleanup_thread(interval: int = settings.cleanup_interval_seconds) -> None:
     threading.Thread(target=_cleanup_task, args=(interval,), daemon=True).start()

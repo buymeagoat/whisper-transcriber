@@ -51,6 +51,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
   `true`.
 - `CLEANUP_DAYS` – how many days to keep transcripts when cleanup is enabled
   (defaults to `30`).
+- `CLEANUP_INTERVAL_SECONDS` – how often the cleanup task runs
+  (defaults to `86400`).
 - `ENABLE_SERVER_CONTROL` – allow `/admin/shutdown` and `/admin/restart`
   endpoints (defaults to `false`).
 - `TIMEZONE` – local timezone name used for log timestamps (defaults to `UTC`).

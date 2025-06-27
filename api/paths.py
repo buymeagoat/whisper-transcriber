@@ -28,5 +28,5 @@ storage = _init_storage()
 
 UPLOAD_DIR = storage.upload_dir
 TRANSCRIPTS_DIR = storage.transcripts_dir
-MODEL_DIR = BASE_DIR / "models"
+MODEL_DIR = Path(settings.model_dir)
 LOG_DIR = storage.log_dir

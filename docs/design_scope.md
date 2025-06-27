@@ -28,7 +28,7 @@ The application is considered working once these basics are functional:
 - `logs/` – rotating log files for jobs and the system.
 - When `STORAGE_BACKEND=cloud` these directories serve as a local cache and
   transcript files are synchronized from S3 when requested.
-- `models/` – directory for Whisper models. The folder is local only and never committed. It must contain `base.pt`, `large-v3.pt`, `medium.pt`, `small.pt`, and `tiny.pt` when building the image. The application checks for these files on startup. Ensure the directory contains the required models before running or building the container.
+ - `MODEL_DIR` specifies where the Whisper models are stored. By default this directory is `models/` which is local only and never committed. It must contain `base.pt`, `large-v3.pt`, `medium.pt`, `small.pt`, and `tiny.pt` when building the image. The application checks for these files on startup.
 - `frontend/` – React app built into `frontend/dist/` and copied by the Dockerfile
   to `api/static/` for the UI.
 
@@ -76,6 +76,9 @@ object used throughout the code base. Available variables are:
 - `ENABLE_SERVER_CONTROL` – allow `/admin/shutdown` and `/admin/restart`
   endpoints (defaults to `false`).
 - `TIMEZONE` – local timezone name used for log timestamps (defaults to `UTC`).
+- `WHISPER_BIN` – path to the Whisper CLI executable (defaults to `whisper`).
+- `WHISPER_LANGUAGE` – language code passed to Whisper (defaults to `en`).
+- `MODEL_DIR` – directory containing Whisper models (defaults to `models/`).
 
 ## API Overview
 - **Job management**: `POST /jobs` to upload, `GET /jobs` and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.

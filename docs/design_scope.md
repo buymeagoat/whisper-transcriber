@@ -144,7 +144,6 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Status toasts for admin actions                                      | Open      | Display toast on success/failure | Frontend state management       | None                          |
 | Playback or text toggle for completed jobs                           | Open      | Switch between audio and text    | Media player integration        | None                          |
 | Use `updated_at` for job sorting/pagination                          | Open      | Modify queries                   | Add index                       | None                          |
-| Enhance CLI orchestrate.py with watch mode                           | Open      | Poll API in loop                 | Handle auth tokens              | None                          |
 | Heartbeat table and `/heartbeat` endpoint                            | Open      | Record worker heartbeats         | Extra DB writes                 | None                          |
 | Kill (cancel) a running job                                          | Open      | Send termination signal          | Handle partial output           | Process management            |
 | Stop / Restart server from Admin                                     | Done      | Admin commands to stop and start | Risk of accidental shutdown     | Requires elevated permissions |

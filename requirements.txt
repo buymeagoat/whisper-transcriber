@@ -23,6 +23,7 @@ python-jose[cryptography]>=3.3.0
 
 # --- Speech-to-text ---
 openai-whisper>=20231116
+openai>=1.14.3
 torch>=2.2.2
 
 # --- Audio helpers ---

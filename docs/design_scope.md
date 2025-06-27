@@ -166,7 +166,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Comprehensive audio toolbox                                          | Open      | Combine many tools in UI         | Complexity of options           | Maintenance burden            |
 | Text-to-speech from documents                                        | Open      | Generate audio from text         | Multi-language support          | TTS model size                |
 | Mobile voice memo support                                            | Open      | Mobile upload workflow           | Touch-friendly UI               | None                          |
-| LLM-powered transcript insights                                      | Open      | Send transcript to LLM service   | Token limits, privacy           | API cost                      |
+| LLM-powered transcript insights                                      | Done      | Send transcript to LLM service   | Token limits, privacy           | API cost                      |
 | Collaborative transcript editing                                     | Open      | Multi-user editing UI            | Real-time sync                  | Conflict resolution           |
 | Automated meeting minutes                                            | Open      | Compose summary + action items   | Integration with calendars      | Summarization accuracy        |
 | Cloud storage sync                                                   | Open      | Upload artifacts to cloud drives | OAuth + API quotas              | Reliability of sync           |

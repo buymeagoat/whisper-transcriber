@@ -11,6 +11,7 @@ export default function TranscriptViewPage() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
   const [showMatchesOnly, setShowMatchesOnly] = useState(false);
+  const [analysis, setAnalysis] = useState(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -78,6 +79,29 @@ export default function TranscriptViewPage() {
         />
         Show matches only
       </label>
+
+      <button
+        onClick={async () => {
+          try {
+            const data = await api.post(`/jobs/${jobId}/analyze`);
+            setAnalysis(data);
+          } catch (err) {
+            setError(err.message);
+          }
+        }}
+        style={{ marginBottom: "1rem", padding: "0.5rem 1rem" }}
+      >
+        Generate Insights
+      </button>
+
+      {analysis && (
+        <div style={{ marginBottom: "1rem" }}>
+          <h3 style={{ margin: 0 }}>AI Summary</h3>
+          <p>{analysis.summary}</p>
+          <h4 style={{ margin: "0.5rem 0 0" }}>Keywords:</h4>
+          <p>{analysis.keywords.join(', ')}</p>
+        </div>
+      )}
 
       {error ? (
         <div style={{ color: "red", fontSize: "0.9rem" }}>{error}</div>

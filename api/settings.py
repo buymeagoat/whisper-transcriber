@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     enable_server_control: bool = Field(False, env="ENABLE_SERVER_CONTROL")
     timezone: str = Field("UTC", env="TIMEZONE")
     cors_origins: str = Field("*", env="CORS_ORIGINS")
+    openai_api_key: str | None = Field(None, env="OPENAI_API_KEY")
+    openai_model: str = Field("gpt-3.5-turbo", env="OPENAI_MODEL")
 
     # Not configurable via environment
     algorithm: str = "HS256"

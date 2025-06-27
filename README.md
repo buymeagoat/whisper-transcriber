@@ -177,6 +177,7 @@ The API offers several management routes that are restricted to users with the
 `admin` role:
 
 - `GET /admin/files` – list log, upload and transcript files on the server.
+- `GET /admin/browse` – inspect directories under logs, uploads or transcripts.
 - `POST /admin/reset` – remove all jobs and related files.
 - `GET /admin/download-all` – download every file as a single ZIP archive.
 - `GET /admin/cleanup-config` – retrieve current cleanup settings.

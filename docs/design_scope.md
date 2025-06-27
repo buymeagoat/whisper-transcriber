@@ -180,4 +180,5 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Health check (`/health`) and version info (`/version`)               | Done      |                                  |                                 |                               |
 | Local-time timestamps shown in the UI                                | Done      |                                  |                                 |                               |
 | Download transcripts as `.txt` (default in UI)                       | Done      |                                  |                                 |                               |
+| Directory browser API (`/admin/browse`)                              | Done   |                                  |                                 |                        |
 \nCleanup retention can be configured via the `/admin/cleanup-config` endpoint.

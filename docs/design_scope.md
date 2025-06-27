@@ -173,7 +173,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Start a New Job button after upload                                  | Done      |                                  |                                 |                               |
 | Replace default favicon                                              | Done      |                                  |                                 |                               |
 | Show Docker stats in Admin (`/admin/stats`)                          | Done      |                                  |                                 |                               |
-| Web-based file manager for logs/uploads/transcripts (`/admin/files`) | Done      |                                  |                                 |                               |
+| Web-based file browser for logs/uploads/transcripts (`/admin/browse`) | Done      | Replaces inline lists with a navigable UI | Delete/download actions in UI |                        |
 | Zip download of all data (`/admin/download-all`)                     | Done      |                                  |                                 |                               |
 | Expose `/metrics` endpoint for monitoring                            | Done      |                                  |                                 |                               |
 | Progress WebSocket (`/ws/progress/{job_id}`) sends status updates    | Done      |                                  |                                 |                               |

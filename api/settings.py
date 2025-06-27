@@ -13,7 +13,6 @@ class Settings(BaseSettings):
     vite_api_host: str = Field("http://localhost:8000", env="VITE_API_HOST")
     log_level: str = Field("DEBUG", env="LOG_LEVEL")
     log_to_stdout: bool = Field(False, env="LOG_TO_STDOUT")
-    metrics_token: str | None = Field(None, env="METRICS_TOKEN")
     allow_registration: bool = Field(True, env="ALLOW_REGISTRATION")
     auth_username: str = Field("admin", env="AUTH_USERNAME")
     auth_password: str = Field("admin", env="AUTH_PASSWORD")

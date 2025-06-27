@@ -52,7 +52,6 @@ object used throughout the code base. Available variables are:
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – log level for backend loggers.
 - `LOG_TO_STDOUT` – mirror logs to the console when `true`.
-- `METRICS_TOKEN` – optional bearer token for `/metrics`.
 - `AUTH_USERNAME` / `AUTH_PASSWORD` – *(deprecated)* old static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint.
 - `SECRET_KEY` – secret for JWT signing.

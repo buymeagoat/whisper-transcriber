@@ -46,8 +46,8 @@ async def submit_job(
 
 
 @router.get("/jobs", response_model=list[JobListOut])
-def list_jobs(search: str | None = None) -> list[JobListOut]:
-    jobs = service_list_jobs(search)
+def list_jobs(search: str | None = None, status: str | None = None) -> list[JobListOut]:
+    jobs = service_list_jobs(search, status)
     return [
         JobListOut(
             id=j.id,

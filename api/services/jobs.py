@@ -34,8 +34,8 @@ def create_job(
             return job
 
 
-def list_jobs(search: Optional[str] = None) -> List[Job]:
-    """Return jobs optionally filtered by search string."""
+def list_jobs(search: Optional[str] = None, status: Optional[str] = None) -> List[Job]:
+    """Return jobs optionally filtered by search string and status."""
     with SessionLocal() as db:
         query = db.query(Job).outerjoin(
             TranscriptMetadata, Job.id == TranscriptMetadata.job_id
@@ -49,6 +49,22 @@ def list_jobs(search: Optional[str] = None) -> List[Job]:
                     TranscriptMetadata.keywords.ilike(pattern),
                 )
             )
+
+        if status:
+            statuses = [s.strip() for s in status.split("|") if s.strip()]
+            conditions = []
+            for s in statuses:
+                if s == "failed":
+                    conditions.append(Job.status.ilike("failed%"))
+                    continue
+                try:
+                    enum_val = JobStatusEnum(s)
+                except ValueError:
+                    continue
+                conditions.append(Job.status == enum_val)
+            if conditions:
+                query = query.filter(or_(*conditions))
+
         return query.order_by(Job.created_at.desc()).all()
 
 

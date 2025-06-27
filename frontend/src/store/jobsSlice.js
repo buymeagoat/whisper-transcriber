@@ -8,8 +8,12 @@ const authHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const fetchJobs = createAsyncThunk('jobs/fetchJobs', async (search = '', { rejectWithValue }) => {
-  const url = search ? `${ROUTES.API}/jobs?search=${encodeURIComponent(search)}` : `${ROUTES.API}/jobs`;
+export const fetchJobs = createAsyncThunk('jobs/fetchJobs', async ({ search = '', status = '' } = {}, { rejectWithValue }) => {
+  let url = `${ROUTES.API}/jobs`;
+  const params = new URLSearchParams();
+  if (search) params.set('search', search);
+  if (status) params.set('status', status);
+  if ([...params].length) url += `?${params.toString()}`;
   const res = await fetch(url, { headers: authHeaders() });
   if (!res.ok) {
     return rejectWithValue(await res.text());

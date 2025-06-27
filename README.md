@@ -161,10 +161,12 @@ The web UI converts them to your local timezone for display.
 
 ### Listing Jobs
 
-`GET /jobs` now accepts an optional `search` query parameter. When provided, the
-backend filters jobs whose ID, original filename or transcript keywords contain
-the given value (case-insensitive). The Completed Jobs page includes a search
-box that submits this parameter.
+`GET /jobs` now accepts optional `search` and `status` query parameters. The
+`search` filter matches the job ID, original filename or transcript keywords
+case-insensitively. The `status` value may include one or more pipe separated
+states (e.g. `queued|processing`). A value of `failed` matches any failure
+status. The Completed, Failed and Active Jobs pages use these parameters to
+request only the relevant jobs from the backend.
 
 ### Transcript Downloads
 

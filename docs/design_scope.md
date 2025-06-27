@@ -77,6 +77,7 @@ object used throughout the code base. Available variables are:
 - **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts, resetting the system, and retrieving CPU/memory stats plus job KPIs.
 - **Logging endpoints** expose job logs and the access log. If the access log does not exist, `/logs/access` returns a `404` with an empty body. Static files under `/uploads`, `/transcripts`, and `/static` are served directly.
 - **Log streaming**: connect to `/ws/logs/{job_id}` to receive new log lines in real time. The frontend's job log view opens this socket and appends each message as it arrives.
+- **System log streaming**: connect to `/ws/logs/system` to watch the access log or `system.log` in real time from the Admin page.
 - **Authentication**: obtain tokens via `/token` using credentials stored in the `users` table. Accounts can be created through `/register` when enabled. Each user has a `role` of `admin` or `user`. The `/admin` and `/metrics` routes are restricted to admins.
 
 ## Migrations and Logging

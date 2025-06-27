@@ -3,6 +3,7 @@ import { ROUTES } from "../routes";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchJobs, selectJobs, addToast } from "../store";
 import { STATUS_LABELS } from "../statusLabels";
+import StatusBadge from "../components/StatusBadge";
 import Button from "../components/Button";
 import { Table, Th, Td } from "../components/Table";
 export default function ActiveJobsPage() {
@@ -60,7 +61,9 @@ export default function ActiveJobsPage() {
               >
                 <Td>{job.original_filename}</Td>
                 <Td>{job.model}</Td>
-                <Td>{STATUS_LABELS[job.status] || job.status}</Td>
+                <Td>
+                  <StatusBadge status={job.status} />
+                </Td>
                 <Td>{new Date(job.created_at + 'Z').toLocaleString()}</Td>
                 <Td style={{ display: "flex", gap: "0.5rem" }}>
                   <Button

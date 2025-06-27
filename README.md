@@ -137,6 +137,18 @@ The React UI downloads transcripts in plain text by default using
 `?format=txt`. This default can be overridden with the `VITE_DEFAULT_TRANSCRIPT_FORMAT`
 build variable or by storing a `downloadFormat` value in `localStorage`.
 
+### Admin Endpoints
+
+The API offers several management routes that are restricted to users with the
+`admin` role:
+
+- `GET /admin/files` – list log, upload and transcript files on the server.
+- `POST /admin/reset` – remove all jobs and related files.
+- `GET /admin/download-all` – download every file as a single ZIP archive.
+- `GET /admin/stats` – return current CPU and memory usage.
+- `POST /admin/shutdown` – stop the server process.
+- `POST /admin/restart` – restart the running server.
+
 ## Usage Notes
 
 - Real-time job status messages appear in the UI via the progress WebSocket with

@@ -149,7 +149,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Resume jobs after crash or cancel                                    | Open      | Persist intermediate state       | Robust job recovery             | Complex state handling        |
 | Stream logs to UI via WebSocket                                      | Done      | Push log lines live              | Scalability of sockets          | None                          |
 | UI progress bars with word-level timestamps                          | Open      | Parse SRT positions              | Frequent UI updates             | None                          |
-| Auto-delete old transcripts after 30 days                            | On Hold      | Background cleanup task          | Configurable retention          | None                          |
+| Auto-delete old transcripts after 30 days                            | Done         | Background cleanup task          | Configurable retention          | None                          |
 | Workflow automation hooks                                            | Open      | Fire webhook on job completion   | Configurable URLs               | Security of hooks             |
 | Audio format conversion                                              | Open      | Use ffmpeg for re-encoding       | Manage codecs                   | None                          |
 | Audio cleanup utilities                                              | Open      | Noise reduction pipeline         | CPU usage                       | External libs                 |
@@ -180,3 +180,4 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Health check (`/health`) and version info (`/version`)               | Done      |                                  |                                 |                               |
 | Local-time timestamps shown in the UI                                | Done      |                                  |                                 |                               |
 | Download transcripts as `.txt` (default in UI)                       | Done      |                                  |                                 |                               |
+\nCleanup retention can be configured via the `/admin/cleanup-config` endpoint.

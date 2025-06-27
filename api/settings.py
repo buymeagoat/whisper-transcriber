@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from pydantic import BaseSettings, Field, model_validator
 
 
@@ -21,6 +22,9 @@ class Settings(BaseSettings):
     max_concurrent_jobs: int = Field(2, env="MAX_CONCURRENT_JOBS")
     job_queue_backend: str = Field("thread", env="JOB_QUEUE_BACKEND")
     storage_backend: str = Field("local", env="STORAGE_BACKEND")
+    local_storage_dir: str = Field(
+        default=str(Path(__file__).resolve().parent.parent), env="LOCAL_STORAGE_DIR"
+    )
     aws_access_key_id: str | None = Field(None, env="AWS_ACCESS_KEY_ID")
     aws_secret_access_key: str | None = Field(None, env="AWS_SECRET_ACCESS_KEY")
     s3_bucket: str | None = Field(None, env="S3_BUCKET")

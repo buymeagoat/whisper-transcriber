@@ -11,7 +11,7 @@ BASE_DIR = ROOT.parent
 
 def _init_storage() -> Storage:
     if settings.storage_backend == "local":
-        return LocalStorage(BASE_DIR)
+        return LocalStorage(Path(settings.local_storage_dir))
     elif settings.storage_backend == "cloud":
         if not settings.s3_bucket:
             raise ValueError("S3_BUCKET must be set for cloud storage")

@@ -7,7 +7,6 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from api import models, orm_bootstrap, paths, app_state
-from api.services.storage import LocalStorage
 from api.routes import jobs, auth, logs, metrics, progress
 from api.services.job_queue import ThreadJobQueue
 
@@ -25,12 +24,16 @@ def temp_db(tmp_path):
 
 
 @pytest.fixture
-def temp_dirs(tmp_path):
-    storage = LocalStorage(tmp_path)
-    paths.storage = storage
-    paths.UPLOAD_DIR = storage.upload_dir
-    paths.TRANSCRIPTS_DIR = storage.transcripts_dir
-    paths.LOG_DIR = storage.log_dir
+def temp_dirs(tmp_path, monkeypatch):
+    monkeypatch.setenv("LOCAL_STORAGE_DIR", str(tmp_path))
+    import api.settings as settings
+
+    importlib.reload(settings)
+    importlib.reload(paths)
+    storage = paths.storage
+    assert paths.UPLOAD_DIR.parent == tmp_path
+    assert paths.TRANSCRIPTS_DIR.parent == tmp_path
+    assert paths.LOG_DIR.parent == tmp_path
     return storage
 
 

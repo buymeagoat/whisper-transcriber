@@ -43,3 +43,15 @@ def test_broker_job_queue_sends_task():
         func = pickle.loads(payload)
         assert name == "run_callable"
         assert func is sample_task
+
+
+def test_broker_backend_dispatch(monkeypatch):
+    monkeypatch.setenv("JOB_QUEUE_BACKEND", "broker")
+    import importlib
+
+    with patch("api.services.celery_app.celery_app.send_task") as send_task:
+        import api.app_state as app_state
+
+        importlib.reload(app_state)
+        app_state.job_queue.enqueue(sample_task)
+        send_task.assert_called_once()

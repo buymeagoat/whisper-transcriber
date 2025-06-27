@@ -63,6 +63,13 @@ Start the backend with `uvicorn`:
 uvicorn api.main:app
 ```
 
+When `JOB_QUEUE_BACKEND` is set to `broker` a Celery worker must also be
+started:
+
+```bash
+python worker.py
+```
+
 To build the React frontend for production run:
 
 ```bash
@@ -214,6 +221,15 @@ Build and start all services with:
 ```bash
 docker compose up --build
 ```
+
+To use Celery for job processing, set `JOB_QUEUE_BACKEND=broker` and start the
+`worker` service defined in `docker-compose.yml`:
+
+```bash
+JOB_QUEUE_BACKEND=broker docker compose up --build api worker broker db
+```
+
+The worker container runs `python worker.py` and listens for tasks from RabbitMQ.
 
 The compose file mounts the `uploads`, `transcripts` and `logs` directories so
 data persists between runs. Once running, access the API at

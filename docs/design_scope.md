@@ -109,6 +109,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 - Completed Jobs now includes a search box that filters results via the `/jobs` `search` query, matching job IDs, filenames or metadata keywords.
 - Transcript viewer shows the final text in a simple styled page.
 - Admin page lists server files, shows CPU/memory usage and KPIs (completed job count, average job time and queue length), and provides buttons to reset the system or download all data.
+- A sidebar along the left provides tabs for each page. It also contains a **Download Desktop App** link that hits the `/download-app` endpoint.
 
 ### Backend
 - REST endpoints handle job submission, progress checks, downloads and admin operations.

@@ -21,8 +21,9 @@ from api.paths import (
 # ─── Paths ─── (imported from api.paths)
 
 # ─── Config ───
-LOCAL_TZ = ZoneInfo("America/Chicago")
 from api.settings import settings
+
+LOCAL_TZ = ZoneInfo(settings.timezone)
 from api.services.job_queue import JobQueue, ThreadJobQueue, BrokerJobQueue
 
 from api.utils.logger import get_logger

@@ -112,7 +112,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Notification/toast system                                           | Done   | Surface status messages          | Auto-dismiss timing             | None                        |
 | Admin dashboard KPIs                                                | Done   | Monitor throughput               | Metrics queries                 | None                        |
 | Role-based auth with settings page                                  | Done   | Restrict features per role       | Session handling, UI            | User management complexity    |
-| Download job archive (.zip)                                          | Open      | Zip existing logs and results    | Avoid large file memory use     | None                          |
+| Download job archive (.zip)                                          | Done      | Zip existing logs and results    | Avoid large file memory use     | None                          |
 | Support `.vtt` transcript export                                     | Done      | Convert from SRT to VTT          | Extra dependency for conversion | None                          |
 | Provide CLI wrapper for non-UI usage                                 | On Hold      | Wrapper script around API calls  | Package distribution            | None                          |
 | Improve status messaging in UI                                       | Done      | Real-time updates via progress WebSocket | Friendlier labels, localization | None                          |

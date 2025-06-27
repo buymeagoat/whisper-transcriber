@@ -49,6 +49,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
   `true`.
 - `CLEANUP_DAYS` – how many days to keep transcripts when cleanup is enabled
   (defaults to `30`).
+- `ENABLE_SERVER_CONTROL` – allow `/admin/shutdown` and `/admin/restart`
+  endpoints (defaults to `false`).
 
 Configuration values are provided by `api/settings.py` using Pydantic's
 `BaseSettings`. An instance named `settings` is imported by the rest of the

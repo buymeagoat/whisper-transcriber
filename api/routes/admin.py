@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 import io
 import shutil
@@ -105,6 +105,12 @@ def admin_stats(user=Depends(require_admin)) -> AdminStatsOut:
 def shutdown_server(user=Depends(require_admin)) -> StatusOut:
     """Shut down the running server process."""
 
+    if not settings.enable_server_control:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Server control disabled",
+        )
+
     def _exit():
         os._exit(0)
 
@@ -115,6 +121,12 @@ def shutdown_server(user=Depends(require_admin)) -> StatusOut:
 @router.post("/restart", response_model=StatusOut)
 def restart_server(user=Depends(require_admin)) -> StatusOut:
     """Restart the running server process."""
+
+    if not settings.enable_server_control:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Server control disabled",
+        )
 
     def _restart():
         os.execv(sys.executable, [sys.executable] + sys.argv)

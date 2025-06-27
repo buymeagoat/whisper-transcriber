@@ -187,8 +187,10 @@ When `STORAGE_BACKEND=cloud`, these folders act as a cache and transcript files
 ## Docker Usage
 
 Docker builds expect a populated `models/` directory and the compiled
-`frontend/dist/` folder. Both directories are ignored by Git so they must be
-prepared manually before running `docker build`. Example:
+`frontend/dist/` folder. During the build the Python script
+`validate_models_dir()` checks the `models/` directory so missing Whisper
+models fail the build early. Both directories are ignored by Git so they must
+be prepared manually before running `docker build`. Example:
 ```bash
 cd frontend
 npm run build

@@ -13,6 +13,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY api         ./api
 COPY models      ./models
+RUN python -c "from api.utils.model_validation import validate_models_dir; validate_models_dir()"
 RUN mkdir -p uploads transcripts
 COPY frontend/dist ./api/static
 

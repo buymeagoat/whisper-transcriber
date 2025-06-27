@@ -2,7 +2,7 @@ import os
 import shutil
 import subprocess
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from subprocess import Popen, PIPE
 from typing import Union
@@ -269,3 +269,42 @@ def handle_whisper(
         threading.Thread(target=_run, daemon=True).start()
     else:
         _run()
+
+
+def cleanup_once() -> None:
+    """Remove uploads, transcripts and logs older than the configured age."""
+    if not settings.cleanup_enabled:
+        return
+
+    cutoff = datetime.utcnow() - timedelta(days=settings.cleanup_days)
+
+    for file in UPLOAD_DIR.glob("*"):
+        if file.is_file() and datetime.fromtimestamp(file.stat().st_mtime) < cutoff:
+            storage.delete_upload(file.name)
+
+    for directory in TRANSCRIPTS_DIR.iterdir():
+        if (
+            directory.is_dir()
+            and datetime.fromtimestamp(directory.stat().st_mtime) < cutoff
+        ):
+            storage.delete_transcript_dir(directory.name)
+
+    for file in LOG_DIR.glob("*"):
+        try:
+            if datetime.fromtimestamp(file.stat().st_mtime) < cutoff:
+                if file.is_file():
+                    file.unlink()
+                else:
+                    shutil.rmtree(file, ignore_errors=True)
+        except FileNotFoundError:
+            pass
+
+
+def _cleanup_task(interval: int = 86400) -> None:
+    while True:
+        cleanup_once()
+        threading.Event().wait(interval)
+
+
+def start_cleanup_thread(interval: int = 86400) -> None:
+    threading.Thread(target=_cleanup_task, args=(interval,), daemon=True).start()

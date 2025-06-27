@@ -20,6 +20,7 @@ from api.app_state import (
     handle_whisper,
     LOCAL_TZ,
     backend_log,
+    start_cleanup_thread,
 )
 
 # ─── Logging ───
@@ -42,6 +43,8 @@ async def lifespan(app: FastAPI):
     validate_or_initialize_database()
     validate_models_dir()
     rehydrate_incomplete_jobs()
+    if settings.cleanup_enabled:
+        start_cleanup_thread()
     yield
     system_log.info("App shutdown — lifespan exiting.")
 

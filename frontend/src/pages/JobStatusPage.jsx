@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useContext } from "react";
 import { ROUTES, getTranscriptDownloadUrl } from "../routes";
-import { STATUS_LABELS } from "../statusLabels";
 import Spinner from "../Spinner";
+import StatusBadge from "../components/StatusBadge";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useApi } from "../api";
@@ -84,7 +84,9 @@ export default function JobStatusPage() {
         <div style={{ marginTop: "1rem" }}>
           <p><strong>Filename:</strong> {job.original_filename}</p>
           <p><strong>Model:</strong> {job.model}</p>
-          <p><strong>Status:</strong> {STATUS_LABELS[job.status] || job.status}</p>
+          <p>
+            <strong>Status:</strong> <StatusBadge status={job.status} />
+          </p>
           <p><strong>Created:</strong> {new Date(job.created_at + 'Z').toLocaleString()}</p>
           <p><strong>Updated:</strong> {job.updated ? new Date(job.updated + 'Z').toLocaleString() : "N/A"}</p>
 

@@ -262,6 +262,5 @@ def update_concurrency(
     if settings.job_queue_backend == "thread" and isinstance(
         app_state.job_queue, ThreadJobQueue
     ):
-        app_state.job_queue.shutdown()
-        app_state.job_queue = ThreadJobQueue(value)
+        app_state.job_queue.resize(value)
     return ConcurrencyConfigOut(max_concurrent_jobs=value)

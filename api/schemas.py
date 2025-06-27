@@ -100,3 +100,11 @@ class UserListOut(BaseModel):
 
 class UserUpdateIn(BaseModel):
     role: str
+
+
+class UserSettingsOut(BaseModel):
+    default_model: str | None = None
+
+
+class UserSettingsIn(BaseModel):
+    default_model: str | None = None

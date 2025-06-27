@@ -110,3 +110,17 @@ class ConfigEntry(Base):
 
     def __repr__(self) -> str:  # pragma: no cover - trivial
         return f"<Config {self.key}={self.value}>"
+
+
+# ─── User Settings Table ─────────────────────────────────────────────────────
+class UserSetting(Base):
+    __tablename__ = "user_settings"
+
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), primary_key=True
+    )
+    key: Mapped[str] = mapped_column(String, primary_key=True)
+    value: Mapped[str] = mapped_column(String, nullable=False)
+
+    def __repr__(self) -> str:  # pragma: no cover - trivial
+        return f"<UserSetting {self.user_id}:{self.key}={self.value}>"

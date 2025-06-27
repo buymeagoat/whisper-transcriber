@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../routes";
 import { useApi } from "../api";
@@ -16,6 +16,20 @@ export default function UploadPage() {
   const [submittedJobs, setSubmittedJobs] = useState([]);
   const inputRef = useRef();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await api.get("/user/settings");
+        if (data.default_model) {
+          setModel(data.default_model);
+        }
+      } catch {
+        // ignore errors
+      }
+    };
+    load();
+  }, []);
 
   const validateFile = (file) => {
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -45,6 +59,17 @@ export default function UploadPage() {
   const handleDelete = (index) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
+
+  useEffect(() => {
+    const save = async () => {
+      try {
+        await api.post("/user/settings", { default_model: model });
+      } catch {
+        // ignore errors
+      }
+    };
+    save();
+  }, [model]);
 // ── NEW handler (component scope) ─────────────────────────
 const handleNewJob = () => {
   setFiles([]);

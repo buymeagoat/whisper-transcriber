@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from api import models, orm_bootstrap, paths, app_state
-from api.routes import jobs, auth, logs, metrics, progress
+from api.routes import jobs, auth, logs, metrics, progress, audio
 from api.services.job_queue import ThreadJobQueue
 
 
@@ -53,6 +53,10 @@ def client(temp_db, temp_dirs):
     jobs.LOG_DIR = paths.LOG_DIR
     jobs.handle_whisper = app_state.handle_whisper
 
+    importlib.reload(audio)
+    audio.UPLOAD_DIR = paths.UPLOAD_DIR
+    audio.storage = paths.storage
+
     app = FastAPI()
     for router in (
         jobs.router,
@@ -60,6 +64,7 @@ def client(temp_db, temp_dirs):
         logs.router,
         metrics.router,
         progress.router,
+        audio.router,
     ):
         app.include_router(router)
 

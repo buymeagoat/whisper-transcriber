@@ -3,6 +3,7 @@ import { ROUTES } from "../routes";
 import { useApi } from "../api";
 import { useDispatch } from "react-redux";
 import { addToast } from "../store";
+import StatsPanel from "../components/StatsPanel";
 export default function AdminPage() {
   const api = useApi();
   const dispatch = useDispatch();
@@ -187,12 +188,7 @@ useEffect(() => {
     <div className="page-content" style={{ color: "white", backgroundColor: "#18181b", minHeight: "100vh" }}>
       <h2 style={{ fontSize: "1.875rem", marginBottom: "1rem" }}>Admin Controls</h2>
             {/* NEW stats read-out */}
-      {stats && (
-        <div style={{ marginTop:"1rem", color:"#a1a1aa" }}>
-          <strong>CPU&nbsp;Usage:</strong> {stats.cpu_percent}% &nbsp;|&nbsp;
-          <strong>Memory:</strong> {stats.mem_used_mb}/{stats.mem_total_mb}&nbsp;MB
-        </div>
-      )}
+      <StatsPanel stats={stats} />
 
 
 

@@ -60,6 +60,9 @@ class AdminStatsOut(BaseModel):
     cpu_percent: float
     mem_used_mb: float
     mem_total_mb: float
+    completed_jobs: int
+    avg_job_time: float
+    queue_length: int
 
 
 class TokenOut(BaseModel):

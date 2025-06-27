@@ -151,7 +151,7 @@ The API offers several management routes that are restricted to users with the
 - `GET /admin/files` – list log, upload and transcript files on the server.
 - `POST /admin/reset` – remove all jobs and related files.
 - `GET /admin/download-all` – download every file as a single ZIP archive.
-- `GET /admin/stats` – return current CPU and memory usage.
+- `GET /admin/stats` – return CPU/memory usage along with completed job count, average processing time and queue length.
 - `POST /admin/shutdown` – stop the server process.
 - `POST /admin/restart` – restart the running server.
 

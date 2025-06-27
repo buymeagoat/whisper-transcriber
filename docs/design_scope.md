@@ -70,7 +70,7 @@ object used throughout the code base. Available variables are:
 
 ## API Overview
 - **Job management**: `POST /jobs` to upload, `GET /jobs` and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.
-- **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts, resetting the system, and retrieving basic stats.
+- **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts, resetting the system, and retrieving CPU/memory stats plus job KPIs.
 - **Logging endpoints** expose job logs and the access log. If the access log does not exist, `/logs/access` returns a `404` with an empty body. Static files under `/uploads`, `/transcripts`, and `/static` are served directly.
 - **Authentication**: obtain tokens via `/token` using credentials stored in the `users` table. Accounts can be created through `/register` when enabled. Each user has a `role` of `admin` or `user`. The `/admin` and `/metrics` routes are restricted to admins.
 
@@ -88,7 +88,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 - Upload page lets users choose audio files and Whisper model size, then starts jobs and links to a status view.
 - Active, Completed and Failed pages display jobs filtered by status with actions to view logs or restart/remove.
 - Transcript viewer shows the final text in a simple styled page.
-- Admin page lists server files, CPU/memory stats and provides buttons to reset the system or download all data.
+- Admin page lists server files, shows CPU/memory usage and KPIs (completed job count, average job time and queue length), and provides buttons to reset the system or download all data.
 
 ### Backend
 - REST endpoints handle job submission, progress checks, downloads and admin operations.
@@ -104,7 +104,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Global state management                                              | Done   | Share job data across components | Choose state library            | Data sync complexity        |
 | Sortable job table component                                        | Open   | Track jobs more easily            | Table library, UI state         | None                        |
 | Notification/toast system                                           | Done   | Surface status messages          | Auto-dismiss timing             | None                        |
-| Admin dashboard KPIs                                                | Open   | Monitor throughput               | Metrics queries                 | None                        |
+| Admin dashboard KPIs                                                | Done   | Monitor throughput               | Metrics queries                 | None                        |
 | Role-based auth with settings page                                  | Done   | Restrict features per role       | Session handling, UI            | User management complexity    |
 | Download job archive (.zip)                                          | Open      | Zip existing logs and results    | Avoid large file memory use     | None                          |
 | Support `.vtt` transcript export                                     | Done      | Convert from SRT to VTT          | Extra dependency for conversion | None                          |

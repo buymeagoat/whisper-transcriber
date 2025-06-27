@@ -11,7 +11,7 @@ import threading
 import psutil
 
 from api.errors import ErrorCode, http_error
-from api.models import Job
+from api.models import Job, JobStatusEnum
 from api.orm_bootstrap import SessionLocal
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR, LOG_DIR
 from api.app_state import db_lock
@@ -94,10 +94,32 @@ def download_all(user=Depends(require_admin)):
 def admin_stats(user=Depends(require_admin)) -> AdminStatsOut:
     cpu_percent = psutil.cpu_percent(interval=0.1)
     mem = psutil.virtual_memory()
+    with SessionLocal() as db:
+        completed_jobs = (
+            db.query(Job).filter(Job.status == JobStatusEnum.COMPLETED).count()
+        )
+        times = (
+            db.query(Job.started_at, Job.finished_at)
+            .filter(
+                Job.status == JobStatusEnum.COMPLETED,
+                Job.started_at.isnot(None),
+                Job.finished_at.isnot(None),
+            )
+            .all()
+        )
+        avg_job_time = (
+            sum((f - s).total_seconds() for s, f in times) / len(times)
+            if times
+            else 0.0
+        )
+        queue_length = db.query(Job).filter(Job.status == JobStatusEnum.QUEUED).count()
     return AdminStatsOut(
         cpu_percent=cpu_percent,
         mem_used_mb=round(mem.used / (1024 * 1024), 1),
         mem_total_mb=round(mem.total / (1024 * 1024), 1),
+        completed_jobs=completed_jobs,
+        avg_job_time=round(avg_job_time, 2),
+        queue_length=queue_length,
     )
 
 

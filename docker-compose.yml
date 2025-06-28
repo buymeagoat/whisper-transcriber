@@ -10,6 +10,7 @@ services:
       - JOB_QUEUE_BACKEND=broker
       - CELERY_BROKER_URL=amqp://guest:guest@broker:5672//
       - CELERY_BACKEND_URL=rpc://
+      - DB_URL=postgresql+psycopg2://whisper:whisper@db:5432/whisper
     volumes:
       - ./uploads:/app/uploads
       - ./transcripts:/app/transcripts
@@ -44,6 +45,7 @@ services:
       - JOB_QUEUE_BACKEND=broker
       - CELERY_BROKER_URL=amqp://guest:guest@broker:5672//
       - CELERY_BACKEND_URL=rpc://
+      - DB_URL=postgresql+psycopg2://whisper:whisper@db:5432/whisper
     volumes:
       - ./uploads:/app/uploads
       - ./transcripts:/app/transcripts

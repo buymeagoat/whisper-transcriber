@@ -9,6 +9,9 @@ except Exception:  # openai not installed
     openai = None
 
 from api.settings import settings
+from api.utils.logger import get_system_logger
+
+system_log = get_system_logger()
 
 
 STOPWORDS = {
@@ -70,6 +73,6 @@ def analyze_text(text: str) -> Tuple[str, List[str]]:
                     kw_text = parts[1].strip()
                 keywords = [k.strip() for k in kw_text.split(",") if k.strip()]
             return summary, keywords
-        except Exception:
-            pass
+        except Exception as e:
+            system_log.error(f"OpenAI analysis failed: {e}")
     return _local_analyze(text)

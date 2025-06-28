@@ -8,7 +8,12 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
    ```bash
    pip install -r requirements.txt
    ```
-2. Install frontend dependencies from the `frontend` directory:
+2. Install system dependencies. `ffmpeg` (providing `ffprobe`) must be present
+   for audio processing features. On Linux you can install it with:
+   ```bash
+   sudo apt-get install -y ffmpeg
+   ```
+3. Install frontend dependencies from the `frontend` directory:
    ```bash
  cd frontend
   npm install

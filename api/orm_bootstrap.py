@@ -5,6 +5,7 @@ from pathlib import Path
 
 from sqlalchemy import inspect, create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import OperationalError
 from api.models import Base
 from api.utils.logger import get_logger
 from api.settings import settings
@@ -29,7 +30,17 @@ def validate_or_initialize_database():
             log.info("jobs.db does not exist — creating empty file.")
             open(db_path, "a").close()
 
-    # ── Step 2: Run Alembic migrations ──
+    # ── Step 2: Check database connection ──
+    try:
+        with engine.connect():
+            pass
+    except OperationalError:
+        log.critical(
+            "Database unreachable. Use DB=/path/to/jobs.db for SQLite or start a PostgreSQL service."
+        )
+        sys.exit(1)
+
+    # ── Step 3: Run Alembic migrations ──
     log.info("Running Alembic migrations to ensure schema is current...")
     ALEMBIC_INI = Path(__file__).resolve().parent.parent / "alembic.ini"
     try:
@@ -46,7 +57,7 @@ def validate_or_initialize_database():
         log.critical(f"Alembic error: {e}")
         sys.exit(1)
 
-    # ── Step 3: Validate expected tables exist ──
+    # ── Step 4: Validate expected tables exist ──
     inspector = inspect(engine)
     expected = set(Base.metadata.tables.keys())
     actual = set(inspector.get_table_names())
@@ -56,5 +67,5 @@ def validate_or_initialize_database():
         log.critical("Schema invalid or incomplete.")
         sys.exit(1)
 
-    # ── Step 4: Success ──
+    # ── Step 5: Success ──
     log.info("Database bootstrapping complete — schema verified.")

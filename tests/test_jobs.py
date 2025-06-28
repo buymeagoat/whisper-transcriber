@@ -5,8 +5,8 @@ from fastapi.testclient import TestClient
 from api import models, orm_bootstrap
 
 
-def create_test_app(tmp_path):
-    os.environ["DB_URL"] = f"sqlite:///{tmp_path / 'test.db'}"
+def create_test_app(postgresql, tmp_path):
+    os.environ["DB_URL"] = postgresql.url()
     import api.settings as settings
 
     importlib.reload(settings)
@@ -45,8 +45,8 @@ def create_test_app(tmp_path):
     return app
 
 
-def test_submit_and_fetch_job(tmp_path, sample_wav):
-    app = create_test_app(tmp_path)
+def test_submit_and_fetch_job(postgresql, tmp_path, sample_wav):
+    app = create_test_app(postgresql, tmp_path)
     client = TestClient(app)
 
     with sample_wav.open("rb") as f:

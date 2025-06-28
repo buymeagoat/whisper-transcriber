@@ -344,7 +344,8 @@ jobs from RabbitMQ. Once running, access the API at `http://localhost:8000`.
 
 ## Testing
 
-Install the development requirements and run the test suite with coverage:
+Install the development requirements and run the test suite with coverage. The
+tests use `pytest-postgresql` to launch a temporary PostgreSQL instance:
 
 ```bash
 pip install -r requirements-dev.txt

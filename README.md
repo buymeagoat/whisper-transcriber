@@ -308,9 +308,10 @@ docker run -p 8000:8000 \
 
 ## Docker Compose
 
-A `docker-compose.yml` is included to start the API together with example
-PostgreSQL and RabbitMQ services. These additional services are placeholders for
-future features but are not required today.
+A `docker-compose.yml` is included to start the API together with the
+PostgreSQL and RabbitMQ services required by the default configuration. The
+`db` service runs PostgreSQL for the API while RabbitMQ provides a broker for
+Celery when using the `broker` job queue backend.
 
 Prepare `models/` with `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` and build the frontend before running compose:
 

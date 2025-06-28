@@ -79,6 +79,15 @@ Start the backend with `uvicorn`:
 uvicorn api.main:app
 ```
 
+To store jobs in a local SQLite file, prefix the command with `DB=./jobs.db`:
+
+```bash
+DB=./jobs.db uvicorn api.main:app
+```
+
+Omitting this variable expects a PostgreSQL service named `db` as configured by
+the default `DB_URL`.
+
 When `JOB_QUEUE_BACKEND` is set to `broker` a Celery worker must also be
 started:
 

@@ -50,11 +50,17 @@ def validate_or_initialize_database():
             ["alembic", "-c", str(ALEMBIC_INI), "upgrade", "head"],
             check=True,
             env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
         )
         log.info("Alembic migrations applied successfully.")
     except subprocess.CalledProcessError as e:
         log.critical(f"Alembic failed to apply migrations: {e}")
-        log.critical(f"Alembic error: {e}")
+        if e.stdout:
+            log.critical(e.stdout)
+        if e.stderr:
+            log.critical(e.stderr)
         sys.exit(1)
 
     # ── Step 4: Validate expected tables exist ──

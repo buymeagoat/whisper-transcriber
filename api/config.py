@@ -15,8 +15,9 @@ load_dotenv()
 RAW_VITE_API_HOST = os.getenv("VITE_API_HOST")
 API_HOST = RAW_VITE_API_HOST or "http://localhost:8000"
 
-# PostgreSQL is required in production. Override ``DB_URL`` to use a different
-# database engine for development or testing.
+# PostgreSQL is required. Provide ``DB_URL`` with the connection string to your
+# PostgreSQL server. Using a different engine is only recommended for local
+# development or testing.
 DB_URL = os.getenv(
     "DB_URL",
     "postgresql+psycopg2://whisper:whisper@db:5432/whisper",

@@ -6,7 +6,10 @@ from api import models, orm_bootstrap
 
 
 def create_test_app(tmp_path):
-    os.environ["DB"] = str(tmp_path / "test.db")
+    os.environ["DB_URL"] = f"sqlite:///{tmp_path / 'test.db'}"
+    import api.settings as settings
+
+    importlib.reload(settings)
     importlib.reload(orm_bootstrap)
     models.Base.metadata.create_all(orm_bootstrap.engine)
 

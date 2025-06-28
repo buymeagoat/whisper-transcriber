@@ -14,7 +14,7 @@ from api.services.job_queue import ThreadJobQueue
 @pytest.fixture
 def temp_db(tmp_path):
     db_file = tmp_path / "test.db"
-    os.environ["DB"] = str(db_file)
+    os.environ["DB_URL"] = f"sqlite:///{db_file}"
     import api.settings as settings
 
     importlib.reload(settings)

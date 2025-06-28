@@ -195,6 +195,10 @@ Send a file to `/edit` to perform basic operations on the clip. Provide optional
 adjust loudness. The endpoint saves the modified file under `uploads/` and
 returns the path to this new file.
 
+Use `/convert` to change an uploaded clip to another format. Supply the file and
+a `target_format` form field set to `mp3`, `m4a`, `wav` or `flac`. The endpoint
+saves the re-encoded file under `uploads/` and returns its path.
+
 ### Admin Endpoints
 
 - The API offers several management routes that are restricted to users with the

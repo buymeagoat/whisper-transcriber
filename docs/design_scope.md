@@ -153,7 +153,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 | UI progress bars with word-level timestamps                          | Open      | Parse SRT positions              | Frequent UI updates             | None                          |
 | Auto-delete old transcripts after 30 days                            | Done         | Background cleanup task          | Configurable retention          | None                          |
 | Workflow automation hooks                                            | Open      | Fire webhook on job completion   | Configurable URLs               | Security of hooks             |
-| Audio format conversion                                              | Open      | Use ffmpeg for re-encoding       | Manage codecs                   | None                          |
+| Audio format conversion                                              | Done      | `/convert` re-encodes uploads    | Allowed: mp3, m4a, wav, flac     | None                          |
 | Audio cleanup utilities                                              | Open      | Noise reduction pipeline         | CPU usage                       | External libs                 |
 | Integration with meeting platforms                                   | Open      | OAuth with Zoom/Meet APIs        | API rate limits                 | Authentication complexity     |
 | Searchable transcript archive                                        | Open      | Full-text search index           | Storage footprint               | Search engine setup           |

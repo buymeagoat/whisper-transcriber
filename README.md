@@ -26,7 +26,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 `api/settings.py` reads the following environment variables at startup:
 
 - `DB_URL` – SQLAlchemy database URL for the main database. Defaults to
-  `postgresql+psycopg2://whisper:whisper@db:5432/whisper`.
+  `postgresql+psycopg2://whisper:whisper@db:5432/whisper`. The Docker image
+  sets `DB=/app/jobs.db` so it uses SQLite unless `DB_URL` is provided.
 - `DB` – path to a SQLite database file used mainly for tests. When set it
   overrides `DB_URL`.
 - `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://localhost:8000`).
@@ -298,13 +299,14 @@ docker build -t whisper-app .
 If you use a prebuilt image, mount the models directory at runtime.
 
 Run the container with the application directories mounted so that
-uploads, transcripts and logs persist on the host. The front end needs
-`VITE_API_HOST` set to the URL where the backend is reachable and `DB=/app/jobs.db` to store jobs in a local SQLite file. Without this variable the container expects a PostgreSQL service named `db` as provided by `docker-compose.yml`:
+uploads, transcripts and logs persist on the host. Set `VITE_API_HOST` to
+the URL where the backend is reachable. The image already sets
+`DB=/app/jobs.db` so jobs are stored in a local SQLite file. To use
+PostgreSQL instead, provide a `DB_URL` pointing to your database:
 
 ```bash
 docker run -p 8000:8000 \
   -e VITE_API_HOST=http://localhost:8000 \
-  -e DB=/app/jobs.db \
   -v $(pwd)/uploads:/app/uploads \
   -v $(pwd)/transcripts:/app/transcripts \
   -v $(pwd)/logs:/app/logs \

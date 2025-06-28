@@ -27,7 +27,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 
 - `DB_URL` – SQLAlchemy connection string for the required PostgreSQL
   database. The default `postgresql+psycopg2://whisper:whisper@db:5432/whisper`
-  points to the `db` service defined in `docker-compose.yml`.
+  points to the `db` service (running the `postgres:15-alpine` image) defined in
+  `docker-compose.yml`.
 - `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://localhost:8000`).
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
@@ -85,7 +86,7 @@ uvicorn api.main:app
 ```
 
 PostgreSQL must be available. The default `DB_URL` targets the `db` service
-from `docker-compose.yml`.
+(based on the `postgres:15-alpine` image) from `docker-compose.yml`.
 
 When `JOB_QUEUE_BACKEND` is set to `broker` a Celery worker must also be
 started:
@@ -293,7 +294,8 @@ If you use a prebuilt image, mount the models directory at runtime.
 Run the container with the application directories mounted so that
 uploads, transcripts and logs persist on the host. Set `VITE_API_HOST` to
 the URL where the backend is reachable. Ensure `DB_URL` points to your
-PostgreSQL instance; the compose file defaults to the `db` service:
+PostgreSQL instance; the compose file defaults to the `db` service
+(using the `postgres:15-alpine` image):
 
 ```bash
 docker run -p 8000:8000 \
@@ -325,7 +327,9 @@ docker compose up --build
 ```
 
 The compose file mounts the `uploads`, `transcripts`, `logs` and `models`
-directories so data and models persist between runs. It also configures
+directories so data and models persist between runs. It defines a `db` service
+using the `postgres:15-alpine` image and sets `DB_URL` on the API and worker so
+they connect to it. It also configures
 Celery with RabbitMQ by setting `JOB_QUEUE_BACKEND=broker`,
 `CELERY_BROKER_URL` and `CELERY_BACKEND_URL` on the API and worker services.
 

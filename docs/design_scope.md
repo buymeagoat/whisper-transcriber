@@ -49,8 +49,10 @@ Application settings come from `api/settings.py`. It reads environment
 variables once using `pydantic_settings.BaseSettings` and exposes a `settings`
 object used throughout the code base. Available variables are:
 
-- `DB_URL` – database URL.
+- `DB_URL` – database URL used when connecting to PostgreSQL.
 - `DB` – SQLite path overriding `DB_URL`.
+  The Docker image sets `DB=/app/jobs.db` so SQLite is used by default.
+  Provide a `DB_URL` value to connect to PostgreSQL instead.
 - `VITE_API_HOST` – base URL for the frontend to reach the API.
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – log level for backend loggers.

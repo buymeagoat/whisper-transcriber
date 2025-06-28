@@ -13,7 +13,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
    ```bash
    sudo apt-get install -y ffmpeg
    ```
-3. Install frontend dependencies from the `frontend` directory:
+3. Install frontend dependencies from the `frontend` directory. The build
+   requires **Node.js 18** or newer:
    ```bash
  cd frontend
   npm install

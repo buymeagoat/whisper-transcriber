@@ -84,6 +84,8 @@ object used throughout the code base. Available variables are:
 - `WHISPER_BIN` – path to the Whisper CLI executable (defaults to `whisper`).
 - `WHISPER_LANGUAGE` – language code passed to Whisper (defaults to `en`).
 - `MODEL_DIR` – directory containing Whisper models (defaults to `models/`).
+- `OPENAI_API_KEY` – API key enabling transcript analysis via OpenAI.
+- `OPENAI_MODEL` – model name used when `OPENAI_API_KEY` is set (defaults to `gpt-3.5-turbo`).
 
 ## API Overview
 - **Job management**: `POST /jobs` to upload, `GET /jobs` (with optional `search` query filtering by ID, filename or keywords) and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.

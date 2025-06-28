@@ -64,6 +64,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 - `WHISPER_BIN` – path to the Whisper CLI executable (defaults to `whisper`).
 - `WHISPER_LANGUAGE` – language code passed to Whisper (defaults to `en`).
 - `MODEL_DIR` – directory containing Whisper model files (defaults to `models/`).
+- `OPENAI_API_KEY` – API key enabling transcript analysis via OpenAI.
+- `OPENAI_MODEL` – model name used when `OPENAI_API_KEY` is set (defaults to `gpt-3.5-turbo`).
 
 Configuration values are provided by `api/settings.py` using
 `pydantic_settings.BaseSettings`. An instance named `settings` is imported by the rest of the

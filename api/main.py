@@ -26,6 +26,18 @@ from api.app_state import (
 # ─── Logging ───
 system_log = get_system_logger()
 
+
+def log_startup_settings() -> None:
+    """Log key configuration settings."""
+    system_log.info(
+        "db_url=%s, job_queue_backend=%s, storage_backend=%s, log_level=%s",
+        settings.db_url,
+        settings.job_queue_backend,
+        settings.storage_backend,
+        settings.log_level,
+    )
+
+
 # ─── Paths ───
 ROOT = Path(__file__).parent
 
@@ -49,6 +61,7 @@ async def lifespan(app: FastAPI):
     system_log.info("App shutdown — lifespan exiting.")
 
 
+log_startup_settings()
 system_log.info("FastAPI app initialization starting.")
 
 # ─── App Setup ───

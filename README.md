@@ -260,7 +260,7 @@ displayed all files at once.
   transcript to an LLM via `POST /jobs/{id}/analyze` and shows the returned
   summary and keywords.
 - Cleanup options can be toggled and saved from the Admin page.
-- `MODEL_DIR` points to the directory that holds the Whisper `.pt` files. The default is `models/`, ignored by Git. Populate this directory before building or running the application.
+- `MODEL_DIR` points to the directory that holds the Whisper `.pt` files. The default is `models/`, ignored by Git. **This directory must contain `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` before you build or start the server.**
 - `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are
   written to `transcripts/`. Per-job logs and the system log live in `logs/`.
@@ -284,7 +284,7 @@ Admins can fetch these files from `/admin/download-app/{os}` by specifying
 Docker builds expect a populated directory containing the Whisper models specified by `MODEL_DIR` along with the compiled
 `frontend/dist/` folder. During the build the Python script
 `validate_models_dir()` checks this directory so missing Whisper
-models fail the build early. Both directories are ignored by Git so they must
+models fail the build early. **Ensure that `models/` contains `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` before invoking `docker build`.** Both directories are ignored by Git so they must
 be prepared manually before running `docker build`. Example:
 ```bash
 cd frontend
@@ -317,7 +317,7 @@ A `docker-compose.yml` is included to start the API together with example
 PostgreSQL and RabbitMQ services. These additional services are placeholders for
 future features but are not required today.
 
-Prepare the models and build the frontend before running compose:
+Prepare `models/` with `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` and build the frontend before running compose:
 
 ```bash
 cd frontend

@@ -12,15 +12,15 @@ from api.services.job_queue import ThreadJobQueue
 
 
 @pytest.fixture
-def temp_db(tmp_path):
-    db_file = tmp_path / "test.db"
-    os.environ["DB_URL"] = f"sqlite:///{db_file}"
+def temp_db(postgresql):
+    os.environ["DB_URL"] = postgresql.url()
     import api.settings as settings
 
     importlib.reload(settings)
     importlib.reload(orm_bootstrap)
     models.Base.metadata.create_all(orm_bootstrap.engine)
-    return db_file
+    yield postgresql
+    models.Base.metadata.drop_all(orm_bootstrap.engine)
 
 
 @pytest.fixture

@@ -293,3 +293,9 @@ This document organizes upcoming features for Whisper Transcriber. Items are gro
 - **Roadblocks**: None.
 - **Next Steps**: Add sorting parameters and update the frontend list.
 
+
+## Completed
+
+### Docker Compose Helper Script
+- **Summary**: Added `scripts/start_containers.sh` to automatically build the frontend and start the Docker Compose stack.
+- **Motivation**: Simplifies setup by launching the API, worker, broker and database with one command.

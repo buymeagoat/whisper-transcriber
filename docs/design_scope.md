@@ -32,6 +32,7 @@ The application is considered working once these basics are functional:
 - `frontend/` – React app built into `frontend/dist/` and copied by the Dockerfile
   to `api/static/` for the UI.
 - `scripts/` – packaging helpers that generate `dist/whisper-transcriber.exe` and `dist/whisper-transcriber.rpm`.
+- `start_containers.sh` – helper script that builds the frontend if needed and launches the Docker Compose stack (`api`, `worker`, `broker`, and `db`).
 
 Both `models/` and `frontend/dist/` are listed in `.gitignore`. They must exist
 before running `docker build`:

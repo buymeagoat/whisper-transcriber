@@ -282,11 +282,12 @@ If you use a prebuilt image, mount the models directory at runtime.
 
 Run the container with the application directories mounted so that
 uploads, transcripts and logs persist on the host. The front end needs
-`VITE_API_HOST` set to the URL where the backend is reachable:
+`VITE_API_HOST` set to the URL where the backend is reachable and `DB=/app/jobs.db` to store jobs in a local SQLite file. Without this variable the container expects a PostgreSQL service named `db` as provided by `docker-compose.yml`:
 
 ```bash
 docker run -p 8000:8000 \
   -e VITE_API_HOST=http://localhost:8000 \
+  -e DB=/app/jobs.db \
   -v $(pwd)/uploads:/app/uploads \
   -v $(pwd)/transcripts:/app/transcripts \
   -v $(pwd)/logs:/app/logs \

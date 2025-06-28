@@ -27,7 +27,6 @@ LOCAL_TZ = ZoneInfo(settings.timezone)
 from api.services.job_queue import JobQueue, ThreadJobQueue, BrokerJobQueue
 
 from api.utils.logger import get_logger
-from api.routes.progress import send_progress_update
 
 backend_log = get_logger("backend")
 ACCESS_LOG = LOG_DIR / "access.log"
@@ -74,6 +73,9 @@ def handle_whisper(
     job_id: str, upload: Path, job_dir: Path, model: str, *, start_thread: bool = True
 ):
     from api.orm_bootstrap import SessionLocal
+
+    # Lazy import to avoid circular imports during module initialization
+    from api.routes.progress import send_progress_update
 
     global WHISPER_BIN
     WHISPER_BIN = WHISPER_BIN or shutil.which(settings.whisper_bin)

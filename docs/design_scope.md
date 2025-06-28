@@ -49,7 +49,10 @@ Application settings come from `api/settings.py`. It reads environment
 variables once using `pydantic_settings.BaseSettings` and exposes a `settings`
 object used throughout the code base. Available variables are:
 
-- `DB_URL` – SQLAlchemy database URL for the required PostgreSQL database.
+- `DB_URL` – SQLAlchemy connection string for the required PostgreSQL
+  database. The default
+  `postgresql+psycopg2://whisper:whisper@db:5432/whisper` points to the `db`
+  service defined in `docker-compose.yml`.
 - `VITE_API_HOST` – base URL for the frontend to reach the API.
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – log level for backend loggers.

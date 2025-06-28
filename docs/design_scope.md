@@ -124,40 +124,25 @@ This document summarizes the repository layout and how the core FastAPI service 
 ## Future Updates
 <!-- Codex: Keep table cells padded to uniform column widths when updating. -->
 
+### Open
 | Feature Idea                                                         | Status    | Reasoning                        | Considerations                 | Roadblocks                    |
 | -------------------------------------------------------------------- | --------- | -------------------------------- | ------------------------------- | ----------------------------- |
-| Global state management                                              | Done   | Share job data across components | Choose state library            | Data sync complexity        |
 | Sortable job table component                                        | Open   | Track jobs more easily            | Table library, UI state         | None                        |
-| Notification/toast system                                           | Done   | Surface status messages          | Auto-dismiss timing             | None                        |
-| Admin dashboard KPIs                                                | Done   | Monitor throughput               | Metrics queries                 | None                        |
-| Role-based auth with settings page                                  | Done   | Restrict features per role       | Session handling, UI            | User management complexity    |
-| Download job archive (.zip)                                          | Done      | Zip existing logs and results    | Avoid large file memory use     | None                          |
-| Support `.vtt` transcript export                                     | Done      | Convert from SRT to VTT          | Extra dependency for conversion | None                          |
-| Provide CLI wrapper for non-UI usage                                 | On Hold      | Wrapper script around API calls  | Package distribution            | None                          |
-| Improve status messaging in UI                                       | Done      | Real-time updates via progress WebSocket | Friendlier labels, localization | None                          |
 | Job runtime display (live & final)                                   | Open      | Track job start and end times    | Store runtime data              | None                          |
 | Admin panel health checks and job cleanup                            | Open      | Add checks and cleanup hooks     | Permission checks               | None                          |
-| Queue limit or concurrency throttle                                  | Done      | Throttle worker count            | Configurable limits             | None                          |
-| Docker Compose setup                                                 | Done      | Provide sample compose file      | Keep dev/prod parity            | None                          |
 | Dashboard KPIs for throughput                                        | Open      | Show totals and averages         | Pull metrics from DB            | None                          |
-| Role-based authentication                                            | Done      | Add user roles table             | Password storage, security      | User management complexity    |
 | Settings page to customize default model                             | Open      | UI for selecting models          | Persist user prefs              | None                          |
 | Allow multiple files per upload with validation                      | Open      | Adjust upload handler            | File size and concurrency       | None                          |
 | Web-based log viewer                                                 | Open      | Simple log tail view             | Log file rotation               | Large logs                    |
-| Sortable and searchable job lists                                    | Partial   | Search filter added via `/jobs`  | Sorting not implemented        | None                          |
 | Status toasts for admin actions                                      | Open      | Display toast on success/failure | Frontend state management       | None                          |
 | Playback or text toggle for completed jobs                           | Open      | Switch between audio and text    | Media player integration        | None                          |
 | Use `updated_at` for job sorting/pagination                          | Open      | Modify queries                   | Add index                       | None                          |
 | Heartbeat table and `/heartbeat` endpoint                            | Open      | Record worker heartbeats         | Extra DB writes                 | None                          |
 | Kill (cancel) a running job                                          | Open      | Send termination signal          | Handle partial output           | Process management            |
-| Stop / Restart server from Admin                                     | Done      | Admin commands to stop and start | Risk of accidental shutdown     | Requires elevated permissions |
 | Shell/CLI access from admin page                                     | Open      | Web terminal component           | Security and sandboxing         | Major security risk           |
 | Resume jobs after crash or cancel                                    | Open      | Persist intermediate state       | Robust job recovery             | Complex state handling        |
-| Stream logs to UI via WebSocket                                      | Done      | Push log lines live              | Scalability of sockets          | None                          |
 | UI progress bars with word-level timestamps                          | Open      | Parse SRT positions              | Frequent UI updates             | None                          |
-| Auto-delete old transcripts after 30 days                            | Done         | Background cleanup task          | Configurable retention          | None                          |
 | Workflow automation hooks                                            | Open      | Fire webhook on job completion   | Configurable URLs               | Security of hooks             |
-| Audio format conversion                                              | Done      | `/convert` re-encodes uploads    | Allowed: mp3, m4a, wav, flac     | None                          |
 | Audio cleanup utilities                                              | Open      | Noise reduction pipeline         | CPU usage                       | External libs                 |
 | Integration with meeting platforms                                   | Open      | OAuth with Zoom/Meet APIs        | API rate limits                 | Authentication complexity     |
 | Searchable transcript archive                                        | Open      | Full-text search index           | Storage footprint               | Search engine setup           |
@@ -170,12 +155,40 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Comprehensive audio toolbox                                          | Open      | Combine many tools in UI         | Complexity of options           | Maintenance burden            |
 | Text-to-speech from documents                                        | Open      | Generate audio from text         | Multi-language support          | TTS model size                |
 | Mobile voice memo support                                            | Open      | Mobile upload workflow           | Touch-friendly UI               | None                          |
-| LLM-powered transcript insights                                      | Done      | Send transcript to LLM service   | Token limits, privacy           | API cost                      |
 | Collaborative transcript editing                                     | Open      | Multi-user editing UI            | Real-time sync                  | Conflict resolution           |
 | Automated meeting minutes                                            | Open      | Compose summary + action items   | Integration with calendars      | Summarization accuracy        |
 | Cloud storage sync                                                   | Open      | Upload artifacts to cloud drives | OAuth + API quotas              | Reliability of sync           |
 | Personalized speech models                                           | Open      | Fine-tune recognition per user   | Training data storage           | Model training cost           |
 | Sign language video generation                                       | Open      | Generate sign language videos    | Signer avatar quality           | Very heavy compute            |
+
+### On Hold
+| Feature Idea                                                         | Status    | Reasoning                        | Considerations                 | Roadblocks                    |
+| -------------------------------------------------------------------- | --------- | -------------------------------- | ------------------------------- | ----------------------------- |
+| Provide CLI wrapper for non-UI usage                                 | On Hold      | Wrapper script around API calls  | Package distribution            | None                          |
+
+### Partial
+| Feature Idea                                                         | Status    | Reasoning                        | Considerations                 | Roadblocks                    |
+| -------------------------------------------------------------------- | --------- | -------------------------------- | ------------------------------- | ----------------------------- |
+| Sortable and searchable job lists                                    | Partial   | Search filter added via `/jobs`  | Sorting not implemented        | None                          |
+
+### Done
+| Feature Idea                                                         | Status    | Reasoning                        | Considerations                 | Roadblocks                    |
+| -------------------------------------------------------------------- | --------- | -------------------------------- | ------------------------------- | ----------------------------- |
+| Global state management                                              | Done   | Share job data across components | Choose state library            | Data sync complexity        |
+| Notification/toast system                                           | Done   | Surface status messages          | Auto-dismiss timing             | None                        |
+| Admin dashboard KPIs                                                | Done   | Monitor throughput               | Metrics queries                 | None                        |
+| Role-based auth with settings page                                  | Done   | Restrict features per role       | Session handling, UI            | User management complexity    |
+| Download job archive (.zip)                                          | Done      | Zip existing logs and results    | Avoid large file memory use     | None                          |
+| Support `.vtt` transcript export                                     | Done      | Convert from SRT to VTT          | Extra dependency for conversion | None                          |
+| Improve status messaging in UI                                       | Done      | Real-time updates via progress WebSocket | Friendlier labels, localization | None                          |
+| Queue limit or concurrency throttle                                  | Done      | Throttle worker count            | Configurable limits             | None                          |
+| Docker Compose setup                                                 | Done      | Provide sample compose file      | Keep dev/prod parity            | None                          |
+| Role-based authentication                                            | Done      | Add user roles table             | Password storage, security      | User management complexity    |
+| Stop / Restart server from Admin                                     | Done      | Admin commands to stop and start | Risk of accidental shutdown     | Requires elevated permissions |
+| Stream logs to UI via WebSocket                                      | Done      | Push log lines live              | Scalability of sockets          | None                          |
+| Auto-delete old transcripts after 30 days                            | Done         | Background cleanup task          | Configurable retention          | None                          |
+| Audio format conversion                                              | Done      | `/convert` re-encodes uploads    | Allowed: mp3, m4a, wav, flac     | None                          |
+| LLM-powered transcript insights                                      | Done      | Send transcript to LLM service   | Token limits, privacy           | API cost                      |
 | Start a New Job button after upload                                  | Done      |                                  |                                 |                               |
 | Replace default favicon                                              | Done      |                                  |                                 |                               |
 | Show Docker stats in Admin (`/admin/stats`)                          | Done      |                                  |                                 |                               |
@@ -188,5 +201,6 @@ This document summarizes the repository layout and how the core FastAPI service 
 | Local-time timestamps shown in the UI                                | Done      |                                  |                                 |                               |
 | Download transcripts as `.txt` (default in UI)                       | Done      |                                  |                                 |                               |
 | Directory browser API (`/admin/browse`)                              | Done   |                                  |                                 |                        |
+
 Cleanup retention can be configured via the `/admin/cleanup-config` endpoint.
 The concurrency limit can be adjusted at runtime using `/admin/concurrency`.

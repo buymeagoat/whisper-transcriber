@@ -25,11 +25,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 
 `api/settings.py` reads the following environment variables at startup:
 
-- `DB_URL` – SQLAlchemy database URL for the main database. Defaults to
-  `postgresql+psycopg2://whisper:whisper@db:5432/whisper`. The Docker image
-  sets `DB=/app/jobs.db` so it uses SQLite unless `DB_URL` is provided.
-- `DB` – path to a SQLite database file used mainly for tests. When set it
-  overrides `DB_URL`.
+- `DB_URL` – SQLAlchemy database URL for the PostgreSQL database. Defaults to
+  `postgresql+psycopg2://whisper:whisper@db:5432/whisper`.
 - `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://localhost:8000`).
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
@@ -86,14 +83,7 @@ Start the backend with `uvicorn`:
 uvicorn api.main:app
 ```
 
-To store jobs in a local SQLite file, prefix the command with `DB=./jobs.db`:
-
-```bash
-DB=./jobs.db uvicorn api.main:app
-```
-
-Omitting this variable expects a PostgreSQL service named `db` as configured by
-the default `DB_URL`.
+A running PostgreSQL service configured by the default `DB_URL` is required.
 
 When `JOB_QUEUE_BACKEND` is set to `broker` a Celery worker must also be
 started:
@@ -300,9 +290,8 @@ If you use a prebuilt image, mount the models directory at runtime.
 
 Run the container with the application directories mounted so that
 uploads, transcripts and logs persist on the host. Set `VITE_API_HOST` to
-the URL where the backend is reachable. The image already sets
-`DB=/app/jobs.db` so jobs are stored in a local SQLite file. To use
-PostgreSQL instead, provide a `DB_URL` pointing to your database:
+the URL where the backend is reachable. Provide a `DB_URL` pointing to your
+PostgreSQL database:
 
 ```bash
 docker run -p 8000:8000 \

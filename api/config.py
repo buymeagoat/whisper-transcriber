@@ -15,10 +15,12 @@ load_dotenv()
 RAW_VITE_API_HOST = os.getenv("VITE_API_HOST")
 API_HOST = RAW_VITE_API_HOST or "http://localhost:8000"
 
-DB_URL = os.getenv("DB_URL", "postgresql+psycopg2://whisper:whisper@db:5432/whisper")
-DB_PATH = os.getenv("DB")
-if DB_PATH:
-    DB_URL = f"sqlite:///{DB_PATH}"
+# PostgreSQL is required in production. Override ``DB_URL`` to use a different
+# database engine for development or testing.
+DB_URL = os.getenv(
+    "DB_URL",
+    "postgresql+psycopg2://whisper:whisper@db:5432/whisper",
+)
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG").upper()
 LOG_TO_STDOUT = os.getenv("LOG_TO_STDOUT", "false").lower() == "true"

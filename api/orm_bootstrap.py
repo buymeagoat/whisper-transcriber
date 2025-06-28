@@ -36,7 +36,7 @@ def validate_or_initialize_database():
             pass
     except OperationalError:
         log.critical(
-            "Database unreachable. Use DB=/path/to/jobs.db for SQLite or start a PostgreSQL service."
+            "Database unreachable. Use DB_URL=sqlite:///path/to/jobs.db for SQLite or start a PostgreSQL service."
         )
         sys.exit(1)
 

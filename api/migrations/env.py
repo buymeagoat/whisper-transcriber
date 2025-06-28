@@ -10,11 +10,10 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 import os
-import sys
 
 db_url = os.getenv("DB_URL")
 if not db_url:
-    sys.exit("DB_URL environment variable is required")
+    raise SystemExit("DB_URL environment variable is required")
 
 config.set_main_option("sqlalchemy.url", db_url)
 

@@ -73,11 +73,6 @@ class Job(Base):
 class TranscriptMetadata(Base):
     __tablename__ = "metadata"
 
-    __table_args__ = (
-        # Enforces better SQLite compatibility and future-proofing
-        {"sqlite_autoincrement": True},
-    )
-
     job_id: Mapped[str] = mapped_column(String, ForeignKey("jobs.id"), primary_key=True)
     tokens: Mapped[int] = mapped_column(Integer, nullable=False)
     duration: Mapped[int] = mapped_column(Integer, nullable=False)

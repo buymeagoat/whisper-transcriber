@@ -11,7 +11,7 @@ The application is considered working once these basics are functional:
 - Jobs can be submitted with `/jobs` and processed with the Whisper CLI.
 - Job status can be queried and transcripts downloaded.
 - Metadata is generated and stored alongside transcripts.
-- Alembic migrations run automatically so the SQLite schema is up to date.
+- Alembic migrations run automatically so the database schema is up to date.
 - Logs are written for each job and for overall system activity.
 
 ## Architecture
@@ -49,10 +49,7 @@ Application settings come from `api/settings.py`. It reads environment
 variables once using `pydantic_settings.BaseSettings` and exposes a `settings`
 object used throughout the code base. Available variables are:
 
-- `DB_URL` – database URL used when connecting to PostgreSQL.
-- `DB` – SQLite path overriding `DB_URL`.
-  The Docker image sets `DB=/app/jobs.db` so SQLite is used by default.
-  Provide a `DB_URL` value to connect to PostgreSQL instead.
+- `DB_URL` – SQLAlchemy database URL for the required PostgreSQL database.
 - `VITE_API_HOST` – base URL for the frontend to reach the API.
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – log level for backend loggers.
@@ -118,7 +115,7 @@ This document summarizes the repository layout and how the core FastAPI service 
 ### Backend
 - REST endpoints handle job submission, progress checks, downloads and admin operations.
 - Whisper runs in a background thread writing transcripts to `transcripts/` and logs to `logs/`.
-- Metadata is extracted from each transcript and persisted to SQLite.
+- Metadata is extracted from each transcript and persisted to the database.
 - Jobs survive server restarts by being rehydrated on startup if processing was incomplete.
 
 ## Future Updates

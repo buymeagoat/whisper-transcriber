@@ -11,9 +11,10 @@ if config.config_file_name is not None:
 
 import os
 
-db_url = os.getenv("DB_URL") or os.getenv("DB")
-if not db_url:
-    db_url = "postgresql+psycopg2://whisper:whisper@db:5432/whisper"
+db_url = os.getenv(
+    "DB_URL",
+    "postgresql+psycopg2://whisper:whisper@db:5432/whisper",
+)
 config.set_main_option("sqlalchemy.url", db_url)
 
 # === PATCH: enable autogeneration by pointing to SQLAlchemy metadata

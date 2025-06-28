@@ -5,7 +5,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-ENV DB=/app/jobs.db
 ENV PYTHONPATH=/app
 COPY requirements.txt .
 COPY alembic.ini .

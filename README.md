@@ -295,7 +295,10 @@ Run the container with the application directories mounted so that
 uploads, transcripts and logs persist on the host. Set `VITE_API_HOST` to
 the URL where the backend is reachable. Ensure `DB_URL` points to your
 PostgreSQL instance; the compose file defaults to the `db` service
-(using the `postgres:15-alpine` image):
+(using the `postgres:15-alpine` image). When starting the container
+without compose you must provide your own PostgreSQL instance. Launch one
+manually or point `DB_URL` at an existing server to avoid the "could not
+translate host name \"db\"" error:
 
 ```bash
 docker run -p 8000:8000 \
@@ -304,6 +307,17 @@ docker run -p 8000:8000 \
   -v $(pwd)/transcripts:/app/transcripts \
   -v $(pwd)/logs:/app/logs \
   whisper-app
+```
+
+If you need a local database without using compose, run a PostgreSQL
+container separately and set `DB_URL` accordingly:
+
+```bash
+docker run -d --name whisper-db \
+  -e POSTGRES_USER=whisper \
+  -e POSTGRES_PASSWORD=whisper \
+  -e POSTGRES_DB=whisper \
+  -p 5432:5432 postgres:15-alpine
 ```
 
 ## Docker Compose
@@ -340,8 +354,9 @@ Start everything with:
 docker compose up --build api worker broker db
 ```
 
-The worker container runs `celery -A api.services.celery_app worker` to process
-jobs from RabbitMQ. Once running, access the API at `http://localhost:8000`.
+The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ.
+An optional helper script `scripts/start_containers.sh` automates these steps. Run it from the repository root to build the frontend if needed and launch the compose stack in detached mode. Use `docker compose down` to stop all services.
+Once running, access the API at `http://localhost:8000`.
 
 ## Testing
 

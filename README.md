@@ -41,6 +41,8 @@ cd frontend
 - `LOG_MAX_BYTES` – maximum size of each log file before rotation (defaults to
   `10000000`).
 - `LOG_BACKUP_COUNT` – how many rotated log files to keep (defaults to `3`).
+- `DB_CONNECT_ATTEMPTS` – how many times to retry connecting to the database on
+  startup (defaults to `10`).
 - `AUTH_USERNAME` and `AUTH_PASSWORD` – *(deprecated)* previous static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
 - `SECRET_KEY` – secret used to sign JWT tokens.
@@ -92,6 +94,9 @@ uvicorn api.main:app
 
 PostgreSQL must be available. The default `DB_URL` targets the `db` service
 (based on the `postgres:15-alpine` image) from `docker-compose.yml`.
+
+If startup fails, set `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` for verbose
+logs before launching the API.
 
 When `JOB_QUEUE_BACKEND` is set to `broker` a Celery worker must also be
 started:

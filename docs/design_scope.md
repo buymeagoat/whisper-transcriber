@@ -61,6 +61,8 @@ object used throughout the code base. Available variables are:
 - `LOG_MAX_BYTES` – maximum size of log files before rotation (defaults to
   `10000000`).
 - `LOG_BACKUP_COUNT` – number of rotated files to keep (defaults to `3`).
+- `DB_CONNECT_ATTEMPTS` – how many times to retry connecting to the database on
+  startup (defaults to `10`).
 - `AUTH_USERNAME` / `AUTH_PASSWORD` – *(deprecated)* old static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint.
 - `SECRET_KEY` – secret for JWT signing.

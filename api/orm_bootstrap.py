@@ -22,7 +22,8 @@ def validate_or_initialize_database():
     log.info("Bootstrapping database...")
 
     # ── Step 1: Check database connection with retries ──
-    max_attempts = 10
+codex/investigate-application-errors-and-propose-fixes
+    max_attempts = settings.db_connect_attempts
     for attempt in range(1, max_attempts + 1):
         try:
             with engine.connect():

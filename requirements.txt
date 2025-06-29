@@ -30,6 +30,9 @@ torch>=2.2.2
 pydub>=0.25.1
 pyttsx3>=2.90
 
+# --- Background task queue ---
+celery>=5.3
+
 # --- .env file support ---
 python-dotenv>=1.1.0
 pydantic-settings>=2.2.1

@@ -11,6 +11,7 @@ dependencies = [
     "pydantic-settings",
     "alembic",                # Keep for DB migration
     "psycopg2-binary",
+    "celery>=5.3",
 ]
 
 [build-system]

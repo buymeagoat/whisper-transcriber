@@ -10,11 +10,19 @@ from api.models import Base
 from api.utils.logger import get_logger
 from api.settings import settings
 
+log = get_logger("orm")
+
 DB_URL = settings.db_url
+if "DB_URL" not in os.environ:
+    log.warning(
+        "DB_URL environment variable not set; using default '%s'."
+        " If running without docker compose, set DB_URL to a reachable"
+        " PostgreSQL server.",
+        DB_URL,
+    )
+
 engine = create_engine(DB_URL)
 SessionLocal = sessionmaker(bind=engine)
-
-log = get_logger("orm")
 
 
 def validate_or_initialize_database():

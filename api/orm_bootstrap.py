@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import os
+import time
 from pathlib import Path
 
 from sqlalchemy import inspect, create_engine
@@ -20,15 +21,27 @@ log = get_logger("orm")
 def validate_or_initialize_database():
     log.info("Bootstrapping database...")
 
-    # ── Step 1: Check database connection ──
-    try:
-        with engine.connect():
-            pass
-    except OperationalError:
-        log.critical(
-            "Database unreachable. Ensure a PostgreSQL service is running and DB_URL is correct."
-        )
-        sys.exit(1)
+    # ── Step 1: Check database connection with retries ──
+    max_attempts = 10
+    for attempt in range(1, max_attempts + 1):
+        try:
+            with engine.connect():
+                break
+        except OperationalError:
+            if attempt == max_attempts:
+                log.critical(
+                    "Database unreachable after %s attempts. Ensure a PostgreSQL service is running and DB_URL is correct.",
+                    max_attempts,
+                )
+                sys.exit(1)
+            wait_time = attempt
+            log.warning(
+                "Database connection failed (attempt %s/%s). Retrying in %s second(s)...",
+                attempt,
+                max_attempts,
+                wait_time,
+            )
+            time.sleep(wait_time)
 
     # ── Step 2: Run Alembic migrations ──
     log.info("Running Alembic migrations to ensure schema is current...")

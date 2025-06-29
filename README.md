@@ -16,10 +16,15 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 3. Install frontend dependencies from the `frontend` directory. The build
    requires **Node.js 18** or newer:
    ```bash
- cd frontend
+cd frontend
   npm install
   ```
    # install Redux packages for global state and toasts
+4. Install Celery if you plan to set `JOB_QUEUE_BACKEND=broker` or use Docker
+   Compose:
+   ```bash
+   pip install celery
+   ```
 
 ## Optional Environment Variables
 

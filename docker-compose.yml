@@ -4,6 +4,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - SERVICE_TYPE=api
       - VITE_API_HOST=http://localhost:8000
       - JOB_QUEUE_BACKEND=broker
       - CELERY_BROKER_URL=amqp://guest:guest@broker:5672//
@@ -17,6 +18,11 @@ services:
     depends_on:
       - db
       - broker
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   db:
     image: postgres:15-alpine
@@ -41,6 +47,7 @@ services:
     # See https://docs.celeryq.dev/en/stable/userguide/workers.html#running-the-worker-as-a-daemon
     command: celery -A api.services.celery_app worker --uid=1000 --gid=1000
     environment:
+      - SERVICE_TYPE=worker
       - VITE_API_HOST=http://localhost:8000
       - JOB_QUEUE_BACKEND=broker
       - CELERY_BROKER_URL=amqp://guest:guest@broker:5672//
@@ -52,6 +59,11 @@ services:
       - ./logs:/app/logs
     depends_on:
       - broker
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   db_data:

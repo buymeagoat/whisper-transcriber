@@ -55,6 +55,12 @@ async def lifespan(app: FastAPI):
     system_log.info("App startup — lifespan entering.")
     validate_or_initialize_database()
     validate_models_dir()
+    system_log.info(
+        "Startup complete: DB connected, storage backend %s ready, job queue %s, timezone %s",
+        settings.storage_backend,
+        settings.job_queue_backend,
+        settings.timezone,
+    )
     check_celery_connection()
     rehydrate_incomplete_jobs()
     if settings.cleanup_enabled:

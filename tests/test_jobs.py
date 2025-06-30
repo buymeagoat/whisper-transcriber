@@ -7,6 +7,7 @@ from api import models, orm_bootstrap
 
 def create_test_app(postgresql, tmp_path):
     os.environ["DB_URL"] = postgresql.url()
+    os.environ.setdefault("SECRET_KEY", "test-secret")
     import api.settings as settings
 
     importlib.reload(settings)

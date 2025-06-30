@@ -6,6 +6,8 @@ variables the old way so legacy imports keep working. New code should import
 """
 
 import os
+import logging
+import sys
 from dotenv import load_dotenv
 
 # Load environment variables from a .env file if present
@@ -41,6 +43,9 @@ STORAGE_BACKEND = os.getenv("STORAGE_BACKEND", "local")
 AUTH_USERNAME = os.getenv("AUTH_USERNAME", "admin")
 AUTH_PASSWORD = os.getenv("AUTH_PASSWORD", "admin")
 
-SECRET_KEY = os.getenv("SECRET_KEY", "change-me")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    logging.critical("SECRET_KEY environment variable not set")
+    sys.exit(1)
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))

@@ -1,7 +1,7 @@
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      ffmpeg git && \
+      ffmpeg git curl && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user to run Celery workers
@@ -17,15 +17,22 @@ COPY alembic.ini .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
+COPY scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
+RUN chmod +x /usr/local/bin/healthcheck.sh
+
 COPY api         ./api
 COPY models      ./models
 RUN python -c "from api.utils.model_validation import validate_models_dir; validate_models_dir()"
 RUN mkdir -p uploads transcripts
 COPY frontend/dist ./api/static
 
+# Default service type for healthcheck script
+ENV SERVICE_TYPE=api
+
 # Switch to non-root user for running the application
 USER appuser
 
 ENV VITE_API_HOST=http://localhost:8000
 EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD /usr/local/bin/healthcheck.sh
 CMD ["uvicorn","api.main:app","--host","0.0.0.0","--port","8000"]

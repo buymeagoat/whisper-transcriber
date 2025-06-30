@@ -50,6 +50,14 @@ cd frontend
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
  - `SECRET_KEY` – **required** secret used to sign JWT tokens. The application
    exits on startup when this variable is missing.
+  Generate one with:
+
+  ```bash
+  # generate a 64-character key
+  python -c "import secrets; print(secrets.token_hex(32))"
+  ```
+  Set `SECRET_KEY` to this value before starting the API or worker containers.
+  The key signs JWT tokens and should be kept private.
 - `ACCESS_TOKEN_EXPIRE_MINUTES` – token lifetime in minutes.
 - `MAX_CONCURRENT_JOBS` – number of worker threads when using the built-in job
   queue. Defaults to `2`. The value can also be changed at runtime via

@@ -19,6 +19,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
 RUN chmod +x /usr/local/bin/healthcheck.sh
+COPY scripts/server_entry.py ./scripts/server_entry.py
 
 COPY api         ./api
 COPY models      ./models
@@ -35,4 +36,4 @@ USER appuser
 ENV VITE_API_HOST=http://localhost:8000
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD /usr/local/bin/healthcheck.sh
-CMD ["uvicorn","api.main:app","--host","0.0.0.0","--port","8000"]
+CMD ["python", "scripts/server_entry.py"]

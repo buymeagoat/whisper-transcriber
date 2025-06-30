@@ -35,6 +35,7 @@ cd frontend
   points to the `db` service (running the `postgres:15-alpine` image) defined in
   `docker-compose.yml`.
 - `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://localhost:8000`).
+- `PORT` – TCP port used by the Uvicorn server (defaults to `8000`).
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
 - `LOG_FORMAT` – set to `json` for structured logs or `plain` for text (defaults

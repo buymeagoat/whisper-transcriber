@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     allow_registration: bool = Field(True, env="ALLOW_REGISTRATION")
     auth_username: str = Field("admin", env="AUTH_USERNAME")
     auth_password: str = Field("admin", env="AUTH_PASSWORD")
-    secret_key: str = Field("change-me", env="SECRET_KEY")
+    secret_key: str = Field(..., env="SECRET_KEY")
     access_token_expire_minutes: int = Field(60, env="ACCESS_TOKEN_EXPIRE_MINUTES")
     max_concurrent_jobs: int = Field(2, env="MAX_CONCURRENT_JOBS")
     job_queue_backend: str = Field("thread", env="JOB_QUEUE_BACKEND")
@@ -58,4 +58,15 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
 
 
-settings = Settings()
+import logging
+import sys
+from pydantic import ValidationError
+
+try:
+    settings = Settings()
+except ValidationError as exc:
+    if any(err["loc"][0] == "secret_key" for err in exc.errors()):
+        logging.critical("SECRET_KEY environment variable not set")
+    else:
+        logging.critical("Invalid configuration: %s", exc)
+    sys.exit(1)

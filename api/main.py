@@ -45,9 +45,7 @@ ROOT = Path(__file__).parent
 # Read API host from environment with a default for local development.
 API_HOST = settings.vite_api_host
 if "VITE_API_HOST" not in os.environ:
-    system_log.warning(
-        "VITE_API_HOST not set, defaulting to http://localhost:8000"
-    )
+    system_log.warning("VITE_API_HOST not set, defaulting to http://localhost:8000")
 
 
 # ─── Lifespan Hook ───
@@ -119,9 +117,7 @@ def rehydrate_incomplete_jobs():
             .all()
         )
         for job in jobs:
-            backend_log.info(
-                f"Rehydrating job {job.id} with model '{job.model}'"
-            )
+            backend_log.info(f"Rehydrating job {job.id} with model '{job.model}'")
             try:
                 upload_path = storage.get_upload_path(job.saved_filename)
                 job_dir = storage.get_transcript_dir(job.id)

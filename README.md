@@ -28,7 +28,7 @@ cd frontend
 
 ## Optional Environment Variables
 
-`api/settings.py` reads the following environment variables at startup:
+`api/settings.py` reads the following environment variables at startup. `SECRET_KEY` has no default and must be set:
 
 - `DB_URL` – SQLAlchemy connection string for the required PostgreSQL
   database. The default `postgresql+psycopg2://whisper:whisper@db:5432/whisper`
@@ -45,7 +45,8 @@ cd frontend
   startup (defaults to `10`).
 - `AUTH_USERNAME` and `AUTH_PASSWORD` – *(deprecated)* previous static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
-- `SECRET_KEY` – secret used to sign JWT tokens.
+ - `SECRET_KEY` – **required** secret used to sign JWT tokens. The application
+   exits on startup when this variable is missing.
 - `ACCESS_TOKEN_EXPIRE_MINUTES` – token lifetime in minutes.
 - `MAX_CONCURRENT_JOBS` – number of worker threads when using the built-in job
   queue. Defaults to `2`. The value can also be changed at runtime via

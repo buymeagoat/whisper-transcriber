@@ -4,6 +4,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       ffmpeg git && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Create a non-root user to run Celery workers
+RUN groupadd -g 1000 appuser && \
+    useradd -m -u 1000 -g appuser appuser
+
+RUN mkdir -p /app && chown -R appuser:appuser /app
+
 WORKDIR /app
 ENV PYTHONPATH=/app
 COPY requirements.txt .

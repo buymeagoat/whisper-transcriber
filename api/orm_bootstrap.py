@@ -27,12 +27,13 @@ def validate_or_initialize_database():
         try:
             with engine.connect():
                 break
-        except OperationalError:
+        except OperationalError as exc:
             if attempt == max_attempts:
                 log.critical(
                     "Database unreachable after %s attempts. Ensure a PostgreSQL service is running and DB_URL is correct.",
                     max_attempts,
                 )
+                log.critical("Last error: %s", exc)
                 sys.exit(1)
             wait_time = attempt
             log.warning(
@@ -41,6 +42,7 @@ def validate_or_initialize_database():
                 max_attempts,
                 wait_time,
             )
+            log.debug("Connection error: %s", exc)
             time.sleep(wait_time)
 
     # ── Step 2: Run Alembic migrations ──

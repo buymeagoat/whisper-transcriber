@@ -37,6 +37,8 @@ cd frontend
 - `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://localhost:8000`).
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
+- `LOG_FORMAT` – set to `json` for structured logs or `plain` for text (defaults
+  to `plain`).
 - `LOG_TO_STDOUT` – set to `true` to also mirror logs to the console.
 - `LOG_MAX_BYTES` – maximum size of each log file before rotation (defaults to
   `10000000`).

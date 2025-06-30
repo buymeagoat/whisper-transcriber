@@ -7,6 +7,7 @@ from pathlib import Path
 from subprocess import Popen, PIPE
 from typing import Union
 from zoneinfo import ZoneInfo
+import sys
 
 from api.metadata_writer import run_metadata_writer
 from api.models import Job, JobStatusEnum
@@ -23,10 +24,20 @@ from api.paths import (
 # ─── Config ───
 from api.settings import settings
 
-LOCAL_TZ = ZoneInfo(settings.timezone)
-from api.services.job_queue import JobQueue, ThreadJobQueue, BrokerJobQueue
+from api.utils.logger import get_logger, get_system_logger
 
-from api.utils.logger import get_logger
+
+def init_timezone() -> ZoneInfo:
+    """Initialize timezone based on configuration."""
+    try:
+        return ZoneInfo(settings.timezone)
+    except Exception as exc:  # pragma: no cover - system exit
+        get_system_logger().critical(f"Invalid timezone '{settings.timezone}': {exc}")
+        sys.exit(1)
+
+
+LOCAL_TZ = init_timezone()
+from api.services.job_queue import JobQueue, ThreadJobQueue, BrokerJobQueue
 
 backend_log = get_logger("backend")
 ACCESS_LOG = LOG_DIR / "access.log"

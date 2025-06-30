@@ -21,6 +21,7 @@ from api.app_state import (
     LOCAL_TZ,
     backend_log,
     start_cleanup_thread,
+    check_celery_connection,
 )
 
 # ─── Logging ───
@@ -54,6 +55,7 @@ async def lifespan(app: FastAPI):
     system_log.info("App startup — lifespan entering.")
     validate_or_initialize_database()
     validate_models_dir()
+    check_celery_connection()
     rehydrate_incomplete_jobs()
     if settings.cleanup_enabled:
         start_cleanup_thread()

@@ -322,3 +322,22 @@ def _cleanup_task(interval: int = settings.cleanup_interval_seconds) -> None:
 
 def start_cleanup_thread(interval: int = settings.cleanup_interval_seconds) -> None:
     threading.Thread(target=_cleanup_task, args=(interval,), daemon=True).start()
+
+
+def check_celery_connection() -> None:
+    """Exit if the Celery broker is unreachable."""
+    if settings.job_queue_backend != "broker":
+        return
+
+    from api.services.celery_app import celery_app
+
+    log = get_system_logger()
+    try:
+        result = celery_app.control.ping(timeout=1)
+    except Exception as exc:  # pragma: no cover - system exit
+        log.critical("Celery ping failed: %s", exc)
+        sys.exit(1)
+
+    if not result:  # pragma: no cover - system exit
+        log.critical("Celery ping timed out or returned no workers")
+        sys.exit(1)

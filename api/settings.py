@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     )
     vite_api_host: str = Field("http://localhost:8000", env="VITE_API_HOST")
     log_level: str = Field("DEBUG", env="LOG_LEVEL")
+    log_format: str = Field("plain", env="LOG_FORMAT")
     log_to_stdout: bool = Field(False, env="LOG_TO_STDOUT")
     log_max_bytes: int = Field(10_000_000, env="LOG_MAX_BYTES")
     log_backup_count: int = Field(3, env="LOG_BACKUP_COUNT")

@@ -1,12 +1,33 @@
 # api/utils/logger.py
 
 import os
+import json
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from api.paths import LOG_DIR
 from api.settings import settings
+
+
+class JsonFormatter(logging.Formatter):
+    """Simple JSON log formatter."""
+
+    def __init__(self, job_id: str | None = None) -> None:
+        super().__init__()
+        self.job_id = job_id
+
+    def format(self, record: logging.LogRecord) -> str:  # type: ignore[override]
+        entry = {
+            "timestamp": self.formatTime(record),
+            "level": record.levelname,
+            "message": record.getMessage(),
+        }
+        if self.job_id:
+            entry["job_id"] = self.job_id
+        if record.exc_info:
+            entry["exc_info"] = self.formatException(record.exc_info)
+        return json.dumps(entry)
 
 
 def get_logger(job_id: str) -> logging.Logger:
@@ -26,9 +47,12 @@ def get_logger(job_id: str) -> logging.Logger:
             backupCount=settings.log_backup_count,
             encoding="utf-8",
         )
-        formatter = logging.Formatter(
-            f"[%(asctime)s] %(levelname)s [{job_id}]: %(message)s"
-        )
+        if settings.log_format.lower() == "json":
+            formatter = JsonFormatter(job_id)
+        else:
+            formatter = logging.Formatter(
+                f"[%(asctime)s] %(levelname)s [{job_id}]: %(message)s"
+            )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
@@ -56,9 +80,12 @@ def get_system_logger(name="system") -> logging.Logger:
             backupCount=settings.log_backup_count,
             encoding="utf-8",
         )
-        formatter = logging.Formatter(
-            "[%(asctime)s] %(levelname)s [system]: %(message)s"
-        )
+        if settings.log_format.lower() == "json":
+            formatter = JsonFormatter("system")
+        else:
+            formatter = logging.Formatter(
+                "[%(asctime)s] %(levelname)s [system]: %(message)s"
+            )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 

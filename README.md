@@ -313,8 +313,13 @@ docker run -p 8000:8000 \
   -v $(pwd)/uploads:/app/uploads \
   -v $(pwd)/transcripts:/app/transcripts \
   -v $(pwd)/logs:/app/logs \
+  -e LOG_LEVEL=DEBUG \
+  -e LOG_TO_STDOUT=true \
   whisper-app
 ```
+
+Setting `LOG_TO_STDOUT=true` and `LOG_LEVEL=DEBUG` surfaces detailed logs, which
+helps diagnose bootstrapping failures when running inside Docker.
 
 ## Docker Compose
 

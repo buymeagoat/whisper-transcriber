@@ -39,7 +39,9 @@ services:
 
   worker:
     build: .
-    command: celery -A api.services.celery_app worker
+    # Explicitly specify the user so Celery doesn't warn about running as root
+    # See https://docs.celeryq.dev/en/stable/userguide/workers.html#running-the-worker-as-a-daemon
+    command: celery -A api.services.celery_app worker --uid=0 --gid=0
     environment:
       - VITE_API_HOST=http://localhost:8000
       - JOB_QUEUE_BACKEND=broker

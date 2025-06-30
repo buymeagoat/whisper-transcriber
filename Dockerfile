@@ -23,6 +23,9 @@ RUN python -c "from api.utils.model_validation import validate_models_dir; valid
 RUN mkdir -p uploads transcripts
 COPY frontend/dist ./api/static
 
+# Switch to non-root user for running the application
+USER appuser
+
 ENV VITE_API_HOST=http://localhost:8000
 EXPOSE 8000
 CMD ["uvicorn","api.main:app","--host","0.0.0.0","--port","8000"]

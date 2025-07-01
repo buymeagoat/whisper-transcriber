@@ -4,7 +4,7 @@ from pathlib import Path
 
 from api.settings import settings
 from api.services.storage import LocalStorage, CloudStorage, Storage
-from api.utils.logger import get_system_logger
+import logging
 import sys
 
 ROOT = Path(__file__).parent
@@ -26,7 +26,7 @@ def init_storage() -> Storage:
             )
         raise ValueError(f"Unknown STORAGE_BACKEND: {settings.storage_backend}")
     except Exception as exc:  # pragma: no cover - system exit
-        get_system_logger().critical(f"Storage initialization failed: {exc}")
+        logging.critical(f"Storage initialization failed: {exc}")
         sys.exit(1)
 
 

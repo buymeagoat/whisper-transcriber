@@ -1,3 +1,4 @@
+# NOTE: This module is unused and will be removed in a future release.
 """Deprecated module kept for backward compatibility.
 
 Use :mod:`api.settings` instead. This file now simply loads environment

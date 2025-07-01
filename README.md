@@ -28,7 +28,7 @@ cd frontend
 
 ## Optional Environment Variables
 
-`api/settings.py` reads the following environment variables at startup. `SECRET_KEY` has no default and must be set:
+`api/settings.py` reads the following environment variables at startup. `SECRET_KEY` has no default and must be set. When using Docker Compose, variables in a `.env` file at the project root are automatically loaded. Create this file by copying `.env.example`:
 
 - `DB_URL` – SQLAlchemy connection string for the required PostgreSQL database in the form
   `postgresql+psycopg2://user:password@host:port/database`. The default
@@ -350,6 +350,8 @@ cd frontend
 npm run build
 cd ..
 ```
+
+Copy `.env.example` to `.env` and set a secure `SECRET_KEY` value. Compose picks up this file automatically.
 
 Build and start all services with:
 

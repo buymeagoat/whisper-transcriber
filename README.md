@@ -325,6 +325,7 @@ PostgreSQL instance; the compose file defaults to the `db` service
 ```bash
 docker run -p 8000:8000 \
   -e VITE_API_HOST=http://localhost:8000 \
+  -e SECRET_KEY=<your key> \
   -v $(pwd)/uploads:/app/uploads \
   -v $(pwd)/transcripts:/app/transcripts \
   -v $(pwd)/logs:/app/logs \
@@ -332,6 +333,14 @@ docker run -p 8000:8000 \
   -e LOG_TO_STDOUT=true \
   whisper-app
 ```
+
+Generate `SECRET_KEY` with:
+
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Alternatively copy `.env.example` to `.env` and set a secure value there before launching the container.
 
 Setting `LOG_TO_STDOUT=true` and `LOG_LEVEL=DEBUG` surfaces detailed logs, which
 helps diagnose bootstrapping failures when running inside Docker.

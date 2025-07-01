@@ -21,9 +21,11 @@ COPY scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
 RUN chmod +x /usr/local/bin/healthcheck.sh
 COPY scripts/server_entry.py ./scripts/server_entry.py
 
+ARG SECRET_KEY
 COPY api         ./api
 COPY models      ./models
-RUN python -c "from api.utils.model_validation import validate_models_dir; validate_models_dir()"
+RUN SECRET_KEY=${SECRET_KEY:-temp-secret} \
+    python -c "from api.utils.model_validation import validate_models_dir; validate_models_dir()"
 RUN mkdir -p uploads transcripts
 COPY frontend/dist ./api/static
 

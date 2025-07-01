@@ -18,7 +18,9 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
    ```bash
 cd frontend
   npm install
-  ```
+   ```
+   Copy `frontend/.env.example` to `frontend/.env` to configure `VITE_API_HOST`,
+   `VITE_DEV_HOST` and `VITE_DEV_PORT`.
    # install Redux packages for global state and toasts
 4. Install Celery if you plan to set `JOB_QUEUE_BACKEND=broker` or use Docker
    Compose:

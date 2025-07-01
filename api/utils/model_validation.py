@@ -8,11 +8,10 @@ system_log = get_system_logger()
 def validate_models_dir():
     """Ensure MODEL_DIR contains all required Whisper model files."""
     if not MODEL_DIR.exists():
-        system_log.critical(
-            "Missing models directory. Populate models/ before running."
-        )
+        system_log.critical("Missing models directory: %s", MODEL_DIR.resolve())
         raise RuntimeError(
-            "Whisper models directory missing. Ensure models/ contains the required files."
+            f"Whisper models directory {MODEL_DIR.resolve()} is missing."
+            " Populate it with the required files before running."
         )
 
     required_models = [
@@ -28,9 +27,10 @@ def validate_models_dir():
     if missing:
         system_log.critical(
             "Missing model files in %s: %s",
-            MODEL_DIR,
+            MODEL_DIR.resolve(),
             ", ".join(missing),
         )
         raise RuntimeError(
-            f"Required model files missing: {', '.join(missing)}. Add them to models/."
+            f"Required model files missing from {MODEL_DIR.resolve()}: "
+            f"{', '.join(missing)}."
         )

@@ -26,7 +26,8 @@ COPY api         ./api
 COPY models      ./models
 RUN SECRET_KEY=${SECRET_KEY:-temp-secret} \
     python -c "from api.utils.model_validation import validate_models_dir; validate_models_dir()"
-RUN mkdir -p uploads transcripts
+RUN mkdir -p uploads transcripts logs \
+    && chown -R appuser:appuser /app
 COPY frontend/dist ./api/static
 
 # Default service type for healthcheck script

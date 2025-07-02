@@ -175,7 +175,10 @@ Available metrics:
 
 ### Health & Version
 
-Use `/health` to check server status. `/version` returns the current application version.
+`/health` now verifies the database connection by running a simple query. It returns
+`{"status": "ok"}` when the check succeeds or `{"status": "db_error"}` with details
+and a 500 status code if the query fails. `/version` returns the current
+application version.
 
 ### Progress WebSocket
 

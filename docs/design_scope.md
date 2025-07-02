@@ -131,6 +131,8 @@ This document summarizes the repository layout and how the core FastAPI service 
 
 ### Backend
 - REST endpoints handle job submission, progress checks, downloads and admin operations.
+- `/health` verifies the database connection and returns `{"status": "db_error"}`
+  with a 500 code when the query fails.
 - Whisper runs in a background thread writing transcripts to `transcripts/` and logs to `logs/`.
 - Metadata is extracted from each transcript and persisted to the database.
 - Jobs survive server restarts by being rehydrated on startup if processing was incomplete.

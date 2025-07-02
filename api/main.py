@@ -6,6 +6,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from sqlalchemy import text
 
 from api.orm_bootstrap import SessionLocal, validate_or_initialize_database
 from api.models import Job
@@ -97,7 +99,15 @@ app.middleware("http")(access_logger)
 # ─── Static File Routes ───
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    try:
+        with SessionLocal() as db:
+            db.execute(text("SELECT 1"))
+        return {"status": "ok"}
+    except Exception as exc:
+        return JSONResponse(
+            status_code=500,
+            content={"status": "db_error", "detail": str(exc)},
+        )
 
 
 @app.get("/version")

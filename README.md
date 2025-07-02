@@ -52,6 +52,8 @@ The old `api/config.py` module is kept only for backward compatibility and will 
 - `LOG_BACKUP_COUNT` – how many rotated log files to keep (defaults to `3`).
 - `DB_CONNECT_ATTEMPTS` – how many times to retry connecting to the database on
   startup (defaults to `10`).
+- `BROKER_CONNECT_ATTEMPTS` – how many times to retry pinging the Celery broker
+  on startup (defaults to `10`).
 - `AUTH_USERNAME` and `AUTH_PASSWORD` – *(deprecated)* previous static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
  - `SECRET_KEY` – **required** secret used to sign JWT tokens. The application

@@ -373,7 +373,12 @@ docker compose up --build
 ```
 
 The compose file mounts the `uploads`, `transcripts`, `logs` and `models`
-directories so data and models persist between runs. It defines a `db` service
+directories so data and models persist between runs. These directories must
+exist on the host and be writable by UID `1000` because the containers run as a
+non-root `appuser`. The Dockerfile now creates `uploads/` and `transcripts/`
+during the build so the API can write to them, but when they are mounted from
+the host this step is bypassed, making correct permissions on `logs/`,
+`uploads/` and `transcripts/` essential. The compose file defines a `db` service
 using the `postgres:15-alpine` image and sets `DB_URL` on the API and worker so
 they connect to it. It also configures
 Celery with RabbitMQ by setting `JOB_QUEUE_BACKEND=broker`,

@@ -104,10 +104,8 @@ def health_check():
             db.execute(text("SELECT 1"))
         return {"status": "ok"}
     except Exception as exc:
-        return JSONResponse(
-            status_code=500,
-            content={"status": "db_error", "detail": str(exc)},
-        )
+        system_log.error(f"Health check failed: {exc}")
+        return JSONResponse(status_code=500, content={"status": "db_error"})
 
 
 @app.get("/version")

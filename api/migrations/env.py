@@ -1,5 +1,6 @@
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
+from sqlalchemy.exc import OperationalError
 from alembic import context
 
 # Alembic Config object
@@ -11,9 +12,11 @@ if config.config_file_name is not None:
 
 import os
 
-db_url = os.getenv("DB_URL")
+from api.settings import settings
+
+db_url = os.getenv("DB_URL") or settings.db_url
 if not db_url:
-    raise SystemExit("DB_URL environment variable is required")
+    raise SystemExit("DB_URL is not set and no default available from settings")
 
 config.set_main_option("sqlalchemy.url", db_url)
 
@@ -49,14 +52,20 @@ def run_migrations_online() -> None:
         poolclass=pool.NullPool,
     )
 
-    with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata,
-        )
+    try:
+        with connectable.connect() as connection:
+            context.configure(
+                connection=connection,
+                target_metadata=target_metadata,
+            )
 
-        with context.begin_transaction():
-            context.run_migrations()
+            with context.begin_transaction():
+                context.run_migrations()
+    except OperationalError as exc:
+        raise SystemExit(
+            "Database unreachable. Ensure a PostgreSQL service is running and DB_URL is correct."
+            f" Last error: {exc}"
+        )
 
 
 if context.is_offline_mode():

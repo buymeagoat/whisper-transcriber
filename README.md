@@ -375,7 +375,14 @@ docker compose up --build
 The compose file mounts the `uploads`, `transcripts`, `logs` and `models`
 directories so data and models persist between runs. These directories must
 exist on the host and be writable by UID `1000` because the containers run as a
-non-root `appuser`. The Dockerfile now creates `uploads/` and `transcripts/`
+non-root `appuser`. Create them and adjust ownership with:
+
+```bash
+mkdir -p uploads transcripts logs
+sudo chown -R 1000:1000 uploads transcripts logs
+```
+
+The Dockerfile now creates `uploads/` and `transcripts/`
 during the build so the API can write to them, but when they are mounted from
 the host this step is bypassed, making correct permissions on `logs/`,
 `uploads/` and `transcripts/` essential. The compose file defines a `db` service
@@ -391,7 +398,7 @@ docker compose up --build api worker broker db
 ```
 
 The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ.
-An optional helper script `scripts/start_containers.sh` automates these steps. Run it from the repository root to build the frontend if needed and launch the compose stack in detached mode. The script now fixes permissions on `uploads`, `transcripts` and `logs` so the API and worker can create log files. Use `docker compose down` to stop all services.
+An optional helper script `scripts/start_containers.sh` automates these steps. Run it from the repository root to build the frontend if needed and launch the compose stack in detached mode. The script now fixes permissions on `uploads`, `transcripts` and `logs`, using `sudo` automatically when required, so the API and worker can create log files. Use `docker compose down` to stop all services.
 Once running, access the API at `http://localhost:8000`.
 
 ## Testing

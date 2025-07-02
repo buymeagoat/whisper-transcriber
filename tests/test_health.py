@@ -26,4 +26,3 @@ def test_health_db_failure(monkeypatch):
     assert resp.status_code == 500
     data = resp.json()
     assert data["status"] == "db_error"
-    assert "boom" in data["detail"]

@@ -389,7 +389,7 @@ docker compose up --build api worker broker db
 ```
 
 The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ.
-An optional helper script `scripts/start_containers.sh` automates these steps. Run it from the repository root to build the frontend if needed and launch the compose stack in detached mode. Because the containers fix permissions automatically, the script no longer needs to run with sudo. Use `docker compose down` to stop all services.
+An optional helper script `scripts/start_containers.sh` automates these steps. Run it from the repository root to build the frontend if needed and launch the compose stack in detached mode. The script uses sudo only to adjust ownership of the `uploads`, `transcripts` and `logs` directories. Use `docker compose down` to stop all services.
 Once running, access the API at `http://localhost:8000`.
 
 ## Testing

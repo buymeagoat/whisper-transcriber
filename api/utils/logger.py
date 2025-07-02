@@ -74,6 +74,7 @@ def get_system_logger(name="system") -> logging.Logger:
     logger.propagate = False
 
     if not logger.handlers:
+        LOG_DIR.mkdir(parents=True, exist_ok=True)
         handler = RotatingFileHandler(
             log_path,
             maxBytes=settings.log_max_bytes,

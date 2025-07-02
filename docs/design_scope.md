@@ -70,6 +70,8 @@ release. Available variables are:
 - `LOG_BACKUP_COUNT` – number of rotated files to keep (defaults to `3`).
 - `DB_CONNECT_ATTEMPTS` – how many times to retry connecting to the database on
   startup (defaults to `10`).
+- `BROKER_CONNECT_ATTEMPTS` – how many times to retry pinging the Celery broker
+  on startup (defaults to `10`).
 - `AUTH_USERNAME` / `AUTH_PASSWORD` – *(deprecated)* old static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint.
 - `SECRET_KEY` – secret for JWT signing.

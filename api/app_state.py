@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 import threading
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from subprocess import Popen, PIPE
@@ -332,12 +333,19 @@ def check_celery_connection() -> None:
     from api.services.celery_app import celery_app
 
     log = get_system_logger()
-    try:
-        result = celery_app.control.ping(timeout=1)
-    except Exception as exc:  # pragma: no cover - system exit
-        log.critical("Celery ping failed: %s", exc)
-        sys.exit(1)
-
-    if not result:  # pragma: no cover - system exit
-        log.critical("Celery ping timed out or returned no workers")
-        sys.exit(1)
+    attempts = settings.broker_connect_attempts
+    for attempt in range(1, attempts + 1):
+        try:
+            result = celery_app.control.ping(timeout=1)
+            if result:
+                return
+            log.warning(
+                "Celery ping returned no workers (attempt %s/%s)", attempt, attempts
+            )
+        except Exception as exc:
+            log.warning(
+                "Celery ping failed (attempt %s/%s): %s", attempt, attempts, exc
+            )
+        time.sleep(attempt)
+    log.critical("Celery broker unreachable after %s attempts", attempts)
+    sys.exit(1)

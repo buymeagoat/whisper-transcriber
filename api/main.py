@@ -11,6 +11,7 @@ from api.orm_bootstrap import SessionLocal, validate_or_initialize_database
 from api.models import Job
 from api.models import JobStatusEnum
 from api.utils.logger import get_system_logger
+from api.config_validator import validate_config
 from api.utils.model_validation import validate_models_dir
 from api.router_setup import register_routes
 from api.middlewares.access_log import access_logger
@@ -26,6 +27,7 @@ from api.app_state import (
 
 # ─── Logging ───
 system_log = get_system_logger()
+validate_config()
 
 
 def log_startup_settings() -> None:

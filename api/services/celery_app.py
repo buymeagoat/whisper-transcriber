@@ -3,6 +3,9 @@ from __future__ import annotations
 from celery import Celery
 
 from api.settings import settings
+from api.config_validator import validate_config
+
+validate_config()
 
 celery_app = Celery(
     "whisper_transcriber",

@@ -17,6 +17,8 @@ fi
 
 # Ensure persistent directories exist
 mkdir -p "$ROOT_DIR/uploads" "$ROOT_DIR/transcripts" "$ROOT_DIR/logs"
+# Fix permissions in case they were created as root
+chown -R 1000:1000 "$ROOT_DIR/uploads" "$ROOT_DIR/transcripts" "$ROOT_DIR/logs"
 
 if [ ! -d "$ROOT_DIR/models" ]; then
     echo "Models directory $ROOT_DIR/models is missing. Place Whisper model files here before running." >&2

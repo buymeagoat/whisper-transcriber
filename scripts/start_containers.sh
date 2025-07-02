@@ -4,6 +4,21 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
+usage() {
+    cat <<EOF
+Usage: $(basename "$0")
+
+Builds the frontend if needed and starts the docker compose stack.
+sudo is required only to adjust ownership of the uploads, transcripts
+and logs directories.
+EOF
+}
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    usage
+    exit 0
+fi
+
 
 # Install and build the frontend if needed
 if [ ! -d "$ROOT_DIR/frontend/node_modules" ]; then
@@ -18,6 +33,7 @@ fi
 
 # Ensure persistent directories exist
 mkdir -p "$ROOT_DIR/uploads" "$ROOT_DIR/transcripts" "$ROOT_DIR/logs"
+sudo chown -R 1000:1000 "$ROOT_DIR/uploads" "$ROOT_DIR/transcripts" "$ROOT_DIR/logs"
 
 if [ ! -d "$ROOT_DIR/models" ]; then
     echo "Models directory $ROOT_DIR/models is missing. Place Whisper model files here before running." >&2

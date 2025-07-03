@@ -68,3 +68,17 @@ def test_submit_and_fetch_job(postgresql, tmp_path, sample_wav):
     assert data["original_filename"] == "test.wav"
     assert data["model"] == "base"
     assert data["status"] == "queued"
+
+
+def test_submit_invalid_model(postgresql, tmp_path, sample_wav):
+    app = create_test_app(postgresql, tmp_path)
+    client = TestClient(app)
+
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/jobs",
+            data={"model": "bogus"},
+            files={"file": ("test.wav", f, "audio/wav")},
+        )
+
+    assert resp.status_code == 400

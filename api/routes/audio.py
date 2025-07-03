@@ -22,13 +22,14 @@ async def convert_audio(
         raise http_error(ErrorCode.UNSUPPORTED_MEDIA)
 
     file_id = uuid.uuid4().hex
-    saved_name = f"{file_id}_{file.filename}"
+    safe_name = Path(file.filename).name
+    saved_name = f"{file_id}_{safe_name}"
     try:
         src_path = storage.save_upload(file.file, saved_name)
     except Exception:
         raise http_error(ErrorCode.FILE_SAVE_FAILED)
 
-    dest_name = f"{Path(file.filename).stem}_{file_id}.{target_format}"
+    dest_name = f"{Path(safe_name).stem}_{file_id}.{target_format}"
     dest_path = UPLOAD_DIR / dest_name
     try:
         subprocess.run(
@@ -55,13 +56,14 @@ async def edit_audio(
     """Perform basic editing on the uploaded audio file."""
 
     file_id = uuid.uuid4().hex
-    saved_name = f"{file_id}_{file.filename}"
+    safe_name = Path(file.filename).name
+    saved_name = f"{file_id}_{safe_name}"
     try:
         src_path = storage.save_upload(file.file, saved_name)
     except Exception:
         raise http_error(ErrorCode.FILE_SAVE_FAILED)
 
-    dest_name = f"{Path(file.filename).stem}_{file_id}{Path(file.filename).suffix}"
+    dest_name = f"{Path(safe_name).stem}_{file_id}{Path(safe_name).suffix}"
     dest_path = UPLOAD_DIR / dest_name
 
     cmd = ["ffmpeg", "-y", "-i", str(src_path)]

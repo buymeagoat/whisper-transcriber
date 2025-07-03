@@ -358,8 +358,10 @@ helps diagnose bootstrapping failures when running inside Docker.
 
 A `docker-compose.yml` is included to start the API together with the
 PostgreSQL and RabbitMQ services required by the default configuration. The
-`db` service runs PostgreSQL for the API while RabbitMQ provides a broker for
-Celery when using the `broker` job queue backend.
+compose file now relies on service health checks so the API and worker wait for
+the database and broker to become available. The `db` service runs PostgreSQL
+for the API while RabbitMQ provides a broker for Celery when using the `broker`
+job queue backend.
 
 Prepare `models/` with `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` and build the frontend before running compose:
 
@@ -369,7 +371,10 @@ npm run build
 cd ..
 ```
 
-Copy `.env.example` to `.env`, replacing `CHANGE_ME` with the generated `SECRET_KEY`. Compose picks up this file automatically.
+Copy `.env.example` to `.env`, replacing `CHANGE_ME` with the generated
+`SECRET_KEY`. Compose picks up this file automatically. Ensure this file also
+contains valid database credentials or a `DB_URL` override so the containers can
+connect to PostgreSQL.
 
 Build and start all services with:
 
@@ -392,6 +397,9 @@ Start everything with:
 ```bash
 docker compose up --build api worker broker db
 ```
+
+If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
+the container logs in the console.
 
 The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ.
 An optional helper script `scripts/start_containers.sh` automates these steps. Run it from the repository root to build the frontend if needed and launch the compose stack in detached mode. The script uses sudo only to adjust ownership of the `uploads`, `transcripts` and `logs` directories. Use `docker compose down` to stop all services.

@@ -1,5 +1,4 @@
 import subprocess
-import sys
 import os
 import time
 import logging
@@ -25,6 +24,7 @@ def validate_or_initialize_database():
     # ── Step 1: Check database connection with retries ──
     max_attempts = settings.db_connect_attempts
     for attempt in range(1, max_attempts + 1):
+        log.info("Attempting database connection (%s/%s)...", attempt, max_attempts)
         try:
             with engine.connect():
                 break
@@ -35,7 +35,7 @@ def validate_or_initialize_database():
                     max_attempts,
                 )
                 log.critical("Last error: %s", exc)
-                sys.exit(1)
+                raise RuntimeError("Database unreachable")
             wait_time = attempt
             log.warning(
                 "Database connection failed (attempt %s/%s). Retrying in %s second(s)...",
@@ -53,7 +53,7 @@ def validate_or_initialize_database():
     try:
         env = os.environ.copy()
         env.update({"PYTHONPATH": str(Path(__file__).resolve().parent.parent)})
-        subprocess.run(
+        completed = subprocess.run(
             ["alembic", "-c", str(ALEMBIC_INI), "upgrade", "head"],
             check=True,
             env=env,
@@ -61,14 +61,19 @@ def validate_or_initialize_database():
             stderr=subprocess.PIPE,
             text=True,
         )
+        if log.isEnabledFor(logging.DEBUG):
+            if completed.stdout:
+                log.debug("Alembic STDOUT:\n%s", completed.stdout)
+            if completed.stderr:
+                log.debug("Alembic STDERR:\n%s", completed.stderr)
         log.info("Alembic migrations applied successfully.")
     except subprocess.CalledProcessError as e:
-        log.critical(f"Alembic failed to apply migrations: {e}")
+        log.critical("Alembic failed with exit code %s", e.returncode)
         if e.stdout:
-            log.critical(e.stdout)
+            log.critical("Alembic STDOUT:\n%s", e.stdout)
         if e.stderr:
-            log.critical(e.stderr)
-        sys.exit(1)
+            log.critical("Alembic STDERR:\n%s", e.stderr)
+        raise RuntimeError("Alembic migrations failed") from e
 
     # ── Step 3: Validate expected tables exist ──
     inspector = inspect(engine)
@@ -78,7 +83,7 @@ def validate_or_initialize_database():
     if not expected.issubset(actual):
         log.critical(f"Schema mismatch: expected {expected}, found {actual}")
         log.critical("Schema invalid or incomplete.")
-        sys.exit(1)
+        raise RuntimeError("Database schema invalid")
 
     # ── Step 4: Success ──
     log.info("Database bootstrapping complete — schema verified.")

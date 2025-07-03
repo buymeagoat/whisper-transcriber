@@ -1,5 +1,3 @@
-from api.settings import settings
-
 import os
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -9,27 +7,35 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
+from api.utils.logger import get_system_logger
+from api.exceptions import ConfigurationError, InitError
+
+system_log = get_system_logger()
+
+try:
+    from api.settings import settings
+    from api.config_validator import validate_config
+    from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
+    from api.app_state import (
+        handle_whisper,
+        LOCAL_TZ,
+        backend_log,
+        start_cleanup_thread,
+        check_celery_connection,
+    )
+
+    validate_config()
+except (ConfigurationError, InitError) as exc:  # pragma: no cover - startup fail
+    system_log.critical(str(exc))
+    raise SystemExit(1)
+
 from api.orm_bootstrap import SessionLocal, validate_or_initialize_database
 from api.models import Job
 from api.models import JobStatusEnum
-from api.utils.logger import get_system_logger
-from api.config_validator import validate_config
 from api.utils.model_validation import validate_models_dir
 from api.router_setup import register_routes
 from api.middlewares.access_log import access_logger
-from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.utils.db_lock import db_lock
-from api.app_state import (
-    handle_whisper,
-    LOCAL_TZ,
-    backend_log,
-    start_cleanup_thread,
-    check_celery_connection,
-)
-
-# ─── Logging ───
-system_log = get_system_logger()
-validate_config()
 
 
 def log_startup_settings() -> None:
@@ -65,7 +71,11 @@ async def lifespan(app: FastAPI):
         settings.job_queue_backend,
         settings.timezone,
     )
-    await check_celery_connection()
+    try:
+        await check_celery_connection()
+    except InitError as exc:
+        system_log.critical(str(exc))
+        raise SystemExit(1)
     rehydrate_incomplete_jobs()
     if settings.cleanup_enabled:
         start_cleanup_thread()

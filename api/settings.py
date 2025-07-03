@@ -62,14 +62,17 @@ class Settings(BaseSettings):
 
 
 import logging
-import sys
 from pydantic import ValidationError
+
+from api.exceptions import ConfigurationError
 
 try:
     settings = Settings()
 except ValidationError as exc:
     if any(err["loc"][0] == "secret_key" for err in exc.errors()):
-        logging.critical("SECRET_KEY environment variable not set")
+        msg = "SECRET_KEY environment variable not set"
+        logging.critical(msg)
     else:
-        logging.critical("Invalid configuration: %s", exc)
-    sys.exit(1)
+        msg = f"Invalid configuration: {exc}"
+        logging.critical(msg)
+    raise ConfigurationError(msg) from exc

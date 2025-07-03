@@ -1,4 +1,5 @@
 from pathlib import Path
+import logging
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -58,8 +59,9 @@ def register_routes(app: FastAPI) -> None:
             raise HTTPException(status_code=404, detail="Not Found")
         return FileResponse(static_dir / "index.html")
 
-    backend_log.debug("\nSTATIC ROUTE CHECK:")
-    for route in app.routes:
-        backend_log.debug(
-            f"Path: {getattr(route, 'path', 'n/a')}  →  Name: {getattr(route, 'name', 'n/a')}  →  Type: {type(route)}"
-        )
+    if backend_log.isEnabledFor(logging.DEBUG):
+        backend_log.debug("\nSTATIC ROUTE CHECK:")
+        for route in app.routes:
+            backend_log.debug(
+                f"Path: {getattr(route, 'path', 'n/a')}  →  Name: {getattr(route, 'name', 'n/a')}  →  Type: {type(route)}"
+            )

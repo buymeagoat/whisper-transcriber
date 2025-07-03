@@ -5,6 +5,10 @@ from pathlib import Path
 import shutil
 import uuid
 
+from api.utils.logger import get_system_logger
+
+log = get_system_logger()
+
 from api.errors import ErrorCode, http_error
 from api.models import JobStatusEnum
 from api.app_state import LOCAL_TZ, handle_whisper, job_queue
@@ -200,8 +204,9 @@ def transcript_view(job_id: str, request: Request):
 
     transcript_file = Path(transcript_path)
     if not transcript_file.exists():
+        log.debug("Transcript file not found at %s", transcript_file)
         return HTMLResponse(
-            content=f"<h2>Transcript file not found at {transcript_file}</h2>",
+            content="<h2>Transcript file not found</h2>",
             status_code=404,
         )
 

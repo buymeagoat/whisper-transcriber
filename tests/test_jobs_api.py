@@ -177,3 +177,28 @@ def test_upload_path_traversal(client, sample_wav):
     assert saved.is_relative_to(UPLOAD_DIR)
     assert saved.name.startswith(f"{job_id}_")
     assert ".." not in saved.name
+
+
+def test_transcript_view_missing_file(client, sample_wav):
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/jobs",
+            data={"model": "base"},
+            files={"file": ("file.wav", f, "audio/wav")},
+        )
+    assert resp.status_code == 202
+    job_id = resp.json()["job_id"]
+
+    transcript_path = TRANSCRIPTS_DIR / job_id / "out.srt"
+    transcript_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with SessionLocal() as db:
+        job = db.query(Job).get(job_id)
+        job.status = JobStatusEnum.COMPLETED
+        job.transcript_path = str(transcript_path)
+        db.commit()
+
+    resp = client.get(f"/transcript/{job_id}/view")
+    assert resp.status_code == 404
+    assert "Transcript file not found" in resp.text
+    assert str(transcript_path) not in resp.text

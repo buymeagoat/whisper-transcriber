@@ -234,6 +234,7 @@ def handle_whisper(
                         except Exception as e:
                             job = db.query(Job).filter_by(id=job_id).first()
                             if job:
+                                storage.delete_transcript_dir(job_id)
                                 job.status = JobStatusEnum.FAILED_UNKNOWN
                                 job.log_path = str(log_path)
                                 job.finished_at = datetime.utcnow()

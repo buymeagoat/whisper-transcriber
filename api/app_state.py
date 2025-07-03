@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import threading
 import time
+import asyncio
 from datetime import datetime, timedelta
 from pathlib import Path
 from subprocess import Popen, PIPE
@@ -325,7 +326,7 @@ def start_cleanup_thread(interval: int = settings.cleanup_interval_seconds) -> N
     threading.Thread(target=_cleanup_task, args=(interval,), daemon=True).start()
 
 
-def check_celery_connection() -> None:
+async def check_celery_connection() -> None:
     """Exit if the Celery broker is unreachable."""
     if settings.job_queue_backend != "broker":
         return
@@ -346,6 +347,6 @@ def check_celery_connection() -> None:
             log.warning(
                 "Celery ping failed (attempt %s/%s): %s", attempt, attempts, exc
             )
-        time.sleep(attempt)
+        await asyncio.sleep(attempt)
     log.critical("Celery broker unreachable after %s attempts", attempts)
     sys.exit(1)

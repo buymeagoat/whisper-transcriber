@@ -65,7 +65,7 @@ async def lifespan(app: FastAPI):
         settings.job_queue_backend,
         settings.timezone,
     )
-    check_celery_connection()
+    await check_celery_connection()
     rehydrate_incomplete_jobs()
     if settings.cleanup_enabled:
         start_cleanup_thread()

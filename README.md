@@ -50,6 +50,8 @@ The old `api/config.py` module is kept only for backward compatibility and will 
 - `LOG_MAX_BYTES` – maximum size of each log file before rotation (defaults to
   `10000000`).
 - `LOG_BACKUP_COUNT` – how many rotated log files to keep (defaults to `3`).
+- `MAX_UPLOAD_SIZE` – maximum allowed upload size in bytes (defaults to
+  `2147483648`).
 - `DB_CONNECT_ATTEMPTS` – how many times to retry connecting to the database on
   startup (defaults to `10`).
 - `BROKER_CONNECT_ATTEMPTS` – how many times to retry pinging the Celery broker

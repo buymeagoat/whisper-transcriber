@@ -7,6 +7,9 @@ import shutil
 import tempfile
 import boto3
 
+from api.errors import ErrorCode, http_error
+from api.settings import settings
+
 
 class Storage(ABC):
     """Abstract storage backend for uploads and transcripts."""
@@ -65,6 +68,9 @@ class LocalStorage(Storage):
         dest = self._upload_dir / filename
         with dest.open("wb") as dst:
             shutil.copyfileobj(source, dst)
+        if dest.stat().st_size > settings.max_upload_size:
+            dest.unlink(missing_ok=True)
+            raise http_error(ErrorCode.FILE_TOO_LARGE)
         return dest
 
     def delete_upload(self, filename: str) -> None:

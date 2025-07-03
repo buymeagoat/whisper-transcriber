@@ -27,6 +27,7 @@ from api.paths import (
 from api.settings import settings
 
 from api.utils.logger import get_logger, get_system_logger
+from api.exceptions import InitError
 
 
 def init_timezone() -> ZoneInfo:
@@ -34,8 +35,9 @@ def init_timezone() -> ZoneInfo:
     try:
         return ZoneInfo(settings.timezone)
     except Exception as exc:  # pragma: no cover - system exit
-        get_system_logger().critical(f"Invalid timezone '{settings.timezone}': {exc}")
-        sys.exit(1)
+        message = f"Invalid timezone '{settings.timezone}': {exc}"
+        get_system_logger().critical(message)
+        raise InitError(message) from exc
 
 
 LOCAL_TZ = init_timezone()
@@ -349,4 +351,4 @@ async def check_celery_connection() -> None:
             )
         await asyncio.sleep(attempt)
     log.critical("Celery broker unreachable after %s attempts", attempts)
-    sys.exit(1)
+    raise InitError(f"Celery broker unreachable after {attempts} attempts")

@@ -47,6 +47,5 @@ AUTH_PASSWORD = os.getenv("AUTH_PASSWORD", "admin")
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
     logging.critical("SECRET_KEY environment variable not set")
-    sys.exit(1)
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))

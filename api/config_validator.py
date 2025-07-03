@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import sys
-
 import logging
+
+from api.exceptions import ConfigurationError
 
 from api.settings import settings
 from api.utils.logger import get_system_logger
@@ -27,7 +27,7 @@ def validate_config() -> None:
         log.critical("Invalid configuration detected:")
         for item in issues:
             log.critical(" - %s", item)
-        sys.exit(1)
+        raise ConfigurationError("Invalid configuration")
 
     if log.isEnabledFor(logging.DEBUG):
         log.debug("Configuration validated")

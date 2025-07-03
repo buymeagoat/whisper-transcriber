@@ -18,8 +18,10 @@ services:
       - ./logs:/app/logs
       - ./models:/app/models:ro
     depends_on:
-      - db
-      - broker
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "/usr/local/bin/healthcheck.sh"]
       interval: 30s
@@ -34,6 +36,11 @@ services:
       POSTGRES_DB: whisper
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "whisper"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   broker:
     image: rabbitmq:3-management
@@ -42,6 +49,11 @@ services:
       - "5672:5672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   worker:
     build: .
@@ -59,7 +71,10 @@ services:
       - ./transcripts:/app/transcripts
       - ./logs:/app/logs
     depends_on:
-      - broker
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "/usr/local/bin/healthcheck.sh"]
       interval: 30s

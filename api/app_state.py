@@ -155,7 +155,10 @@ def handle_whisper(
                     stdout_thread.start()
                     stderr_thread.start()
 
-                    proc.wait()
+                    wait_args = {}
+                    if settings.whisper_timeout_seconds > 0:
+                        wait_args["timeout"] = settings.whisper_timeout_seconds
+                    proc.wait(**wait_args)
                     stdout_thread.join()
                     stderr_thread.join()
                     logger.info(f"Whisper exited with code {proc.returncode}")

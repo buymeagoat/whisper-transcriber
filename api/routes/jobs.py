@@ -45,7 +45,8 @@ async def submit_job(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid model"
         )
     job_id = uuid.uuid4().hex
-    saved = f"{job_id}_{file.filename}"
+    safe_name = Path(file.filename).name
+    saved = f"{job_id}_{safe_name}"
     try:
         upload_path = storage.save_upload(file.file, saved)
     except Exception:

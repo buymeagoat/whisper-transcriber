@@ -155,3 +155,25 @@ def test_list_jobs_status_filter(client, sample_wav):
 
     resp = client.get("/jobs?status=queued|completed")
     assert {j["id"] for j in resp.json()} == {job_a, job_b}
+
+
+def test_upload_path_traversal(client, sample_wav):
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/jobs",
+            data={"model": "base"},
+            files={"file": ("../evil.wav", f, "audio/wav")},
+        )
+
+    assert resp.status_code == 202
+    job_id = resp.json()["job_id"]
+
+    from api.paths import UPLOAD_DIR
+
+    files = list(UPLOAD_DIR.iterdir())
+    assert len(files) == 1
+    saved = files[0]
+    assert saved.is_file()
+    assert saved.is_relative_to(UPLOAD_DIR)
+    assert saved.name.startswith(f"{job_id}_")
+    assert ".." not in saved.name

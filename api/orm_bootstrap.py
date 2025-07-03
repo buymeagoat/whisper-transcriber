@@ -2,6 +2,7 @@ import subprocess
 import sys
 import os
 import time
+import logging
 from pathlib import Path
 
 from sqlalchemy import inspect, create_engine
@@ -42,7 +43,8 @@ def validate_or_initialize_database():
                 max_attempts,
                 wait_time,
             )
-            log.debug("Connection error: %s", exc)
+            if log.isEnabledFor(logging.DEBUG):
+                log.debug("Connection error: %s", exc)
             time.sleep(wait_time)
 
     # ── Step 2: Run Alembic migrations ──

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import sys
 
+import logging
+
 from api.settings import settings
 from api.utils.logger import get_system_logger
 
@@ -27,4 +29,5 @@ def validate_config() -> None:
             log.critical(" - %s", item)
         sys.exit(1)
 
-    log.debug("Configuration validated")
+    if log.isEnabledFor(logging.DEBUG):
+        log.debug("Configuration validated")

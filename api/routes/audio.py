@@ -38,6 +38,8 @@ async def convert_audio(
             stderr=subprocess.PIPE,
         )
     except Exception:
+        dest_path.unlink(missing_ok=True)
+        storage.delete_upload(src_path.name)
         raise http_error(ErrorCode.UNSUPPORTED_MEDIA)
 
     return {"path": str(dest_path)}
@@ -74,6 +76,8 @@ async def edit_audio(
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except Exception:
+        dest_path.unlink(missing_ok=True)
+        storage.delete_upload(src_path.name)
         raise http_error(ErrorCode.UNSUPPORTED_MEDIA)
 
     return {"path": str(dest_path)}

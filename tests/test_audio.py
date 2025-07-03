@@ -52,3 +52,41 @@ def test_edit_trim_volume(client, sample_wav, monkeypatch):
     assert resp.status_code == 200
     path = Path(resp.json()["path"])
     assert path.exists()
+
+
+def test_convert_ffmpeg_error_cleanup(client, sample_wav, monkeypatch):
+    def fake_run(cmd, check, stdout=None, stderr=None):
+        raise subprocess.CalledProcessError(1, cmd)
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    from api import paths
+
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/convert",
+            data={"target_format": "mp3"},
+            files={"file": ("in.wav", f, "audio/wav")},
+        )
+
+    assert resp.status_code == 415
+    assert resp.json()["code"] == ErrorCode.UNSUPPORTED_MEDIA
+    assert not any(paths.UPLOAD_DIR.iterdir())
+
+
+def test_edit_ffmpeg_error_cleanup(client, sample_wav, monkeypatch):
+    def fake_run(cmd, check, stdout=None, stderr=None):
+        raise subprocess.CalledProcessError(1, cmd)
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    from api import paths
+
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/edit",
+            data={"volume": "1"},
+            files={"file": ("clip.wav", f, "audio/wav")},
+        )
+
+    assert resp.status_code == 415
+    assert resp.json()["code"] == ErrorCode.UNSUPPORTED_MEDIA
+    assert not any(paths.UPLOAD_DIR.iterdir())

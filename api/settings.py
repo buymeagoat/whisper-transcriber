@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     )
     whisper_bin: str = Field("whisper", env="WHISPER_BIN")
     whisper_language: str = Field("en", env="WHISPER_LANGUAGE")
+    whisper_timeout_seconds: int = Field(0, env="WHISPER_TIMEOUT_SECONDS")
     model_dir: str = Field(
         default=str(Path(__file__).resolve().parent.parent / "models"),
         env="MODEL_DIR",

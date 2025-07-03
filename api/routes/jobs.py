@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Form, Request, status
+from fastapi import APIRouter, UploadFile, File, Form, Request, status, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, Response
 from datetime import datetime
 from pathlib import Path
@@ -30,6 +30,9 @@ from api.services.analysis import analyze_text
 
 router = APIRouter()
 
+# Allowed Whisper model names derived from validate_models_dir
+ALLOWED_MODELS = {"base", "small", "medium", "large-v3", "tiny"}
+
 
 @router.post(
     "/jobs", status_code=status.HTTP_202_ACCEPTED, response_model=JobCreatedOut
@@ -37,6 +40,10 @@ router = APIRouter()
 async def submit_job(
     file: UploadFile = File(...), model: str = Form("base")
 ) -> JobCreatedOut:
+    if model not in ALLOWED_MODELS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid model"
+        )
     job_id = uuid.uuid4().hex
     saved = f"{job_id}_{file.filename}"
     try:

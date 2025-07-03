@@ -45,6 +45,16 @@ def test_job_lifecycle(client, sample_wav):
         assert db.query(Job).get(job_id) is None
 
 
+def test_submit_invalid_model_api(client, sample_wav):
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/jobs",
+            data={"model": "bogus"},
+            files={"file": ("bad.wav", f, "audio/wav")},
+        )
+    assert resp.status_code == 400
+
+
 def test_list_jobs_search_filter(client, sample_wav):
     with sample_wav.open("rb") as f:
         resp = client.post(

@@ -27,7 +27,7 @@ class User(Base):
 
 # ─── Enum Class ─────────────────────────────────────────────────────────
 # These values are used in logs, API responses, and DB — use machine-safe slugs
-class JobStatusEnum(PyEnum):
+class JobStatusEnum(str, PyEnum):
     QUEUED = "queued"
     PROCESSING = "processing"
     ENRICHING = "enriching"
@@ -50,7 +50,9 @@ class Job(Base):
     saved_filename: Mapped[str] = mapped_column(String, nullable=False)
     model: Mapped[str] = mapped_column(String, nullable=False)
     status: Mapped[JobStatusEnum] = mapped_column(
-        Enum(JobStatusEnum), nullable=False, default=JobStatusEnum.QUEUED
+        Enum(JobStatusEnum, values_callable=lambda e: [v.value for v in e]),
+        nullable=False,
+        default=JobStatusEnum.QUEUED,
     )
     # Filled after processing: should not be empty if status is COMPLETED
     transcript_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)

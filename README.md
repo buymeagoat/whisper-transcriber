@@ -7,6 +7,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 1. Install Python dependencies:
    ```bash
    pip install -r requirements.txt
+   # required for running tests
+   pip install -r requirements-dev.txt
    ```
 2. Install system dependencies. `ffmpeg` (providing `ffprobe`) must be present
    for audio processing features. On Linux you can install it with:
@@ -411,7 +413,8 @@ Once running, access the API at `http://localhost:8000`.
 ## Testing
 
 Install the development requirements and run the test suite with coverage. The
-tests use `pytest-postgresql` to launch a temporary PostgreSQL instance:
+test suite requires the additional packages from `requirements-dev.txt` and
+uses `pytest-postgresql` to launch a temporary PostgreSQL instance:
 
 ```bash
 pip install -r requirements-dev.txt

@@ -11,6 +11,7 @@ import JobStatusPage from "./pages/JobStatusPage";
 import FailedJobsPage from "./pages/FailedJobsPage";
 import JobProgressPage from "./pages/JobProgressPage";
 import LoginPage from "./pages/LoginPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 import FileBrowserPage from "./pages/FileBrowserPage";
 import { AuthContext } from "./context/AuthContext";
 import { useApi } from "./api";
@@ -39,6 +40,7 @@ export default function App() {
           <Route path={ROUTES.ADMIN} element={isAuthenticated ? <AdminPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
           <Route path={ROUTES.FILE_BROWSER} element={isAuthenticated ? <FileBrowserPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
           <Route path={ROUTES.SETTINGS} element={isAuthenticated && role === "admin" ? <SettingsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
+          <Route path={ROUTES.CHANGE_PASSWORD} element={isAuthenticated ? <ChangePasswordPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
           <Route path={ROUTES.TRANSCRIPT_VIEW} element={isAuthenticated ? <TranscriptViewPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
           <Route path={ROUTES.STATUS} element={isAuthenticated ? <JobStatusPage /> : <Navigate to={ROUTES.LOGIN} replace />} />
           <Route path={ROUTES.FAILED} element={isAuthenticated ? <FailedJobsPage /> : <Navigate to={ROUTES.LOGIN} replace />} />

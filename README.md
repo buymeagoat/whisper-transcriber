@@ -148,6 +148,11 @@ creates regular users. Set `ALLOW_REGISTRATION=false` in production to disable
 this endpoint. Obtain a token from `/token` using the same credentials. JWT
 payloads now include the user role so clients can inspect their privileges.
 
+The application ships with a built-in `admin` account using the password
+`admin`. Logging in with these credentials returns a token with
+`must_change_password=true`. Call `/change-password` with the new password and
+the token to update it before continuing.
+
 ### User Management
 
 Admins can manage accounts via two endpoints:

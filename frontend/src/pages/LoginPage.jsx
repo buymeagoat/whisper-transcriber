@@ -21,7 +21,11 @@ export default function LoginPage() {
         { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
       );
       login(data.access_token);
-      window.location.href = ROUTES.UPLOAD;
+      if (data.must_change_password) {
+        window.location.href = ROUTES.CHANGE_PASSWORD;
+      } else {
+        window.location.href = ROUTES.UPLOAD;
+      }
     } catch (err) {
       setError(err.message || "Login failed");
     }
@@ -29,6 +33,7 @@ export default function LoginPage() {
 
   return (
     <div className="page-content" style={{ maxWidth: "400px", margin: "0 auto" }}>
+      <h1 style={{ textAlign: "center" }}>Whisper Transcriber</h1>
       <h2>Login</h2>
       <form onSubmit={handleSubmit} style={{ marginTop: "1rem" }}>
         <div style={{ marginBottom: "0.5rem" }}>

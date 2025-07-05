@@ -10,6 +10,7 @@ export const ROUTES = {
   STATUS: "/status/:jobId",
   PROGRESS: "/progress/:jobId",
   FILE_BROWSER: "/admin/files",
+  CHANGE_PASSWORD: "/change-password",
   API: import.meta.env.VITE_API_HOST || "http://localhost:8000"
 };
 

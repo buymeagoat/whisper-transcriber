@@ -32,6 +32,7 @@ except (ConfigurationError, InitError) as exc:  # pragma: no cover - startup fai
 from api.orm_bootstrap import SessionLocal, validate_or_initialize_database
 from api.models import Job
 from api.models import JobStatusEnum
+from api.services.users import ensure_default_admin
 from api.utils.model_validation import validate_models_dir
 from api.router_setup import register_routes
 from api.middlewares.access_log import access_logger
@@ -64,6 +65,7 @@ if "VITE_API_HOST" not in os.environ:
 async def lifespan(app: FastAPI):
     system_log.info("App startup — lifespan entering.")
     validate_or_initialize_database()
+    ensure_default_admin(settings.auth_username, settings.auth_password)
     validate_models_dir()
     system_log.info(
         "Startup complete: DB connected, storage backend %s ready, job queue %s, timezone %s",

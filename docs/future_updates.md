@@ -300,6 +300,6 @@ This document organizes upcoming features for Whisper Transcriber. Items are gro
 - **Summary**: Added `scripts/start_containers.sh` to automatically build the frontend and start the Docker Compose stack.
 - **Motivation**: Simplifies setup by launching the API, worker, broker and database with one command.
 
-### Build Argument for SECRET_KEY
-- **Summary**: Dockerfile accepts a `SECRET_KEY` build argument so model validation can run during image creation.
-- **Motivation**: `validate_models_dir()` loads settings which require a secret key, so the build would fail without one.
+### BuildKit Secret for SECRET_KEY
+- **Summary**: Dockerfile now expects a BuildKit secret named `secret_key` so model validation can run during image creation.
+- **Motivation**: `validate_models_dir()` loads settings which require a secret key, so the build would fail without one. Using a BuildKit secret avoids leaking the key in image layers.

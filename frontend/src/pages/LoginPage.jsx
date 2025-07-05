@@ -22,8 +22,8 @@ export default function LoginPage() {
       );
       login(data.access_token);
       window.location.href = ROUTES.UPLOAD;
-    } catch {
-      setError("Network error");
+    } catch (err) {
+      setError(err.message || "Login failed");
     }
   };
 

@@ -8,6 +8,7 @@ import uuid
 from api.utils.logger import get_system_logger
 
 log = get_system_logger()
+from api.app_state import backend_log
 
 from api.errors import ErrorCode, http_error
 from api.models import JobStatusEnum
@@ -53,8 +54,11 @@ async def submit_job(
     saved = f"{job_id}_{safe_name}"
     try:
         upload_path = storage.save_upload(file.file, saved)
-    except Exception:
-        raise http_error(ErrorCode.FILE_SAVE_FAILED)
+    except HTTPException:
+        raise
+    except OSError as e:
+        backend_log.error(f"Failed to save upload '{saved}': {e}")
+        raise http_error(ErrorCode.FILE_SAVE_FAILED) from e
     job_dir = storage.get_transcript_dir(job_id)
 
     ts = datetime.now(LOCAL_TZ)

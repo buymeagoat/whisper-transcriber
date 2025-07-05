@@ -4,10 +4,11 @@ import subprocess
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, File, Form, UploadFile
+from fastapi import APIRouter, File, Form, UploadFile, HTTPException
 
 from api.paths import storage, UPLOAD_DIR
 from api.errors import ErrorCode, http_error
+from api.app_state import backend_log
 
 ALLOWED_FORMATS = {"mp3", "m4a", "wav", "flac"}
 
@@ -26,8 +27,11 @@ async def convert_audio(
     saved_name = f"{file_id}_{safe_name}"
     try:
         src_path = storage.save_upload(file.file, saved_name)
-    except Exception:
-        raise http_error(ErrorCode.FILE_SAVE_FAILED)
+    except HTTPException:
+        raise
+    except OSError as e:
+        backend_log.error(f"Failed to save upload '{saved_name}': {e}")
+        raise http_error(ErrorCode.FILE_SAVE_FAILED) from e
 
     dest_name = f"{Path(safe_name).stem}_{file_id}.{target_format}"
     dest_path = UPLOAD_DIR / dest_name
@@ -38,10 +42,11 @@ async def convert_audio(
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-    except Exception:
+    except subprocess.CalledProcessError as e:
+        backend_log.error(f"ffmpeg convert failed: {e}")
         dest_path.unlink(missing_ok=True)
         storage.delete_upload(src_path.name)
-        raise http_error(ErrorCode.UNSUPPORTED_MEDIA)
+        raise http_error(ErrorCode.UNSUPPORTED_MEDIA) from e
 
     return {"path": str(dest_path)}
 
@@ -60,8 +65,11 @@ async def edit_audio(
     saved_name = f"{file_id}_{safe_name}"
     try:
         src_path = storage.save_upload(file.file, saved_name)
-    except Exception:
-        raise http_error(ErrorCode.FILE_SAVE_FAILED)
+    except HTTPException:
+        raise
+    except OSError as e:
+        backend_log.error(f"Failed to save upload '{saved_name}': {e}")
+        raise http_error(ErrorCode.FILE_SAVE_FAILED) from e
 
     dest_name = f"{Path(safe_name).stem}_{file_id}{Path(safe_name).suffix}"
     dest_path = UPLOAD_DIR / dest_name
@@ -77,9 +85,10 @@ async def edit_audio(
 
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    except Exception:
+    except subprocess.CalledProcessError as e:
+        backend_log.error(f"ffmpeg edit failed: {e}")
         dest_path.unlink(missing_ok=True)
         storage.delete_upload(src_path.name)
-        raise http_error(ErrorCode.UNSUPPORTED_MEDIA)
+        raise http_error(ErrorCode.UNSUPPORTED_MEDIA) from e
 
     return {"path": str(dest_path)}

@@ -5,6 +5,8 @@ from datetime import datetime
 from api.orm_bootstrap import SessionLocal
 from api.models import Job, JobStatusEnum, TranscriptMetadata
 from api.paths import TRANSCRIPTS_DIR
+from api.errors import ErrorCode
+import api.routes.jobs as jobs
 
 
 def test_job_lifecycle(client, sample_wav):
@@ -202,3 +204,19 @@ def test_transcript_view_missing_file(client, sample_wav):
     assert resp.status_code == 404
     assert "Transcript file not found" in resp.text
     assert str(transcript_path) not in resp.text
+
+
+def test_job_submit_save_error(client, sample_wav, monkeypatch):
+    def fail_save(fileobj, name):
+        raise OSError("disk error")
+
+    monkeypatch.setattr(jobs.storage, "save_upload", fail_save)
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/jobs",
+            data={"model": "base"},
+            files={"file": ("in.wav", f, "audio/wav")},
+        )
+
+    assert resp.status_code == 500
+    assert resp.json()["code"] == ErrorCode.FILE_SAVE_FAILED

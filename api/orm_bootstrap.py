@@ -74,6 +74,11 @@ def validate_or_initialize_database():
         if e.stderr:
             log.critical("Alembic STDERR:\n%s", e.stderr)
         raise RuntimeError("Alembic migrations failed") from e
+    except FileNotFoundError as e:
+        log.critical(
+            "Alembic command not found. Ensure Alembic is installed and on PATH."
+        )
+        raise RuntimeError("Alembic not installed") from e
 
     # ── Step 3: Validate expected tables exist ──
     inspector = inspect(engine)

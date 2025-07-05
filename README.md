@@ -392,14 +392,21 @@ created automatically inside the containers and ownership fixed to UID `1000`
 by the entrypoint script, so no manual `chown` step is required. The compose
 file defines a `db` service
 using the `postgres:15-alpine` image and sets `DB_URL` on the API and worker so
-they connect to it. It also configures
-Celery with RabbitMQ by setting `JOB_QUEUE_BACKEND=broker`,
+they connect to it. Because port `5432` is published you can connect from the
+host with `psql -h localhost -p 5432 -U whisper`. It also configures Celery with
+RabbitMQ by setting `JOB_QUEUE_BACKEND=broker`,
 `CELERY_BROKER_URL` and `CELERY_BACKEND_URL` on the API and worker services.
 
 Start everything with:
 
 ```bash
 docker compose up --build api worker broker db
+```
+
+If you edit `docker-compose.yml`, restart the stack so the changes take effect:
+
+```bash
+docker compose restart
 ```
 
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see

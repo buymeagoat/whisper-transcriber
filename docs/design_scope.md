@@ -34,6 +34,7 @@ The application is considered working once these basics are functional:
 - `scripts/` – packaging helpers that generate `dist/whisper-transcriber.exe` and `dist/whisper-transcriber.rpm`.
 - `start_containers.sh` – helper script that builds the frontend if needed and launches the Docker Compose stack (`api`, `worker`, `broker`, and `db`).
 - `docker_build.sh` – wipes old Docker resources and rebuilds the compose stack from scratch.
+- `update_images.sh` – rebuilds the API and worker images using Docker's cache and restarts those services without pruning existing resources.
 
 Both `models/` and `frontend/dist/` are listed in `.gitignore`. They must exist
 before running `docker build`:

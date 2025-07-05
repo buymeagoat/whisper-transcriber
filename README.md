@@ -423,6 +423,8 @@ the container logs in the console.
 The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ.
 An optional helper script `scripts/start_containers.sh` automates these steps. Run it from the repository root to build the frontend if needed and launch the compose stack in detached mode. The script uses sudo only to adjust ownership of the `uploads`, `transcripts` and `logs` directories. Use `docker compose down` to stop all services.
 Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch.
+Use `scripts/update_images.sh` to rebuild just the API and worker images using
+Docker's cache and restart those services when you make code changes.
 Once running, access the API at `http://localhost:8000`.
 
 ## Testing

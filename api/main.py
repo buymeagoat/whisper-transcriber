@@ -16,6 +16,7 @@ try:
     from api.settings import settings
     from api.config_validator import validate_config
     from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
+    import api.app_state as app_state
     from api.app_state import (
         handle_whisper,
         LOCAL_TZ,
@@ -23,6 +24,7 @@ try:
         start_cleanup_thread,
         check_celery_connection,
     )
+    from api.services.job_queue import ThreadJobQueue
 
     validate_config()
 except (ConfigurationError, InitError) as exc:  # pragma: no cover - startup fail
@@ -87,6 +89,8 @@ async def lifespan(app: FastAPI):
     )
     yield
     system_log.info("App shutdown — lifespan exiting.")
+    if isinstance(app_state.job_queue, ThreadJobQueue):
+        app_state.job_queue.shutdown()
 
 
 log_startup_settings()

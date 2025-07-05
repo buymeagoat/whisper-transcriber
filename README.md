@@ -10,6 +10,9 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
    # required for running tests
    pip install -r requirements-dev.txt
    ```
+   The `bcrypt` dependency is pinned to `<4` for compatibility with
+   `passlib`. If installing packages manually ensure this version
+   constraint is respected.
 2. Install system dependencies. `ffmpeg` (providing `ffprobe`) must be present
    for audio processing features. On Linux you can install it with:
    ```bash

@@ -16,17 +16,22 @@ export default function Layout({ children }) {
     <div
       style={{
         display: "flex",
+        flexDirection: "column",
         minHeight: "100vh",
         backgroundColor: "#18181b",
         color: "white",
       }}
     >
       <ToastContainer />
-      <aside className="side-nav">
-        <nav style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <Link to={ROUTES.UPLOAD} style={linkStyle}>
-            Upload
-          </Link>
+      <header className="app-header">
+        <h1 style={{ margin: 0 }}>Whisper Transcriber</h1>
+      </header>
+      <div style={{ display: "flex", flex: 1 }}>
+        <aside className="side-nav">
+          <nav style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <Link to={ROUTES.UPLOAD} style={linkStyle}>
+              Upload
+            </Link>
           <Link to={ROUTES.ACTIVE} style={linkStyle}>
             Active Jobs
           </Link>
@@ -57,10 +62,11 @@ export default function Layout({ children }) {
             </Link>
           )}
         </nav>
-      </aside>
-      <main className="page-content" style={{ flex: 1 }}>
-        {children}
-      </main>
+        </aside>
+        <main className="page-content" style={{ flex: 1 }}>
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

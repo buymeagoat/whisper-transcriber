@@ -39,8 +39,8 @@ if [ -z "$SECRET_KEY" ] || [ "$SECRET_KEY" = "CHANGE_ME" ]; then
     echo "Generated SECRET_KEY saved in .env"
 fi
 
-# Build the Docker image using the secret key
-docker build --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
+# Build the Docker image using a BuildKit secret
+docker build --secret id=secret_key,env=SECRET_KEY -t whisper-app "$ROOT_DIR"
 
 # Start the compose stack
 docker compose -f "$ROOT_DIR/docker-compose.yml" up --build api worker broker db

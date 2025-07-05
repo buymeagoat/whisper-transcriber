@@ -22,6 +22,7 @@ try:
         LOCAL_TZ,
         backend_log,
         start_cleanup_thread,
+        stop_cleanup_thread,
         check_celery_connection,
     )
     from api.services.job_queue import ThreadJobQueue
@@ -91,6 +92,8 @@ async def lifespan(app: FastAPI):
     system_log.info("App shutdown — lifespan exiting.")
     if isinstance(app_state.job_queue, ThreadJobQueue):
         app_state.job_queue.shutdown()
+    if settings.cleanup_enabled:
+        stop_cleanup_thread()
 
 
 log_startup_settings()

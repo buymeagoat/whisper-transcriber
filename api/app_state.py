@@ -58,6 +58,9 @@ if settings.job_queue_backend == "thread":
 else:
     job_queue = BrokerJobQueue()
 
+# ─── Cleanup Thread Control ───
+cleanup_stop_event = threading.Event()
+
 
 def get_duration(path: Union[str, os.PathLike]) -> float:
     if shutil.which("ffprobe") is None:
@@ -323,13 +326,23 @@ def cleanup_once() -> None:
 
 
 def _cleanup_task(interval: int = settings.cleanup_interval_seconds) -> None:
-    while True:
+    while not cleanup_stop_event.is_set():
         cleanup_once()
-        threading.Event().wait(interval)
+        if cleanup_stop_event.wait(interval):
+            break
 
 
-def start_cleanup_thread(interval: int = settings.cleanup_interval_seconds) -> None:
-    threading.Thread(target=_cleanup_task, args=(interval,), daemon=True).start()
+def start_cleanup_thread(
+    interval: int = settings.cleanup_interval_seconds,
+) -> threading.Thread:
+    cleanup_stop_event.clear()
+    thread = threading.Thread(target=_cleanup_task, args=(interval,), daemon=True)
+    thread.start()
+    return thread
+
+
+def stop_cleanup_thread() -> None:
+    cleanup_stop_event.set()
 
 
 async def check_celery_connection() -> None:

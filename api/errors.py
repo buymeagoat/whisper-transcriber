@@ -29,6 +29,7 @@ class ErrorCode(IntEnum):
     # 5xx – server
     WHISPER_RUNTIME = 50001  # Whisper process crashed
     FILE_NOT_FOUND = 50002  # Internal mismatch: missing expected output
+    CLOUD_STORAGE_ERROR = 50003  # Failed S3 interaction
 
 
 ERROR_MAP: dict[ErrorCode, str] = {
@@ -42,6 +43,7 @@ ERROR_MAP: dict[ErrorCode, str] = {
     ErrorCode.JOB_BUSY: "Job is currently running—try later.",
     ErrorCode.WHISPER_RUNTIME: "Transcription failed—internal Whisper error.",
     ErrorCode.FILE_NOT_FOUND: "Expected output file missing—contact support.",
+    ErrorCode.CLOUD_STORAGE_ERROR: "Cloud storage operation failed.",
 }
 
 _HTTP_STATUS = {
@@ -55,6 +57,7 @@ _HTTP_STATUS = {
     ErrorCode.JOB_BUSY: 403,
     ErrorCode.WHISPER_RUNTIME: 500,
     ErrorCode.FILE_NOT_FOUND: 500,
+    ErrorCode.CLOUD_STORAGE_ERROR: 500,
 }
 
 

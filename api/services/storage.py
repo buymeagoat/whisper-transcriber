@@ -6,9 +6,13 @@ from typing import BinaryIO
 import shutil
 import tempfile
 import boto3
+from botocore.exceptions import BotoCoreError
+import logging
 
 from api.errors import ErrorCode, http_error
 from api.settings import settings
+
+log = logging.getLogger(__name__)
 
 
 class Storage(ABC):
@@ -132,7 +136,11 @@ class CloudStorage(Storage):
         if dest.stat().st_size > settings.max_upload_size:
             dest.unlink(missing_ok=True)
             raise http_error(ErrorCode.FILE_TOO_LARGE)
-        self.s3.upload_file(str(dest), self.bucket, f"uploads/{filename}")
+        try:
+            self.s3.upload_file(str(dest), self.bucket, f"uploads/{filename}")
+        except BotoCoreError as e:
+            log.error(f"Failed to upload '{filename}' to S3: {e}")
+            raise http_error(ErrorCode.FILE_SAVE_FAILED) from e
         return dest
 
     def delete_upload(self, filename: str) -> None:
@@ -145,7 +153,11 @@ class CloudStorage(Storage):
     def get_upload_path(self, filename: str) -> Path:
         path = self._upload_dir / filename
         if not path.exists():
-            self.s3.download_file(self.bucket, f"uploads/{filename}", str(path))
+            try:
+                self.s3.download_file(self.bucket, f"uploads/{filename}", str(path))
+            except BotoCoreError as e:
+                log.error(f"Failed to download '{filename}' from S3: {e}")
+                raise http_error(ErrorCode.CLOUD_STORAGE_ERROR) from e
         return path
 
     def get_transcript_dir(self, job_id: str) -> Path:
@@ -164,8 +176,20 @@ class CloudStorage(Storage):
 
     def delete_transcript_dir(self, job_id: str) -> None:
         shutil.rmtree(self._transcripts_dir / job_id, ignore_errors=True)
-        paginator = self.s3.get_paginator("list_objects_v2")
+        try:
+            paginator = self.s3.get_paginator("list_objects_v2")
+        except BotoCoreError as e:
+            log.error(f"Failed to get paginator for job '{job_id}': {e}")
+            raise http_error(ErrorCode.CLOUD_STORAGE_ERROR) from e
         prefix = f"transcripts/{job_id}/"
-        for page in paginator.paginate(Bucket=self.bucket, Prefix=prefix):
-            for obj in page.get("Contents", []):
-                self.s3.delete_object(Bucket=self.bucket, Key=obj["Key"])
+        try:
+            for page in paginator.paginate(Bucket=self.bucket, Prefix=prefix):
+                for obj in page.get("Contents", []):
+                    try:
+                        self.s3.delete_object(Bucket=self.bucket, Key=obj["Key"])
+                    except BotoCoreError as e:
+                        log.error(f"Failed to delete '{obj['Key']}' from S3: {e}")
+                        raise http_error(ErrorCode.CLOUD_STORAGE_ERROR) from e
+        except BotoCoreError as e:
+            log.error(f"Failed to list objects for job '{job_id}': {e}")
+            raise http_error(ErrorCode.CLOUD_STORAGE_ERROR) from e

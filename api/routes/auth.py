@@ -1,13 +1,18 @@
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 
 from api.settings import settings
-from api.schemas import TokenOut
+from api.schemas import TokenOut, TokenLoginOut, PasswordChangeIn
 from api.models import User
-from api.services.users import create_user, get_user_by_username, verify_password
+from api.services.users import (
+    create_user,
+    get_user_by_username,
+    verify_password,
+    update_user_password,
+)
 
 router = APIRouter()
 
@@ -24,8 +29,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 
-@router.post("/token", response_model=TokenOut)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenOut:
+@router.post("/token", response_model=TokenLoginOut)
+async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenLoginOut:
     user = get_user_by_username(form_data.username)
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
@@ -34,7 +39,11 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenOut:
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = create_access_token({"sub": user.username, "role": user.role})
-    return TokenOut(access_token=token, token_type="bearer")
+    return TokenLoginOut(
+        access_token=token,
+        token_type="bearer",
+        must_change_password=user.must_change_password,
+    )
 
 
 @router.post("/register", response_model=TokenOut, status_code=status.HTTP_201_CREATED)
@@ -79,3 +88,11 @@ def require_admin(user: User = Depends(get_current_user)) -> User:
             status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required"
         )
     return user
+
+
+@router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT)
+async def change_password(
+    payload: PasswordChangeIn, user: User = Depends(get_current_user)
+) -> Response:
+    update_user_password(user.id, payload.password)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

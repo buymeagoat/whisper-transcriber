@@ -75,6 +75,14 @@ class TokenOut(BaseModel):
     token_type: str
 
 
+class TokenLoginOut(TokenOut):
+    must_change_password: bool | None = None
+
+
+class PasswordChangeIn(BaseModel):
+    password: str
+
+
 class CleanupConfigOut(BaseModel):
     cleanup_enabled: bool
     cleanup_days: int

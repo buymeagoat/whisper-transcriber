@@ -12,7 +12,13 @@ from api.utils.db_lock import db_lock
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def create_user(username: str, password: str, role: str = "user") -> User:
+def create_user(
+    username: str,
+    password: str,
+    role: str = "user",
+    *,
+    must_change_password: bool = False,
+) -> User:
     """Create and persist a new user."""
     hashed = pwd_context.hash(password)
     with db_lock:
@@ -21,6 +27,7 @@ def create_user(username: str, password: str, role: str = "user") -> User:
                 username=username,
                 hashed_password=hashed,
                 role=role,
+                must_change_password=must_change_password,
                 created_at=datetime.utcnow(),
             )
             db.add(user)
@@ -57,3 +64,37 @@ def update_user_role(user_id: int, role: str) -> Optional[User]:
             db.commit()
             db.refresh(user)
             return user
+
+
+def update_user_password(user_id: int, password: str) -> Optional[User]:
+    """Set a new password for the user."""
+    hashed = pwd_context.hash(password)
+    with db_lock:
+        with SessionLocal() as db:
+            user = db.query(User).get(user_id)
+            if not user:
+                return None
+            user.hashed_password = hashed
+            user.must_change_password = False
+            db.commit()
+            db.refresh(user)
+            return user
+
+
+def ensure_default_admin(username: str, password: str) -> None:
+    """Create the default admin account if it does not exist."""
+    with db_lock:
+        with SessionLocal() as db:
+            if db.query(User).filter_by(username=username).first():
+                return
+            hashed = pwd_context.hash(password)
+            user = User(
+                username=username,
+                hashed_password=hashed,
+                role="admin",
+                must_change_password=True,
+                created_at=datetime.utcnow(),
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)

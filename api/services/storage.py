@@ -129,6 +129,9 @@ class CloudStorage(Storage):
         dest = self._upload_dir / filename
         with dest.open("wb") as dst:
             shutil.copyfileobj(source, dst)
+        if dest.stat().st_size > settings.max_upload_size:
+            dest.unlink(missing_ok=True)
+            raise http_error(ErrorCode.FILE_TOO_LARGE)
         self.s3.upload_file(str(dest), self.bucket, f"uploads/{filename}")
         return dest
 

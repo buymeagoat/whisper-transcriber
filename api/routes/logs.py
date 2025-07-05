@@ -71,8 +71,8 @@ async def log_event(request: Request) -> StatusOut:
         context = payload.get("context", {})
         backend_log.info(f"Client Event: {event} | Context: {context}")
         return StatusOut(status="logged")
-    except Exception as e:
-        backend_log.error(f"Failed to log client event: {e}")
+    except ValueError as e:
+        backend_log.error(f"Failed to parse client event: {e}")
         return StatusOut(status="error", message=str(e))
 
 

@@ -38,6 +38,13 @@ nav {
   border-right: 1px solid #3f3f46;
 }
 
+.app-header {
+  background-color: #27272a;
+  border-bottom: 1px solid #3f3f46;
+  text-align: center;
+  padding: 1rem;
+}
+
 @media (max-width: 600px) {
   table {
     display: block;

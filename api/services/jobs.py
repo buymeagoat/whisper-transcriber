@@ -55,7 +55,10 @@ def list_jobs(search: Optional[str] = None, status: Optional[str] = None) -> Lis
             conditions = []
             for s in statuses:
                 if s == "failed":
-                    conditions.append(Job.status.ilike("failed%"))
+                    fail_statuses = [
+                        st for st in JobStatusEnum if st.value.startswith("failed")
+                    ]
+                    conditions.append(Job.status.in_(fail_statuses))
                     continue
                 try:
                     enum_val = JobStatusEnum(s)

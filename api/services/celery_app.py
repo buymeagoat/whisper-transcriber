@@ -13,6 +13,13 @@ celery_app = Celery(
     backend=settings.celery_backend_url,
 )
 
+# Avoid Celery printing duplicate banners when the worker starts or
+# stops by disabling the root logger hijack and stdout redirection.
+celery_app.conf.update(
+    worker_hijack_root_logger=False,
+    worker_redirect_stdouts=False,
+)
+
 
 @celery_app.task(name="run_callable")
 def run_callable(pickled_func: bytes) -> None:

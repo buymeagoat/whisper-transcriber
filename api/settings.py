@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     db_url: str = Field(
         "postgresql+psycopg2://whisper:whisper@db:5432/whisper", env="DB_URL"
     )
-    vite_api_host: str = Field("http://localhost:8000", env="VITE_API_HOST")
+    vite_api_host: str = Field("http://192.168.1.52:8000", env="VITE_API_HOST")
     log_level: str = Field("DEBUG", env="LOG_LEVEL")
     log_format: str = Field("plain", env="LOG_FORMAT")
     log_to_stdout: bool = Field(False, env="LOG_TO_STDOUT")

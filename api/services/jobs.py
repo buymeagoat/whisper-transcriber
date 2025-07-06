@@ -56,7 +56,9 @@ def list_jobs(search: Optional[str] = None, status: Optional[str] = None) -> Lis
             for s in statuses:
                 if s == "failed":
                     fail_statuses = [
-                        st for st in JobStatusEnum if st.value.startswith("failed")
+                        status
+                        for status in JobStatusEnum
+                        if status.value.startswith("failed")
                     ]
                     conditions.append(Job.status.in_(fail_statuses))
                     continue

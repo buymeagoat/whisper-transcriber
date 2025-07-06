@@ -290,6 +290,7 @@ displayed all files at once.
 - The Admin page shows the system log via `/ws/logs/system`.
 - Toast notifications show the result of actions across all pages.
 - Admins can manage user roles from the Settings page.
+- The worker container's health check uses `pgrep` to ensure a Celery process is running and now runs every 5 minutes.
 - A left-side navigation bar lists each section, including a **Download Desktop App** tab linking to `/download-app`.
 - The Completed Jobs page provides a search box that filters results using the
   `search` query parameter on `/jobs`.

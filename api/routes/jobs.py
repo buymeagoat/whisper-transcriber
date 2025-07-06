@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, Form, Request, status, HTTPExce
 from fastapi.responses import FileResponse, HTMLResponse, Response
 from datetime import datetime
 from pathlib import Path
+from functools import partial
 import shutil
 import uuid
 
@@ -65,7 +66,7 @@ async def submit_job(
     create_job(job_id, file.filename, saved, model, ts)
 
     job_queue.enqueue(
-        lambda: handle_whisper(job_id, upload_path, job_dir, model, start_thread=False)
+        partial(handle_whisper, job_id, upload_path, job_dir, model, start_thread=False)
     )
     return JobCreatedOut(job_id=job_id)
 
@@ -253,6 +254,6 @@ def restart_job(job_id: str) -> StatusOut:
     update_job_status(job_id, JobStatusEnum.QUEUED)
 
     job_queue.enqueue(
-        lambda: handle_whisper(job_id, upload_path, job_dir, model, start_thread=False)
+        partial(handle_whisper, job_id, upload_path, job_dir, model, start_thread=False)
     )
     return StatusOut(status="restarted")

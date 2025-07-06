@@ -38,6 +38,6 @@ ENV SERVICE_TYPE=api
 
 ENV VITE_API_HOST=http://localhost:8000
 EXPOSE 8000
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD /usr/local/bin/healthcheck.sh
+HEALTHCHECK --interval=5m --timeout=10s --retries=3 CMD /usr/local/bin/healthcheck.sh
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["python", "scripts/server_entry.py"]

@@ -159,6 +159,30 @@ def test_list_jobs_status_filter(client, sample_wav):
     assert {j["id"] for j in resp.json()} == {job_a, job_b}
 
 
+def test_list_jobs_failed_statuses(client, sample_wav):
+    fail_statuses = [
+        status for status in JobStatusEnum if status.value.startswith("failed")
+    ]
+
+    job_ids = []
+    for st in fail_statuses:
+        with sample_wav.open("rb") as f:
+            resp = client.post(
+                "/jobs",
+                data={"model": "base"},
+                files={"file": (f"{st.value}.wav", f, "audio/wav")},
+            )
+        job_ids.append(resp.json()["job_id"])
+
+    with SessionLocal() as db:
+        for jid, st in zip(job_ids, fail_statuses):
+            db.query(Job).filter_by(id=jid).update({"status": st})
+        db.commit()
+
+    resp = client.get("/jobs?status=failed")
+    assert {j["id"] for j in resp.json()} == set(job_ids)
+
+
 def test_upload_path_traversal(client, sample_wav):
     with sample_wav.open("rb") as f:
         resp = client.post(

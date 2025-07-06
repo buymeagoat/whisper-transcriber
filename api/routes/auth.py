@@ -1,7 +1,19 @@
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status, Response
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    Response,
+    Request,
+    WebSocket,
+)
+from fastapi.security import (
+    OAuth2PasswordBearer,
+    OAuth2PasswordRequestForm,
+    get_authorization_scheme_param,
+)
 from jose import JWTError, jwt
 
 from api.settings import settings
@@ -18,6 +30,20 @@ router = APIRouter()
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+async def get_token(
+    request: Request | None = None, websocket: WebSocket | None = None
+) -> str:
+    if request is not None:
+        return await oauth2_scheme(request)
+    token = websocket.query_params.get("token")
+    if not token:
+        auth = websocket.headers.get("Authorization")
+        scheme, token = get_authorization_scheme_param(auth)
+        if not auth or scheme.lower() != "bearer":
+            raise HTTPException(status_code=401, detail="Not authenticated")
+    return token
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
@@ -61,7 +87,7 @@ async def register(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenOut
     return TokenOut(access_token=token, token_type="bearer")
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+async def get_current_user(token: str = Depends(get_token)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

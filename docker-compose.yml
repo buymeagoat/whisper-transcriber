@@ -6,7 +6,7 @@ services:
     environment:
       - SERVICE_TYPE=api
       - PORT=8000 # change to run the API on a different port
-      - VITE_API_HOST=http://localhost:8000
+      - VITE_API_HOST=http://192.168.1.52:8000
       - JOB_QUEUE_BACKEND=broker
       - CELERY_BROKER_URL=amqp://guest:guest@broker:5672//
       - CELERY_BACKEND_URL=rpc://
@@ -62,7 +62,7 @@ services:
     command: celery -A api.services.celery_app worker
     environment:
       - SERVICE_TYPE=worker
-      - VITE_API_HOST=http://localhost:8000
+      - VITE_API_HOST=http://192.168.1.52:8000
       - JOB_QUEUE_BACKEND=broker
       - CELERY_BROKER_URL=amqp://guest:guest@broker:5672//
       - CELERY_BACKEND_URL=rpc://

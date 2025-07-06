@@ -45,7 +45,7 @@ The old `api/config.py` module is kept only for backward compatibility and will 
   `docker-compose.yml` because it references the `db` service. Override it for
   a local instance, for example
   `DB_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/whisper`.
-- `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://localhost:8000`).
+- `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://192.168.1.52:8000`).
 - `PORT` – TCP port used by the Uvicorn server (defaults to `8000`).
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
@@ -346,7 +346,7 @@ PostgreSQL instance; the compose file defaults to the `db` service
 
 ```bash
 docker run -p 8000:8000 \
-  -e VITE_API_HOST=http://localhost:8000 \
+  -e VITE_API_HOST=http://192.168.1.52:8000 \
   -e SECRET_KEY=<your key> \
   -v $(pwd)/uploads:/app/uploads \
   -v $(pwd)/transcripts:/app/transcripts \
@@ -426,7 +426,7 @@ An optional helper script `scripts/start_containers.sh` automates these steps. R
 Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch.
 Use `scripts/update_images.sh` to rebuild just the API and worker images using
 Docker's cache and restart those services when you make code changes.
-Once running, access the API at `http://localhost:8000`.
+Once running, access the API at `http://192.168.1.52:8000`.
 
 ## Testing
 

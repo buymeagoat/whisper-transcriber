@@ -291,6 +291,7 @@ displayed all files at once.
 - Toast notifications show the result of actions across all pages.
 - Admins can manage user roles from the Settings page.
 - The worker container's health check uses `pgrep` to ensure a Celery process is running and now runs every 5 minutes.
+- `scripts/healthcheck.sh` checks the API using `VITE_API_HOST` and defaults to `http://192.168.1.52:8000` when the variable is not set.
 - A left-side navigation bar lists each section, including a **Download Desktop App** tab linking to `/download-app`.
 - The Completed Jobs page provides a search box that filters results using the
   `search` query parameter on `/jobs`.

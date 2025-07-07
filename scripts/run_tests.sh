@@ -3,6 +3,10 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
+
+# Ensure docker compose services are stopped on exit
+trap 'docker compose -f "$COMPOSE_FILE" down' EXIT
 
 # Install Python dependencies
 pip install -r "$ROOT_DIR/requirements.txt"

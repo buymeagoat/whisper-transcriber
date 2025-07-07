@@ -444,19 +444,27 @@ Once running, access the API at `http://localhost:8000`.
 
 ## Testing
 
-Install the development requirements and run the test suite with coverage.
-`requirements-dev.txt` includes `psycopg[binary]>=3.1` which `pytest-postgresql`
-uses to launch a temporary PostgreSQL instance:
+Tests rely on Docker to provide the required services and on **Node.js 18** or
+newer to build the frontend. The easiest way to run them is via
+`scripts/run_tests.sh`:
+
+```bash
+./scripts/run_tests.sh
+```
+
+This script installs all Python and Node dependencies, rebuilds the API and
+worker images and then executes the test suite with coverage. It automatically
+shuts down the compose stack with `docker compose down` even when tests fail.
+
+To run the tests manually install the development requirements and execute the
+commands below. `requirements-dev.txt` includes `psycopg[binary]>=3.1` which
+`pytest-postgresql` uses to launch a temporary PostgreSQL instance:
 
 ```bash
 pip install -r requirements-dev.txt
 coverage run -m pytest
 coverage report
 ```
-
-The helper script `scripts/run_tests.sh` performs these steps in a Docker
-environment and automatically stops the compose stack with `docker compose down`
-even when tests fail.
 
 
 ## Contributing

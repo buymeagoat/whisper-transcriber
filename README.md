@@ -454,6 +454,10 @@ coverage run -m pytest
 coverage report
 ```
 
+The helper script `scripts/run_tests.sh` performs these steps in a Docker
+environment and automatically stops the compose stack with `docker compose down`
+even when tests fail.
+
 
 ## Contributing
 

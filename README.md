@@ -443,18 +443,26 @@ The worker container runs `celery -A api.services.celery_app worker` to process 
 ## Testing
 
 Tests rely on Docker to provide the required services and on **Node.js 18** or
-newer to build the frontend. Start the containers with `scripts/start_containers.sh`
-or `docker compose up --build` and then run:
+newer. Install the frontend dev dependencies first:
 
 ```bash
-./scripts/run_tests.sh
+cd frontend
+npm install
 ```
 
-The script runs the backend test suite inside the `api` container and performs
-basic integration checks against the live API. Results are written to
-`logs/test.log` for review.
+Start the containers with `scripts/start_containers.sh` or `docker compose
+up --build` and run the full suite with:
 
-To run the tests manually use the same commands inside the running container:
+```bash
+./scripts/run_all_tests.sh
+```
+
+This script runs the backend tests and integration checks, then executes the
+frontend unit tests and Cypress end‑to‑end tests. Output is saved to
+`logs/full_test.log`.
+
+To invoke just the backend tests manually use the same commands inside the
+running container:
 
 ```bash
 docker compose exec api coverage run -m pytest

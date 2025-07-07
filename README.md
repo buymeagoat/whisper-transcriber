@@ -37,8 +37,6 @@ needed.
 
 `api/settings.py` reads the following environment variables at startup. `SECRET_KEY` has no default and must be set. When using Docker Compose, variables in a `.env` file at the project root are automatically loaded. Create this file by copying `.env.example` and replacing the placeholder with a unique value.
 
-The old `api/config.py` module is kept only for backward compatibility and will be removed in a future release. New code should import settings from `api.settings`.
-
 - `DB_URL` – SQLAlchemy connection string for the required PostgreSQL database in the form
   `postgresql+psycopg2://user:password@host:port/database`. The default
   `postgresql+psycopg2://whisper:whisper@db:5432/whisper` works with

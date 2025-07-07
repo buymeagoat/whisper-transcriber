@@ -55,9 +55,7 @@ Key environment files include `pyproject.toml`, `requirements.txt`, and the `Doc
 
 Application settings come from `api/settings.py`. It reads environment
 variables once using `pydantic_settings.BaseSettings` and exposes a `settings`
-object used throughout the code base. The legacy `api/config.py` module is
-retained only for backward compatibility and will be removed in a future
-release. Available variables are:
+object used throughout the code base. Available variables are:
 
 - `DB_URL` – SQLAlchemy connection string for the required PostgreSQL
   database. The default

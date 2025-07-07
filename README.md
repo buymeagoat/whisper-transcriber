@@ -444,9 +444,9 @@ Once running, access the API at `http://192.168.1.52:8000`.
 
 ## Testing
 
-Install the development requirements and run the test suite with coverage. The
-test suite requires the additional packages from `requirements-dev.txt` and
-uses `pytest-postgresql` to launch a temporary PostgreSQL instance:
+Install the development requirements and run the test suite with coverage.
+`requirements-dev.txt` includes `psycopg[binary]>=3.1` which `pytest-postgresql`
+uses to launch a temporary PostgreSQL instance:
 
 ```bash
 pip install -r requirements-dev.txt

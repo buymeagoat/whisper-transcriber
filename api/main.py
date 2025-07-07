@@ -60,7 +60,7 @@ ROOT = Path(__file__).parent
 # Read API host from environment with a default for local development.
 API_HOST = settings.vite_api_host
 if "VITE_API_HOST" not in os.environ:
-    system_log.warning("VITE_API_HOST not set, defaulting to http://192.168.1.52:8000")
+    system_log.warning("VITE_API_HOST not set, defaulting to http://localhost:8000")
 
 
 # ─── Lifespan Hook ───

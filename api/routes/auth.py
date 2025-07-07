@@ -33,6 +33,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def get_token(request: Request = None, websocket: WebSocket = None) -> str:
+    """Return the JWT bearer token from an HTTP request or WebSocket."""
     if request is not None:
         return await oauth2_scheme(request)
     token = websocket.query_params.get("token")

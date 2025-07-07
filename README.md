@@ -2,6 +2,9 @@
 
 This project provides a FastAPI backend with a React frontend for running OpenAI Whisper transcription jobs.
 
+> **Note**
+> OpenAI-generated insights are automated and may contain errors. Always verify the output before relying on it.
+
 ## Requirements & Installation
 
 1. Install Python dependencies:

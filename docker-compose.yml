@@ -1,6 +1,7 @@
 services:
   api:
     build: .
+    restart: on-failure
     ports:
       - "8000:8000"
     environment:
@@ -63,6 +64,7 @@ services:
   worker:
     build: .
     command: celery -A api.services.celery_app worker
+    restart: on-failure
     environment:
       - SERVICE_TYPE=worker
       - VITE_API_HOST=http://192.168.1.52:8000

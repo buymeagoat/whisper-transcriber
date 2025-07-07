@@ -6,6 +6,7 @@ from fastapi.responses import PlainTextResponse
 
 from api.errors import ErrorCode, http_error
 from api.paths import storage, LOG_DIR
+from pathlib import Path
 from api.app_state import ACCESS_LOG, backend_log
 from api.schemas import StatusOut
 
@@ -85,7 +86,14 @@ def get_access_log(user: User = Depends(get_current_user)):
 
 @router.get("/logs/{filename}", response_class=PlainTextResponse)
 def get_log_file(filename: str, user: User = Depends(get_current_user)):
-    path = LOG_DIR / filename
-    if not path.exists():
+    try:
+        base = LOG_DIR.resolve()
+        path = (base / filename).resolve()
+        path.relative_to(base)
+    except Exception:
         raise http_error(ErrorCode.FILE_NOT_FOUND)
+
+    if not path.exists() or not path.is_file():
+        raise http_error(ErrorCode.FILE_NOT_FOUND)
+
     return path.read_text()

@@ -42,6 +42,9 @@ fi
 # Build the Docker image using a BuildKit secret
 docker build --secret id=secret_key,env=SECRET_KEY -t whisper-app "$ROOT_DIR"
 
-# Start the compose stack
-docker compose -f "$ROOT_DIR/docker-compose.yml" up --build api worker broker db
+# Start the compose stack in the background
+docker compose -f "$ROOT_DIR/docker-compose.yml" up --build -d api worker broker db
+
+# Run the full test suite; the build fails if any step exits non-zero
+"$SCRIPT_DIR/run_all_tests.sh"
 

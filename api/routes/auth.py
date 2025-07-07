@@ -32,9 +32,7 @@ router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-async def get_token(
-    request: Request | None = None, websocket: WebSocket | None = None
-) -> str:
+async def get_token(request: Request = None, websocket: WebSocket = None) -> str:
     if request is not None:
         return await oauth2_scheme(request)
     token = websocket.query_params.get("token")

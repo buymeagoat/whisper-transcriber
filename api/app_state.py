@@ -353,19 +353,21 @@ async def check_celery_connection() -> None:
     from api.services.celery_app import celery_app
 
     log = get_system_logger()
-    attempts = settings.broker_connect_attempts
-    for attempt in range(1, attempts + 1):
+    attempt = 1
+    while True:
         try:
             result = celery_app.control.ping(timeout=1)
             if result:
                 return
             log.warning(
-                "Celery ping returned no workers (attempt %s/%s)", attempt, attempts
+                "Celery ping returned no workers (attempt %s)",
+                attempt,
             )
         except Exception as exc:
             log.warning(
-                "Celery ping failed (attempt %s/%s): %s", attempt, attempts, exc
+                "Celery ping failed (attempt %s): %s",
+                attempt,
+                exc,
             )
         await asyncio.sleep(attempt)
-    log.critical("Celery broker unreachable after %s attempts", attempts)
-    raise InitError(f"Celery broker unreachable after {attempts} attempts")
+        attempt += 1

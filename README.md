@@ -450,9 +450,9 @@ or `docker compose up --build` and then run:
 ./scripts/run_tests.sh
 ```
 
-The Docker image now includes the development requirements so the script simply
-executes the test suite with coverage inside the `api` container without
-destroying the compose stack.
+The script runs the backend test suite inside the `api` container and performs
+basic integration checks against the live API. Results are written to
+`logs/test.log` for review.
 
 To run the tests manually use the same commands inside the running container:
 
@@ -460,8 +460,6 @@ To run the tests manually use the same commands inside the running container:
 docker compose exec api coverage run -m pytest
 docker compose exec api coverage report
 ```
-
-
 ## Contributing
 
 Run `black .` before committing changes. When adding features or changing configuration, update both `docs/design_scope.md`, `docs/future_updates.md`, and `README.md` so the documentation stays consistent.

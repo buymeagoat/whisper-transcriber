@@ -407,6 +407,16 @@ host with `psql -h localhost -p 5432 -U whisper`. It also configures Celery with
 RabbitMQ by setting `JOB_QUEUE_BACKEND=broker`,
 `CELERY_BROKER_URL` and `CELERY_BACKEND_URL` on the API and worker services.
 
+The broker service loads additional settings from `rabbitmq.conf` mounted at
+`/etc/rabbitmq/rabbitmq.conf`. This configuration enables collection of
+management metrics and other deprecated features required by Celery:
+
+```
+deprecated_features.permit.management_metrics_collection = true
+deprecated_features.permit.transient_nonexcl_queues = true
+deprecated_features.permit.global_qos = true
+```
+
 Start everything with:
 
 ```bash

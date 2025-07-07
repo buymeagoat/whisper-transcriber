@@ -368,6 +368,9 @@ Alternatively copy `.env.example` to `.env` and replace `CHANGE_ME` with a uniqu
 Setting `LOG_TO_STDOUT=true` and `LOG_LEVEL=DEBUG` surfaces detailed logs, which
 helps diagnose bootstrapping failures when running inside Docker.
 
+The compose file configures the `api` and `worker` services with `restart: on-failure`
+so they automatically restart if either container exits unexpectedly.
+
 ## Docker Compose
 
 A `docker-compose.yml` is included to start the API together with the

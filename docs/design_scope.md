@@ -80,8 +80,8 @@ release. Available variables are:
 - `ACCESS_TOKEN_EXPIRE_MINUTES` – JWT lifetime.
 - `MAX_CONCURRENT_JOBS` – worker thread count for the internal queue. This value can be changed at runtime via `/admin/concurrency`.
 - `JOB_QUEUE_BACKEND` – queue implementation (`thread` by default).
-- Celery must be installed when `JOB_QUEUE_BACKEND=broker` or using Docker
-  Compose.
+- Celery is installed from `requirements.txt` and used when
+  `JOB_QUEUE_BACKEND=broker` or running Docker Compose.
 - `STORAGE_BACKEND` – where uploads and transcripts are stored.
 - `LOCAL_STORAGE_DIR` – base directory for the local storage backend. Defaults
   to the repository root.

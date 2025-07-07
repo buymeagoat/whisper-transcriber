@@ -12,7 +12,8 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
    ```
    The `bcrypt` dependency is pinned to `<4` for compatibility with
    `passlib`. If installing packages manually ensure this version
-   constraint is respected.
+   constraint is respected. Celery is also installed from this file
+   and is used when the broker-based queue is enabled.
 2. Install system dependencies. `ffmpeg` (providing `ffprobe`) must be present
    for audio processing features. On Linux you can install it with:
    ```bash
@@ -27,11 +28,10 @@ cd frontend
    Copy `frontend/.env.example` to `frontend/.env` to configure `VITE_API_HOST`,
    `VITE_DEV_HOST` and `VITE_DEV_PORT`.
    # install Redux packages for global state and toasts
-4. Install Celery if you plan to set `JOB_QUEUE_BACKEND=broker` or use Docker
-   Compose:
-   ```bash
-   pip install celery
-   ```
+
+Celery is included in `requirements.txt` and is required when
+`JOB_QUEUE_BACKEND=broker` or using Docker Compose, so no extra installation step is
+needed.
 
 ## Optional Environment Variables
 

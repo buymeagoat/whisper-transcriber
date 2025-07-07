@@ -43,7 +43,7 @@ needed.
   `docker-compose.yml` because it references the `db` service. Override it for
   a local instance, for example
   `DB_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/whisper`.
-- `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://192.168.1.52:8000`).
+- `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://localhost:8000`).
 - `PORT` – TCP port used by the Uvicorn server (defaults to `8000`).
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).
@@ -291,7 +291,7 @@ displayed all files at once.
 - Toast notifications show the result of actions across all pages.
 - Admins can manage user roles from the Settings page.
 - The worker container's health check uses `pgrep` to ensure a Celery process is running and now runs every 5 minutes.
-- `scripts/healthcheck.sh` checks the API using `VITE_API_HOST` and defaults to `http://192.168.1.52:8000` when the variable is not set.
+- `scripts/healthcheck.sh` checks the API using `VITE_API_HOST` and defaults to `http://localhost:8000` when the variable is not set.
 - A left-side navigation bar lists each section, including a **Download Desktop App** tab linking to `/download-app`.
 - The Completed Jobs page provides a search box that filters results using the
   `search` query parameter on `/jobs`.
@@ -347,7 +347,7 @@ PostgreSQL instance; the compose file defaults to the `db` service
 
 ```bash
 docker run -p 8000:8000 \
-  -e VITE_API_HOST=http://192.168.1.52:8000 \
+  -e VITE_API_HOST=http://localhost:8000 \
   -e SECRET_KEY=<your key> \
   -v $(pwd)/uploads:/app/uploads \
   -v $(pwd)/transcripts:/app/transcripts \
@@ -440,7 +440,7 @@ An optional helper script `scripts/start_containers.sh` automates these steps. R
 Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch.
 Use `scripts/update_images.sh` to rebuild just the API and worker images using
 Docker's cache and restart those services when you make code changes.
-Once running, access the API at `http://192.168.1.52:8000`.
+Once running, access the API at `http://localhost:8000`.
 
 ## Testing
 

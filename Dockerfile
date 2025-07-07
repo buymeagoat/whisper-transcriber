@@ -36,7 +36,7 @@ COPY frontend/dist ./api/static
 ENV SERVICE_TYPE=api
 
 
-ENV VITE_API_HOST=http://192.168.1.52:8000
+ENV VITE_API_HOST=http://localhost:8000
 EXPOSE 8000
 HEALTHCHECK --interval=5m --timeout=10s --retries=3 CMD /usr/local/bin/healthcheck.sh
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

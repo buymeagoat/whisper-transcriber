@@ -36,6 +36,8 @@ The application is considered working once these basics are functional:
 - `docker_build.sh` – wipes old Docker resources and rebuilds the compose stack from scratch.
 - `update_images.sh` – rebuilds the API and worker images using Docker's cache and restarts those services without pruning existing resources.
 - `run_tests.sh` – runs backend tests and integration checks, logging output to `logs/test.log`.
+- `run_all_tests.sh` – preferred wrapper that additionally executes frontend unit
+  tests and Cypress end-to-end tests, saving results to `logs/full_test.log`.
 
 Both `models/` and `frontend/dist/` are listed in `.gitignore`. They must exist
 before running `docker build`:

@@ -12,8 +12,8 @@ from fastapi import (
 from fastapi.security import (
     OAuth2PasswordBearer,
     OAuth2PasswordRequestForm,
-    get_authorization_scheme_param,
 )
+from fastapi.security.utils import get_authorization_scheme_param
 from jose import JWTError, jwt
 
 from api.settings import settings

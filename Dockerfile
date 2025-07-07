@@ -13,9 +13,11 @@ RUN mkdir -p /app && chown -R appuser:appuser /app
 WORKDIR /app
 ENV PYTHONPATH=/app
 COPY requirements.txt .
+COPY requirements-dev.txt .
 COPY alembic.ini .
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir -r requirements-dev.txt
 
 COPY scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
 RUN chmod +x /usr/local/bin/healthcheck.sh

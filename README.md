@@ -438,35 +438,27 @@ docker compose restart
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
 
-The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ.
-An optional helper script `scripts/start_containers.sh` automates these steps. Run it from the repository root to build the frontend if needed and launch the compose stack in detached mode. The script uses sudo only to adjust ownership of the `uploads`, `transcripts` and `logs` directories. Use `docker compose down` to stop all services.
-Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch.
-Use `scripts/update_images.sh` to rebuild just the API and worker images using
-Docker's cache and restart those services when you make code changes.
-Once running, access the API at `http://localhost:8000`.
+The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ. An optional helper script `scripts/start_containers.sh` builds the frontend if needed and launches the compose stack in detached mode. Use `docker compose down` to stop all services. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. Once running, access the API at `http://localhost:8000`.
 
 ## Testing
 
 Tests rely on Docker to provide the required services and on **Node.js 18** or
-newer to build the frontend. The easiest way to run them is via
-`scripts/run_tests.sh`:
+newer to build the frontend. Start the containers with `scripts/start_containers.sh`
+or `docker compose up --build` and then run:
 
 ```bash
 ./scripts/run_tests.sh
 ```
 
-This script installs all Python and Node dependencies, rebuilds the API and
-worker images and then executes the test suite with coverage. It automatically
-shuts down the compose stack with `docker compose down` even when tests fail.
+The Docker image now includes the development requirements so the script simply
+executes the test suite with coverage inside the `api` container without
+destroying the compose stack.
 
-To run the tests manually install the development requirements and execute the
-commands below. `requirements-dev.txt` includes `psycopg[binary]>=3.1` which
-`pytest-postgresql` uses to launch a temporary PostgreSQL instance:
+To run the tests manually use the same commands inside the running container:
 
 ```bash
-pip install -r requirements-dev.txt
-coverage run -m pytest
-coverage report
+docker compose exec api coverage run -m pytest
+docker compose exec api coverage report
 ```
 
 

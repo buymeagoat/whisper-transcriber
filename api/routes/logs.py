@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.get("/log/{job_id}", response_class=PlainTextResponse)
-def get_job_log(job_id: str):
+def get_job_log(job_id: str, user: User = Depends(get_current_user)):
     log_path = LOG_DIR / f"{job_id}.log"
     if not log_path.exists():
         return PlainTextResponse("No log yet.", status_code=404)
@@ -77,14 +77,14 @@ async def log_event(request: Request) -> StatusOut:
 
 
 @router.get("/logs/access", response_class=PlainTextResponse)
-def get_access_log():
+def get_access_log(user: User = Depends(get_current_user)):
     if not ACCESS_LOG.exists():
         return PlainTextResponse("", status_code=404)
     return ACCESS_LOG.read_text()
 
 
 @router.get("/logs/{filename}", response_class=PlainTextResponse)
-def get_log_file(filename: str):
+def get_log_file(filename: str, user: User = Depends(get_current_user)):
     path = LOG_DIR / filename
     if not path.exists():
         raise http_error(ErrorCode.FILE_NOT_FOUND)

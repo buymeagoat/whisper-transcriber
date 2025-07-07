@@ -204,6 +204,8 @@ immediately with friendlier labels. Messages reflect the `queued`, `processing`,
 Open `/ws/logs/{job_id}` to stream log output for a running job. The frontend's log viewer subscribes to this socket and appends new lines as they arrive.
 Admins can also connect to `/ws/logs/system` to monitor the access or system log in real time. The Admin page displays this feed in a built-in viewer.
 
+Retrieving log files via `/log/{job_id}`, `/logs/access` and `/logs/{filename}` now requires a valid token.
+
 ### Example Job Response
 
 Calls like `GET /jobs/{id}` now return Pydantic models. A typical response

@@ -10,7 +10,7 @@ usage() {
 Usage: $(basename "$0")
 
 Prunes Docker resources, rebuilds images and starts the compose stack from scratch.
-Run scripts/run_all_tests.sh afterward to execute the test suite.
+Run scripts/run_tests.sh afterward to execute the test suite.
 EOF
 }
 
@@ -44,5 +44,5 @@ docker compose -f "$ROOT_DIR/docker-compose.yml" build \
   --build-arg SECRET_KEY="$SECRET_KEY" api worker
 docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
 
-echo "Images built and containers started. Run scripts/run_all_tests.sh separately to execute the test suite."
+echo "Images built and containers started. Run scripts/run_tests.sh separately to execute the test suite."
 

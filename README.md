@@ -440,7 +440,7 @@ docker compose restart
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
 
-The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ. An optional helper script `scripts/start_containers.sh` builds the frontend if needed, verifies model files and `.env`, and then launches the compose stack in detached mode. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch; optionally run `scripts/run_all_tests.sh` afterward to execute the tests. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. These scripts source `scripts/shared_checks.sh` which ensures Whisper models are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. Once running, access the API at `http://localhost:8000`.
+The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ. An optional helper script `scripts/start_containers.sh` builds the frontend if needed, verifies model files and `.env`, and then launches the compose stack in detached mode. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch; optionally run `scripts/run_tests.sh` afterward to execute the tests. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. These scripts source `scripts/shared_checks.sh` which ensures Whisper models are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. Once running, access the API at `http://localhost:8000`.
 
 ## Testing
 
@@ -456,14 +456,14 @@ Start the containers with `scripts/start_containers.sh` or `docker compose
 up --build` and run the full suite with:
 
 ```bash
-./scripts/run_all_tests.sh
+./scripts/run_tests.sh
 ```
 
 This script runs the backend tests and integration checks, then executes the
 frontend unit tests and Cypress end‑to‑end tests. Output is saved to
 `logs/full_test.log`.
 
-Both `scripts/run_all_tests.sh` and `scripts/run_tests.sh` check that the `api`
+Both `scripts/run_tests.sh` and `scripts/run_backend_tests.sh` check that the `api`
 container is running before executing. If it isn't, they exit with the message
 ```
 API container is not running. Start the stack with scripts/start_containers.sh

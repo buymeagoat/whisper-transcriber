@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/shared_checks.sh"
 
 usage() {
     cat <<EOF
@@ -32,26 +33,8 @@ pip install -r "$ROOT_DIR/requirements.txt"
 # Install and build the frontend
 (cd "$ROOT_DIR/frontend" && npm install && npm run build)
 
-# Verify Whisper model files exist
-MODELS=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
-for m in "${MODELS[@]}"; do
-    if [ ! -f "$ROOT_DIR/models/$m" ]; then
-        echo "Missing models/$m. Populate the models/ directory before building." >&2
-        exit 1
-    fi
-done
-
-# Ensure .env with SECRET_KEY
-if [ ! -f "$ROOT_DIR/.env" ]; then
-    cp "$ROOT_DIR/.env.example" "$ROOT_DIR/.env"
-fi
-
-SECRET_KEY=$(grep -E '^SECRET_KEY=' "$ROOT_DIR/.env" | cut -d= -f2-)
-if [ -z "$SECRET_KEY" ] || [ "$SECRET_KEY" = "CHANGE_ME" ]; then
-    SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
-    sed -i "s/^SECRET_KEY=.*/SECRET_KEY=$SECRET_KEY/" "$ROOT_DIR/.env"
-    echo "Generated SECRET_KEY saved in .env"
-fi
+check_whisper_models
+ensure_env_file
 
 # Build the standalone image used for production deployments
 docker build --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"

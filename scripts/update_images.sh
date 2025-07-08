@@ -4,18 +4,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
+source "$SCRIPT_DIR/shared_checks.sh"
 
-# Load secret key from .env for Docker build
-if [ ! -f "$ROOT_DIR/.env" ]; then
-    echo "Missing .env file" >&2
-    exit 1
-fi
-
-SECRET_KEY=$(grep -E '^SECRET_KEY=' "$ROOT_DIR/.env" | cut -d= -f2-)
-if [ -z "$SECRET_KEY" ]; then
-    echo "SECRET_KEY not set in .env" >&2
-    exit 1
-fi
+# Load SECRET_KEY from .env
+ensure_env_file
 
 # Rebuild frontend assets
 (cd "$ROOT_DIR/frontend" && npm run build)

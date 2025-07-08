@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 LOG_DIR="$ROOT_DIR/logs"
-LOG_FILE="$LOG_DIR/full_test.log"
+LOG_FILE="$LOG_DIR/test.log"
 
 mkdir -p "$LOG_DIR"
 
@@ -16,9 +16,9 @@ if ! docker compose -f "$COMPOSE_FILE" ps api | grep -q "running"; then
 fi
 
 {
-    "$SCRIPT_DIR/run_tests.sh"
-    npm test --prefix "$ROOT_DIR/frontend"
-    npm run e2e --prefix "$ROOT_DIR/frontend"
+    docker compose -f "$COMPOSE_FILE" exec -T api coverage run -m pytest
+    docker compose -f "$COMPOSE_FILE" exec -T api coverage report
+    "$SCRIPT_DIR/integration_tests.sh"
 } | tee "$LOG_FILE"
 
-echo "Full test log saved to $LOG_FILE"
+echo "Test log saved to $LOG_FILE"

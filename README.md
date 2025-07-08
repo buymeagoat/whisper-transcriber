@@ -46,7 +46,7 @@ needed.
   `docker-compose.yml` because it references the `db` service. Override it for
   a local instance, for example
   `DB_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/whisper`.
-- `VITE_API_HOST` – base URL used by the frontend to reach the API (defaults to `http://localhost:8000`).
+- `VITE_API_HOST` – base URL used by the frontend to reach the API. Leave blank to use the site's origin and set a URL when the API is hosted remotely.
 - `PORT` – TCP port used by the Uvicorn server (defaults to `8000`).
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – logging level for job/system logs (`DEBUG` by default).

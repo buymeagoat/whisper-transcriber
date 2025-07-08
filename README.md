@@ -338,7 +338,7 @@ cd ..
 Build the image with a secret key:
 ```bash
 SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
-docker build --secret id=secret_key,env=SECRET_KEY -t whisper-app .
+docker build --build-arg SECRET_KEY=$SECRET_KEY -t whisper-app .
 ```
 If you use a prebuilt image, mount the models directory at runtime.
 

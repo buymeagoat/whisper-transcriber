@@ -32,7 +32,7 @@ The application is considered working once these basics are functional:
 - `frontend/` – React app built into `frontend/dist/` and copied by the Dockerfile
   to `api/static/` for the UI.
 - `scripts/` – packaging helpers that generate `dist/whisper-transcriber.exe` and `dist/whisper-transcriber.rpm`.
-- `start_containers.sh` – helper script that builds the frontend if needed and launches the Docker Compose stack (`api`, `worker`, `broker`, and `db`).
+ - `start_containers.sh` – helper script that builds the frontend if needed, verifies required models and `.env`, then launches the Docker Compose stack (`api`, `worker`, `broker`, and `db`).
  - `docker_build.sh` – wipes old Docker resources and rebuilds the compose stack from scratch. Tests are no longer run automatically; invoke `run_all_tests.sh` separately if desired.
 - `update_images.sh` – rebuilds the API and worker images using Docker's cache and restarts those services without pruning existing resources.
 - `run_tests.sh` – runs backend tests and integration checks, logging output to `logs/test.log`.

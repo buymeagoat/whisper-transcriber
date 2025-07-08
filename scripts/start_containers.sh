@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 
 usage() {
     cat <<EOF
@@ -41,6 +42,6 @@ if [ ! -d "$ROOT_DIR/models" ]; then
 fi
 
 echo "Starting containers with docker compose..."
-docker compose -f "$ROOT_DIR/docker-compose.yml" up --build -d api worker broker db
+docker compose -f "$COMPOSE_FILE" up --build -d api worker broker db
 
 echo "Containers are starting. Use 'docker compose ps' to check status."

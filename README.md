@@ -383,7 +383,7 @@ the database and broker to become available. The `db` service runs PostgreSQL
 for the API while RabbitMQ provides a broker for Celery when using the `broker`
 job queue backend.
 
-Prepare `models/` with `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` and build the frontend before running compose:
+Prepare `models/` with `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` and build the frontend before running compose. The helper script will verify these files exist:
 
 ```bash
 cd frontend
@@ -391,10 +391,12 @@ npm run build
 cd ..
 ```
 
-Copy `.env.example` to `.env`, replacing `CHANGE_ME` with the generated
-`SECRET_KEY`. Compose picks up this file automatically. Ensure this file also
-contains valid database credentials or a `DB_URL` override so the containers can
-connect to PostgreSQL.
+Ensure `.env` exists with a valid `SECRET_KEY`. The helper
+`scripts/start_containers.sh` will create this file from `.env.example`
+and generate a key automatically when needed. If you start the stack
+manually, copy `.env.example` to `.env` and replace `CHANGE_ME` with your
+key. Include valid database credentials or a `DB_URL` override so the containers
+can connect to PostgreSQL.
 
 Build and start all services with:
 
@@ -438,7 +440,7 @@ docker compose restart
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
 
-The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ. An optional helper script `scripts/start_containers.sh` builds the frontend if needed and launches the compose stack in detached mode. Use `docker compose down` to stop all services. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch; optionally run `scripts/post_build_tests.sh` afterward to execute the tests. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. Once running, access the API at `http://localhost:8000`.
+The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ. An optional helper script `scripts/start_containers.sh` builds the frontend if needed, verifies model files and `.env`, and then launches the compose stack in detached mode. Use `docker compose down` to stop all services. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch; optionally run `scripts/post_build_tests.sh` afterward to execute the tests. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. Once running, access the API at `http://localhost:8000`.
 
 ## Testing
 

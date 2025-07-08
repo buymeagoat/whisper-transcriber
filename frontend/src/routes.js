@@ -11,7 +11,7 @@ export const ROUTES = {
   PROGRESS: "/progress/:jobId",
   FILE_BROWSER: "/admin/files",
   CHANGE_PASSWORD: "/change-password",
-  API: import.meta.env.VITE_API_HOST || "http://localhost:8000"
+  API: import.meta.env.VITE_API_HOST || window.location.origin
 };
 
 export const DEFAULT_DOWNLOAD_FORMAT =

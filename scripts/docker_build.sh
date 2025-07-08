@@ -39,12 +39,13 @@ if [ -z "$SECRET_KEY" ] || [ "$SECRET_KEY" = "CHANGE_ME" ]; then
     echo "Generated SECRET_KEY saved in .env"
 fi
 
-# Build the Docker image using a BuildKit secret
+# Build the standalone image used for production deployments
 docker build --secret id=secret_key,env=SECRET_KEY -t whisper-app "$ROOT_DIR"
 
-# Start the compose stack in the background
-docker compose -f "$ROOT_DIR/docker-compose.yml" up --build -d api worker broker db
+# Build images for the compose stack and start the services
+docker compose -f "$ROOT_DIR/docker-compose.yml" build \
+  --secret id=secret_key,env=SECRET_KEY api worker
+docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
 
-# Run the full test suite; the build fails if any step exits non-zero
-"$SCRIPT_DIR/run_all_tests.sh"
+echo "Images built and containers started. Run scripts/run_all_tests.sh separately to execute the test suite."
 

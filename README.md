@@ -438,7 +438,7 @@ docker compose restart
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
 
-The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ. An optional helper script `scripts/start_containers.sh` builds the frontend if needed and launches the compose stack in detached mode. Use `docker compose down` to stop all services. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch. After the stack starts it automatically runs `scripts/run_all_tests.sh`, aborting the build when any test fails. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. Once running, access the API at `http://localhost:8000`.
+The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ. An optional helper script `scripts/start_containers.sh` builds the frontend if needed and launches the compose stack in detached mode. Use `docker compose down` to stop all services. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch; run `scripts/run_all_tests.sh` separately if you wish to execute the tests. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. Once running, access the API at `http://localhost:8000`.
 
 ## Testing
 

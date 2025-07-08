@@ -463,6 +463,12 @@ This script runs the backend tests and integration checks, then executes the
 frontend unit tests and Cypress end‑to‑end tests. Output is saved to
 `logs/full_test.log`.
 
+Both `scripts/run_all_tests.sh` and `scripts/run_tests.sh` check that the `api`
+container is running before executing. If it isn't, they exit with the message
+```
+API container is not running. Start the stack with scripts/start_containers.sh
+```
+
 To invoke just the backend tests manually use the same commands inside the
 running container:
 

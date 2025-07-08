@@ -40,11 +40,11 @@ if [ -z "$SECRET_KEY" ] || [ "$SECRET_KEY" = "CHANGE_ME" ]; then
 fi
 
 # Build the standalone image used for production deployments
-docker build --secret id=secret_key,env=SECRET_KEY -t whisper-app "$ROOT_DIR"
+docker build --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
 
 # Build images for the compose stack and start the services
 docker compose -f "$ROOT_DIR/docker-compose.yml" build \
-  --secret id=secret_key,env=SECRET_KEY api worker
+  --build-arg SECRET_KEY="$SECRET_KEY" api worker
 docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
 
 echo "Images built and containers started. Run scripts/run_all_tests.sh separately to execute the test suite."

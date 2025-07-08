@@ -304,6 +304,6 @@ This document organizes upcoming features for Whisper Transcriber. Items are gro
 - **Summary**: Added `scripts/update_images.sh` to rebuild the API and worker images using cached layers.
 - **Motivation**: Speeds up development by avoiding full image pruning when only code changes.
 
-### BuildKit Secret for SECRET_KEY
-- **Summary**: Dockerfile now expects a BuildKit secret named `secret_key` so model validation can run during image creation.
-- **Motivation**: `validate_models_dir()` loads settings which require a secret key, so the build would fail without one. Using a BuildKit secret avoids leaking the key in image layers.
+### Build Argument for SECRET_KEY
+- **Summary**: Dockerfile now expects a `SECRET_KEY` build argument so model validation can run during image creation.
+- **Motivation**: `validate_models_dir()` loads settings which require a secret key. Passing it via build argument keeps the build compatible with older Docker Compose versions.

@@ -9,6 +9,12 @@ LOG_FILE="$LOG_DIR/test.log"
 
 mkdir -p "$LOG_DIR"
 
+# Ensure the API container is running before executing tests
+if ! docker compose -f "$COMPOSE_FILE" ps api | grep -q "running"; then
+    echo "API container is not running. Start the stack with scripts/start_containers.sh" >&2
+    exit 1
+fi
+
 {
     docker compose -f "$COMPOSE_FILE" exec -T api coverage run -m pytest
     docker compose -f "$COMPOSE_FILE" exec -T api coverage report

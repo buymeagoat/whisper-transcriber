@@ -4,6 +4,20 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+usage() {
+    cat <<EOF
+Usage: $(basename "$0")
+
+Prunes Docker resources, rebuilds images and starts the compose stack from scratch.
+Run scripts/post_build_tests.sh afterward to execute the test suite.
+EOF
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    usage
+    exit 0
+fi
+
 # Remove existing containers, images and volumes to start fresh
 docker compose -f "$ROOT_DIR/docker-compose.yml" down -v --remove-orphans || true
 docker system prune -af --volumes

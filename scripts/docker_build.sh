@@ -10,7 +10,7 @@ usage() {
 Usage: $(basename "$0")
 
 Prunes Docker resources, rebuilds images and starts the compose stack from scratch.
-Run scripts/post_build_tests.sh afterward to execute the test suite.
+Run scripts/run_all_tests.sh afterward to execute the test suite.
 EOF
 }
 

@@ -40,6 +40,7 @@ from api.utils.model_validation import validate_models_dir
 from api.router_setup import register_routes
 from api.middlewares.access_log import access_logger
 from api.utils.db_lock import db_lock
+from functools import partial
 
 
 def log_startup_settings() -> None:
@@ -158,7 +159,16 @@ def rehydrate_incomplete_jobs():
             try:
                 upload_path = storage.get_upload_path(job.saved_filename)
                 job_dir = storage.get_transcript_dir(job.id)
-                handle_whisper(job.id, upload_path, job_dir, job.model)
+                app_state.job_queue.enqueue(
+                    partial(
+                        handle_whisper,
+                        job.id,
+                        upload_path,
+                        job_dir,
+                        job.model,
+                        start_thread=False,
+                    )
+                )
             except Exception as e:
                 backend_log.error(f"Failed to rehydrate job {job.id}: {e}")
 

@@ -14,6 +14,7 @@ if ! docker compose -f "$COMPOSE_FILE" ps api | grep -q "running"; then
     echo "API container is not running. Start the stack with scripts/start_containers.sh" >&2
     echo "Last API container logs:" >&2
     docker compose -f "$COMPOSE_FILE" logs api | tail -n 20 >&2 || true
+    docker compose -f "$COMPOSE_FILE" ps >&2
     exit 1
 fi
 

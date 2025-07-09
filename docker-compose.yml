@@ -1,6 +1,9 @@
 services:
   api:
-    build: .
+    build:
+      context: .
+      args:
+        SECRET_KEY: ${SECRET_KEY}
     restart: on-failure
     ports:
       - "8000:8000"
@@ -62,7 +65,10 @@ services:
       retries: 5
 
   worker:
-    build: .
+    build:
+      context: .
+      args:
+        SECRET_KEY: ${SECRET_KEY}
     command: celery -A api.services.celery_app worker
     restart: on-failure
     environment:

@@ -397,6 +397,8 @@ and generate a key automatically when needed. If you start the stack
 manually, copy `.env.example` to `.env` and replace `CHANGE_ME` with your
 key. Include valid database credentials or a `DB_URL` override so the containers
 can connect to PostgreSQL.
+When building with Docker Compose, `SECRET_KEY` must be set in the environment so
+Compose can forward it as a build argument.
 
 Build and start all services with:
 

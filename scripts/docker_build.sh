@@ -44,5 +44,30 @@ docker compose -f "$ROOT_DIR/docker-compose.yml" build \
   --build-arg SECRET_KEY="$SECRET_KEY" api worker
 docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
 
+# Wait for the API container to become healthy
+max_wait=${API_HEALTH_TIMEOUT:-120}
+start_time=$(date +%s)
+printf "Waiting for api service to become healthy..."
+while true; do
+    container_id=$(docker compose -f "$ROOT_DIR/docker-compose.yml" ps -q api)
+    if [ -n "$container_id" ]; then
+        health=$(docker inspect --format '{{ .State.Health.Status }}' "$container_id" 2>/dev/null || echo "starting")
+        if [ "$health" = "healthy" ]; then
+            echo " done"
+            break
+        fi
+    fi
+    elapsed=$(( $(date +%s) - start_time ))
+    if [ $elapsed -ge $max_wait ]; then
+        echo ""
+        echo "API container failed to become healthy within ${max_wait}s." >&2
+        echo "Last API container logs:" >&2
+        docker compose -f "$ROOT_DIR/docker-compose.yml" logs api | tail -n 20 >&2 || true
+        exit 1
+    fi
+    printf "."
+    sleep 5
+done
+
 echo "Images built and containers started. Run scripts/run_tests.sh separately to execute the test suite."
 

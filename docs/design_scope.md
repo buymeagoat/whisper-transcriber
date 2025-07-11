@@ -47,11 +47,13 @@ npm run build
 cd ..
 ```
 Create a file containing your SECRET_KEY and pass it to BuildKit so the
-validation step can load application settings:
+validation step can load application settings. BuildKit secrets are the
+preferred mechanism:
 ```bash
 docker build --secret id=secret_key,src=<file> -t whisper-app .
 ```
-Alternatively pass the key as a build argument:
+If `docker build` does not support `--secret`, pass the key as a build
+argument instead:
 ```bash
 docker build --build-arg SECRET_KEY=<key> -t whisper-app .
 ```

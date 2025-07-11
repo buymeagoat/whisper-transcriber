@@ -2,8 +2,8 @@ services:
   api:
     build:
       context: .
-      args:
-        SECRET_KEY: ${SECRET_KEY}
+      secrets:
+        - secret_key
     restart: on-failure
     ports:
       - "8000:8000"
@@ -16,6 +16,8 @@ services:
       - CELERY_BACKEND_URL=rpc://
       - DB_URL=postgresql+psycopg2://whisper:whisper@db:5432/whisper
       - SECRET_KEY=${SECRET_KEY}
+    secrets:
+      - secret_key
     volumes:
       - ./uploads:/app/uploads
       - ./transcripts:/app/transcripts
@@ -67,8 +69,8 @@ services:
   worker:
     build:
       context: .
-      args:
-        SECRET_KEY: ${SECRET_KEY}
+      secrets:
+        - secret_key
     command: celery -A api.services.celery_app worker
     restart: on-failure
     environment:
@@ -79,6 +81,8 @@ services:
       - CELERY_BACKEND_URL=rpc://
       - DB_URL=postgresql+psycopg2://whisper:whisper@db:5432/whisper
       - SECRET_KEY=${SECRET_KEY}
+    secrets:
+      - secret_key
     volumes:
       - ./uploads:/app/uploads
       - ./transcripts:/app/transcripts
@@ -97,3 +101,7 @@ services:
 volumes:
   db_data:
   rabbitmq_data:
+
+secrets:
+  secret_key:
+    file: ./secret_key.txt

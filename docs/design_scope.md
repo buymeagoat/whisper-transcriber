@@ -46,10 +46,10 @@ cd frontend
 npm run build
 cd ..
 ```
-Provide a `SECRET_KEY` build argument so the image can run the validation
-step that loads application settings:
+Create a file containing your SECRET_KEY and pass it to BuildKit so the
+validation step can load application settings:
 ```bash
-docker build --build-arg SECRET_KEY=<your_key> -t whisper-app .
+docker build --secret id=secret_key,src=<file> -t whisper-app .
 ```
 
 Key environment files include `pyproject.toml`, `requirements.txt`, and the `Dockerfile` used to build a runnable image.

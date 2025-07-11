@@ -5,6 +5,11 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 
+# Return 0 if docker compose build supports --secret
+supports_secret() {
+    docker compose build --help 2>/dev/null | grep -q -- "--secret"
+}
+
 FORCE_PRUNE=false
 
 usage() {
@@ -64,17 +69,26 @@ check_whisper_models
 ensure_env_file
 
 # Build the standalone image used for production deployments
-secret_file=$(mktemp)
-printf '%s' "$SECRET_KEY" > "$secret_file"
-docker build --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
-rm -f "$secret_file"
+if supports_secret; then
+    secret_file=$(mktemp)
+    printf '%s' "$SECRET_KEY" > "$secret_file"
+    docker build --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
+    rm -f "$secret_file"
+else
+    docker build --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
+fi
 
 # Build images for the compose stack and start the services
-secret_file=$(mktemp)
-printf '%s' "$SECRET_KEY" > "$secret_file"
-docker compose -f "$ROOT_DIR/docker-compose.yml" build \
-  --secret id=secret_key,src="$secret_file" api worker
-rm -f "$secret_file"
+if supports_secret; then
+    secret_file=$(mktemp)
+    printf '%s' "$SECRET_KEY" > "$secret_file"
+    docker compose -f "$ROOT_DIR/docker-compose.yml" build \
+      --secret id=secret_key,src="$secret_file" api worker
+    rm -f "$secret_file"
+else
+    docker compose -f "$ROOT_DIR/docker-compose.yml" build \
+      --build-arg SECRET_KEY="$SECRET_KEY" api worker
+fi
 docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
 
 # Wait for the API container to become healthy

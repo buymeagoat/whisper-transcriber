@@ -335,15 +335,15 @@ cd frontend
 npm run build
 cd ..
 ```
-Build the image with a secret key:
+Build the image with a secret key (using BuildKit secrets is preferred):
 ```bash
 SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
 printf "%s" "$SECRET_KEY" > secret_key.txt
 docker build --secret id=secret_key,src=secret_key.txt -t whisper-app .
 rm secret_key.txt
 ```
-You can also pass the key via build argument when BuildKit secrets are not
-available:
+If your Docker installation does not support `--secret`, pass the key via build
+argument instead:
 ```bash
 docker build --build-arg SECRET_KEY=$SECRET_KEY -t whisper-app .
 ```
@@ -405,11 +405,18 @@ manually, copy `.env.example` to `.env` and replace `CHANGE_ME` with your
 key. Include valid database credentials or a `DB_URL` override so the containers
 can connect to PostgreSQL.
 When building with Docker Compose, write the key to a temporary file and pass it
-using Docker's BuildKit secrets feature:
+using Docker's BuildKit secrets feature (recommended). The helper script
+`scripts/start_containers.sh` now creates `secret_key.txt` automatically so you
+only need to supply the key when invoking it manually:
 ```bash
 printf "%s" "$SECRET_KEY" > secret_key.txt
 docker compose build --secret id=secret_key,src=secret_key.txt api worker
 rm secret_key.txt
+```
+If `docker compose build` does not support `--secret`, use a build argument
+instead:
+```bash
+docker compose build --build-arg SECRET_KEY=$SECRET_KEY api worker
 ```
 
 Build and start all services with:

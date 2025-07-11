@@ -61,7 +61,7 @@ needed.
 - `DB_CONNECT_ATTEMPTS` – how many times to retry connecting to the database on
   startup (defaults to `10`).
 - `BROKER_CONNECT_ATTEMPTS` – how many times to retry pinging the Celery broker
-  on startup (defaults to `10`).
+  on startup (defaults to `20`).
 - `AUTH_USERNAME` and `AUTH_PASSWORD` – *(deprecated)* previous static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
  - `SECRET_KEY` – **required** secret used to sign JWT tokens. The application
@@ -124,7 +124,8 @@ PostgreSQL must be available. The default `DB_URL` targets the `db` service
 (based on the `postgres:15-alpine` image) from `docker-compose.yml`.
 
 If startup fails, set `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` for verbose
-logs before launching the API.
+logs before launching the API. Increase `BROKER_CONNECT_ATTEMPTS` if the API
+exits before the Celery worker is ready.
 
 When `JOB_QUEUE_BACKEND` is set to `broker` a Celery worker must also be
 started:

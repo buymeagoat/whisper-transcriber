@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     log_backup_count: int = Field(3, env="LOG_BACKUP_COUNT")
     max_upload_size: int = Field(2 * 1024**3, env="MAX_UPLOAD_SIZE")
     db_connect_attempts: int = Field(10, env="DB_CONNECT_ATTEMPTS")
-    broker_connect_attempts: int = Field(10, env="BROKER_CONNECT_ATTEMPTS")
+    broker_connect_attempts: int = Field(20, env="BROKER_CONNECT_ATTEMPTS")
     allow_registration: bool = Field(True, env="ALLOW_REGISTRATION")
     auth_username: str = Field("admin", env="AUTH_USERNAME")
     auth_password: str = Field("admin", env="AUTH_PASSWORD")

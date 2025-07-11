@@ -19,6 +19,14 @@ check_whisper_models() {
     done
 }
 
+# Verify ffmpeg is installed and on PATH
+check_ffmpeg() {
+    if ! command -v ffmpeg >/dev/null 2>&1; then
+        echo "ffmpeg executable not found. Please install ffmpeg and ensure it is in your PATH." >&2
+        return 1
+    fi
+}
+
 # Ensure .env exists and SECRET_KEY is populated
 ensure_env_file() {
     local env_file="$ROOT_DIR/.env"

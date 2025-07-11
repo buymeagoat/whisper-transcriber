@@ -35,6 +35,7 @@ fi
 
 setup_persistent_dirs
 check_whisper_models
+check_ffmpeg
 ensure_env_file
 
 secret_file="$ROOT_DIR/secret_key.txt"

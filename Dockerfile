@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -25,10 +26,10 @@ COPY scripts/server_entry.py ./scripts/server_entry.py
 COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-ARG SECRET_KEY
 COPY api         ./api
 COPY models      ./models
-RUN SECRET_KEY=${SECRET_KEY:-temp-secret} \
+RUN --mount=type=secret,id=secret_key \
+    SECRET_KEY=$(cat /run/secrets/secret_key) \
     python -c "from api.utils.model_validation import validate_models_dir; validate_models_dir()"
 RUN mkdir -p uploads transcripts logs \
     && chown -R appuser:appuser /app

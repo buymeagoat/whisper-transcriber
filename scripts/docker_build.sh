@@ -37,11 +37,17 @@ check_whisper_models
 ensure_env_file
 
 # Build the standalone image used for production deployments
-docker build --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
+secret_file=$(mktemp)
+printf '%s' "$SECRET_KEY" > "$secret_file"
+docker build --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
+rm -f "$secret_file"
 
 # Build images for the compose stack and start the services
+secret_file=$(mktemp)
+printf '%s' "$SECRET_KEY" > "$secret_file"
 docker compose -f "$ROOT_DIR/docker-compose.yml" build \
-  --build-arg SECRET_KEY="$SECRET_KEY" api worker
+  --secret id=secret_key,src="$secret_file" api worker
+rm -f "$secret_file"
 docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
 
 # Wait for the API container to become healthy

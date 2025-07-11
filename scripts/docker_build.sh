@@ -66,6 +66,7 @@ pip install -r "$ROOT_DIR/requirements.txt"
 (cd "$ROOT_DIR/frontend" && npm install && npm run build)
 
 check_whisper_models
+check_ffmpeg
 ensure_env_file
 
 secret_file_runtime="$ROOT_DIR/secret_key.txt"

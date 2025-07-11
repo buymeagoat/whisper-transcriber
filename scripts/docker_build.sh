@@ -5,23 +5,50 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 
+FORCE_PRUNE=false
+
 usage() {
     cat <<EOF
-Usage: $(basename "$0")
+Usage: $(basename "$0") [--force]
 
 Prunes Docker resources, rebuilds images and starts the compose stack from scratch.
+With no options, the script will prompt before removing Docker data.
+  --force  Skip confirmation prompt and prune without asking.
 Run scripts/run_tests.sh afterward to execute the test suite.
 EOF
 }
 
-if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
-    usage
-    exit 0
-fi
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -f|--force)
+            FORCE_PRUNE=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+done
 
 # Remove existing containers, images and volumes to start fresh
 docker compose -f "$ROOT_DIR/docker-compose.yml" down -v --remove-orphans || true
-docker system prune -af --volumes
+
+if [ "$FORCE_PRUNE" = true ]; then
+    docker system prune -af --volumes
+else
+    read -r -p "Run 'docker system prune -af --volumes'? This may remove unrelated Docker data. [y/N] " response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        docker system prune -af --volumes
+    else
+        echo "Skipping docker system prune."
+    fi
+fi
 
 # Update the repo
 git -C "$ROOT_DIR" fetch

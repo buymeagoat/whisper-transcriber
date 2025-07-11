@@ -37,6 +37,9 @@ setup_persistent_dirs
 check_whisper_models
 ensure_env_file
 
+secret_file="$ROOT_DIR/secret_key.txt"
+printf '%s' "$SECRET_KEY" > "$secret_file"
+
 echo "Starting containers with docker compose..."
 docker compose -f "$COMPOSE_FILE" up --build -d api worker broker db
 
@@ -64,3 +67,4 @@ while true; do
 done
 
 echo "Containers are ready. Use 'docker compose ps' to check status."
+rm -f "$secret_file"

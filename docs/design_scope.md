@@ -51,6 +51,10 @@ validation step can load application settings:
 ```bash
 docker build --secret id=secret_key,src=<file> -t whisper-app .
 ```
+Alternatively pass the key as a build argument:
+```bash
+docker build --build-arg SECRET_KEY=<key> -t whisper-app .
+```
 
 Key environment files include `pyproject.toml`, `requirements.txt`, and the `Dockerfile` used to build a runnable image.
 

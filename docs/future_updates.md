@@ -305,8 +305,8 @@ This document organizes upcoming features for Whisper Transcriber. Items are gro
 - **Motivation**: Speeds up development by avoiding full image pruning when only code changes.
 
 ### Build Argument for SECRET_KEY
-- **Summary**: Dockerfile now expects a `SECRET_KEY` build argument so model validation can run during image creation.
-- **Motivation**: `validate_models_dir()` loads settings which require a secret key. Passing it via build argument keeps the build compatible with older Docker Compose versions.
+- **Summary**: Dockerfile now accepts a `SECRET_KEY` build argument and falls back to it when `/run/secrets/secret_key` is not provided during build.
+- **Motivation**: `validate_models_dir()` loads settings which require a secret key. Supporting both BuildKit secrets and a build argument keeps the build compatible with older Docker Compose versions.
 
 ### Prerequisite Checks in start_containers.sh
 - **Summary**: start_containers.sh now verifies Whisper models exist and ensures a valid SECRET_KEY in .env. Missing prerequisites abort the build.

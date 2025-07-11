@@ -1,6 +1,9 @@
 # syntax=docker/dockerfile:1.4
 FROM python:3.11-slim
 
+# Secret used for model validation during build
+ARG SECRET_KEY
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ffmpeg git curl gosu && \
       apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -28,9 +31,10 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 COPY api         ./api
 COPY models      ./models
+# Use BuildKit secrets when available, otherwise rely on the build argument
 RUN --mount=type=secret,id=secret_key \
-    SECRET_KEY=$(cat /run/secrets/secret_key) \
-    python -c "from api.utils.model_validation import validate_models_dir; validate_models_dir()"
+    bash -c 'if [ -f /run/secrets/secret_key ]; then export SECRET_KEY="$(cat /run/secrets/secret_key)"; fi; \ 
+    python -c "from api.utils.model_validation import validate_models_dir; validate_models_dir()"'
 RUN mkdir -p uploads transcripts logs \
     && chown -R appuser:appuser /app
 COPY frontend/dist ./api/static

@@ -342,6 +342,11 @@ printf "%s" "$SECRET_KEY" > secret_key.txt
 docker build --secret id=secret_key,src=secret_key.txt -t whisper-app .
 rm secret_key.txt
 ```
+You can also pass the key via build argument when BuildKit secrets are not
+available:
+```bash
+docker build --build-arg SECRET_KEY=$SECRET_KEY -t whisper-app .
+```
 If you use a prebuilt image, mount the models directory at runtime.
 
 Run the container with the application directories mounted so that

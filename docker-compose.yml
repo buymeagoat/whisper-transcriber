@@ -29,7 +29,7 @@ services:
       broker:
         condition: service_healthy
       worker:
-        condition: service_started
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "/usr/local/bin/healthcheck.sh"]
       interval: 30s

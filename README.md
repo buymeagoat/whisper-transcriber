@@ -338,7 +338,9 @@ cd ..
 Build the image with a secret key:
 ```bash
 SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
-docker build --build-arg SECRET_KEY=$SECRET_KEY -t whisper-app .
+printf "%s" "$SECRET_KEY" > secret_key.txt
+docker build --secret id=secret_key,src=secret_key.txt -t whisper-app .
+rm secret_key.txt
 ```
 If you use a prebuilt image, mount the models directory at runtime.
 
@@ -397,8 +399,13 @@ and generate a key automatically when needed. If you start the stack
 manually, copy `.env.example` to `.env` and replace `CHANGE_ME` with your
 key. Include valid database credentials or a `DB_URL` override so the containers
 can connect to PostgreSQL.
-When building with Docker Compose, `SECRET_KEY` must be set in the environment so
-Compose can forward it as a build argument.
+When building with Docker Compose, write the key to a temporary file and pass it
+using Docker's BuildKit secrets feature:
+```bash
+printf "%s" "$SECRET_KEY" > secret_key.txt
+docker compose build --secret id=secret_key,src=secret_key.txt api worker
+rm secret_key.txt
+```
 
 Build and start all services with:
 

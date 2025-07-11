@@ -57,7 +57,7 @@ def update_user_role(user_id: int, role: str) -> Optional[User]:
     """Update a user's role and return the updated user or None."""
     with db_lock:
         with SessionLocal() as db:
-            user = db.query(User).get(user_id)
+            user = db.get(User, user_id)
             if not user:
                 return None
             user.role = role
@@ -71,7 +71,7 @@ def update_user_password(user_id: int, password: str) -> Optional[User]:
     hashed = pwd_context.hash(password)
     with db_lock:
         with SessionLocal() as db:
-            user = db.query(User).get(user_id)
+            user = db.get(User, user_id)
             if not user:
                 return None
             user.hashed_password = hashed

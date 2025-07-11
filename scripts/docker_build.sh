@@ -68,6 +68,9 @@ pip install -r "$ROOT_DIR/requirements.txt"
 check_whisper_models
 ensure_env_file
 
+secret_file_runtime="$ROOT_DIR/secret_key.txt"
+printf '%s' "$SECRET_KEY" > "$secret_file_runtime"
+
 # Build the standalone image used for production deployments
 if supports_secret; then
     secret_file=$(mktemp)
@@ -117,4 +120,5 @@ while true; do
 done
 
 echo "Images built and containers started. Run scripts/run_tests.sh separately to execute the test suite."
+rm -f "$secret_file_runtime"
 

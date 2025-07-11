@@ -61,7 +61,10 @@ needed.
 - `DB_CONNECT_ATTEMPTS` – how many times to retry connecting to the database on
   startup (defaults to `10`).
 - `BROKER_CONNECT_ATTEMPTS` – how many times to retry pinging the Celery broker
-  on startup (defaults to `20`).
+  on startup (defaults to `20`). If the API exits immediately with a log like
+  `Celery broker unreachable after 20 attempts. Is the broker running?` (seen in
+  the `scripts/docker_build.sh` output), increase this value or confirm the
+  worker is healthy.
 - `AUTH_USERNAME` and `AUTH_PASSWORD` – *(deprecated)* previous static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
  - `SECRET_KEY` – **required** secret used to sign JWT tokens. The application

@@ -466,7 +466,15 @@ docker compose restart
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
 
-The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ. An optional helper script `scripts/start_containers.sh` builds the frontend if needed, verifies model files and `.env`, and then launches the compose stack in detached mode. After starting the containers it waits for the `api` service to report a healthy status (controlled by the `API_HEALTH_TIMEOUT` environment variable which defaults to 120 seconds) and exits with an error if it never becomes healthy. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch; optionally run `scripts/run_tests.sh` afterward to execute the tests. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. These scripts source `scripts/shared_checks.sh` which ensures Whisper models are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. Once running, access the API at `http://localhost:8000`.
+The worker container runs `celery -A api.services.celery_app worker` to process jobs from RabbitMQ. An optional helper script `scripts/start_containers.sh` builds the frontend if needed, verifies model files and `.env`, and then launches the compose stack in detached mode. After starting the containers it waits for the `api` service to report a healthy status (controlled by the `API_HEALTH_TIMEOUT` environment variable which defaults to 120 seconds) and exits with an error if it never becomes healthy. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. These scripts source `scripts/shared_checks.sh` which ensures Whisper models are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. Once running, access the API at `http://localhost:8000`.
+
+## Updating the Application
+
+Use `scripts/docker_build.sh --force` for a clean rebuild after pulling the latest code. This script fetches updates with `git fetch` and `git pull`, prunes Docker resources, installs dependencies and rebuilds all images from scratch. Run it when dependencies, the Dockerfile or compose configuration change, or whenever the environment falls out of sync.
+
+For routine code updates, run `scripts/update_images.sh` once your repository is up to date. It uses Docker's cache to rebuild only the API and worker images and then restarts those services.
+
+After using either script, execute `scripts/run_tests.sh` to verify the new build.
 
 ## Testing
 

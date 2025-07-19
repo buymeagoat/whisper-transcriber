@@ -470,9 +470,15 @@ The worker container runs `celery -A api.services.celery_app worker` to process 
 
 ## Updating the Application
 
-Use `scripts/docker_build.sh --force` for a clean rebuild after pulling the latest code. This script fetches updates with `git fetch` and `git pull`, prunes Docker resources, installs dependencies and rebuilds all images from scratch. Run it when dependencies, the Dockerfile or compose configuration change, or whenever the environment falls out of sync.
+Before rebuilding containers, update the repository:
+```bash
+git fetch
+git pull
+```
 
-For routine code updates, run `scripts/update_images.sh` once your repository is up to date. It uses Docker's cache to rebuild only the API and worker images and then restarts those services.
+Use `scripts/docker_build.sh --force` for a clean rebuild when dependencies, the Dockerfile or compose configuration change or if the environment is out of sync. It prunes Docker resources, installs dependencies and rebuilds all images from scratch.
+
+Run `scripts/update_images.sh` after pulling the latest code for routine updates. It reuses Docker's cache to rebuild only the API and worker images and then restarts those services.
 
 After using either script, execute `scripts/run_tests.sh` to verify the new build.
 

@@ -34,3 +34,15 @@ def validate_models_dir():
             f"Required model files missing from {MODEL_DIR.resolve()}: "
             f"{', '.join(missing)}."
         )
+
+
+def available_models() -> set[str]:
+    """Return model names discovered in ``MODEL_DIR``.
+
+    Model files are expected to have a ``.pt`` extension. The returned names
+    exclude the extension. Missing ``MODEL_DIR`` simply results in an empty
+    set.
+    """
+    if not MODEL_DIR.exists():
+        return set()
+    return {p.stem for p in MODEL_DIR.glob("*.pt") if p.is_file()}

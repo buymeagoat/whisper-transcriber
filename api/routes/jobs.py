@@ -7,6 +7,7 @@ import shutil
 import uuid
 
 from api.utils.logger import get_system_logger
+from api.utils.model_validation import available_models
 
 log = get_system_logger()
 from api.app_state import backend_log
@@ -36,9 +37,6 @@ from api.services.analysis import analyze_text
 
 router = APIRouter()
 
-# Allowed Whisper model names derived from validate_models_dir
-ALLOWED_MODELS = {"base", "small", "medium", "large-v3", "tiny"}
-
 
 @router.post(
     "/jobs", status_code=status.HTTP_202_ACCEPTED, response_model=JobCreatedOut
@@ -46,7 +44,7 @@ ALLOWED_MODELS = {"base", "small", "medium", "large-v3", "tiny"}
 async def submit_job(
     file: UploadFile = File(...), model: str = Form("base")
 ) -> JobCreatedOut:
-    if model not in ALLOWED_MODELS:
+    if model not in available_models():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid model"
         )

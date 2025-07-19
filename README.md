@@ -65,6 +65,8 @@ needed.
   `Celery broker unreachable after 20 attempts. Is the broker running?` (seen in
   the `scripts/docker_build.sh` output), increase this value or confirm the
   worker is healthy.
+- `BROKER_PING_TIMEOUT` – how many seconds the worker entrypoint waits for
+  RabbitMQ to respond before exiting (defaults to `60`).
 - `AUTH_USERNAME` and `AUTH_PASSWORD` – *(deprecated)* previous static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
  - `SECRET_KEY` – **required** secret used to sign JWT tokens. The application
@@ -466,7 +468,7 @@ docker compose restart
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
 
-The worker container runs `python worker.py` to process jobs from RabbitMQ. An optional helper script `scripts/start_containers.sh` builds the frontend if needed, verifies model files and `.env`, and then launches the compose stack in detached mode. After starting the containers it waits for the `api` service to report a healthy status (controlled by the `API_HEALTH_TIMEOUT` environment variable which defaults to 120 seconds) and exits with an error if it never becomes healthy. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. These scripts source `scripts/shared_checks.sh` which ensures Whisper models are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. Once running, access the API at `http://localhost:8000`.
+The worker container runs `python worker.py` to process jobs from RabbitMQ. Its entrypoint pings the broker until it responds, printing `waiting...` while attempts fail and exiting if no response arrives within `BROKER_PING_TIMEOUT` seconds (60 by default). An optional helper script `scripts/start_containers.sh` builds the frontend if needed, verifies model files and `.env`, and then launches the compose stack in detached mode. After starting the containers it waits for the `api` service to report a healthy status (controlled by the `API_HEALTH_TIMEOUT` environment variable which defaults to 120 seconds) and exits with an error if it never becomes healthy. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. These scripts source `scripts/shared_checks.sh` which ensures Whisper models are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. Once running, access the API at `http://localhost:8000`.
 
 ## Updating the Application
 

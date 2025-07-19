@@ -108,6 +108,7 @@ object used throughout the code base. Available variables are:
 - `CORS_ORIGINS` – comma-separated list of allowed CORS origins (defaults to `*`).
 - `WHISPER_BIN` – path to the Whisper CLI executable (defaults to `whisper`).
 - `WHISPER_LANGUAGE` – language code passed to Whisper (defaults to `en`).
+- `WHISPER_TIMEOUT_SECONDS` – maximum seconds to wait for Whisper before marking the job failed (0 disables timeout).
 - `MODEL_DIR` – directory containing Whisper models (defaults to `models/`).
 - `OPENAI_API_KEY` – API key enabling transcript analysis via OpenAI.
 - `OPENAI_MODEL` – model name used when `OPENAI_API_KEY` is set (defaults to `gpt-3.5-turbo`).

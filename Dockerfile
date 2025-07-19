@@ -1,6 +1,9 @@
 # syntax=docker/dockerfile:1.4
 FROM python:3.11-slim
 
+# Install dev requirements when building test images
+ARG INSTALL_DEV=false
+
 # Secret used for model validation during build
 ARG SECRET_KEY
 
@@ -21,7 +24,7 @@ COPY requirements-dev.txt .
 COPY alembic.ini .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir -r requirements-dev.txt
+    if [ "$INSTALL_DEV" = "true" ]; then pip install --no-cache-dir -r requirements-dev.txt; fi
 
 COPY scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
 RUN chmod +x /usr/local/bin/healthcheck.sh

@@ -71,7 +71,7 @@ services:
       context: .
       secrets:
         - secret_key
-    command: celery -A api.services.celery_app worker
+    command: python worker.py
     restart: on-failure
     environment:
       - SERVICE_TYPE=worker

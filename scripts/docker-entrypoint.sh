@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
+
+LOG_FILE="/app/logs/entrypoint.log"
 mkdir -p /app/uploads /app/transcripts /app/logs
+# Mirror output to a log file for troubleshooting
+exec > >(tee -a "$LOG_FILE") 2>&1
 chown -R 1000:1000 /app/uploads /app/transcripts /app/logs
+
+echo "Container entrypoint starting with environment:" >&2
+env | sort >&2
 
 # If this container is running a worker, wait for the broker to be ready
 if [ "${SERVICE_TYPE:-api}" = "worker" ]; then
@@ -30,4 +37,5 @@ while True:
 print("Broker is available. Starting worker.")
 PY
 fi
+echo "Executing: $@" >&2
 exec gosu appuser "$@"

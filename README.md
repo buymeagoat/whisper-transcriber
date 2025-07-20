@@ -469,6 +469,7 @@ If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
 
 The worker container runs `python worker.py` to process jobs from RabbitMQ. Its entrypoint uses Python's `socket` module to connect to the broker until it responds, printing `waiting...` while attempts fail and exiting if no response arrives within `BROKER_PING_TIMEOUT` seconds (60 by default). An optional helper script `scripts/start_containers.sh` builds the frontend if needed, verifies model files and `.env`, and then launches the compose stack in detached mode. After starting the containers it waits for the `api` service to report a healthy status (controlled by the `API_HEALTH_TIMEOUT` environment variable which defaults to 120 seconds) and exits with an error if it never becomes healthy. Another script `scripts/docker_build.sh` prunes Docker resources and then rebuilds the images and stack from scratch. Use `scripts/update_images.sh` to rebuild just the API and worker images using Docker's cache and restart those services when you make code changes. These scripts source `scripts/shared_checks.sh` which ensures Whisper models are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. Once running, access the API at `http://localhost:8000`.
+The build helper scripts mirror their output to log files for easier troubleshooting: `logs/start_containers.log`, `logs/docker_build.log`, and `logs/update_images.log`. The container entrypoint also writes to `logs/entrypoint.log` when each service starts.
 
 ## Updating the Application
 
@@ -481,7 +482,7 @@ git pull
 Use `scripts/docker_build.sh --force` for a clean rebuild when dependencies, the Dockerfile or compose configuration change or if the environment is out of sync. It prunes Docker resources, installs dependencies and rebuilds all images from scratch.
 
 Run `scripts/update_images.sh` after pulling the latest code for routine updates. It reuses Docker's cache to rebuild only the API and worker images and then restarts those services.
-If containers fail to start, run `scripts/diagnose_containers.sh` to check their status, exit codes, restart counts and health information. The script also prints the `SERVICE_TYPE` and `CELERY_BROKER_URL` environment variables for each service and shows the last 20 log lines by default.
+If containers fail to start, run `scripts/diagnose_containers.sh` to check their status, exit codes, restart counts and health information. The script also prints the `SERVICE_TYPE` and `CELERY_BROKER_URL` environment variables for each service, shows the last 20 log lines from each container by default, and prints the full contents of any build log files in `logs/`.
 
 After using either script, execute `scripts/run_tests.sh` to verify the new build.
 

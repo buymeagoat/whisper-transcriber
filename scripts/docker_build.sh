@@ -5,6 +5,11 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 
+LOG_DIR="$ROOT_DIR/logs"
+LOG_FILE="$LOG_DIR/docker_build.log"
+mkdir -p "$LOG_DIR"
+exec > >(tee -a "$LOG_FILE") 2>&1
+
 # Return 0 if docker compose build supports --secret
 supports_secret() {
     docker compose build --help 2>/dev/null | grep -q -- "--secret"
@@ -69,6 +74,9 @@ pip install -r "$ROOT_DIR/requirements.txt"
 check_whisper_models
 check_ffmpeg
 ensure_env_file
+
+echo "Environment variables:" >&2
+env | sort >&2
 
 secret_file_runtime="$ROOT_DIR/secret_key.txt"
 printf '%s' "$SECRET_KEY" > "$secret_file_runtime"

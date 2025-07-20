@@ -6,6 +6,12 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 source "$SCRIPT_DIR/shared_checks.sh"
 
+LOG_DIR="$ROOT_DIR/logs"
+LOG_FILE="$LOG_DIR/start_containers.log"
+mkdir -p "$LOG_DIR"
+# Mirror all output to a startup log for troubleshooting
+exec > >(tee -a "$LOG_FILE") 2>&1
+
 usage() {
     cat <<EOF
 Usage: $(basename "$0")
@@ -40,6 +46,9 @@ ensure_env_file
 
 secret_file="$ROOT_DIR/secret_key.txt"
 printf '%s' "$SECRET_KEY" > "$secret_file"
+
+echo "Environment variables:" >&2
+env | sort >&2
 
 echo "Starting containers with docker compose..."
 docker compose -f "$COMPOSE_FILE" up --build -d api worker broker db

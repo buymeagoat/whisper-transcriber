@@ -6,6 +6,11 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 source "$SCRIPT_DIR/shared_checks.sh"
 
+LOG_DIR="$ROOT_DIR/logs"
+LOG_FILE="$LOG_DIR/update_images.log"
+mkdir -p "$LOG_DIR"
+exec > >(tee -a "$LOG_FILE") 2>&1
+
 # Return 0 if docker compose build supports --secret
 supports_secret() {
     docker compose build --help 2>/dev/null | grep -q -- "--secret"
@@ -13,6 +18,9 @@ supports_secret() {
 
 # Load SECRET_KEY from .env
 ensure_env_file
+
+echo "Environment variables:" >&2
+env | sort >&2
 
 # Rebuild frontend assets
 

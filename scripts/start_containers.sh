@@ -61,6 +61,7 @@ while true; do
     if [ $elapsed -ge $max_wait ]; then
         echo ""
         echo "API service failed to become healthy within ${max_wait}s. Check 'docker compose logs api' for details." >&2
+        echo "Run scripts/diagnose_containers.sh for further troubleshooting." >&2
         exit 1
     fi
     printf "."
@@ -68,4 +69,5 @@ while true; do
 done
 
 echo "Containers are ready. Use 'docker compose ps' to check status."
+echo "Run scripts/run_tests.sh to execute the test suite." 
 rm -f "$secret_file"

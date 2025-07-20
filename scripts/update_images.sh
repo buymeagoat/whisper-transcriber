@@ -33,3 +33,13 @@ else
 fi
 
 docker compose -f "$COMPOSE_FILE" up -d api worker
+
+cat <<'EOF'
+API and worker images updated.
+Available test scripts:
+  scripts/run_tests.sh         - runs backend tests plus frontend unit and Cypress end-to-end tests.
+  scripts/run_backend_tests.sh - executes only the backend tests and verifies the /health and /version endpoints.
+
+Run the desired script to verify the update.
+If containers encounter issues, use scripts/diagnose_containers.sh for troubleshooting.
+EOF

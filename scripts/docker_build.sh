@@ -125,7 +125,13 @@ while true; do
 done
 
 echo "Images built and containers started."
-echo "Run scripts/run_tests.sh to execute the test suite." 
-echo "If containers encounter issues, use scripts/diagnose_containers.sh for troubleshooting." 
+cat <<'EOF'
+Available test scripts:
+  scripts/run_tests.sh         - runs backend tests plus frontend unit and Cypress end-to-end tests. Recommended after a full build.
+  scripts/run_backend_tests.sh - executes only the backend tests and verifies the /health and /version endpoints.
+
+Run the desired script to verify the build.
+If containers encounter issues, use scripts/diagnose_containers.sh for troubleshooting.
+EOF
 rm -f "$secret_file_runtime"
 

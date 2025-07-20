@@ -20,6 +20,7 @@ Prunes Docker resources, rebuilds images and starts the compose stack from scrat
 With no options, the script will prompt before removing Docker data.
   --force  Skip confirmation prompt and prune without asking.
 Run scripts/run_tests.sh afterward to execute the test suite.
+If startup fails, use scripts/diagnose_containers.sh to inspect the containers.
 EOF
 }
 
@@ -116,12 +117,15 @@ while true; do
         echo "API container failed to become healthy within ${max_wait}s." >&2
         echo "Last API container logs:" >&2
         docker compose -f "$ROOT_DIR/docker-compose.yml" logs api | tail -n 20 >&2 || true
+        echo "Run scripts/diagnose_containers.sh for a detailed status report." >&2
         exit 1
     fi
     printf "."
     sleep 5
 done
 
-echo "Images built and containers started. Run scripts/run_tests.sh separately to execute the test suite."
+echo "Images built and containers started."
+echo "Run scripts/run_tests.sh to execute the test suite." 
+echo "If containers encounter issues, use scripts/diagnose_containers.sh for troubleshooting." 
 rm -f "$secret_file_runtime"
 

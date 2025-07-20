@@ -34,6 +34,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 COPY api         ./api
 COPY models      ./models
+COPY worker.py   ./worker.py
 # Use BuildKit secrets when available, otherwise rely on the build argument
 RUN --mount=type=secret,id=secret_key \
     bash -c 'if [ -f /run/secrets/secret_key ]; then export SECRET_KEY="$(cat /run/secrets/secret_key)"; fi; \ 

@@ -35,7 +35,7 @@ The application is considered working once these basics are functional:
  - `start_containers.sh` – helper script that builds the frontend if needed, verifies required models and `.env`, then launches the Docker Compose stack (`api`, `worker`, `broker`, and `db`).
  - `docker_build.sh` – wipes old Docker resources and rebuilds the compose stack from scratch. Run it after `git fetch` and `git pull` when dependencies, the Dockerfile or compose configuration change, or if the environment is out of sync. After rebuilding, run `scripts/run_tests.sh` to verify everything works. Use `scripts/run_backend_tests.sh` if you only need the backend tests.
 - `update_images.sh` – rebuilds the API and worker images using Docker's cache and restarts those services without pruning existing resources. Run it after `git fetch` and `git pull` for routine code updates.
-- `run_backend_tests.sh` – runs backend tests and integration checks, logging output to `logs/test.log`.
+- `run_backend_tests.sh` – runs backend tests and verifies the `/health` and `/version` endpoints, logging output to `logs/test.log`.
 - `run_tests.sh` – preferred wrapper that additionally executes frontend unit
   tests and Cypress end-to-end tests, saving results to `logs/full_test.log`.
 

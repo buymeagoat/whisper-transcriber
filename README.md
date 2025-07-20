@@ -502,8 +502,9 @@ up --build` and run the full suite with:
 ./scripts/run_tests.sh
 ```
 
-This script runs the backend tests and integration checks, then executes the
-frontend unit tests and Cypress end‑to‑end tests. Output is saved to
+This script runs the backend tests and verifies the `/health` and `/version`
+endpoints, then executes the frontend unit tests and Cypress end‑to‑end tests.
+Output is saved to
 `logs/full_test.log`.
 
 Both `scripts/run_tests.sh` and `scripts/run_backend_tests.sh` check that the `api`

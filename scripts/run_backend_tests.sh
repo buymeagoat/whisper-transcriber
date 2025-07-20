@@ -17,10 +17,24 @@ if ! docker compose -f "$COMPOSE_FILE" ps api | grep -q "running"; then
     exit 1
 fi
 
+API_HOST="${VITE_API_HOST:-http://localhost:8000}"
+API_HOST="${API_HOST%/}"
+
+check_endpoint() {
+    local path="$1"
+    if curl -fsS "$API_HOST$path" >/dev/null; then
+        echo "$path OK"
+    else
+        echo "$path FAILED"
+        return 1
+    fi
+}
+
 {
     docker compose -f "$COMPOSE_FILE" exec -T api coverage run -m pytest
     docker compose -f "$COMPOSE_FILE" exec -T api coverage report
-    "$SCRIPT_DIR/integration_tests.sh"
+    check_endpoint /health
+    check_endpoint /version
 } | tee "$LOG_FILE"
 
 echo "Test log saved to $LOG_FILE"

@@ -6,18 +6,28 @@ chown -R 1000:1000 /app/uploads /app/transcripts /app/logs
 # If this container is running a worker, wait for the broker to be ready
 if [ "${SERVICE_TYPE:-api}" = "worker" ]; then
     broker_host="${CELERY_BROKER_HOST:-broker}"
+    broker_port="${CELERY_BROKER_PORT:-5672}"
     max_wait=${BROKER_PING_TIMEOUT:-60}
-    start_time=$(date +%s)
-    echo "Waiting for RabbitMQ at ${broker_host}..."
-    while ! rabbitmq-diagnostics -q ping -n "rabbit@${broker_host}" >/dev/null 2>&1; do
-        echo "waiting..."
-        sleep 1
-        elapsed=$(( $(date +%s) - start_time ))
-        if [ $elapsed -ge $max_wait ]; then
-            echo "Broker unreachable after ${max_wait}s" >&2
-            exit 1
-        fi
-    done
-    echo "Broker is available. Starting worker."
+    echo "Waiting for RabbitMQ at ${broker_host}:${broker_port}..."
+    BROKER_HOST="$broker_host" BROKER_PORT="$broker_port" TIMEOUT="$max_wait" \
+    python - <<'PY'
+import os, socket, sys, time
+
+host = os.environ["BROKER_HOST"]
+port = int(os.environ["BROKER_PORT"])
+timeout = int(os.environ["TIMEOUT"])
+start = time.time()
+while True:
+    try:
+        with socket.create_connection((host, port), timeout=1):
+            break
+    except OSError:
+        print("waiting...", flush=True)
+        if time.time() - start >= timeout:
+            print(f"Broker unreachable after {timeout}s", file=sys.stderr)
+            sys.exit(1)
+        time.sleep(1)
+print("Broker is available. Starting worker.")
+PY
 fi
 exec gosu appuser "$@"

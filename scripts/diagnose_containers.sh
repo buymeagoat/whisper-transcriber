@@ -56,3 +56,16 @@ if [ -z "$api_id" ]; then
         fi
     done
 fi
+
+echo
+echo "===== Build logs ====="
+for log in docker_build.log start_containers.log update_images.log entrypoint.log; do
+    log_path="$ROOT_DIR/logs/$log"
+    echo
+    echo "----- ${log} -----"
+    if [ -f "$log_path" ]; then
+        cat "$log_path"
+    else
+        echo "Log file $log_path not found"
+    fi
+done

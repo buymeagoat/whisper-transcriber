@@ -482,7 +482,7 @@ git pull
 Use `scripts/docker_build.sh --force` for a clean rebuild when dependencies, the Dockerfile or compose configuration change or if the environment is out of sync. It prunes Docker resources, installs dependencies and rebuilds all images from scratch.
 
 Run `scripts/update_images.sh` after pulling the latest code for routine updates. It reuses Docker's cache to rebuild only the API and worker images and then restarts those services.
-If containers fail to start, run `scripts/diagnose_containers.sh` to check their status, exit codes, restart counts and health information. The script also prints the `SERVICE_TYPE` and `CELERY_BROKER_URL` environment variables for each service and shows the last 20 log lines by default.
+If containers fail to start, run `scripts/diagnose_containers.sh` to check their status, exit codes, restart counts and health information. The script also prints the `SERVICE_TYPE` and `CELERY_BROKER_URL` environment variables for each service, shows the last 20 log lines from each container by default, and prints the full contents of any build log files in `logs/`.
 
 After using either script, execute `scripts/run_tests.sh` to verify the new build.
 

@@ -18,7 +18,9 @@ for svc in $services; do
     echo "===== Inspecting $svc ====="
     container_id=$(docker compose -f "$COMPOSE_FILE" ps -q "$svc" 2>/dev/null || true)
     if [ -n "$container_id" ]; then
-        docker inspect --format 'Status: {{ .State.Status }} (Health: {{ if .State.Health }}{{ .State.Health.Status }}{{ else }}none{{ end }})  Restarts: {{ .RestartCount }}' "$container_id" || true
+        docker inspect --format 'Status: {{ .State.Status }} (Health: {{ if .State.Health }}{{ .State.Health.Status }}{{ else }}none{{ end }})  Exit Code: {{ .State.ExitCode }}  Restarts: {{ .RestartCount }}' "$container_id" || true
+        echo "Environment variables:"
+        docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$container_id" | grep -E '^(SERVICE_TYPE|CELERY_BROKER_URL)=' || true
     else
         echo "Container not running"
     fi

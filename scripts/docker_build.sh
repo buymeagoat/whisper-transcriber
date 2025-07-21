@@ -74,6 +74,7 @@ pip install -r "$ROOT_DIR/requirements.txt"
 check_whisper_models
 check_ffmpeg
 ensure_env_file
+check_docker_registry
 
 echo "Environment variables:" >&2
 env | sort >&2

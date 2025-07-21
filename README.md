@@ -354,6 +354,11 @@ argument instead:
 ```bash
 docker build --build-arg SECRET_KEY=$SECRET_KEY -t whisper-app .
 ```
+Docker must reach `registry-1.docker.io` during this step. If `docker build`
+fails with errors like `failed to resolve source metadata` or `lookup
+http.docker.internal ... i/o timeout`, your network is blocking access to the
+Docker Hub registry. Check any proxy or firewall configuration and ensure the
+host can pull images before retrying the build.
 If you use a prebuilt image, mount the models directory at runtime.
 
 Run the container with the application directories mounted so that

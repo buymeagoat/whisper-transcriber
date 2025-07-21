@@ -18,7 +18,7 @@ supports_secret() {
 
 # Load SECRET_KEY from .env
 ensure_env_file
-check_docker_registry
+stage_build_dependencies
 
 echo "Environment variables:" >&2
 env | sort >&2

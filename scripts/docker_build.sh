@@ -65,16 +65,12 @@ fi
 git -C "$ROOT_DIR" fetch
 git -C "$ROOT_DIR" pull
 
-# Install Python dependencies
-pip install -r "$ROOT_DIR/requirements.txt"
-
-# Install and build the frontend
-(cd "$ROOT_DIR/frontend" && npm install && npm run build)
+stage_build_dependencies
+(cd "$ROOT_DIR/frontend" && npm run build)
 
 check_whisper_models
 check_ffmpeg
 ensure_env_file
-check_docker_registry
 
 echo "Environment variables:" >&2
 env | sort >&2

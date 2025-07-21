@@ -70,3 +70,50 @@ check_docker_registry() {
     fi
 }
 
+# Return 0 when pypi.org and registry.npmjs.org are reachable
+check_internet() {
+    curl -sSf https://pypi.org >/dev/null 2>&1 \
+        && curl -sSf https://registry.npmjs.org >/dev/null 2>&1
+}
+
+# Ensure python packages and node modules are installed and docker images pulled
+stage_build_dependencies() {
+    local compose_file="$ROOT_DIR/docker-compose.yml"
+    local base_image
+    base_image=$(grep -m1 '^FROM ' "$ROOT_DIR/Dockerfile" | awk '{print $2}')
+
+    if check_internet && check_docker_registry; then
+        echo "Prefetching build dependencies..." >&2
+        if ! docker image inspect "$base_image" >/dev/null 2>&1; then
+            docker pull "$base_image"
+        fi
+        docker compose -f "$compose_file" pull db broker
+        pip install -r "$ROOT_DIR/requirements.txt"
+        (cd "$ROOT_DIR/frontend" && npm install)
+    else
+        echo "No internet connection. Verifying staged components..." >&2
+        if ! docker image inspect "$base_image" >/dev/null 2>&1; then
+            echo "Missing required docker image $base_image" >&2
+            return 1
+        fi
+        if ! docker image inspect "$(docker compose -f "$compose_file" config | awk '/image:/ {print $2}' | head -n1)" >/dev/null 2>&1; then
+            echo "Compose images not staged" >&2
+            return 1
+        fi
+        while read -r pkg; do
+            pkg=${pkg%%[*#]*}
+            pkg=$(echo "$pkg" | xargs)
+            [ -z "$pkg" ] && continue
+            pkg=${pkg%%=*}
+            if ! pip show "$pkg" >/dev/null 2>&1; then
+                echo "Missing python dependency $pkg" >&2
+                return 1
+            fi
+        done < "$ROOT_DIR/requirements.txt"
+        if [ ! -d "$ROOT_DIR/frontend/node_modules" ]; then
+            echo "Missing frontend/node_modules" >&2
+            return 1
+        fi
+    fi
+}
+

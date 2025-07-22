@@ -23,8 +23,10 @@ COPY requirements.txt .
 COPY requirements-dev.txt .
 COPY alembic.ini .
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    if [ "$INSTALL_DEV" = "true" ]; then pip install --no-cache-dir -r requirements-dev.txt; fi
+    pip install --no-cache-dir -r requirements.txt --retries 5 --resume-retries 3 --timeout 60 && \
+    if [ "$INSTALL_DEV" = "true" ]; then \
+        pip install --no-cache-dir -r requirements-dev.txt --retries 5 --resume-retries 3 --timeout 60; \
+    fi
 
 COPY scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
 RUN chmod +x /usr/local/bin/healthcheck.sh

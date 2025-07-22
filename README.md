@@ -359,6 +359,9 @@ fails with errors like `failed to resolve source metadata` or `lookup
 http.docker.internal ... i/o timeout`, your network is blocking access to the
 Docker Hub registry. Check any proxy or firewall configuration and ensure the
 host can pull images before retrying the build.
+Dependency installation also retries automatically: the Dockerfile runs pip with
+`--retries 5 --resume-retries 3 --timeout 60` so large wheels resume downloading
+instead of failing the build.
 The helper script `scripts/docker_build.sh` uses `--network=host` only with
 `docker build` to bypass proxy-related issues when fetching base images.
 `docker compose build` does not accept this flag, so the script omits it when

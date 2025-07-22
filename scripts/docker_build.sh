@@ -88,10 +88,10 @@ printf '%s' "$SECRET_KEY" > "$secret_file_runtime"
 if supports_secret; then
     secret_file=$(mktemp)
     printf '%s' "$SECRET_KEY" > "$secret_file"
-    docker build --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
+    docker build --network=host --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
     rm -f "$secret_file"
 else
-    docker build --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
+    docker build --network=host --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
 fi
 
 # Build images for the compose stack and start the services
@@ -99,11 +99,13 @@ if supports_secret; then
     secret_file=$(mktemp)
     printf '%s' "$SECRET_KEY" > "$secret_file"
     docker compose -f "$ROOT_DIR/docker-compose.yml" build \
+      --network=host \
       --secret id=secret_key,src="$secret_file" \
       --build-arg INSTALL_DEV=true api worker
     rm -f "$secret_file"
 else
     docker compose -f "$ROOT_DIR/docker-compose.yml" build \
+      --network=host \
       --build-arg SECRET_KEY="$SECRET_KEY" \
       --build-arg INSTALL_DEV=true api worker
 fi

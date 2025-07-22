@@ -21,6 +21,17 @@ supports_secret() {
     docker compose build --help 2>/dev/null | grep -q -- "--secret"
 }
 
+# Return 0 only if the API and worker images exist after the build
+verify_built_images() {
+    local images=(whisper-transcriber-api:latest whisper-transcriber-worker:latest)
+    for img in "${images[@]}"; do
+        if ! docker image inspect "$img" >/dev/null 2>&1; then
+            echo "Missing Docker image $img" >&2
+            return 1
+        fi
+    done
+}
+
 FORCE_PRUNE=false
 
 usage() {
@@ -107,6 +118,8 @@ else
       --build-arg SECRET_KEY="$SECRET_KEY" \
       --build-arg INSTALL_DEV=true api worker
 fi
+
+verify_built_images
 docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
 
 # Wait for the API container to become healthy

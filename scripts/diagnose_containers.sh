@@ -38,6 +38,10 @@ for svc in $services; do
             echo "worker.py present in worker image"
         else
             echo "worker.py missing in worker image"
+            if ! docker compose -f "$COMPOSE_FILE" run --rm --no-deps --entrypoint "" worker test -f /app/worker.py >/dev/null; then
+                echo "ERROR: /app/worker.py not found in worker image" >&2
+                exit 1
+            fi
         fi
     fi
 done

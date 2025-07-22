@@ -359,9 +359,10 @@ fails with errors like `failed to resolve source metadata` or `lookup
 http.docker.internal ... i/o timeout`, your network is blocking access to the
 Docker Hub registry. Check any proxy or firewall configuration and ensure the
 host can pull images before retrying the build.
-The helper script `scripts/docker_build.sh` passes `--network=host` to both
-`docker build` and `docker compose build`, which uses the host's networking
-directly and bypasses Docker's proxy settings such as `http.docker.internal`.
+The helper script `scripts/docker_build.sh` uses `--network=host` only with
+`docker build` to bypass proxy-related issues when fetching base images.
+`docker compose build` does not accept this flag, so the script omits it when
+building Compose services.
 If you use a prebuilt image, mount the models directory at runtime.
 
 Run the container with the application directories mounted so that

@@ -66,7 +66,7 @@ check_docker_registry() {
     echo "Checking Docker Hub connectivity..." >&2
     if ! docker pull --quiet docker/dockerfile:1.4 >/dev/null 2>&1; then
         echo "Unable to reach registry-1.docker.io. Configure network or proxy settings before building." >&2
-        exit 1
+        return 1
     fi
 }
 

@@ -5,6 +5,12 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 
+# Verify Docker Hub access before proceeding
+if ! check_docker_registry; then
+    echo "Docker Hub is unreachable. Configure your proxy or network settings before building." >&2
+    exit 1
+fi
+
 LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/docker_build.log"
 mkdir -p "$LOG_DIR"

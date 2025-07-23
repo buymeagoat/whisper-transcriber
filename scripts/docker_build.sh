@@ -23,8 +23,9 @@ log_step "STAGING"
 # Verify Docker and cache directories are ready
 check_docker_running
 check_cache_dirs
+stage_build_dependencies
 
-# Ensure required offline assets are present
+# Verify required offline assets after downloads complete
 verify_offline_assets
 
 # Return 0 if docker compose build supports --secret
@@ -108,7 +109,6 @@ fi
 # Update the repo
 (git -C "$ROOT_DIR" fetch && git -C "$ROOT_DIR" pull)
 echo "Checking network connectivity and installing dependencies..."
-stage_build_dependencies
 (cd "$ROOT_DIR/frontend" && npm run build)
 
 log_step "VERIFICATION"

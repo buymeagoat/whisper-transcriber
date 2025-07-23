@@ -19,6 +19,11 @@ log_step() {
 # Summarize failures before exiting
 trap 'echo "[ERROR] docker_build.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
 
+MODE=full
+FORCE_PRUNE=false
+FORCE_FRONTEND=false
+
+
 log_step "STAGING"
 # Stage dependencies needed for an offline build
 "$SCRIPT_DIR/prestage_dependencies.sh"
@@ -27,8 +32,11 @@ check_docker_running
 check_cache_dirs
 stage_build_dependencies
 
-# Build frontend assets before verifying cached resources
-(cd "$ROOT_DIR/frontend" && npm run build)
+# Build frontend assets if missing or forced before verifying cached resources
+if [ "$FORCE_FRONTEND" = true ] || [ ! -d "$ROOT_DIR/frontend/dist" ]; then
+    echo "Building frontend assets..."
+    (cd "$ROOT_DIR/frontend" && npm run build)
+fi
 
 # Verify required offline assets after downloads complete
 verify_offline_assets
@@ -49,16 +57,15 @@ verify_built_images() {
     done
 }
 
-MODE=full
-FORCE_PRUNE=false
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [--full|--incremental] [--force]
+Usage: $(basename "$0") [--full|--incremental] [--force] [--force-frontend]
 
 --full          Prune Docker resources and rebuild the compose stack from scratch.
 --incremental   Rebuild only missing or unhealthy images similar to update_images.sh.
 --force         Skip confirmation prompt when using --full.
+--force-frontend Rebuild the frontend even if frontend/dist exists.
 With no option, --full is assumed.
 Run scripts/run_tests.sh afterward to execute the test suite.
 If startup fails, use scripts/diagnose_containers.sh to inspect the containers.
@@ -81,6 +88,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -f|--force)
             FORCE_PRUNE=true
+            shift
+            ;;
+        --force-frontend)
+            FORCE_FRONTEND=true
             shift
             ;;
         *)

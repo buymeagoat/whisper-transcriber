@@ -19,6 +19,8 @@ log_step() {
 
 trap 'echo "[ERROR] start_containers.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
 
+FORCE_FRONTEND=false
+
 log_step "STAGING"
 # Stage dependencies needed for an offline build
 "$SCRIPT_DIR/prestage_dependencies.sh"
@@ -29,7 +31,7 @@ echo "Checking network connectivity and installing dependencies..."
 stage_build_dependencies
 
 # Build the frontend if needed before verifying offline assets
-if [ ! -d "$ROOT_DIR/frontend/dist" ]; then
+if [ "$FORCE_FRONTEND" = true ] || [ ! -d "$ROOT_DIR/frontend/dist" ]; then
     echo "Building frontend..."
     (cd "$ROOT_DIR/frontend" && npm run build)
 fi
@@ -39,18 +41,32 @@ verify_offline_assets
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0")
+Usage: $(basename "$0") [--force-frontend]
 
 Builds the frontend if needed and starts the docker compose stack.
 sudo is required only to adjust ownership of the uploads, transcripts
 and logs directories.
+--force-frontend Rebuild the frontend even if frontend/dist exists.
 EOF
 }
 
-if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
-    usage
-    exit 0
-fi
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --force-frontend)
+            FORCE_FRONTEND=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+done
 
 log_step "VERIFICATION"
 setup_persistent_dirs

@@ -202,8 +202,8 @@ stage_build_dependencies() {
 verify_offline_assets() {
     local pip_cache="${CACHE_DIR:-$ROOT_DIR/cache}/pip"
     local npm_cache="${CACHE_DIR:-$ROOT_DIR/cache}/npm"
-    local image_cache="${CACHE_DIR:-$ROOT_DIR/cache}/images"
     local apt_cache="${CACHE_DIR:-$ROOT_DIR/cache}/apt"
+    local image_cache="${CACHE_DIR:-$ROOT_DIR/cache}/images"
 
     local missing=0
 

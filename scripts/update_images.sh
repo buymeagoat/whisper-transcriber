@@ -17,6 +17,17 @@ supports_secret() {
     docker compose build --help 2>/dev/null | grep -q -- "--secret"
 }
 
+# Verify the given Docker images exist
+verify_built_images() {
+    local images=("$@")
+    for img in "${images[@]}"; do
+        if ! docker image inspect "$img" >/dev/null 2>&1; then
+            echo "Missing Docker image $img" >&2
+            return 1
+        fi
+    done
+}
+
 # Load SECRET_KEY from .env
 ensure_env_file
 echo "Checking network connectivity and installing dependencies..."
@@ -28,29 +39,60 @@ env | sort >&2
 echo "Building frontend assets..."
 (cd "$ROOT_DIR/frontend" && npm run build)
 
-echo "Rebuilding API and worker images..."
-# Rebuild API and worker images using Docker cache
-if supports_secret; then
-    secret_file=$(mktemp)
-    printf '%s' "$SECRET_KEY" > "$secret_file"
-    docker compose -f "$COMPOSE_FILE" build \
-        --secret id=secret_key,src="$secret_file" \
-        --build-arg INSTALL_DEV=true api worker
-    rm -f "$secret_file"
+# Determine which services require a rebuild
+services=(api worker)
+build_targets=()
+images_to_check=()
+for svc in "${services[@]}"; do
+    image="whisper-transcriber-${svc}:latest"
+    rebuild=false
+    if ! docker image inspect "$image" >/dev/null 2>&1; then
+        echo "Image $image missing. Marking $svc for rebuild."
+        rebuild=true
+    else
+        container_id=$(docker compose -f "$COMPOSE_FILE" ps -q "$svc" || true)
+        if [ -n "$container_id" ]; then
+            health=$(docker inspect --format '{{ .State.Health.Status }}' "$container_id" 2>/dev/null || echo "")
+            if [ "$health" = "unhealthy" ]; then
+                echo "$svc container unhealthy. Marking for rebuild."
+                rebuild=true
+            fi
+        fi
+    fi
+    if [ "$rebuild" = true ]; then
+        build_targets+=("$svc")
+    fi
+    images_to_check+=("$image")
+done
+
+if [ "${#build_targets[@]}" -eq 0 ]; then
+    echo "All images present and containers healthy. Skipping rebuild."
 else
-    docker compose -f "$COMPOSE_FILE" build \
-        --build-arg SECRET_KEY="$SECRET_KEY" \
-        --build-arg INSTALL_DEV=true api worker
+    echo "Rebuilding services: ${build_targets[*]}" 
+    if supports_secret; then
+        secret_file=$(mktemp)
+        printf '%s' "$SECRET_KEY" > "$secret_file"
+        docker compose -f "$COMPOSE_FILE" build \
+            --secret id=secret_key,src="$secret_file" \
+            --build-arg INSTALL_DEV=true "${build_targets[@]}"
+        rm -f "$secret_file"
+    else
+        docker compose -f "$COMPOSE_FILE" build \
+            --build-arg SECRET_KEY="$SECRET_KEY" \
+            --build-arg INSTALL_DEV=true "${build_targets[@]}"
+    fi
 fi
 
 echo "Verifying built images..."
-verify_built_images
+verify_built_images "${images_to_check[@]}"
 
-echo "Starting containers..."
-docker compose -f "$COMPOSE_FILE" up -d api worker
+if [ "${#build_targets[@]}" -gt 0 ]; then
+    echo "Starting containers..."
+    docker compose -f "$COMPOSE_FILE" up -d "${build_targets[@]}"
+fi
 
 cat <<'EOF'
-API and worker images updated.
+Images verified. Updated services have been restarted if necessary.
 Available test scripts:
   scripts/run_tests.sh         - runs backend tests plus frontend unit and Cypress end-to-end tests.
   scripts/run_backend_tests.sh - executes only the backend tests and verifies the /health and /version endpoints.

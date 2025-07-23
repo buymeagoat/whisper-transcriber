@@ -15,6 +15,11 @@ IMAGES_DIR="$CACHE_DIR/images"
 
 mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$CACHE_DIR/apt"
 
+# Echo a marker for major milestones
+log_step() {
+    echo "===== $1 ====="
+}
+
 # Ensure Docker is running and required cache directories exist
 check_docker_running
 check_cache_dirs
@@ -30,6 +35,7 @@ mapfile -t COMPOSE_IMAGES < <(grep -E '^\s*image:' "$COMPOSE_FILE" | awk '{print
 IMAGES=("$BASE_IMAGE" "${COMPOSE_IMAGES[@]}")
 IMAGES=($(printf '%s\n' "${IMAGES[@]}" | sort -u))
 
+log_step "IMAGES"
 echo "Pulling docker images..."
 for img in "${IMAGES[@]}"; do
     echo "Fetching $img"
@@ -38,16 +44,19 @@ for img in "${IMAGES[@]}"; do
     docker save "$img" -o "$IMAGES_DIR/$tar_name"
 done
 
+log_step "PYTHON"
 echo "Downloading Python packages..."
 pip download -d "$CACHE_DIR/pip" \
     pip \
     -r "$ROOT_DIR/requirements.txt" \
     -r "$ROOT_DIR/requirements-dev.txt"
 
+log_step "NPM"
 echo "Caching Node modules..."
 npm install --prefix "$ROOT_DIR/frontend"
 npm ci --prefix "$ROOT_DIR/frontend" --cache "$CACHE_DIR/npm"
 
+log_step "APT"
 echo "Downloading apt packages..."
 apt-get update
 apt-get install -y --download-only --no-install-recommends \
@@ -61,5 +70,6 @@ else
 fi
 apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
+log_step "COMPLETE"
 echo "Dependencies staged under $CACHE_DIR"
 

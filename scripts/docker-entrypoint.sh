@@ -2,11 +2,17 @@
 set -euo pipefail
 
 LOG_FILE="/app/logs/entrypoint.log"
+# Create required directories and mirror all output to a log file
 mkdir -p /app/uploads /app/transcripts /app/logs
-# Mirror output to a log file for troubleshooting
 exec > >(tee -a "$LOG_FILE") 2>&1
 chown -R 1000:1000 /app/uploads /app/transcripts /app/logs
 
+# Echo a marker for major milestones
+log_step() {
+    echo "===== $1 ====="
+}
+
+log_step "ENVIRONMENT"
 echo "Container entrypoint starting with environment:" >&2
 env | sort >&2
 
@@ -19,6 +25,7 @@ if [ "${SERVICE_TYPE:-api}" = "worker" ]; then
     broker_host="${CELERY_BROKER_HOST:-broker}"
     broker_port="${CELERY_BROKER_PORT:-5672}"
     max_wait=${BROKER_PING_TIMEOUT:-60}
+    log_step "WAIT FOR BROKER"
     echo "Waiting for RabbitMQ at ${broker_host}:${broker_port}..."
     BROKER_HOST="$broker_host" BROKER_PORT="$broker_port" TIMEOUT="$max_wait" \
     python - <<'PY'
@@ -41,5 +48,6 @@ while True:
 print("Broker is available. Starting worker.")
 PY
 fi
+log_step "START"
 echo "Executing: $@" >&2
 exec gosu appuser "$@"

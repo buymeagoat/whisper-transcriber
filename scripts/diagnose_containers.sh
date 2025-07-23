@@ -6,6 +6,15 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 LOG_LINES="${LOG_LINES:-20}"
 
+# Ensure the Docker daemon is available before proceeding
+if ! docker info >/dev/null 2>&1; then
+    echo "Docker daemon is not running or not reachable" >&2
+    exit 1
+fi
+
+# Location of cached dependencies
+CACHE_DIR="${CACHE_DIR:-$ROOT_DIR/cache}"
+
 echo "Container status:"
 # Display container status including health information
 docker compose -f "$COMPOSE_FILE" ps
@@ -62,14 +71,34 @@ if [ -z "$api_id" ]; then
 fi
 
 echo
+echo "===== Cache directories under $CACHE_DIR ====="
+cache_missing=0
+for sub in images pip npm apt; do
+    dir="$CACHE_DIR/$sub"
+    if [ -d "$dir" ]; then
+        if [ -n "$(ls -A "$dir" 2>/dev/null)" ]; then
+            echo "$dir: present"
+        else
+            echo "$dir: no files found"
+        fi
+    else
+        echo "Missing directory: $dir"
+        cache_missing=1
+    fi
+done
+if [ $cache_missing -ne 0 ]; then
+    echo "One or more cache directories are missing or empty" >&2
+fi
+
+echo
 echo "===== Build logs ====="
 for log in docker_build.log start_containers.log update_images.log entrypoint.log; do
     log_path="$ROOT_DIR/logs/$log"
     echo
-    echo "----- ${log} -----"
+    echo "----- ${log_path} -----"
     if [ -f "$log_path" ]; then
         cat "$log_path"
     else
-        echo "Log file $log_path not found"
+        echo "No log found at $log_path"
     fi
 done

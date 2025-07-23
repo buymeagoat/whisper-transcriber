@@ -494,7 +494,7 @@ git pull
 Use `scripts/docker_build.sh --full --force` for a clean rebuild when dependencies, the Dockerfile or compose configuration change or if the environment is out of sync. It prunes Docker resources, installs dependencies and rebuilds all images from scratch.
 
 Run `scripts/docker_build.sh --incremental` or `scripts/update_images.sh` after pulling the latest code for routine updates. In incremental mode the script rebuilds a service only when its Docker image is missing or the running container reports an unhealthy status, then restarts any rebuilt services. It exits early if the required Whisper models or `ffmpeg` are not present.
-If containers fail to start, run `scripts/diagnose_containers.sh` to check their status, exit codes, restart counts and health information. The script also prints the `SERVICE_TYPE` and `CELERY_BROKER_URL` environment variables for each service, shows the last 20 log lines from each container by default, and prints the full contents of any build log files in `logs/`.
+If containers fail to start, run `scripts/diagnose_containers.sh` to check their status, exit codes, restart counts and health information. The script verifies Docker is running, prints the `SERVICE_TYPE` and `CELERY_BROKER_URL` variables for each service, shows the last 20 log lines from each container, reports on the `cache/images`, `cache/pip`, `cache/npm` and `cache/apt` directories, and dumps the full contents of any build logs in `logs/`, noting the path when a log is missing.
 
 After using either script, execute `scripts/run_tests.sh` to verify the new build.
 

@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
+trap 'echo "prestage_dependencies.sh failed near line $LINENO" >&2' ERR
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+LOG_FILE="$ROOT_DIR/logs/prestage_dependencies.log"
+mkdir -p "$(dirname "$LOG_FILE")"
+exec > >(tee -a "$LOG_FILE") 2>&1
+
 CACHE_DIR="$ROOT_DIR/cache"
 IMAGES_DIR="$CACHE_DIR/images"
 

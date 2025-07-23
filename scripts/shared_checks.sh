@@ -82,37 +82,66 @@ stage_build_dependencies() {
     local base_image
     base_image=$(grep -m1 '^FROM ' "$ROOT_DIR/Dockerfile" | awk '{print $2}')
 
+    local pip_cache="${CACHE_DIR:-$ROOT_DIR/cache}/pip"
+    local npm_cache="${CACHE_DIR:-$ROOT_DIR/cache}/npm"
+    local image_cache="${CACHE_DIR:-$ROOT_DIR/cache}/images"
+
+    mapfile -t compose_images < <(docker compose -f "$compose_file" config | awk '/image:/ {print $2}' | sort -u)
+    local images=("$base_image" "${compose_images[@]}")
+
     if check_internet && check_docker_registry; then
         echo "Prefetching build dependencies..." >&2
-        if ! docker image inspect "$base_image" >/dev/null 2>&1; then
-            docker pull "$base_image"
+        for img in "${images[@]}"; do
+            if ! docker image inspect "$img" >/dev/null 2>&1; then
+                docker pull "$img"
+            fi
+        done
+        if [ -d "$pip_cache" ]; then
+            pip install --no-index --find-links "$pip_cache" -r "$ROOT_DIR/requirements.txt"
+        else
+            pip install -r "$ROOT_DIR/requirements.txt"
         fi
-        docker compose -f "$compose_file" pull db broker
-        pip install -r "$ROOT_DIR/requirements.txt"
-        (cd "$ROOT_DIR/frontend" && npm install)
+        if [ -d "$npm_cache" ]; then
+            npm ci --offline --prefix "$ROOT_DIR/frontend" --cache "$npm_cache"
+        else
+            (cd "$ROOT_DIR/frontend" && npm install)
+        fi
     else
         echo "No internet connection. Verifying staged components..." >&2
-        if ! docker image inspect "$base_image" >/dev/null 2>&1; then
-            echo "Missing required docker image $base_image" >&2
-            return 1
+        for img in "${images[@]}"; do
+            if ! docker image inspect "$img" >/dev/null 2>&1; then
+                local tar="$image_cache/$(echo "$img" | sed 's#[/:]#_#g').tar"
+                if [ -f "$tar" ]; then
+                    docker load -i "$tar" >/dev/null
+                else
+                    echo "Missing cached Docker image $tar" >&2
+                    return 1
+                fi
+            fi
+        done
+
+        if [ -d "$pip_cache" ]; then
+            pip install --no-index --find-links "$pip_cache" -r "$ROOT_DIR/requirements.txt"
+        else
+            while read -r pkg; do
+                pkg=${pkg%%[*#]*}
+                pkg=$(echo "$pkg" | xargs)
+                [ -z "$pkg" ] && continue
+                pkg=${pkg%%=*}
+                if ! pip show "$pkg" >/dev/null 2>&1; then
+                    echo "Missing python dependency $pkg" >&2
+                    return 1
+                fi
+            done < "$ROOT_DIR/requirements.txt"
         fi
-        if ! docker image inspect "$(docker compose -f "$compose_file" config | awk '/image:/ {print $2}' | head -n1)" >/dev/null 2>&1; then
-            echo "Compose images not staged" >&2
-            return 1
-        fi
-        while read -r pkg; do
-            pkg=${pkg%%[*#]*}
-            pkg=$(echo "$pkg" | xargs)
-            [ -z "$pkg" ] && continue
-            pkg=${pkg%%=*}
-            if ! pip show "$pkg" >/dev/null 2>&1; then
-                echo "Missing python dependency $pkg" >&2
+
+        if [ -d "$npm_cache" ]; then
+            npm ci --offline --prefix "$ROOT_DIR/frontend" --cache "$npm_cache"
+        else
+            if [ ! -d "$ROOT_DIR/frontend/node_modules" ]; then
+                echo "Missing frontend/node_modules" >&2
                 return 1
             fi
-        done < "$ROOT_DIR/requirements.txt"
-        if [ ! -d "$ROOT_DIR/frontend/node_modules" ]; then
-            echo "Missing frontend/node_modules" >&2
-            return 1
         fi
     fi
 }

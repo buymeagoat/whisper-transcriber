@@ -22,11 +22,12 @@ ENV PYTHONPATH=/app
 COPY requirements.txt .
 COPY requirements-dev.txt .
 COPY alembic.ini .
+COPY cache/pip ./wheels
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt --retries 5 --resume-retries 3 --timeout 60 && \
+    pip install --no-index --find-links ./wheels -r requirements.txt && \
     if [ "$INSTALL_DEV" = "true" ]; then \
-        pip install --no-cache-dir -r requirements-dev.txt --retries 5 --resume-retries 3 --timeout 60; \
-    fi
+        pip install --no-index --find-links ./wheels -r requirements-dev.txt; \
+    fi && rm -rf ./wheels
 
 COPY scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
 RUN chmod +x /usr/local/bin/healthcheck.sh

@@ -13,6 +13,9 @@ mkdir -p "$LOG_DIR"
 # Mirror all output to a startup log for troubleshooting
 exec > >(tee -a "$LOG_FILE") 2>&1
 
+# Ensure required offline assets are present
+verify_offline_assets
+
 usage() {
     cat <<EOF
 Usage: $(basename "$0")

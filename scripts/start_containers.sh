@@ -13,6 +13,10 @@ mkdir -p "$LOG_DIR"
 # Mirror all output to a startup log for troubleshooting
 exec > >(tee -a "$LOG_FILE") 2>&1
 
+# Verify Docker and cache directories are ready
+check_docker_running
+check_cache_dirs
+
 # Ensure required offline assets are present
 verify_offline_assets
 

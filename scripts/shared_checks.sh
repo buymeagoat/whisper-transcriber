@@ -110,7 +110,7 @@ check_docker_running() {
 # Confirm cache directories exist under CACHE_DIR
 check_cache_dirs() {
     local base="${CACHE_DIR:-$ROOT_DIR/cache}"
-    local dirs=("$base/images" "$base/pip" "$base/npm")
+    local dirs=("$base/images" "$base/pip" "$base/npm" "$base/apt")
     for d in "${dirs[@]}"; do
         if [ ! -d "$d" ]; then
             echo "Required cache directory $d missing" >&2
@@ -202,6 +202,7 @@ verify_offline_assets() {
     local pip_cache="${CACHE_DIR:-$ROOT_DIR/cache}/pip"
     local npm_cache="${CACHE_DIR:-$ROOT_DIR/cache}/npm"
     local image_cache="${CACHE_DIR:-$ROOT_DIR/cache}/images"
+    local apt_cache="${CACHE_DIR:-$ROOT_DIR/cache}/apt"
 
     local missing=0
 
@@ -229,6 +230,19 @@ verify_offline_assets() {
     if [ ! -d "$npm_cache" ] || [ -z "$(ls -A "$npm_cache" 2>/dev/null)" ]; then
         echo "Npm cache directory $npm_cache missing or empty" >&2
         missing=1
+    fi
+
+    echo "Verifying cached APT packages..." >&2
+    if [ ! -d "$apt_cache" ] || [ -z "$(ls "$apt_cache"/*.deb 2>/dev/null)" ]; then
+        echo "APT cache directory $apt_cache missing or empty" >&2
+        missing=1
+    else
+        for pkg in ffmpeg git curl gosu; do
+            if ! ls "$apt_cache"/${pkg}*\.deb >/dev/null 2>&1; then
+                echo "Missing $pkg package in $apt_cache" >&2
+                missing=1
+            fi
+        done
     fi
 
     echo "Verifying cached Docker images..." >&2

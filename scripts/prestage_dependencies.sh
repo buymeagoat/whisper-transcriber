@@ -6,7 +6,8 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 CACHE_DIR="$ROOT_DIR/cache"
 IMAGES_DIR="$CACHE_DIR/images"
 
-mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm"
+APT_DIR="$CACHE_DIR/apt"
+mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$APT_DIR"
 
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 
@@ -35,6 +36,10 @@ pip download -d "$CACHE_DIR/pip" \
 echo "Caching Node modules..."
 npm install --prefix "$ROOT_DIR/frontend"
 npm ci --prefix "$ROOT_DIR/frontend" --cache "$CACHE_DIR/npm"
+
+echo "Downloading APT packages..."
+apt-get update
+apt-get -o Dir::Cache::archives="$APT_DIR" --yes --download-only --reinstall install ffmpeg git curl gosu
 
 echo "Dependencies staged under $CACHE_DIR"
 

@@ -177,3 +177,62 @@ stage_build_dependencies() {
     fi
 }
 
+# Verify cached pip wheels, npm packages and Docker images exist under CACHE_DIR
+verify_offline_assets() {
+    local pip_cache="${CACHE_DIR:-$ROOT_DIR/cache}/pip"
+    local npm_cache="${CACHE_DIR:-$ROOT_DIR/cache}/npm"
+    local image_cache="${CACHE_DIR:-$ROOT_DIR/cache}/images"
+
+    local missing=0
+
+    echo "Verifying cached pip packages..." >&2
+    if [ ! -d "$pip_cache" ]; then
+        echo "Pip cache directory $pip_cache missing" >&2
+        missing=1
+    else
+        for req_file in "$ROOT_DIR/requirements.txt" "$ROOT_DIR/requirements-dev.txt"; do
+            [ -f "$req_file" ] || continue
+            while read -r req; do
+                req=${req%%[*#]*}
+                req=$(echo "$req" | xargs)
+                [ -z "$req" ] && continue
+                pkg=${req%%[<=>]*}
+                if ! ls "$pip_cache"/"$pkg"-* >/dev/null 2>&1; then
+                    echo "Missing wheel for $pkg in $pip_cache" >&2
+                    missing=1
+                fi
+            done < "$req_file"
+        done
+    fi
+
+    echo "Verifying cached npm packages..." >&2
+    if [ ! -d "$npm_cache" ] || [ -z "$(ls -A "$npm_cache" 2>/dev/null)" ]; then
+        echo "Npm cache directory $npm_cache missing or empty" >&2
+        missing=1
+    fi
+
+    echo "Verifying cached Docker images..." >&2
+    if [ ! -d "$image_cache" ]; then
+        echo "Image cache directory $image_cache missing" >&2
+        missing=1
+    else
+        local compose_file="$ROOT_DIR/docker-compose.yml"
+        local base_image
+        base_image=$(grep -m1 '^FROM ' "$ROOT_DIR/Dockerfile" | awk '{print $2}')
+        mapfile -t compose_images < <(docker compose -f "$compose_file" config | awk '/image:/ {print $2}' | sort -u)
+        local images=("$base_image" "${compose_images[@]}")
+        for img in "${images[@]}"; do
+            local tar="$image_cache/$(echo "$img" | sed 's#[/:]#_#g').tar"
+            if [ ! -f "$tar" ]; then
+                echo "Missing cached Docker image $tar" >&2
+                missing=1
+            fi
+        done
+    fi
+
+    if [ $missing -ne 0 ]; then
+        echo "Required offline assets missing under $CACHE_DIR" >&2
+        exit 1
+    fi
+}
+

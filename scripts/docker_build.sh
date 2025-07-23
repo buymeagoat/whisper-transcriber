@@ -11,6 +11,9 @@ LOG_FILE="$LOG_DIR/docker_build.log"
 mkdir -p "$LOG_DIR"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
+# Ensure required offline assets are present
+verify_offline_assets
+
 # Return 0 if docker compose build supports --secret
 supports_secret() {
     docker compose build --help 2>/dev/null | grep -q -- "--secret"

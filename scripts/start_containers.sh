@@ -68,19 +68,62 @@ supports_secret() {
     docker compose build --help 2>/dev/null | grep -q -- "--secret"
 }
 
-if supports_secret; then
-    temp_secret=$(mktemp)
-    printf '%s' "$SECRET_KEY" > "$temp_secret"
-    docker compose -f "$COMPOSE_FILE" build \
-        --secret id=secret_key,src="$temp_secret" \
-        --network=none \
-        --build-arg INSTALL_DEV=true api worker
-    rm -f "$temp_secret"
+# Verify the given Docker images exist
+verify_built_images() {
+    local images=("$@")
+    for img in "${images[@]}"; do
+        if ! docker image inspect "$img" >/dev/null 2>&1; then
+            echo "Missing Docker image $img" >&2
+            return 1
+        fi
+    done
+}
+
+services=(api worker)
+build_targets=()
+images_to_check=()
+for svc in "${services[@]}"; do
+    image="whisper-transcriber-${svc}:latest"
+    rebuild=false
+    if ! docker image inspect "$image" >/dev/null 2>&1; then
+        echo "Image $image missing. Marking $svc for rebuild."
+        rebuild=true
+    else
+        container_id=$(docker compose -f "$COMPOSE_FILE" ps -q "$svc" || true)
+        if [ -n "$container_id" ]; then
+            health=$(docker inspect --format '{{ .State.Health.Status }}' "$container_id" 2>/dev/null || echo "")
+            if [ "$health" = "unhealthy" ]; then
+                echo "$svc container unhealthy. Marking for rebuild."
+                rebuild=true
+            fi
+        fi
+    fi
+    if [ "$rebuild" = true ]; then
+        build_targets+=("$svc")
+    fi
+    images_to_check+=("$image")
+done
+
+if [ "${#build_targets[@]}" -eq 0 ]; then
+    echo "All images present and containers healthy. Skipping rebuild."
 else
-    docker compose -f "$COMPOSE_FILE" build \
-        --network=none \
-        --build-arg SECRET_KEY="$SECRET_KEY" \
-        --build-arg INSTALL_DEV=true api worker
+    echo "Rebuilding services: ${build_targets[*]}"
+    if supports_secret; then
+        temp_secret=$(mktemp)
+        printf '%s' "$SECRET_KEY" > "$temp_secret"
+        docker compose -f "$COMPOSE_FILE" build \
+            --secret id=secret_key,src="$temp_secret" \
+            --network=none \
+            --build-arg INSTALL_DEV=true "${build_targets[@]}"
+        rm -f "$temp_secret"
+    else
+        docker compose -f "$COMPOSE_FILE" build \
+            --network=none \
+            --build-arg SECRET_KEY="$SECRET_KEY" \
+            --build-arg INSTALL_DEV=true "${build_targets[@]}"
+    fi
+    echo "Verifying built images..."
+    verify_built_images "${images_to_check[@]}"
 fi
 
 log_step "STARTUP"

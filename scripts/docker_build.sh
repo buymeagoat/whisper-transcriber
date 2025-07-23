@@ -11,6 +11,15 @@ LOG_FILE="$LOG_DIR/docker_build.log"
 mkdir -p "$LOG_DIR"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
+# Echo a marker indicating the current script stage
+log_step() {
+    echo "===== $1 ====="
+}
+
+# Summarize failures before exiting
+trap 'echo "[ERROR] docker_build.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
+
+log_step "STAGING"
 # Verify Docker and cache directories are ready
 check_docker_running
 check_cache_dirs
@@ -98,11 +107,11 @@ fi
 
 # Update the repo
 (git -C "$ROOT_DIR" fetch && git -C "$ROOT_DIR" pull)
-
 echo "Checking network connectivity and installing dependencies..."
 stage_build_dependencies
 (cd "$ROOT_DIR/frontend" && npm run build)
 
+log_step "VERIFICATION"
 check_whisper_models
 check_ffmpeg
 ensure_env_file
@@ -113,6 +122,7 @@ env | sort >&2
 secret_file_runtime="$ROOT_DIR/secret_key.txt"
 printf '%s' "$SECRET_KEY" > "$secret_file_runtime"
 
+log_step "BUILD"
 echo "Building the production image..."
 # Build the standalone image used for production deployments
 if supports_secret; then
@@ -142,6 +152,7 @@ fi
 echo "Verifying built images..."
 verify_built_images
 
+log_step "STARTUP"
 echo "Starting containers..."
 docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
 

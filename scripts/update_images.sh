@@ -27,6 +27,9 @@ check_cache_dirs
 echo "Checking network connectivity and installing dependencies..."
 stage_build_dependencies
 
+echo "Building frontend assets..."
+(cd "$ROOT_DIR/frontend" && npm run build)
+
 # Verify required offline assets after downloads complete
 verify_offline_assets
 
@@ -58,9 +61,6 @@ echo "Environment variables:" >&2
 env | sort >&2
 
 log_step "BUILD"
-echo "Building frontend assets..."
-(cd "$ROOT_DIR/frontend" && npm run build)
-
 # Determine which services require a rebuild
 services=(api worker)
 build_targets=()

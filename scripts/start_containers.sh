@@ -28,6 +28,12 @@ check_cache_dirs
 echo "Checking network connectivity and installing dependencies..."
 stage_build_dependencies
 
+# Build the frontend if needed before verifying offline assets
+if [ ! -d "$ROOT_DIR/frontend/dist" ]; then
+    echo "Building frontend..."
+    (cd "$ROOT_DIR/frontend" && npm run build)
+fi
+
 # Verify required offline assets after downloads complete
 verify_offline_assets
 
@@ -53,11 +59,6 @@ check_ffmpeg
 ensure_env_file
 
 log_step "BUILD"
-# Build the frontend if needed
-if [ ! -d "$ROOT_DIR/frontend/dist" ]; then
-    echo "Building frontend..."
-    (cd "$ROOT_DIR/frontend" && npm run build)
-fi
 
 secret_file="$ROOT_DIR/secret_key.txt"
 printf '%s' "$SECRET_KEY" > "$secret_file"

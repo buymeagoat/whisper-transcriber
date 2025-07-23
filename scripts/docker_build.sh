@@ -113,11 +113,6 @@ else
     fi
 fi
 
-# Update the repo
-(git -C "$ROOT_DIR" fetch && git -C "$ROOT_DIR" pull)
-echo "Checking network connectivity and installing dependencies..."
-(cd "$ROOT_DIR/frontend" && npm run build)
-
 log_step "VERIFICATION"
 check_whisper_models
 check_ffmpeg

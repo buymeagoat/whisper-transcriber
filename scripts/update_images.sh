@@ -18,6 +18,34 @@ log_step() {
 
 trap 'echo "[ERROR] update_images.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
 
+FORCE_FRONTEND=false
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [--force-frontend]
+
+--force-frontend Rebuild the frontend even if frontend/dist exists.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --force-frontend)
+            FORCE_FRONTEND=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+done
+
 log_step "STAGING"
 # Stage dependencies needed for an offline build
 "$SCRIPT_DIR/prestage_dependencies.sh"
@@ -27,8 +55,10 @@ check_cache_dirs
 echo "Checking network connectivity and installing dependencies..."
 stage_build_dependencies
 
-echo "Building frontend assets..."
-(cd "$ROOT_DIR/frontend" && npm run build)
+if [ "$FORCE_FRONTEND" = true ] || [ ! -d "$ROOT_DIR/frontend/dist" ]; then
+    echo "Building frontend assets..."
+    (cd "$ROOT_DIR/frontend" && npm run build)
+fi
 
 # Verify required offline assets after downloads complete
 verify_offline_assets

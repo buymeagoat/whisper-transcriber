@@ -7,9 +7,10 @@ ARG INSTALL_DEV=false
 # Secret used for model validation during build
 ARG SECRET_KEY
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      ffmpeg git curl gosu && \
-      apt-get clean && rm -rf /var/lib/apt/lists/*
+COPY cache/apt /tmp/apt
+RUN dpkg -i /tmp/apt/*.deb && \
+    rm -rf /tmp/apt && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user to run Celery workers
 RUN groupadd -g 1000 appuser && \

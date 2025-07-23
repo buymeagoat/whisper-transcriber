@@ -47,5 +47,12 @@ echo "Caching Node modules..."
 npm install --prefix "$ROOT_DIR/frontend"
 npm ci --prefix "$ROOT_DIR/frontend" --cache "$CACHE_DIR/npm"
 
+echo "Downloading apt packages..."
+apt-get update
+apt-get install -y --download-only --no-install-recommends \
+    ffmpeg git curl gosu
+cp /var/cache/apt/archives/*.deb "$CACHE_DIR/apt/"
+apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
 echo "Dependencies staged under $CACHE_DIR"
 

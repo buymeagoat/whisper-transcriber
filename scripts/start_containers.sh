@@ -23,8 +23,10 @@ log_step "STAGING"
 # Verify Docker and cache directories are ready
 check_docker_running
 check_cache_dirs
+echo "Checking network connectivity and installing dependencies..."
+stage_build_dependencies
 
-# Ensure required offline assets are present
+# Verify required offline assets after downloads complete
 verify_offline_assets
 
 usage() {
@@ -41,8 +43,6 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     usage
     exit 0
 fi
-
-stage_build_dependencies
 
 log_step "VERIFICATION"
 setup_persistent_dirs

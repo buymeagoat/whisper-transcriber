@@ -22,8 +22,10 @@ log_step "STAGING"
 # Verify Docker and cache directories are ready
 check_docker_running
 check_cache_dirs
+echo "Checking network connectivity and installing dependencies..."
+stage_build_dependencies
 
-# Ensure required offline assets are present
+# Verify required offline assets after downloads complete
 verify_offline_assets
 
 # Return 0 if docker compose build supports --secret
@@ -44,8 +46,6 @@ verify_built_images() {
 
 # Load SECRET_KEY from .env
 ensure_env_file
-echo "Checking network connectivity and installing dependencies..."
-stage_build_dependencies
 
 log_step "VERIFICATION"
 echo "Verifying Whisper models and ffmpeg..."

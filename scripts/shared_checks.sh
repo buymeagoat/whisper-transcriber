@@ -203,6 +203,7 @@ verify_offline_assets() {
     local pip_cache="${CACHE_DIR:-$ROOT_DIR/cache}/pip"
     local npm_cache="${CACHE_DIR:-$ROOT_DIR/cache}/npm"
     local image_cache="${CACHE_DIR:-$ROOT_DIR/cache}/images"
+    local apt_cache="${CACHE_DIR:-$ROOT_DIR/cache}/apt"
 
     local missing=0
 
@@ -233,9 +234,17 @@ verify_offline_assets() {
     fi
 
     echo "Verifying cached apt packages..." >&2
-    if [ -d "$apt_cache" ] && [ -z "$(ls -A "$apt_cache" 2>/dev/null)" ]; then
-        echo "Apt cache directory $apt_cache empty" >&2
+    if [ ! -d "$apt_cache" ]; then
+        echo "Apt cache directory $apt_cache missing" >&2
         missing=1
+    else
+        local debs=(ffmpeg git curl gosu)
+        for pkg in "${debs[@]}"; do
+            if ! ls "$apt_cache"/"$pkg"*.deb >/dev/null 2>&1; then
+                echo "Missing $pkg package in $apt_cache" >&2
+                missing=1
+            fi
+        done
     fi
 
     echo "Verifying cached Docker images..." >&2

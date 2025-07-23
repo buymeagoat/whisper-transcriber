@@ -97,17 +97,27 @@ if [ "$MODE" = "incremental" ]; then
     exit $?
 fi
 
-# Remove existing containers, images and volumes to start fresh
+# Remove existing containers and volumes created by this repository
 docker compose -f "$ROOT_DIR/docker-compose.yml" down -v --remove-orphans || true
 
+# Remove only the Docker images built for this project
+remove_project_images() {
+    local images=(whisper-app whisper-transcriber-api:latest whisper-transcriber-worker:latest)
+    for img in "${images[@]}"; do
+        if docker image inspect "$img" >/dev/null 2>&1; then
+            docker image rm "$img" >/dev/null 2>&1 || true
+        fi
+    done
+}
+
 if [ "$FORCE_PRUNE" = true ]; then
-    docker system prune -af --volumes
+    remove_project_images
 else
-    read -r -p "Run 'docker system prune -af --volumes'? This may remove unrelated Docker data. [y/N] " response
+    read -r -p "Remove Docker images built for this project? [y/N] " response
     if [[ "$response" =~ ^[Yy]$ ]]; then
-        docker system prune -af --volumes
+        remove_project_images
     else
-        echo "Skipping docker system prune."
+        echo "Skipping image removal."
     fi
 fi
 

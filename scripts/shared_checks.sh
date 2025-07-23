@@ -114,7 +114,16 @@ stage_build_dependencies() {
     mapfile -t compose_images < <(docker compose -f "$compose_file" config | awk '/image:/ {print $2}' | sort -u)
     local images=("$base_image" "${compose_images[@]}")
 
-    if check_internet && check_docker_registry; then
+    use_cache=false
+    if [ "${OFFLINE_MODE:-false}" = true ]; then
+        echo "OFFLINE_MODE=true. Installing dependencies from cache..." >&2
+        use_cache=true
+    elif ! (check_internet && check_docker_registry); then
+        echo "No internet connection. Verifying staged components..." >&2
+        use_cache=true
+    fi
+
+    if [ "$use_cache" = false ]; then
         echo "Prefetching build dependencies..." >&2
         for img in "${images[@]}"; do
             if ! docker image inspect "$img" >/dev/null 2>&1; then
@@ -132,7 +141,6 @@ stage_build_dependencies() {
             (cd "$ROOT_DIR/frontend" && npm install)
         fi
     else
-        echo "No internet connection. Verifying staged components..." >&2
         if [ ! -d "$image_cache" ]; then
             echo "Image cache directory $image_cache missing" >&2
             return 1

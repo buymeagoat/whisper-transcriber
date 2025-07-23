@@ -4,6 +4,7 @@ trap 'echo "prestage_dependencies.sh failed near line $LINENO" >&2' ERR
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/shared_checks.sh"
 
 LOG_FILE="$ROOT_DIR/logs/prestage_dependencies.log"
 mkdir -p "$(dirname "$LOG_FILE")"
@@ -12,7 +13,11 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 CACHE_DIR="$ROOT_DIR/cache"
 IMAGES_DIR="$CACHE_DIR/images"
 
-mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm"
+mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$CACHE_DIR/apt"
+
+# Ensure Docker is running and required cache directories exist
+check_docker_running
+check_cache_dirs
 
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 

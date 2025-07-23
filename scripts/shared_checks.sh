@@ -171,28 +171,44 @@ stage_build_dependencies() {
         done
 
         if [ -d "$pip_cache" ]; then
-            pip install --no-index --find-links "$pip_cache" -r "$ROOT_DIR/requirements.txt"
-        else
-            echo "Pip cache directory $pip_cache missing" >&2
-            while read -r pkg; do
-                pkg=${pkg%%[*#]*}
-                pkg=$(echo "$pkg" | xargs)
-                [ -z "$pkg" ] && continue
-                pkg=${pkg%%=*}
-                if ! pip show "$pkg" >/dev/null 2>&1; then
-                    echo "Missing python dependency $pkg" >&2
+            if ! pip install --no-index --find-links "$pip_cache" -r "$ROOT_DIR/requirements.txt"; then
+                if check_internet; then
+                    echo "Falling back to online pip install..." >&2
+                    pip install -r "$ROOT_DIR/requirements.txt"
+                else
+                    echo "Offline pip install failed and no internet connection" >&2
                     return 1
                 fi
-            done < "$ROOT_DIR/requirements.txt"
+            fi
+        else
+            echo "Pip cache directory $pip_cache missing" >&2
+            if check_internet; then
+                pip install -r "$ROOT_DIR/requirements.txt"
+            else
+                echo "No pip cache and no internet connection" >&2
+                return 1
+            fi
         fi
 
         if [ -d "$npm_cache" ]; then
-            npm ci --offline --prefix "$ROOT_DIR/frontend" --cache "$npm_cache"
+            if ! npm ci --offline --prefix "$ROOT_DIR/frontend" --cache "$npm_cache"; then
+                if check_internet; then
+                    echo "Falling back to online npm install..." >&2
+                    (cd "$ROOT_DIR/frontend" && npm install)
+                else
+                    echo "Offline npm install failed and no internet connection" >&2
+                    return 1
+                fi
+            fi
         else
             echo "Npm cache directory $npm_cache missing" >&2
-            if [ ! -d "$ROOT_DIR/frontend/node_modules" ]; then
-                echo "Missing frontend/node_modules" >&2
-                return 1
+            if check_internet; then
+                (cd "$ROOT_DIR/frontend" && npm install)
+            else
+                if [ ! -d "$ROOT_DIR/frontend/node_modules" ]; then
+                    echo "Missing frontend/node_modules and no internet connection" >&2
+                    return 1
+                fi
             fi
         fi
     fi

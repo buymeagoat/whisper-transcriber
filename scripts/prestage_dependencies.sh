@@ -40,6 +40,7 @@ done
 
 echo "Downloading Python packages..."
 pip download -d "$CACHE_DIR/pip" \
+    pip \
     -r "$ROOT_DIR/requirements.txt" \
     -r "$ROOT_DIR/requirements-dev.txt"
 

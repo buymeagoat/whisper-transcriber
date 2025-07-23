@@ -24,7 +24,7 @@ COPY requirements.txt .
 COPY requirements-dev.txt .
 COPY alembic.ini .
 COPY cache/pip ./wheels
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --no-index --find-links ./wheels --upgrade pip && \
     pip install --no-index --find-links ./wheels -r requirements.txt && \
     if [ "$INSTALL_DEV" = "true" ]; then \
         pip install --no-index --find-links ./wheels -r requirements-dev.txt; \

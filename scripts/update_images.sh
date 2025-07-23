@@ -96,10 +96,12 @@ else
         printf '%s' "$SECRET_KEY" > "$secret_file"
         docker compose -f "$COMPOSE_FILE" build \
             --secret id=secret_key,src="$secret_file" \
+            --network=none \
             --build-arg INSTALL_DEV=true "${build_targets[@]}"
         rm -f "$secret_file"
     else
         docker compose -f "$COMPOSE_FILE" build \
+            --network=none \
             --build-arg SECRET_KEY="$SECRET_KEY" \
             --build-arg INSTALL_DEV=true "${build_targets[@]}"
     fi

@@ -76,8 +76,33 @@ check_internet() {
         && curl -sSf https://registry.npmjs.org >/dev/null 2>&1
 }
 
+# Verify Node.js is installed and at least version 18
+check_node_version() {
+    if ! command -v node >/dev/null 2>&1; then
+        echo "Node.js executable not found in PATH" >&2
+        return 1
+    fi
+    local version
+    version=$(node --version | sed 's/^v//')
+    local major=${version%%.*}
+    if [ "$major" -lt 18 ]; then
+        echo "Node.js 18 or newer is required. Found $version" >&2
+        return 1
+    fi
+}
+
+# Ensure the docker compose CLI is available
+check_docker_compose() {
+    if ! docker compose version >/dev/null 2>&1; then
+        echo "'docker compose' command not available. Install Docker Compose v2." >&2
+        return 1
+    fi
+}
+
 # Ensure python packages and node modules are installed and docker images pulled
 stage_build_dependencies() {
+    check_node_version
+    check_docker_compose
     local compose_file="$ROOT_DIR/docker-compose.yml"
     local base_image
     base_image=$(grep -m1 '^FROM ' "$ROOT_DIR/Dockerfile" | awk '{print $2}')

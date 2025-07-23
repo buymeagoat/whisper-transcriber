@@ -3,13 +3,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+CACHE_DIR="${CACHE_DIR:-$ROOT_DIR/cache}"
 source "$SCRIPT_DIR/shared_checks.sh"
-
-# Verify Docker Hub access before proceeding
-check_docker_registry || {
-    echo "Docker Hub is unreachable. Configure your proxy or network settings before building." >&2
-    exit 1
-}
 
 LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/docker_build.log"

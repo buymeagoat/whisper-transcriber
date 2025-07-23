@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+CACHE_DIR="${CACHE_DIR:-$ROOT_DIR/cache}"
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 source "$SCRIPT_DIR/shared_checks.sh"
 
@@ -27,12 +28,9 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     exit 0
 fi
 
+stage_build_dependencies
 
-# Install and build the frontend if needed
-if [ ! -d "$ROOT_DIR/frontend/node_modules" ]; then
-    echo "Installing frontend dependencies..."
-    (cd "$ROOT_DIR/frontend" && npm install)
-fi
+# Build the frontend if needed
 
 if [ ! -d "$ROOT_DIR/frontend/dist" ]; then
     echo "Building frontend..."

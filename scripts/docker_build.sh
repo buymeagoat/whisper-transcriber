@@ -25,6 +25,11 @@ check_docker_running
 check_cache_dirs
 stage_build_dependencies
 
+# Update the repo and build frontend assets before verifying cached resources
+(git -C "$ROOT_DIR" fetch && git -C "$ROOT_DIR" pull)
+echo "Checking network connectivity and installing dependencies..."
+(cd "$ROOT_DIR/frontend" && npm run build)
+
 # Verify required offline assets after downloads complete
 verify_offline_assets
 
@@ -128,10 +133,10 @@ echo "Building the production image..."
 if supports_secret; then
     secret_file=$(mktemp)
     printf '%s' "$SECRET_KEY" > "$secret_file"
-    docker build --network=host --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
+    docker build --network=none --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
     rm -f "$secret_file"
 else
-    docker build --network=host --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
+    docker build --network=none --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
 fi
 
 echo "Rebuilding API and worker images..."
@@ -141,10 +146,12 @@ if supports_secret; then
     printf '%s' "$SECRET_KEY" > "$secret_file"
     docker compose -f "$ROOT_DIR/docker-compose.yml" build \
       --secret id=secret_key,src="$secret_file" \
+      --network=none \
       --build-arg INSTALL_DEV=true api worker
     rm -f "$secret_file"
 else
     docker compose -f "$ROOT_DIR/docker-compose.yml" build \
+      --network=none \
       --build-arg SECRET_KEY="$SECRET_KEY" \
       --build-arg INSTALL_DEV=true api worker
 fi

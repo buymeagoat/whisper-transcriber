@@ -74,9 +74,9 @@ else
 fi
 
 # Update the repo
-git -C "$ROOT_DIR" fetch
-git -C "$ROOT_DIR" pull
+(git -C "$ROOT_DIR" fetch && git -C "$ROOT_DIR" pull)
 
+echo "Checking network connectivity and installing dependencies..."
 stage_build_dependencies
 (cd "$ROOT_DIR/frontend" && npm run build)
 
@@ -90,6 +90,7 @@ env | sort >&2
 secret_file_runtime="$ROOT_DIR/secret_key.txt"
 printf '%s' "$SECRET_KEY" > "$secret_file_runtime"
 
+echo "Building the production image..."
 # Build the standalone image used for production deployments
 if supports_secret; then
     secret_file=$(mktemp)
@@ -100,6 +101,7 @@ else
     docker build --network=host --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
 fi
 
+echo "Rebuilding API and worker images..."
 # Build images for the compose stack and start the services
 if supports_secret; then
     secret_file=$(mktemp)
@@ -114,7 +116,10 @@ else
       --build-arg INSTALL_DEV=true api worker
 fi
 
+echo "Verifying built images..."
 verify_built_images
+
+echo "Starting containers..."
 docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
 
 # Wait for the API container to become healthy

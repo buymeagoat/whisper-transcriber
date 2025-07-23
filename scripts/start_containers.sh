@@ -13,6 +13,13 @@ mkdir -p "$LOG_DIR"
 # Mirror all output to a startup log for troubleshooting
 exec > >(tee -a "$LOG_FILE") 2>&1
 
+log_step() {
+    echo "===== $1 ====="
+}
+
+trap 'echo "[ERROR] start_containers.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
+
+log_step "STAGING"
 # Verify Docker and cache directories are ready
 check_docker_running
 check_cache_dirs
@@ -37,21 +44,23 @@ fi
 
 stage_build_dependencies
 
-# Build the frontend if needed
-
-if [ ! -d "$ROOT_DIR/frontend/dist" ]; then
-    echo "Building frontend..."
-    (cd "$ROOT_DIR/frontend" && npm run build)
-fi
-
+log_step "VERIFICATION"
 setup_persistent_dirs
 check_whisper_models
 check_ffmpeg
 ensure_env_file
 
+log_step "BUILD"
+# Build the frontend if needed
+if [ ! -d "$ROOT_DIR/frontend/dist" ]; then
+    echo "Building frontend..."
+    (cd "$ROOT_DIR/frontend" && npm run build)
+fi
+
 secret_file="$ROOT_DIR/secret_key.txt"
 printf '%s' "$SECRET_KEY" > "$secret_file"
 
+log_step "STARTUP"
 echo "Environment variables:" >&2
 env | sort >&2
 

@@ -12,6 +12,13 @@ LOG_FILE="$LOG_DIR/update_images.log"
 mkdir -p "$LOG_DIR"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
+log_step() {
+    echo "===== $1 ====="
+}
+
+trap 'echo "[ERROR] update_images.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
+
+log_step "STAGING"
 # Verify Docker and cache directories are ready
 check_docker_running
 check_cache_dirs
@@ -40,6 +47,7 @@ ensure_env_file
 echo "Checking network connectivity and installing dependencies..."
 stage_build_dependencies
 
+log_step "VERIFICATION"
 echo "Verifying Whisper models and ffmpeg..."
 check_whisper_models
 check_ffmpeg
@@ -47,6 +55,7 @@ check_ffmpeg
 echo "Environment variables:" >&2
 env | sort >&2
 
+log_step "BUILD"
 echo "Building frontend assets..."
 (cd "$ROOT_DIR/frontend" && npm run build)
 
@@ -98,6 +107,7 @@ echo "Verifying built images..."
 verify_built_images "${images_to_check[@]}"
 
 if [ "${#build_targets[@]}" -gt 0 ]; then
+    log_step "STARTUP"
     echo "Starting containers..."
     docker compose -f "$COMPOSE_FILE" up -d "${build_targets[@]}"
 fi

@@ -2,6 +2,12 @@
 set -euo pipefail
 trap 'echo "prestage_dependencies.sh failed near line $LINENO" >&2' ERR
 
+# Ensure script is run with root privileges for apt operations
+if [[ $EUID -ne 0 ]]; then
+    echo "Run with sudo to download apt packages" >&2
+    exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"

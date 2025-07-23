@@ -30,15 +30,17 @@ verify_built_images() {
     done
 }
 
+MODE=full
 FORCE_PRUNE=false
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [--force]
+Usage: $(basename "$0") [--full|--incremental] [--force]
 
-Prunes Docker resources, rebuilds images and starts the compose stack from scratch.
-With no options, the script will prompt before removing Docker data.
-  --force  Skip confirmation prompt and prune without asking.
+--full          Prune Docker resources and rebuild the compose stack from scratch.
+--incremental   Rebuild only missing or unhealthy images similar to update_images.sh.
+--force         Skip confirmation prompt when using --full.
+With no option, --full is assumed.
 Run scripts/run_tests.sh afterward to execute the test suite.
 If startup fails, use scripts/diagnose_containers.sh to inspect the containers.
 EOF
@@ -49,6 +51,14 @@ while [[ $# -gt 0 ]]; do
         -h|--help)
             usage
             exit 0
+            ;;
+        --full)
+            MODE=full
+            shift
+            ;;
+        --incremental)
+            MODE=incremental
+            shift
             ;;
         -f|--force)
             FORCE_PRUNE=true
@@ -61,6 +71,12 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# If running an incremental build, delegate to update_images.sh
+if [ "$MODE" = "incremental" ]; then
+    "$SCRIPT_DIR/update_images.sh"
+    exit $?
+fi
 
 # Remove existing containers, images and volumes to start fresh
 docker compose -f "$ROOT_DIR/docker-compose.yml" down -v --remove-orphans || true

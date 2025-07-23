@@ -20,6 +20,8 @@ log_step() {
 trap 'echo "[ERROR] start_containers.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
 
 log_step "STAGING"
+# Stage dependencies needed for an offline build
+"$SCRIPT_DIR/prestage_dependencies.sh"
 # Verify Docker and cache directories are ready
 check_docker_running
 check_cache_dirs

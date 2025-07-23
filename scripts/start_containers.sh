@@ -63,12 +63,32 @@ log_step "BUILD"
 secret_file="$ROOT_DIR/secret_key.txt"
 printf '%s' "$SECRET_KEY" > "$secret_file"
 
+# Return 0 if docker compose build supports --secret
+supports_secret() {
+    docker compose build --help 2>/dev/null | grep -q -- "--secret"
+}
+
+if supports_secret; then
+    temp_secret=$(mktemp)
+    printf '%s' "$SECRET_KEY" > "$temp_secret"
+    docker compose -f "$COMPOSE_FILE" build \
+        --secret id=secret_key,src="$temp_secret" \
+        --network=none \
+        --build-arg INSTALL_DEV=true api worker
+    rm -f "$temp_secret"
+else
+    docker compose -f "$COMPOSE_FILE" build \
+        --network=none \
+        --build-arg SECRET_KEY="$SECRET_KEY" \
+        --build-arg INSTALL_DEV=true api worker
+fi
+
 log_step "STARTUP"
 echo "Environment variables:" >&2
 env | sort >&2
 
 echo "Starting containers with docker compose..."
-docker compose -f "$COMPOSE_FILE" up --build -d api worker broker db
+docker compose -f "$COMPOSE_FILE" up -d api worker broker db
 
 # Wait for the API service to become healthy
 max_wait=${API_HEALTH_TIMEOUT:-120}

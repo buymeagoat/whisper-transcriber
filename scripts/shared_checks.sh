@@ -99,6 +99,26 @@ check_docker_compose() {
     fi
 }
 
+# Verify that the Docker daemon is running
+check_docker_running() {
+    if ! docker info >/dev/null 2>&1; then
+        echo "Docker daemon is not running. Start Docker and retry." >&2
+        return 1
+    fi
+}
+
+# Confirm cache directories exist under CACHE_DIR
+check_cache_dirs() {
+    local base="${CACHE_DIR:-$ROOT_DIR/cache}"
+    local dirs=("$base/images" "$base/pip" "$base/npm")
+    for d in "${dirs[@]}"; do
+        if [ ! -d "$d" ]; then
+            echo "Required cache directory $d missing" >&2
+            return 1
+        fi
+    done
+}
+
 # Ensure python packages and node modules are installed and docker images pulled
 stage_build_dependencies() {
     check_node_version

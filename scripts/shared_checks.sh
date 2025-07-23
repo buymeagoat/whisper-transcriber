@@ -108,6 +108,10 @@ stage_build_dependencies() {
         fi
     else
         echo "No internet connection. Verifying staged components..." >&2
+        if [ ! -d "$image_cache" ]; then
+            echo "Image cache directory $image_cache missing" >&2
+            return 1
+        fi
         for img in "${images[@]}"; do
             if ! docker image inspect "$img" >/dev/null 2>&1; then
                 local tar="$image_cache/$(echo "$img" | sed 's#[/:]#_#g').tar"
@@ -123,6 +127,7 @@ stage_build_dependencies() {
         if [ -d "$pip_cache" ]; then
             pip install --no-index --find-links "$pip_cache" -r "$ROOT_DIR/requirements.txt"
         else
+            echo "Pip cache directory $pip_cache missing" >&2
             while read -r pkg; do
                 pkg=${pkg%%[*#]*}
                 pkg=$(echo "$pkg" | xargs)
@@ -138,6 +143,7 @@ stage_build_dependencies() {
         if [ -d "$npm_cache" ]; then
             npm ci --offline --prefix "$ROOT_DIR/frontend" --cache "$npm_cache"
         else
+            echo "Npm cache directory $npm_cache missing" >&2
             if [ ! -d "$ROOT_DIR/frontend/node_modules" ]; then
                 echo "Missing frontend/node_modules" >&2
                 return 1

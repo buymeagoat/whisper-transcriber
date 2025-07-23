@@ -19,15 +19,16 @@ supports_secret() {
 
 # Load SECRET_KEY from .env
 ensure_env_file
+echo "Checking network connectivity and installing dependencies..."
 stage_build_dependencies
 
 echo "Environment variables:" >&2
 env | sort >&2
 
-# Rebuild frontend assets
-
+echo "Building frontend assets..."
 (cd "$ROOT_DIR/frontend" && npm run build)
 
+echo "Rebuilding API and worker images..."
 # Rebuild API and worker images using Docker cache
 if supports_secret; then
     secret_file=$(mktemp)
@@ -42,6 +43,10 @@ else
         --build-arg INSTALL_DEV=true api worker
 fi
 
+echo "Verifying built images..."
+verify_built_images
+
+echo "Starting containers..."
 docker compose -f "$COMPOSE_FILE" up -d api worker
 
 cat <<'EOF'

@@ -238,13 +238,19 @@ verify_offline_assets() {
         echo "Apt cache directory $apt_cache missing" >&2
         missing=1
     else
-        local debs=(ffmpeg git curl gosu)
-        for pkg in "${debs[@]}"; do
-            if ! ls "$apt_cache"/"$pkg"*.deb >/dev/null 2>&1; then
-                echo "Missing $pkg package in $apt_cache" >&2
-                missing=1
-            fi
-        done
+        local list="$apt_cache/deb_list.txt"
+        if [ ! -f "$list" ]; then
+            echo "Apt package list $list missing" >&2
+            missing=1
+        else
+            while read -r deb; do
+                [ -z "$deb" ] && continue
+                if [ ! -f "$apt_cache/$deb" ]; then
+                    echo "Missing $deb in $apt_cache" >&2
+                    missing=1
+                fi
+            done < "$list"
+        fi
     fi
 
     echo "Verifying cached Docker images..." >&2

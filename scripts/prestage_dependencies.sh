@@ -52,7 +52,13 @@ echo "Downloading apt packages..."
 apt-get update
 apt-get install -y --download-only --no-install-recommends \
     ffmpeg git curl gosu
-cp /var/cache/apt/archives/*.deb "$CACHE_DIR/apt/"
+if ls /var/cache/apt/archives/*.deb >/dev/null 2>&1; then
+    ls /var/cache/apt/archives/*.deb \
+        | xargs -n1 basename > "$CACHE_DIR/apt/deb_list.txt"
+    cp /var/cache/apt/archives/*.deb "$CACHE_DIR/apt/"
+else
+    echo "No deb files found in /var/cache/apt/archives" >&2
+fi
 apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 echo "Dependencies staged under $CACHE_DIR"

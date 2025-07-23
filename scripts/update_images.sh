@@ -33,6 +33,10 @@ ensure_env_file
 echo "Checking network connectivity and installing dependencies..."
 stage_build_dependencies
 
+echo "Verifying Whisper models and ffmpeg..."
+check_whisper_models
+check_ffmpeg
+
 echo "Environment variables:" >&2
 env | sort >&2
 

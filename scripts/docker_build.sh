@@ -27,9 +27,7 @@ check_docker_running
 check_cache_dirs
 stage_build_dependencies
 
-# Update the repo and build frontend assets before verifying cached resources
-(git -C "$ROOT_DIR" fetch && git -C "$ROOT_DIR" pull)
-echo "Checking network connectivity and installing dependencies..."
+# Build frontend assets before verifying cached resources
 (cd "$ROOT_DIR/frontend" && npm run build)
 
 # Verify required offline assets after downloads complete

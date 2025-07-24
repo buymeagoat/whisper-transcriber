@@ -47,7 +47,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 log_step "STAGING"
-# Stage dependencies needed for an offline build
+# Stage dependencies for an offline build, clearing the cache before downloads
 "$SCRIPT_DIR/prestage_dependencies.sh"
 # Verify Docker and cache directories are ready
 check_docker_running

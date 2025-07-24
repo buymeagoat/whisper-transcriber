@@ -44,8 +44,8 @@ usage() {
 Usage: $(basename "$0") [--force-frontend]
 
 Builds the frontend if needed and starts the docker compose stack.
-sudo is required only to adjust ownership of the uploads, transcripts
-and logs directories.
+Run with sudo so apt packages can be downloaded and to adjust ownership of the
+uploads, transcripts and logs directories.
 --force-frontend Rebuild the frontend even if frontend/dist exists.
 EOF
 }

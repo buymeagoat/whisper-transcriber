@@ -19,7 +19,7 @@ log_step() {
 # Summarize failures before exiting
 trap 'echo "[ERROR] docker_build.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
 
-MODE=full
+MODE=""
 FORCE_PRUNE=false
 FORCE_FRONTEND=false
 
@@ -64,9 +64,8 @@ Usage: $(basename "$0") [--full|--incremental] [--force] [--force-frontend]
 
 --full          Prune Docker resources and rebuild the compose stack from scratch.
 --incremental   Rebuild only missing or unhealthy images similar to update_images.sh.
---force         Skip confirmation prompt when using --full.
 --force-frontend Rebuild the frontend even if frontend/dist exists.
-With no option, --full is assumed.
+You must supply either --full or --incremental.
 Run scripts/run_tests.sh afterward to execute the test suite.
 If startup fails, use scripts/diagnose_containers.sh to inspect the containers.
 EOF
@@ -101,6 +100,12 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [ -z "$MODE" ]; then
+    echo "Specify --full for a clean rebuild or --incremental for an in-place update." >&2
+    usage >&2
+    exit 1
+fi
 
 # If running an incremental build, delegate to update_images.sh
 if [ "$MODE" = "incremental" ]; then

@@ -24,8 +24,12 @@ mkdir -p "$(dirname "$LOG_FILE")"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
 CACHE_DIR="$ROOT_DIR/cache"
-IMAGES_DIR="$CACHE_DIR/images"
 
+# Always start from a clean cache so staged packages match the
+# current requirements.
+rm -rf "$CACHE_DIR"
+
+IMAGES_DIR="$CACHE_DIR/images"
 mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$CACHE_DIR/apt"
 
 # Echo a marker for major milestones

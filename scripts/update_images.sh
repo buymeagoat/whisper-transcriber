@@ -19,12 +19,14 @@ log_step() {
 trap 'echo "[ERROR] update_images.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
 
 FORCE_FRONTEND=false
+OFFLINE=false
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [--force-frontend]
+Usage: $(basename "$0") [--force-frontend] [--offline]
 
 --force-frontend Rebuild the frontend even if frontend/dist exists.
+--offline        Skip prestage_dependencies.sh and use cached packages.
 EOF
 }
 
@@ -38,6 +40,10 @@ while [[ $# -gt 0 ]]; do
             FORCE_FRONTEND=true
             shift
             ;;
+        --offline)
+            OFFLINE=true
+            shift
+            ;;
         *)
             echo "Unknown option: $1" >&2
             usage >&2
@@ -48,7 +54,11 @@ done
 
 log_step "STAGING"
 # Stage dependencies for an offline build, clearing the cache before downloads
-"$SCRIPT_DIR/prestage_dependencies.sh"
+if [ "${SKIP_PRESTAGE:-}" = "1" ] || [ "$OFFLINE" = true ]; then
+    echo "Skipping prestage_dependencies.sh (offline mode)"
+else
+    "$SCRIPT_DIR/prestage_dependencies.sh"
+fi
 # Verify Docker and cache directories are ready
 check_docker_running
 check_cache_dirs

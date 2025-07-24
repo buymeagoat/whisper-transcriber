@@ -180,7 +180,7 @@ echo "Starting containers..."
 docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
 
 # Wait for the API container to become healthy
-max_wait=${API_HEALTH_TIMEOUT:-120}
+max_wait=${API_HEALTH_TIMEOUT:-300}
 start_time=$(date +%s)
 printf "Waiting for api service to become healthy..."
 while true; do

@@ -67,6 +67,9 @@ needed.
   worker is healthy.
 - `BROKER_PING_TIMEOUT` – how many seconds the worker entrypoint waits for
   RabbitMQ to respond before exiting (defaults to `60`).
+- `API_HEALTH_TIMEOUT` – how many seconds `docker_build.sh` and
+  `start_containers.sh` wait for the API container to become healthy
+  (defaults to `300`).
 - `AUTH_USERNAME` and `AUTH_PASSWORD` – *(deprecated)* previous static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
  - `SECRET_KEY` – **required** secret used to sign JWT tokens. The application

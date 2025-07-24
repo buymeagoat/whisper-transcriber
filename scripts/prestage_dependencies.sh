@@ -13,7 +13,11 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 
 # Ensure Node.js 18+ is available before running npm commands
-check_node_version
+if ! check_node_version; then
+    current_version=$(node --version 2>/dev/null || echo "not installed")
+    echo "Node.js 18 or newer is required; current version is ${current_version}" >&2
+    exit 1
+fi
 
 LOG_FILE="$ROOT_DIR/logs/prestage_dependencies.log"
 mkdir -p "$(dirname "$LOG_FILE")"

@@ -21,32 +21,13 @@ trap 'echo "[ERROR] start_containers.sh failed near line $LINENO. Check $LOG_FIL
 
 FORCE_FRONTEND=false
 
-log_step "STAGING"
-# Stage dependencies needed for an offline build
-"$SCRIPT_DIR/prestage_dependencies.sh"
-# Verify Docker and cache directories are ready
-check_docker_running
-check_cache_dirs
-echo "Checking network connectivity and installing dependencies..."
-stage_build_dependencies
-
-# Build the frontend if needed before verifying offline assets
-if [ "$FORCE_FRONTEND" = true ] || [ ! -d "$ROOT_DIR/frontend/dist" ]; then
-    echo "Building frontend..."
-    (cd "$ROOT_DIR/frontend" && npm run build)
-fi
-
-# Verify required offline assets after downloads complete
-verify_offline_assets
-
 usage() {
     cat <<EOF
 Usage: $(basename "$0") [--force-frontend]
 
 Builds the frontend if needed and starts the docker compose stack.
-Run with sudo so apt packages can be downloaded and to adjust ownership of the
-uploads, transcripts and logs directories.
---force-frontend Rebuild the frontend even if frontend/dist exists.
+Run with sudo so apt packages can be downloaded and to adjust ownership of the uploads, transcripts and logs directories.
+--force-frontend  Rebuild the frontend even if frontend/dist exists.
 EOF
 }
 
@@ -67,6 +48,26 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+log_step "STAGING"
+# Ensure Node.js is available before downloading npm packages
+check_node_version
+# Stage dependencies needed for an offline build
+"$SCRIPT_DIR/prestage_dependencies.sh"
+# Verify Docker and cache directories are ready
+check_docker_running
+check_cache_dirs
+echo "Checking network connectivity and installing dependencies..."
+stage_build_dependencies
+
+# Build the frontend if needed before verifying offline assets
+if [ "$FORCE_FRONTEND" = true ] || [ ! -d "$ROOT_DIR/frontend/dist" ]; then
+    echo "Building frontend..."
+    (cd "$ROOT_DIR/frontend" && npm run build)
+fi
+
+# Verify required offline assets after downloads complete
+verify_offline_assets
 
 log_step "VERIFICATION"
 setup_persistent_dirs

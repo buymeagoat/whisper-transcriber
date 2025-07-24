@@ -4,5 +4,6 @@ black
 pytest-asyncio
 coverage
 pytest-postgresql
+pytest-xdist
 
 psycopg[binary]>=3.1

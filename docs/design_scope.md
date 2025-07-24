@@ -39,8 +39,9 @@ The application is considered working once these basics are functional:
 - `prestage_dependencies.sh` – download Docker images and Python/Node packages into `cache/` for offline use. The build scripts automatically run this step, so invoke it manually only when you want a separate download pass.
 - `run_backend_tests.sh` – runs backend tests and verifies the `/health` and `/version` endpoints, logging output to `logs/test.log`.
 - `diagnose_containers.sh` – checks that Docker is running, verifies cache directories, and prints container and build logs for troubleshooting.
-- `run_tests.sh` – preferred wrapper that additionally executes frontend unit
-  tests and Cypress end-to-end tests, saving results to `logs/full_test.log`.
+ - `run_tests.sh` – preferred wrapper that runs backend, frontend and Cypress
+  tests by default. Pass `--backend`, `--frontend` or `--cypress` to run a
+  subset. Results are saved to `logs/full_test.log`.
 
 Both `models/` and `frontend/dist/` are listed in `.gitignore`. They must exist
 before running `docker build`:

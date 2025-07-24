@@ -523,6 +523,9 @@ endpoints, then executes the frontend unit tests and Cypress end‑to‑end test
 Output is saved to
 `logs/full_test.log`.
 
+Pass `--backend`, `--frontend`, or `--cypress` to execute only that portion
+of the suite.
+
 Both `scripts/run_tests.sh` and `scripts/run_backend_tests.sh` check that the `api`
 container is running before executing. If it isn't, they exit with the message
 ```
@@ -533,7 +536,7 @@ To invoke just the backend tests manually use the same commands inside the
 running container:
 
 ```bash
-docker compose exec api coverage run -m pytest
+docker compose exec api coverage run -m pytest -n auto
 docker compose exec api coverage report
 ```
 ## Contributing

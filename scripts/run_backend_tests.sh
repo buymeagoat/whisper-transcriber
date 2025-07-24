@@ -37,7 +37,7 @@ check_endpoint() {
 
 {
     log_step "BACKEND TESTS"
-    docker compose -f "$COMPOSE_FILE" exec -T api coverage run -m pytest
+    docker compose -f "$COMPOSE_FILE" exec -T api coverage run -m pytest -n auto
     docker compose -f "$COMPOSE_FILE" exec -T api coverage report
     log_step "API ENDPOINTS"
     check_endpoint /health

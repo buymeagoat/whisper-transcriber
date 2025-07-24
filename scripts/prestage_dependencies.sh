@@ -12,6 +12,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 
+# Ensure Node.js 18+ is available before running npm commands
+check_node_version
+
 LOG_FILE="$ROOT_DIR/logs/prestage_dependencies.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 exec > >(tee -a "$LOG_FILE") 2>&1

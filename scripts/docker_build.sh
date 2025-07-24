@@ -24,22 +24,6 @@ FORCE_PRUNE=false
 FORCE_FRONTEND=false
 
 
-log_step "STAGING"
-# Stage dependencies needed for an offline build
-"$SCRIPT_DIR/prestage_dependencies.sh"
-# Verify Docker and cache directories are ready and install packages
-check_docker_running
-check_cache_dirs
-stage_build_dependencies
-
-# Build frontend assets if missing or forced before verifying cached resources
-if [ "$FORCE_FRONTEND" = true ] || [ ! -d "$ROOT_DIR/frontend/dist" ]; then
-    echo "Building frontend assets..."
-    (cd "$ROOT_DIR/frontend" && npm run build)
-fi
-
-# Verify required offline assets after downloads complete
-verify_offline_assets
 
 # Return 0 if docker compose build supports --secret
 supports_secret() {
@@ -112,6 +96,21 @@ if [ "$MODE" = "incremental" ]; then
     "$SCRIPT_DIR/update_images.sh"
     exit $?
 fi
+
+log_step "STAGING"
+check_node_version
+"$SCRIPT_DIR/prestage_dependencies.sh"
+check_docker_running
+check_cache_dirs
+stage_build_dependencies
+
+# Build frontend assets if missing or forced before verifying cached resources
+if [ "$FORCE_FRONTEND" = true ] || [ ! -d "$ROOT_DIR/frontend/dist" ]; then
+    echo "Building frontend assets..."
+    (cd "$ROOT_DIR/frontend" && npm run build)
+fi
+
+verify_offline_assets
 
 # Remove existing containers and volumes created by this repository
 docker compose -f "$ROOT_DIR/docker-compose.yml" down -v --remove-orphans || true

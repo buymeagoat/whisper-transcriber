@@ -108,7 +108,7 @@ if [ "$MODE" = "incremental" ]; then
 fi
 
 log_step "STAGING"
-check_node_version
+install_node18
 if [ "${SKIP_PRESTAGE:-}" = "1" ] || [ "$OFFLINE" = true ]; then
     echo "Skipping prestage_dependencies.sh (offline mode)"
 else

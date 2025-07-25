@@ -11,7 +11,8 @@ For a step-by-step setup guide, see [docs/help.md](docs/help.md).
 
 For prerequisites and installation steps, follow the instructions in
 [docs/help.md](docs/help.md). The guide covers Python and system
-dependencies as well as optional Docker usage.
+dependencies as well as optional Docker usage. The build scripts will
+install or upgrade Node.js 18 automatically if it is missing.
 
 ## Optional Environment Variables
 
@@ -120,8 +121,8 @@ started:
 python worker.py
 ```
 
-The React UI ships pre-built in `api/static/`, so no additional Node.js steps
-are required.
+The React UI ships pre-built in `api/static/`. When the frontend must be rebuilt,
+the helper scripts automatically install or upgrade Node.js 18 if needed.
 
 
 

@@ -12,12 +12,8 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 
-# Ensure Node.js 18+ is available before running npm commands
-if ! check_node_version; then
-    current_version=$(node --version 2>/dev/null || echo "not installed")
-    echo "Node.js 18 or newer is required; current version is ${current_version}" >&2
-    exit 1
-fi
+# Ensure Node.js 18 is installed before running npm commands
+install_node18
 
 LOG_FILE="$ROOT_DIR/logs/prestage_dependencies.log"
 mkdir -p "$(dirname "$LOG_FILE")"
@@ -76,8 +72,9 @@ npm ci --prefix "$ROOT_DIR/frontend" --cache "$CACHE_DIR/npm"
 log_step "APT"
 echo "Downloading apt packages..."
 apt-get update
+curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 apt-get install -y --download-only --no-install-recommends \
-    ffmpeg git curl gosu
+    ffmpeg git curl gosu nodejs
 if ls /var/cache/apt/archives/*.deb >/dev/null 2>&1; then
     ls /var/cache/apt/archives/*.deb \
         | xargs -n1 basename > "$CACHE_DIR/apt/deb_list.txt"

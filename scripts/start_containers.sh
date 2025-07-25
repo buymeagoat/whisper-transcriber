@@ -155,7 +155,7 @@ fi
 
 log_step "STARTUP"
 echo "Environment variables:" >&2
-env | sort >&2
+env | sort | grep -v '^SECRET_KEY=' >&2
 
 echo "Starting containers with docker compose..."
 docker compose -f "$COMPOSE_FILE" up -d api worker broker db

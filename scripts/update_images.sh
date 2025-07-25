@@ -98,7 +98,7 @@ check_whisper_models
 check_ffmpeg
 
 echo "Environment variables:" >&2
-env | sort >&2
+env | sort | grep -v '^SECRET_KEY=' >&2
 
 log_step "BUILD"
 # Determine which services require a rebuild

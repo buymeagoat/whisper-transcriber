@@ -36,7 +36,6 @@ class JobStatusEnum(str, PyEnum):
     ENRICHING = "enriching"
     COMPLETED = "completed"
     FAILED = "failed"
-    STALLED = "stalled"
     FAILED_TIMEOUT = "failed_timeout"
     FAILED_LAUNCH_ERROR = "failed_launch_error"
     FAILED_WHISPER_ERROR = "failed_whisper_error"

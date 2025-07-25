@@ -348,14 +348,9 @@ fails with errors like `failed to resolve source metadata` or `lookup
 http.docker.internal ... i/o timeout`, your network is blocking access to the
 Docker Hub registry. Check any proxy or firewall configuration and ensure the
 host can pull images before retrying the build.
-Dependency installation also retries automatically: the Dockerfile runs pip with
-`--retries 5 --resume-retries 3 --timeout 60` so large wheels resume downloading
-instead of failing the build.
-The helper script `scripts/docker_build.sh` uses `--network=host` only with
-`docker build` to bypass proxy-related issues when fetching base images.
-`docker compose build` does not accept this flag, so the script omits it when
-building Compose services.
-If you use a prebuilt image, mount the models directory at runtime.
+`docker compose build` does not accept the `--network=host` flag, so avoid using
+it with Compose services. If you use a prebuilt image, mount the models
+directory at runtime.
 
 Run the container with the application directories mounted so that
 uploads, transcripts and logs persist on the host. Set `VITE_API_HOST` to
@@ -469,7 +464,7 @@ docker compose restart
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
 
-Another script `scripts/docker_build.sh` can perform a full rebuild or an incremental update. By default it prunes Docker resources and rebuilds the images and stack from scratch (`--full`). Supplying `--incremental` rebuilds only services whose Docker image is missing or whose running container reports an unhealthy status. Both `docker_build.sh` and `update_images.sh` stage Docker images and Python/Node packages before any build step. `prestage_dependencies.sh` clears the `cache/` directory and downloads fresh copies each run so network hiccups do not interrupt the process. Set the environment variable `SKIP_PRESTAGE=1` or pass `--offline` to skip this step and reuse the existing cache. `update_images.sh` inspects the running containers and rebuilds a service only when its image is missing or the container reports an unhealthy status. These scripts source `scripts/shared_checks.sh` which ensures Whisper models and `ffmpeg` are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. It also checks that **Node.js 18+** is installed and that the `docker compose` command is available. `docker_build.sh` also verifies that the `whisper-transcriber-api` and `whisper-transcriber-worker` images were created successfully before starting the stack. Once running, access the API at `http://localhost:8000`.
+Another script `scripts/docker_build.sh` performs a full rebuild or an incremental update. Pass `--full` to prune Docker resources and rebuild the images and stack from scratch. Pass `--incremental` to rebuild only services whose Docker image is missing or whose running container reports an unhealthy status. Both `docker_build.sh` and `update_images.sh` stage Docker images and Python/Node packages before any build step. `prestage_dependencies.sh` clears the `cache/` directory and downloads fresh copies each run so network hiccups do not interrupt the process. Set the environment variable `SKIP_PRESTAGE=1` or pass `--offline` to skip this step and reuse the existing cache. `update_images.sh` inspects the running containers and rebuilds a service only when its image is missing or the container reports an unhealthy status. These scripts source `scripts/shared_checks.sh` which ensures Whisper models and `ffmpeg` are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. It also checks that **Node.js 18+** is installed and that the `docker compose` command is available. `docker_build.sh` also verifies that the `whisper-transcriber-api` and `whisper-transcriber-worker` images were created successfully before starting the stack. Once running, access the API at `http://localhost:8000`.
 The build helper scripts mirror their output to log files for easier troubleshooting: `logs/start_containers.log`, `logs/docker_build.log`, and `logs/update_images.log`. The container entrypoint also writes to `logs/entrypoint.log` when each service starts. All build logs reside in the `logs/` directory, and each script exits on the first failure to prevent cascading errors.
 
 ## Updating the Application

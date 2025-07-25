@@ -294,3 +294,22 @@ verify_offline_assets() {
     fi
 }
 
+# Return 0 if docker compose build supports --secret
+supports_secret() {
+    docker compose build --help 2>/dev/null | grep -q -- "--secret"
+}
+
+# Verify the given Docker images exist
+verify_built_images() {
+    local images=("$@")
+    if [ ${#images[@]} -eq 0 ]; then
+        images=(whisper-transcriber-api:latest whisper-transcriber-worker:latest)
+    fi
+    for img in "${images[@]}"; do
+        if ! docker image inspect "$img" >/dev/null 2>&1; then
+            echo "Missing Docker image $img" >&2
+            return 1
+        fi
+    done
+}
+

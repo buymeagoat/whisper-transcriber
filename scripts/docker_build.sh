@@ -41,21 +41,6 @@ OFFLINE=false
 
 
 
-# Return 0 if docker compose build supports --secret
-supports_secret() {
-    docker compose build --help 2>/dev/null | grep -q -- "--secret"
-}
-
-# Return 0 only if the API and worker images exist after the build
-verify_built_images() {
-    local images=(whisper-transcriber-api:latest whisper-transcriber-worker:latest)
-    for img in "${images[@]}"; do
-        if ! docker image inspect "$img" >/dev/null 2>&1; then
-            echo "Missing Docker image $img" >&2
-            return 1
-        fi
-    done
-}
 
 
 usage() {

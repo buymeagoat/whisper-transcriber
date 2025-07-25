@@ -13,11 +13,20 @@ mkdir -p "$LOG_DIR"
 # Mirror all output to a startup log for troubleshooting
 exec > >(tee -a "$LOG_FILE") 2>&1
 
+# File storing the SECRET_KEY during startup
+secret_file="$ROOT_DIR/secret_key.txt"
+
+# Remove the temporary secret file on exit or error
+cleanup() {
+    rm -f "$secret_file"
+}
+
 log_step() {
     echo "===== $1 ====="
 }
 
-trap 'echo "[ERROR] start_containers.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
+trap 'echo "[ERROR] start_containers.sh failed near line $LINENO. Check $LOG_FILE for details." >&2; cleanup' ERR
+trap cleanup EXIT
 
 FORCE_FRONTEND=false
 OFFLINE=false
@@ -86,8 +95,6 @@ check_ffmpeg
 ensure_env_file
 
 log_step "BUILD"
-
-secret_file="$ROOT_DIR/secret_key.txt"
 printf '%s' "$SECRET_KEY" > "$secret_file"
 
 # Return 0 if docker compose build supports --secret

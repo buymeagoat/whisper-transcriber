@@ -11,13 +11,22 @@ LOG_FILE="$LOG_DIR/docker_build.log"
 mkdir -p "$LOG_DIR"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
+# File storing the SECRET_KEY during the build
+secret_file_runtime="$ROOT_DIR/secret_key.txt"
+
+# Remove the temporary secret file on exit or error
+cleanup() {
+    rm -f "$secret_file_runtime"
+}
+
 # Echo a marker indicating the current script stage
 log_step() {
     echo "===== $1 ====="
 }
 
-# Summarize failures before exiting
-trap 'echo "[ERROR] docker_build.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
+# Summarize failures before exiting and clean up secret file
+trap 'echo "[ERROR] docker_build.sh failed near line $LINENO. Check $LOG_FILE for details." >&2; cleanup' ERR
+trap cleanup EXIT
 
 MODE=""
 FORCE_PRUNE=false
@@ -157,8 +166,6 @@ ensure_env_file
 
 echo "Environment variables:" >&2
 env | sort | grep -v '^SECRET_KEY=' >&2
-
-secret_file_runtime="$ROOT_DIR/secret_key.txt"
 printf '%s' "$SECRET_KEY" > "$secret_file_runtime"
 
 log_step "BUILD"

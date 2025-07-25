@@ -156,7 +156,7 @@ check_ffmpeg
 ensure_env_file
 
 echo "Environment variables:" >&2
-env | sort >&2
+env | sort | grep -v '^SECRET_KEY=' >&2
 
 secret_file_runtime="$ROOT_DIR/secret_key.txt"
 printf '%s' "$SECRET_KEY" > "$secret_file_runtime"

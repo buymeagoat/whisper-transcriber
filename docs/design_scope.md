@@ -33,22 +33,18 @@ The application is considered working once these basics are functional:
   to `api/static/` for the UI.
 - `scripts/` – helper utilities for Docker builds, testing and container management.
  - `start_containers.sh` – helper script that builds the frontend if needed, verifies required models and `.env`, then launches the Docker Compose stack (`api`, `worker`, `broker`, and `db`). It normally runs `prestage_dependencies.sh` first to refresh the `cache/` directory with Docker images and packages. Set `SKIP_PRESTAGE=1` or pass `--offline` to reuse the existing cache instead. When `cache/` is already populated it installs dependencies from there so the stack can start offline. All output is mirrored to `logs/start_containers.log` for troubleshooting.
- - `docker_build.sh` – performs a full rebuild or an incremental update. Pass `--full` to wipe old Docker resources and rebuild the compose stack from scratch, or `--incremental` to rebuild only missing or unhealthy images. Before building it stages all required Docker images and Python/Node packages so network interruptions do not halt the process. Pass `--offline` or set `SKIP_PRESTAGE=1` to skip refreshing the cache. Run it after `git fetch` and `git pull` when dependencies, the Dockerfile or compose configuration change, or if the environment is out of sync. Output is saved to `logs/docker_build.log`. After rebuilding, run `scripts/run_tests.sh` to verify everything works. Use `scripts/run_backend_tests.sh` if you only need the backend tests.
+ - `docker_build.sh` – performs a full rebuild or an incremental update. Pass `--full` to wipe old Docker resources and rebuild the compose stack from scratch, or `--incremental` to rebuild only missing or unhealthy images. Before building it stages all required Docker images and Python packages so network interruptions do not halt the process. Pass `--offline` or set `SKIP_PRESTAGE=1` to skip refreshing the cache. Run it after `git fetch` and `git pull` when dependencies, the Dockerfile or compose configuration change, or if the environment is out of sync. Output is saved to `logs/docker_build.log`. After rebuilding, run `scripts/run_tests.sh` to verify everything works. Use `scripts/run_backend_tests.sh` if you only need the backend tests.
  - `update_images.sh` – inspects the running containers and rebuilds only the API or worker image when its container is unhealthy or the image is missing. Healthy services are left untouched. Like `docker_build.sh` it stages dependencies up front and then verifies the Whisper models and `ffmpeg` are available. Pass `--offline` or set `SKIP_PRESTAGE=1` to skip refreshing the cache. Its log is written to `logs/update_images.log`. Run it after `git fetch` and `git pull` for routine code updates.
- - `prestage_dependencies.sh` – remove and repopulate `cache/` on every run with all Docker images and Python/Node packages needed for the build. Because it clears the cache each time, offline startup requires skipping this step with `SKIP_PRESTAGE=1` or the `--offline` flag or manually pre-populating `cache/` before running other scripts. The build scripts automatically run this step, so invoke it manually only when you want a separate download pass. It aborts early if Node.js 18 or newer is not available.
+ - `prestage_dependencies.sh` – remove and repopulate `cache/` on every run with all Docker images and Python packages needed for the build. Because it clears the cache each time, offline startup requires skipping this step with `SKIP_PRESTAGE=1` or the `--offline` flag or manually pre-populating `cache/` before running other scripts. The build scripts automatically run this step, so invoke it manually only when you want a separate download pass.
 - `run_backend_tests.sh` – runs backend tests and verifies the `/health` and `/version` endpoints, logging output to `logs/test.log`.
 - `diagnose_containers.sh` – checks that Docker is running, verifies cache directories, and prints container and build logs for troubleshooting.
  - `run_tests.sh` – preferred wrapper that runs backend, frontend and Cypress
   tests by default. Pass `--backend`, `--frontend` or `--cypress` to run a
   subset. Results are saved to `logs/full_test.log`.
 
-Both `models/` and `frontend/dist/` are listed in `.gitignore`. They must exist
-before running `docker build`:
-```bash
-cd frontend
-npm run build
-cd ..
-```
+Both `models/` and `frontend/dist/` are listed in `.gitignore`. Ensure the
+Whisper models are present before running `docker build`. The precompiled
+frontend assets already live under `frontend/dist/`.
 Create a file containing your SECRET_KEY and pass it to BuildKit so the
 validation step can load application settings. BuildKit secrets are the
 preferred mechanism:
@@ -133,8 +129,8 @@ This document summarizes the repository layout and how the core FastAPI service 
 ## Current Functionality
 
 ### Frontend
-- React-based single page app built with Vite. The build outputs `frontend/dist/`,
-  which the Dockerfile copies to `api/static/` for serving.
+- React-based single page app built with Vite. The prebuilt files live in
+  `frontend/dist/`, which the Dockerfile copies to `api/static/` for serving.
 - Upload page lets users choose audio files and Whisper model size, then starts jobs and links to a status view.
 - Active, Completed and Failed pages display jobs filtered by status with actions to view logs or restart/remove.
 - Completed Jobs now includes a search box that filters results via the `/jobs` `search` query, matching job IDs, filenames or metadata keywords.

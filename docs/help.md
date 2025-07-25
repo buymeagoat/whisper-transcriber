@@ -4,7 +4,6 @@ Follow these steps to install and run Whisper Transcriber.
 
 ## Prerequisites
 - Python 3 and `pip`
-- Node.js 18 or newer
 - `ffmpeg` with `ffprobe`
 - Docker and Docker Compose *(optional)*
 
@@ -13,13 +12,6 @@ Follow these steps to install and run Whisper Transcriber.
   ```bash
   pip install -r requirements.txt
   ```
-- Frontend packages from the `frontend` directory:
-  ```bash
-  cd frontend
-  npm install
-  cd ..
-  ```
-
 ## Configure the application
 - Copy `.env.example` to `.env` and replace the placeholder value.
 - Generate a secret with:
@@ -29,10 +21,7 @@ Follow these steps to install and run Whisper Transcriber.
   Use this value for `SECRET_KEY` in `.env`.
 
 ## Build and run
-- Build the frontend:
-  ```bash
-  npm run build
-  ```
+The React frontend is precompiled, so no additional build step is required.
 - Start locally with:
   ```bash
   uvicorn api.main:app

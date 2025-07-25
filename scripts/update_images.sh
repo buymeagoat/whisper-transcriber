@@ -59,6 +59,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 log_step "STAGING"
+install_node18
 # Stage dependencies for an offline build, clearing the cache before downloads
 if [ "${SKIP_PRESTAGE:-}" = "1" ] || [ "$OFFLINE" = true ]; then
     echo "Skipping prestage_dependencies.sh (offline mode)"

@@ -72,7 +72,7 @@ done
 
 log_step "STAGING"
 # Ensure Node.js is available before downloading npm packages
-check_node_version
+install_node18
 # Stage dependencies for an offline build, clearing the cache before downloads
 if [ "${SKIP_PRESTAGE:-}" = "1" ] || [ "$OFFLINE" = true ]; then
     echo "Skipping prestage_dependencies.sh (offline mode)"

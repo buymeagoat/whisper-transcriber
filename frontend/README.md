@@ -6,7 +6,9 @@ application.
 
 ## Installation
 
-From this directory install the Node dependencies (requires Node 18 or newer):
+From this directory install the Node dependencies (requires Node 18 or newer).
+The repository's build scripts install or upgrade Node.js 18 automatically when
+needed:
 
 ```bash
 npm install

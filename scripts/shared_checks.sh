@@ -91,6 +91,20 @@ check_node_version() {
     fi
 }
 
+# Install Node.js 18 via NodeSource when missing or outdated
+install_node18() {
+    if check_node_version; then
+        return 0
+    fi
+    echo "Installing Node.js 18..." >&2
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+        apt-get install -y nodejs
+    if ! check_node_version; then
+        echo "Node.js installation failed" >&2
+        return 1
+    fi
+}
+
 # Ensure the docker compose CLI is available
 check_docker_compose() {
     if ! docker compose version >/dev/null 2>&1; then
@@ -121,7 +135,7 @@ check_cache_dirs() {
 
 # Ensure python packages and node modules are installed and docker images pulled
 stage_build_dependencies() {
-    check_node_version
+    install_node18
     check_docker_compose
     local compose_file="$ROOT_DIR/docker-compose.yml"
     local base_image
@@ -266,6 +280,10 @@ verify_offline_assets() {
                     missing=1
                 fi
             done < "$list"
+        fi
+        if ! ls "$apt_cache"/nodejs_* >/dev/null 2>&1; then
+            echo "Nodejs package missing in $apt_cache" >&2
+            missing=1
         fi
     fi
 

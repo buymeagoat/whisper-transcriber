@@ -31,7 +31,7 @@ The application is considered working once these basics are functional:
  - `MODEL_DIR` specifies where the Whisper models are stored. By default this directory is `models/` which is local only and never committed. It must contain `base.pt`, `large-v3.pt`, `medium.pt`, `small.pt`, and `tiny.pt` when building the image. The application checks for these files on startup.
 - `frontend/` – React app built into `frontend/dist/` and copied by the Dockerfile
   to `api/static/` for the UI.
-- `scripts/` – packaging helpers that generate `dist/whisper-transcriber.exe` and `dist/whisper-transcriber.rpm`.
+- `scripts/` – helper utilities for Docker builds, testing and container management.
  - `start_containers.sh` – helper script that builds the frontend if needed, verifies required models and `.env`, then launches the Docker Compose stack (`api`, `worker`, `broker`, and `db`). It normally runs `prestage_dependencies.sh` first to refresh the `cache/` directory with Docker images and packages. Set `SKIP_PRESTAGE=1` or pass `--offline` to reuse the existing cache instead. When `cache/` is already populated it installs dependencies from there so the stack can start offline. All output is mirrored to `logs/start_containers.log` for troubleshooting.
  - `docker_build.sh` – performs a full rebuild or an incremental update. With `--full` (the default) it wipes old Docker resources and rebuilds the compose stack from scratch. `--incremental` rebuilds only missing or unhealthy images. Before building it stages all required Docker images and Python/Node packages so network interruptions do not halt the process. Pass `--offline` or set `SKIP_PRESTAGE=1` to skip refreshing the cache. Run it after `git fetch` and `git pull` when dependencies, the Dockerfile or compose configuration change, or if the environment is out of sync. Output is saved to `logs/docker_build.log`. After rebuilding, run `scripts/run_tests.sh` to verify everything works. Use `scripts/run_backend_tests.sh` if you only need the backend tests.
  - The Dockerfile installs Python packages with pip's `--retries`, `--resume-retries` and `--timeout` options so dependency downloads resume automatically if the connection drops.
@@ -119,7 +119,7 @@ object used throughout the code base. Available variables are:
 
 ## API Overview
 - **Job management**: `POST /jobs` to upload, `GET /jobs` (with optional `search` query filtering by ID, filename or keywords) and `GET /jobs/{id}` to query, `DELETE /jobs/{id}` to remove, `POST /jobs/{id}/restart` to rerun, and `/jobs/{id}/download` to fetch the transcript. `GET /metadata/{id}` returns generated metadata.
-- **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts and packaged binaries via `/admin/download-app/{os}`, resetting the system, configuring cleanup via `/admin/cleanup-config`, adjusting concurrency via `/admin/concurrency`, and retrieving CPU/memory stats plus job KPIs.
+- **Admin actions** under `/admin` allow listing and deleting files, downloading all artifacts via `/admin/download-all`, resetting the system, configuring cleanup via `/admin/cleanup-config`, adjusting concurrency via `/admin/concurrency`, and retrieving CPU/memory stats plus job KPIs.
 - **Logging endpoints** expose job logs and the access log. `/log/{job_id}`, `/logs/access` and `/logs/{filename}` require authentication. If the access log does not exist, `/logs/access` returns a `404` with an empty body. Static files under `/uploads`, `/transcripts`, and `/static` are served directly.
 - **Log streaming**: connect to `/ws/logs/{job_id}` to receive new log lines in real time. The frontend's job log view opens this socket and appends each message as it arrives.
 - **System log streaming**: connect to `/ws/logs/system` to watch the access log or `system.log` in real time from the Admin page.
@@ -141,7 +141,6 @@ This document summarizes the repository layout and how the core FastAPI service 
 - Completed Jobs now includes a search box that filters results via the `/jobs` `search` query, matching job IDs, filenames or metadata keywords.
 - Transcript viewer shows the final text in a simple styled page.
 - Admin page lists server files, shows CPU/memory usage and KPIs (completed job count, average job time and queue length), and provides buttons to reset the system or download all data.
-- A sidebar along the left provides tabs for each page. It also contains a **Download Desktop App** link that hits the `/download-app` endpoint.
 
 ### Backend
 - REST endpoints handle job submission, progress checks, downloads and admin operations.

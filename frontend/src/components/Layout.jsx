@@ -44,9 +44,6 @@ export default function Layout({ children }) {
           <Link to={ROUTES.ADMIN} style={linkStyle}>
             Admin
           </Link>
-          <a href="/download-app" style={linkStyle}>
-            Download Desktop App
-          </a>
           {role === "admin" && (
             <Link to={ROUTES.SETTINGS} style={linkStyle}>
               Settings

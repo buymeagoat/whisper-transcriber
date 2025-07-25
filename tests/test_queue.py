@@ -45,6 +45,13 @@ def test_broker_job_queue_sends_task():
         assert func is sample_task
 
 
+def test_broker_job_queue_shutdown():
+    with patch("api.services.celery_app.celery_app.close") as close:
+        q = BrokerJobQueue()
+        q.shutdown()
+        close.assert_called_once()
+
+
 def test_broker_backend_dispatch(monkeypatch):
     monkeypatch.setenv("JOB_QUEUE_BACKEND", "broker")
     import importlib

@@ -85,8 +85,6 @@ class TranscriptMetadata(Base):
     lang: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     wpm: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     keywords: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    vector_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     language: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     sentiment: Mapped[Optional[float]] = mapped_column(Float, nullable=True)

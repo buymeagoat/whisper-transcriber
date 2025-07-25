@@ -111,7 +111,11 @@ def update_job_status(job_id: str, status: JobStatusEnum) -> Optional[Job]:
 
 
 def update_analysis(
-    job_id: str, summary: str, keywords: list[str] | str
+    job_id: str,
+    summary: str,
+    keywords: list[str] | str,
+    language: str | None,
+    sentiment: float | None,
 ) -> TranscriptMetadata:
     """Store analysis results in the metadata table."""
     with db_lock:
@@ -133,6 +137,8 @@ def update_analysis(
                 else keywords
             )
             metadata.keywords = ", ".join(kw_list)
+            metadata.language = language
+            metadata.sentiment = sentiment
             db.commit()
             db.refresh(metadata)
             return metadata

@@ -32,6 +32,10 @@ class MetadataOut(BaseModel):
     duration: int
     abstract: str
     sample_rate: Optional[int] = None
+    summary: Optional[str] = None
+    keywords: Optional[str] = None
+    language: Optional[str] = None
+    sentiment: Optional[float] = None
     generated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -133,3 +137,5 @@ class AnalysisOut(BaseModel):
 
     summary: str
     keywords: list[str]
+    language: Optional[str] = None
+    sentiment: Optional[float] = None

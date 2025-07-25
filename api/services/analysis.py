@@ -20,6 +20,16 @@ try:
 except Exception:  # openai not installed
     openai = None
 
+try:
+    from langdetect import detect
+except Exception:
+    detect = None
+
+try:
+    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+except Exception:
+    SentimentIntensityAnalyzer = None
+
 from api.settings import settings
 from api.utils.logger import get_system_logger
 
@@ -120,3 +130,24 @@ def analyze_text(text: str) -> Tuple[str, List[str]]:
         except Exception as e:
             system_log.error(f"OpenAI analysis failed: {e}")
     return _local_analyze(text)
+
+
+def detect_language(text: str) -> str | None:
+    """Return ISO language code if detection is available."""
+    if detect is None:
+        return None
+    try:
+        return detect(text)
+    except Exception:
+        return None
+
+
+def analyze_sentiment(text: str) -> float | None:
+    """Return normalized sentiment score using Vader when available."""
+    if SentimentIntensityAnalyzer is None:
+        return None
+    try:
+        analyzer = SentimentIntensityAnalyzer()
+        return analyzer.polarity_scores(text)["compound"]
+    except Exception:
+        return None

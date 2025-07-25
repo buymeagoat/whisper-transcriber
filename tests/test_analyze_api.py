@@ -37,6 +37,9 @@ def test_analyze_endpoint(client, sample_wav):
     assert resp.status_code == 200
     data = resp.json()
     assert "summary" in data and "keywords" in data
+    assert "language" in data and "sentiment" in data
     with SessionLocal() as db:
         meta = db.query(TranscriptMetadata).filter_by(job_id=job_id).first()
         assert meta.summary == data["summary"]
+        assert meta.language == data["language"]
+        assert meta.sentiment == data["sentiment"]

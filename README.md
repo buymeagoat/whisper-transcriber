@@ -281,7 +281,7 @@ displayed all files at once.
   optionally display only matching lines.
 - Clicking the "Generate Insights" button on the Transcript Viewer sends the
   transcript to an LLM via `POST /jobs/{id}/analyze` and shows the returned
-  summary and keywords.
+  summary, keywords, detected language and sentiment score.
 - Cleanup options can be toggled and saved from the Admin page.
 - `MODEL_DIR` points to the directory that holds the Whisper `.pt` files. The default is `models/`, ignored by Git. **This directory must contain `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` before you build or start the server.**
 - `frontend/dist/` contains the precompiled React assets bundled with the repository.

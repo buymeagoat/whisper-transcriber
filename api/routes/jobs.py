@@ -33,7 +33,7 @@ from api.schemas import (
     StatusOut,
     AnalysisOut,
 )
-from api.services.analysis import analyze_text
+from api.services.analysis import analyze_text, detect_language, analyze_sentiment
 
 router = APIRouter()
 
@@ -110,6 +110,10 @@ def get_metadata(job_id: str) -> MetadataOut:
         duration=metadata.duration,
         abstract=metadata.abstract,
         sample_rate=metadata.sample_rate,
+        summary=metadata.summary,
+        keywords=metadata.keywords,
+        language=metadata.language,
+        sentiment=metadata.sentiment,
         generated_at=metadata.generated_at,
     )
 
@@ -185,8 +189,15 @@ def analyze_job(job_id: str) -> AnalysisOut:
         raise http_error(ErrorCode.FILE_NOT_FOUND)
     text = path.read_text(encoding="utf-8")
     summary, keywords = analyze_text(text)
-    update_analysis(job_id, summary, keywords)
-    return AnalysisOut(summary=summary, keywords=keywords)
+    language = detect_language(text)
+    sentiment = analyze_sentiment(text)
+    update_analysis(job_id, summary, keywords, language, sentiment)
+    return AnalysisOut(
+        summary=summary,
+        keywords=keywords,
+        language=language,
+        sentiment=sentiment,
+    )
 
 
 @router.get("/transcript/{job_id}/view", response_class=HTMLResponse)

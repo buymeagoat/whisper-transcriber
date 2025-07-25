@@ -5,36 +5,13 @@ This project provides a FastAPI backend with a React frontend for running OpenAI
 > **Note**
 > OpenAI-generated insights are automated and may contain errors. Always verify the output before relying on it.
 
+For a step-by-step setup guide, see [docs/help.md](docs/help.md).
+
 ## Requirements & Installation
 
-1. Install Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   # required for running tests
-   pip install -r requirements-dev.txt
-   ```
-   The `bcrypt` dependency is pinned to `<4` for compatibility with
-   `passlib`. If installing packages manually ensure this version
-   constraint is respected. Celery is also installed from this file
-   and is used when the broker-based queue is enabled.
-2. Install system dependencies. `ffmpeg` (providing `ffprobe`) must be present
-   for audio processing features. On Linux you can install it with:
-   ```bash
-   sudo apt-get install -y ffmpeg
-   ```
-3. Install frontend dependencies from the `frontend` directory. The build
-   requires **Node.js 18** or newer:
-   ```bash
-cd frontend
-  npm install
-   ```
-   Copy `frontend/.env.example` to `frontend/.env` to configure `VITE_API_HOST`,
-   `VITE_DEV_HOST` and `VITE_DEV_PORT`.
-   # install Redux packages for global state and toasts
-
-Celery is included in `requirements.txt` and is required when
-`JOB_QUEUE_BACKEND=broker` or using Docker Compose, so no extra installation step is
-needed.
+For prerequisites and installation steps, follow the instructions in
+[docs/help.md](docs/help.md). The guide covers Python, Node and system
+dependencies as well as optional Docker usage.
 
 ## Optional Environment Variables
 

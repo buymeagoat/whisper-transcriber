@@ -10,7 +10,7 @@ For a step-by-step setup guide, see [docs/help.md](docs/help.md).
 ## Requirements & Installation
 
 For prerequisites and installation steps, follow the instructions in
-[docs/help.md](docs/help.md). The guide covers Python, Node and system
+[docs/help.md](docs/help.md). The guide covers Python and system
 dependencies as well as optional Docker usage.
 
 ## Optional Environment Variables
@@ -120,16 +120,10 @@ started:
 python worker.py
 ```
 
-To build the React frontend for production run:
+The React UI ships pre-built in `api/static/`, so no additional Node.js steps
+are required.
 
-```bash
-cd frontend
-npm run build
-```
 
-This outputs static files under `frontend/dist/`.
-The Dockerfile copies this directory into `api/static/` so the React
-application can be served with the backend.
 
 ### User Registration
 
@@ -290,7 +284,7 @@ displayed all files at once.
   summary and keywords.
 - Cleanup options can be toggled and saved from the Admin page.
 - `MODEL_DIR` points to the directory that holds the Whisper `.pt` files. The default is `models/`, ignored by Git. **This directory must contain `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` before you build or start the server.**
-- `frontend/dist/` is not tracked by Git. Build it from the `frontend` directory with `npm run build` before any `docker build`.
+- `frontend/dist/` contains the precompiled React assets bundled with the repository.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are
   written to `transcripts/`. Per-job logs and the system log live in `logs/`.
 When `STORAGE_BACKEND=cloud`, these folders act as a cache and transcript files
@@ -303,11 +297,6 @@ Docker builds expect a populated directory containing the Whisper models specifi
 `validate_models_dir()` checks this directory so missing Whisper
 models fail the build early. **Ensure that `models/` contains `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` before invoking `docker build`.** Both directories are ignored by Git so they must
 be prepared manually before running `docker build`. Example:
-```bash
-cd frontend
-npm run build
-cd ..
-```
 Build the image with a secret key (using BuildKit secrets is preferred):
 ```bash
 SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
@@ -370,13 +359,7 @@ the database and broker to become available. The `db` service runs PostgreSQL
 for the API while RabbitMQ provides a broker for Celery when using the `broker`
 job queue backend.
 
-Prepare `models/` with `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` and build the frontend before running compose. The helper script will verify these files exist:
-
-```bash
-cd frontend
-npm run build
-cd ..
-```
+Prepare `models/` with `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` before running compose.
 
 Ensure `.env` exists with a valid `SECRET_KEY`. The helper
 `scripts/start_containers.sh` will create this file from `.env.example`
@@ -441,7 +424,7 @@ docker compose restart
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
 
-Another script `scripts/docker_build.sh` performs a full rebuild or an incremental update. Pass `--full` to prune Docker resources and rebuild the images and stack from scratch. Pass `--incremental` to rebuild only services whose Docker image is missing or whose running container reports an unhealthy status. Both `docker_build.sh` and `update_images.sh` stage Docker images and Python/Node packages before any build step. `prestage_dependencies.sh` clears the `cache/` directory and downloads fresh copies each run so network hiccups do not interrupt the process. Set the environment variable `SKIP_PRESTAGE=1` or pass `--offline` to skip this step and reuse the existing cache. `update_images.sh` inspects the running containers and rebuilds a service only when its image is missing or the container reports an unhealthy status. These scripts source `scripts/shared_checks.sh` which ensures Whisper models and `ffmpeg` are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. It also checks that **Node.js 18+** is installed and that the `docker compose` command is available. `docker_build.sh` also verifies that the `whisper-transcriber-api` and `whisper-transcriber-worker` images were created successfully before starting the stack. Once running, access the API at `http://localhost:8000`.
+Another script `scripts/docker_build.sh` performs a full rebuild or an incremental update. Pass `--full` to prune Docker resources and rebuild the images and stack from scratch. Pass `--incremental` to rebuild only services whose Docker image is missing or whose running container reports an unhealthy status. Both `docker_build.sh` and `update_images.sh` stage Docker images and Python packages before any build step. `prestage_dependencies.sh` clears the `cache/` directory and downloads fresh copies each run so network hiccups do not interrupt the process. Set the environment variable `SKIP_PRESTAGE=1` or pass `--offline` to skip this step and reuse the existing cache. `update_images.sh` inspects the running containers and rebuilds a service only when its image is missing or the container reports an unhealthy status. These scripts source `scripts/shared_checks.sh` which ensures Whisper models and `ffmpeg` are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. `docker_build.sh` also verifies that the `whisper-transcriber-api` and `whisper-transcriber-worker` images were created successfully before starting the stack. Once running, access the API at `http://localhost:8000`.
 The build helper scripts mirror their output to log files for easier troubleshooting: `logs/start_containers.log`, `logs/docker_build.log`, and `logs/update_images.log`. The container entrypoint also writes to `logs/entrypoint.log` when each service starts. All build logs reside in the `logs/` directory, and each script exits on the first failure to prevent cascading errors.
 
 ## Updating the Application
@@ -461,13 +444,7 @@ After using either script, execute `scripts/run_tests.sh` to verify the new buil
 
 ## Testing
 
-Tests rely on Docker to provide the required services and on **Node.js 18** or
-newer. Install the frontend dev dependencies first:
-
-```bash
-cd frontend
-npm install
-```
+Tests rely on Docker to provide the required services.
 
 Start the containers with `sudo scripts/start_containers.sh` or `docker compose
 up --build` and run the full suite with:

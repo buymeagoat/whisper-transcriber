@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Form, Request, status, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, Response
 from datetime import datetime
 from pathlib import Path
@@ -201,7 +201,7 @@ def analyze_job(job_id: str) -> AnalysisOut:
 
 
 @router.get("/transcript/{job_id}/view", response_class=HTMLResponse)
-def transcript_view(job_id: str, request: Request):
+def transcript_view(job_id: str):
     job = service_get_job(job_id)
     if not job:
         return HTMLResponse(

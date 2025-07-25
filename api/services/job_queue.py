@@ -109,5 +109,8 @@ class BrokerJobQueue(JobQueue):
         payload = pickle.dumps(func)
         self._celery_app.send_task(self._task_name, args=(payload,))
 
-    def shutdown(self) -> None:  # pragma: no cover - stub
-        pass
+    def shutdown(self) -> None:
+        """Close Celery connections if possible."""
+        close = getattr(self._celery_app, "close", None)
+        if callable(close):
+            close()

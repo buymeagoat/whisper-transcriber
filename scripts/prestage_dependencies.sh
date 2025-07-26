@@ -21,6 +21,17 @@ if [ -z "${CACHE_DIR:-}" ]; then
     fi
 fi
 
+# Verify that CACHE_DIR is writable before continuing.
+check_cache_writable() {
+    mkdir -p "$CACHE_DIR" || true
+    local test_file="$CACHE_DIR/.write_test"
+    if ! touch "$test_file" >/dev/null 2>&1; then
+        echo "Cannot write to $CACHE_DIR. Set CACHE_DIR to a writable path or fix permissions." >&2
+        exit 1
+    fi
+    rm -f "$test_file"
+}
+
 # Ensure Node.js 18 is installed before running npm commands
 install_node18
 
@@ -29,6 +40,9 @@ mkdir -p "$(dirname "$LOG_FILE")"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
 export CACHE_DIR
+
+# Exit early if the cache directory is not writable
+check_cache_writable
 
 # Always start from a clean cache so staged packages match the
 # current requirements.

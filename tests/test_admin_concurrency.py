@@ -67,3 +67,15 @@ def test_concurrency_update_forbidden(admin_client):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert resp.status_code == 403
+
+
+def test_admin_update_concurrency_invalid(admin_client):
+    create_user("admin", "pw", role="admin")
+    token = _token(admin_client, "admin", "pw")
+
+    resp = admin_client.post(
+        "/admin/concurrency",
+        json={"max_concurrent_jobs": 0},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 422

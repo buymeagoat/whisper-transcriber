@@ -238,10 +238,13 @@ def get_concurrency() -> ConcurrencyConfigOut:
 def update_concurrency(
     payload: ConcurrencyConfigIn, user=Depends(require_admin)
 ) -> ConcurrencyConfigOut:
-    value = config_service.update_concurrency(payload.max_concurrent_jobs)
-    settings.max_concurrent_jobs = value
-    if settings.job_queue_backend == "thread" and isinstance(
-        app_state.job_queue, ThreadJobQueue
-    ):
-        app_state.job_queue.resize(value)
+    try:
+        value = config_service.update_concurrency(payload.max_concurrent_jobs)
+        settings.max_concurrent_jobs = value
+        if settings.job_queue_backend == "thread" and isinstance(
+            app_state.job_queue, ThreadJobQueue
+        ):
+            app_state.job_queue.resize(value)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
     return ConcurrencyConfigOut(max_concurrent_jobs=value)

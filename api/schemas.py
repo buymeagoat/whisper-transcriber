@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from api.models import JobStatusEnum
 
@@ -105,6 +105,12 @@ class ConcurrencyConfigOut(BaseModel):
 
 class ConcurrencyConfigIn(BaseModel):
     max_concurrent_jobs: int
+
+    @model_validator(mode="after")
+    def _check_max_jobs(cls, values: "ConcurrencyConfigIn") -> "ConcurrencyConfigIn":
+        if values.max_concurrent_jobs <= 0:
+            raise ValueError("max_concurrent_jobs must be greater than 0")
+        return values
 
 
 class UserOut(BaseModel):

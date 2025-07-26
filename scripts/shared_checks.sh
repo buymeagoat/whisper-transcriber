@@ -97,6 +97,7 @@ install_node18() {
         return 0
     fi
     echo "Installing Node.js 18..." >&2
+    apt-get purge -y nodejs npm libnode-dev nodejs-doc || true
     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
         apt-get install -y nodejs
     if ! check_node_version; then

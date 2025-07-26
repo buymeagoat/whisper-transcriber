@@ -75,16 +75,21 @@ object used throughout the code base. Available variables are:
   `postgresql+psycopg2://whisper:whisper@db:5432/whisper` points to the `db`
   service defined in `docker-compose.yml`.
 - `VITE_API_HOST` – base URL for the frontend to reach the API.
+- `PORT` – TCP port used by the Uvicorn server (defaults to `8000`).
 - `VITE_DEFAULT_TRANSCRIPT_FORMAT` – default download format used by the web UI (defaults to `txt`).
 - `LOG_LEVEL` – log level for backend loggers.
+- `LOG_FORMAT` – set to `json` for structured logs or `plain` for text (defaults to `plain`).
 - `LOG_TO_STDOUT` – mirror logs to the console when `true`.
 - `LOG_MAX_BYTES` – maximum size of log files before rotation (defaults to
   `10000000`).
 - `LOG_BACKUP_COUNT` – number of rotated files to keep (defaults to `3`).
+- `MAX_UPLOAD_SIZE` – maximum allowed upload size in bytes (defaults to `2147483648`).
 - `DB_CONNECT_ATTEMPTS` – how many times to retry connecting to the database on
   startup (defaults to `10`).
 - `BROKER_CONNECT_ATTEMPTS` – how many times to retry pinging the Celery broker
   on startup (defaults to `20`).
+- `BROKER_PING_TIMEOUT` – how many seconds the worker entrypoint waits for RabbitMQ to respond before exiting (defaults to `60`).
+- `API_HEALTH_TIMEOUT` – how many seconds the build scripts wait for the API container to become healthy (defaults to `300`).
 - `AUTH_USERNAME` / `AUTH_PASSWORD` – *(deprecated)* old static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint.
 - `SECRET_KEY` – secret for JWT signing.

@@ -7,6 +7,19 @@ Follow these steps to install and run Whisper Transcriber.
 - `ffmpeg` with `ffprobe`
 - Docker and Docker Compose *(optional)*
 
+## Docker on WSL
+Follow these steps to install Docker inside the WSL distribution:
+1. `sudo apt remove docker docker.io containerd runc`
+2. `sudo apt update && sudo apt install docker.io`
+3. Enable and start the daemon:
+   ```bash
+   sudo systemctl enable docker
+   sudo service docker start
+   ```
+4. Add your user to the `docker` group with `sudo usermod -aG docker $USER` and log out.
+Remove Docker Desktop to avoid conflicts when running WSL-native Docker.
+
+
 ## Install dependencies
 - Python packages:
   ```bash

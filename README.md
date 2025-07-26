@@ -13,6 +13,18 @@ For prerequisites and installation steps, follow the instructions in
 [docs/help.md](docs/help.md). The guide covers Python and system
 dependencies as well as optional Docker usage. The build scripts will
 install or upgrade Node.js 18 automatically if it is missing.
+### Docker on WSL
+To install Docker inside WSL, run:
+1. `sudo apt remove docker docker.io containerd runc`
+2. `sudo apt update && sudo apt install docker.io`
+3. Enable and start the service:
+   ```bash
+   sudo systemctl enable docker
+   sudo service docker start
+   ```
+4. Add your user to the `docker` group with `sudo usermod -aG docker $USER` and log out.
+Remove Docker Desktop when relying on WSL-native Docker.
+
 
 ## Optional Environment Variables
 

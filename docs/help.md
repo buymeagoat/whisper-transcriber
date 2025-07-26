@@ -34,8 +34,7 @@ Remove Docker Desktop to avoid conflicts when running WSL-native Docker.
   Use this value for `SECRET_KEY` in `.env`.
 
 ## Build and run
-The React frontend is precompiled, so no additional build step is required.
-- Start locally with:
+The compiled frontend assets live in `frontend/dist/`, which is not committed. Run `npm run build` in the `frontend` directory or use the helper scripts to generate this folder.
   ```bash
   uvicorn api.main:app
   ```

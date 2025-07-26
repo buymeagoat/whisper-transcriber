@@ -161,6 +161,9 @@ ensure_env_file
 
 echo "Environment variables:" >&2
 env | sort | grep -v '^SECRET_KEY=' >&2
+if [ -d "$secret_file_runtime" ]; then
+    rm -rf "$secret_file_runtime"
+fi
 printf '%s' "$SECRET_KEY" > "$secret_file_runtime"
 
 log_step "BUILD"
@@ -168,6 +171,9 @@ echo "Building the production image..."
 # Build the standalone image used for production deployments
 if supports_secret; then
     secret_file=$(mktemp)
+    if [ -d "$secret_file" ]; then
+        rm -rf "$secret_file"
+    fi
     printf '%s' "$SECRET_KEY" > "$secret_file"
     docker build --network=none --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
     rm -f "$secret_file"
@@ -179,6 +185,9 @@ echo "Rebuilding API and worker images..."
 # Build images for the compose stack and start the services
 if supports_secret; then
     secret_file=$(mktemp)
+    if [ -d "$secret_file" ]; then
+        rm -rf "$secret_file"
+    fi
     printf '%s' "$SECRET_KEY" > "$secret_file"
     docker compose -f "$ROOT_DIR/docker-compose.yml" build \
       --secret id=secret_key,src="$secret_file" \

@@ -105,6 +105,9 @@ check_ffmpeg
 ensure_env_file
 
 log_step "BUILD"
+if [ -d "$secret_file" ]; then
+    rm -rf "$secret_file"
+fi
 printf '%s' "$SECRET_KEY" > "$secret_file"
 
 

@@ -19,7 +19,8 @@ LOG_FILE="$ROOT_DIR/logs/prestage_dependencies.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-CACHE_DIR="$ROOT_DIR/cache"
+CACHE_DIR="${CACHE_DIR:-$ROOT_DIR/cache}"
+export CACHE_DIR
 
 # Always start from a clean cache so staged packages match the
 # current requirements.

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Form, status, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, Response
+import html
 from datetime import datetime
 from pathlib import Path
 from functools import partial
@@ -225,7 +226,7 @@ def transcript_view(job_id: str):
         )
 
     transcript_text = transcript_file.read_text(encoding="utf-8")
-    html = f"""
+    html_content = f"""
     <html>
       <head>
         <title>Transcript for {job_id}</title>
@@ -236,11 +237,11 @@ def transcript_view(job_id: str):
       </head>
       <body>
         <h1>Transcript for Job ID: {job_id}</h1>
-        <pre>{transcript_text}</pre>
+        <pre>{html.escape(transcript_text)}</pre>
       </body>
     </html>
     """
-    return HTMLResponse(content=html)
+    return HTMLResponse(content=html_content)
 
 
 @router.post("/jobs/{job_id}/restart", response_model=StatusOut)

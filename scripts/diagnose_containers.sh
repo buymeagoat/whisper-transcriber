@@ -13,7 +13,7 @@ if ! docker info >/dev/null 2>&1; then
 fi
 
 # Location of cached dependencies
-CACHE_DIR="${CACHE_DIR:-$ROOT_DIR/cache}"
+CACHE_DIR="${CACHE_DIR:-/tmp/docker_cache}"
 
 echo "Container status:"
 # Display container status including health information

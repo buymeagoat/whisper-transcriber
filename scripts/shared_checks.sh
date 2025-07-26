@@ -97,7 +97,10 @@ install_node18() {
         return 0
     fi
     echo "Installing Node.js 18..." >&2
-    apt-get purge -y nodejs npm libnode-dev nodejs-doc || true
+    # Remove any old Node.js packages that may conflict with NodeSource
+    # installations. libnode72 is provided by Ubuntu's Node 12 packages and
+    # clashes with newer releases.
+    apt-get purge -y nodejs npm libnode-dev nodejs-doc libnode72 || true
     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
         apt-get install -y nodejs
     if ! check_node_version; then

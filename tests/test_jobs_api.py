@@ -230,6 +230,32 @@ def test_transcript_view_missing_file(client, sample_wav):
     assert str(transcript_path) not in resp.text
 
 
+def test_transcript_view_escapes_html(client, sample_wav):
+    with sample_wav.open("rb") as f:
+        resp = client.post(
+            "/jobs",
+            data={"model": "base"},
+            files={"file": ("file.wav", f, "audio/wav")},
+        )
+    assert resp.status_code == 202
+    job_id = resp.json()["job_id"]
+
+    transcript_path = TRANSCRIPTS_DIR / job_id / "out.srt"
+    transcript_path.parent.mkdir(parents=True, exist_ok=True)
+    transcript_path.write_text("<div>AT&T</div>")
+
+    with SessionLocal() as db:
+        job = db.query(Job).get(job_id)
+        job.status = JobStatusEnum.COMPLETED
+        job.transcript_path = str(transcript_path)
+        db.commit()
+
+    resp = client.get(f"/transcript/{job_id}/view")
+    assert resp.status_code == 200
+    assert "<div>" not in resp.text
+    assert "&lt;div&gt;AT&amp;T&lt;/div&gt;" in resp.text
+
+
 def test_job_submit_save_error(client, sample_wav, monkeypatch):
     def fail_save(fileobj, name):
         raise OSError("disk error")

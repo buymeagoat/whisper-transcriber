@@ -4,6 +4,7 @@ Follow these steps to install and run Whisper Transcriber.
 
 ## Prerequisites
 - Python 3 and `pip`
+- Node.js 18 *(required to build the frontend; must already be installed when building offline)*
 - `ffmpeg` with `ffprobe`
 - Docker and Docker Compose *(optional)*
 

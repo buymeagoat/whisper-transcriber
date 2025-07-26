@@ -3,13 +3,11 @@
 
 # Expect ROOT_DIR to be defined by the caller
 
-# Determine the default cache directory. Under WSL the Windows filesystem is
-# used so the cache persists across distro resets.
+# Determine the default cache directory. /tmp/docker_cache is used when
+# CACHE_DIR is not set.
 default_cache_dir() {
     if [ -n "${CACHE_DIR:-}" ]; then
         echo "$CACHE_DIR"
-    elif grep -qi microsoft /proc/version && [ -d /mnt/c ]; then
-        echo "/mnt/c/whisper_cache"
     else
         echo "/tmp/docker_cache"
     fi

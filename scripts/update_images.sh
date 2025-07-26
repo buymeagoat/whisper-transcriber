@@ -10,15 +10,9 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Choose a persistent cache location when running under WSL. This keeps
-# cached packages on the Windows drive so they survive Linux
-# distribution resets.
+# Set CACHE_DIR to a sensible default when unset
 if [ -z "${CACHE_DIR:-}" ]; then
-    if grep -qi microsoft /proc/version && [ -d /mnt/c ]; then
-        CACHE_DIR="/mnt/c/whisper_cache"
-    else
-        CACHE_DIR="/tmp/docker_cache"
-    fi
+    CACHE_DIR="/tmp/docker_cache"
 fi
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 source "$SCRIPT_DIR/shared_checks.sh"

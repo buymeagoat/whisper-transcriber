@@ -10,14 +10,9 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Default the cache directory, preferring the Windows drive when running under
-# WSL so cached packages persist across sessions.
+# Default the cache directory when not explicitly set
 if [ -z "${CACHE_DIR:-}" ]; then
-    if grep -qi microsoft /proc/version && [ -d /mnt/c ]; then
-        CACHE_DIR="/mnt/c/whisper_cache"
-    else
-        CACHE_DIR="/tmp/docker_cache"
-    fi
+    CACHE_DIR="/tmp/docker_cache"
 fi
 source "$SCRIPT_DIR/shared_checks.sh"
 

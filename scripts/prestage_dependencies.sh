@@ -93,7 +93,7 @@ echo "Downloading apt packages..."
 apt-get update
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 apt-get install -y --download-only --no-install-recommends \
-    ffmpeg git curl gosu nodejs
+    ffmpeg git curl gosu nodejs docker-compose-plugin
 if ls /var/cache/apt/archives/*.deb >/dev/null 2>&1; then
     ls /var/cache/apt/archives/*.deb \
         | xargs -n1 basename > "$CACHE_DIR/apt/deb_list.txt"

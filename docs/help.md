@@ -18,6 +18,7 @@ Follow these steps to install Docker inside the WSL distribution:
    sudo service docker start
    ```
 4. Add your user to the `docker` group with `sudo usermod -aG docker $USER` and log out.
+5. Install the Compose plugin with `sudo apt install docker-compose-plugin`.
 Remove Docker Desktop to avoid conflicts when running WSL-native Docker.
 
 

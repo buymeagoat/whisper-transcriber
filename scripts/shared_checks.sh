@@ -126,11 +126,27 @@ install_node18() {
     fi
 }
 
+# Install docker-compose-plugin when docker compose is unavailable
+install_docker_compose_plugin() {
+    echo "Installing docker-compose-plugin..." >&2
+    local apt_cache="$(default_cache_dir)/apt"
+    if [ -d "$apt_cache" ] && ls "$apt_cache"/docker-compose-plugin_*.deb >/dev/null 2>&1; then
+        echo "Using cached docker-compose packages from $apt_cache" >&2
+        dpkg -i "$apt_cache"/docker-compose-plugin_*.deb >/dev/null 2>&1 || true
+        apt-get install -f -y
+    else
+        apt-get update && apt-get install -y docker-compose-plugin
+    fi
+}
+
 # Ensure the docker compose CLI is available
 check_docker_compose() {
     if ! docker compose version >/dev/null 2>&1; then
-        echo "'docker compose' command not available. Install Docker Compose v2." >&2
-        return 1
+        install_docker_compose_plugin
+        if ! docker compose version >/dev/null 2>&1; then
+            echo "'docker compose' command not available. Install Docker Compose v2." >&2
+            return 1
+        fi
     fi
 }
 
@@ -306,6 +322,10 @@ verify_offline_assets() {
         fi
         if ! ls "$apt_cache"/nodejs_* >/dev/null 2>&1; then
             echo "Nodejs package missing in $apt_cache" >&2
+            missing=1
+        fi
+        if ! ls "$apt_cache"/docker-compose-plugin_* >/dev/null 2>&1; then
+            echo "docker-compose-plugin package missing in $apt_cache" >&2
             missing=1
         fi
     fi

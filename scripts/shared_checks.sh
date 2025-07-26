@@ -3,6 +3,18 @@
 
 # Expect ROOT_DIR to be defined by the caller
 
+# Determine the default cache directory. Under WSL the Windows filesystem is
+# used so the cache persists across distro resets.
+default_cache_dir() {
+    if [ -n "${CACHE_DIR:-}" ]; then
+        echo "$CACHE_DIR"
+    elif grep -qi microsoft /proc/version && [ -d /mnt/c ]; then
+        echo "/mnt/c/whisper_cache"
+    else
+        echo "/tmp/docker_cache"
+    fi
+}
+
 # Verify required Whisper model files exist in $ROOT_DIR/models
 check_whisper_models() {
     local model_dir="${MODEL_DIR:-$ROOT_DIR/models}"
@@ -127,7 +139,7 @@ check_docker_running() {
 
 # Confirm cache directories exist under CACHE_DIR
 check_cache_dirs() {
-    local base="${CACHE_DIR:-/tmp/docker_cache}"
+    local base="$(default_cache_dir)"
     local dirs=("$base/images" "$base/pip" "$base/npm" "$base/apt")
     for d in "${dirs[@]}"; do
         if [ ! -d "$d" ]; then
@@ -145,10 +157,11 @@ stage_build_dependencies() {
     local base_image
     base_image=$(grep -m1 '^FROM ' "$ROOT_DIR/Dockerfile" | awk '{print $2}')
 
-    local pip_cache="${CACHE_DIR:-/tmp/docker_cache}/pip"
-    local npm_cache="${CACHE_DIR:-/tmp/docker_cache}/npm"
-    local apt_cache="${CACHE_DIR:-/tmp/docker_cache}/apt"
-    local image_cache="${CACHE_DIR:-/tmp/docker_cache}/images"
+    local cache_base="$(default_cache_dir)"
+    local pip_cache="$cache_base/pip"
+    local npm_cache="$cache_base/npm"
+    local apt_cache="$cache_base/apt"
+    local image_cache="$cache_base/images"
 
     mapfile -t compose_images < <(docker compose -f "$compose_file" config | awk '/image:/ {print $2}' | sort -u)
     local images=("$base_image" "${compose_images[@]}")
@@ -234,10 +247,11 @@ stage_build_dependencies() {
 
 # Verify cached pip wheels, npm packages and Docker images exist under CACHE_DIR
 verify_offline_assets() {
-    local pip_cache="${CACHE_DIR:-/tmp/docker_cache}/pip"
-    local npm_cache="${CACHE_DIR:-/tmp/docker_cache}/npm"
-    local apt_cache="${CACHE_DIR:-/tmp/docker_cache}/apt"
-    local image_cache="${CACHE_DIR:-/tmp/docker_cache}/images"
+    local base="$(default_cache_dir)"
+    local pip_cache="$base/pip"
+    local npm_cache="$base/npm"
+    local apt_cache="$base/apt"
+    local image_cache="$base/images"
 
     local missing=0
 

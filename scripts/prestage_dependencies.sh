@@ -12,6 +12,15 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 
+# Use /mnt/c/whisper_cache on WSL for persistence unless CACHE_DIR is provided.
+if [ -z "${CACHE_DIR:-}" ]; then
+    if grep -qi microsoft /proc/version && [ -d /mnt/c ]; then
+        CACHE_DIR="/mnt/c/whisper_cache"
+    else
+        CACHE_DIR="/tmp/docker_cache"
+    fi
+fi
+
 # Ensure Node.js 18 is installed before running npm commands
 install_node18
 
@@ -19,7 +28,6 @@ LOG_FILE="$ROOT_DIR/logs/prestage_dependencies.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-CACHE_DIR="${CACHE_DIR:-/tmp/docker_cache}"
 export CACHE_DIR
 
 # Always start from a clean cache so staged packages match the

@@ -9,7 +9,16 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-CACHE_DIR="${CACHE_DIR:-/tmp/docker_cache}"
+
+# Determine default cache directory, using the Windows filesystem when running
+# under WSL so cached packages are preserved between sessions.
+if [ -z "${CACHE_DIR:-}" ]; then
+    if grep -qi microsoft /proc/version && [ -d /mnt/c ]; then
+        CACHE_DIR="/mnt/c/whisper_cache"
+    else
+        CACHE_DIR="/tmp/docker_cache"
+    fi
+fi
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 source "$SCRIPT_DIR/shared_checks.sh"
 

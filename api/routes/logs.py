@@ -5,7 +5,7 @@ import asyncio
 from fastapi.responses import PlainTextResponse
 
 from api.errors import ErrorCode, http_error
-from api.paths import storage, LOG_DIR
+from api.paths import LOG_DIR
 from pathlib import Path
 from api.app_state import ACCESS_LOG, backend_log
 from api.schemas import StatusOut

@@ -12,14 +12,9 @@ if ! docker info >/dev/null 2>&1; then
     exit 1
 fi
 
-# Location of cached dependencies. Prefer the Windows drive on WSL so that logs
-# and cached packages persist across distro upgrades.
+# Set CACHE_DIR if not already defined
 if [ -z "${CACHE_DIR:-}" ]; then
-    if grep -qi microsoft /proc/version && [ -d /mnt/c ]; then
-        CACHE_DIR="/mnt/c/whisper_cache"
-    else
-        CACHE_DIR="/tmp/docker_cache"
-    fi
+    CACHE_DIR="/tmp/docker_cache"
 fi
 
 echo "Container status:"

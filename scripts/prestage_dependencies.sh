@@ -12,13 +12,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 
-# Use /mnt/c/whisper_cache on WSL for persistence unless CACHE_DIR is provided.
+# Default cache directory when not set
 if [ -z "${CACHE_DIR:-}" ]; then
-    if grep -qi microsoft /proc/version && [ -d /mnt/c ]; then
-        CACHE_DIR="/mnt/c/whisper_cache"
-    else
-        CACHE_DIR="/tmp/docker_cache"
-    fi
+    CACHE_DIR="/tmp/docker_cache"
 fi
 
 # Verify that CACHE_DIR is writable before continuing.

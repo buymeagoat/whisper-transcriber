@@ -320,3 +320,7 @@ This document organizes upcoming features for Whisper Transcriber. Items are gro
 - **Summary**: The Dockerfile installs Python packages from cached wheels using `--no-index --find-links`, so builds succeed without network access.
 - **Motivation**: Pre-caching dependencies avoids network timeouts and ensures reproducible builds.
 
+### Checksums for Cached Assets
+- **Summary**: `prestage_dependencies.sh` accepts `--checksum` to generate `cache/checksums.txt` listing SHA-256 sums for cached files.
+- **Motivation**: Provides an audit trail for staged images and packages.
+

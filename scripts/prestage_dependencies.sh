@@ -191,8 +191,24 @@ log_step "COMPLETE"
 echo "Dependencies staged under $CACHE_DIR"
 
 if [ "$CHECKSUM" = "1" ]; then
-    checksum_file="$ROOT_DIR/cache/checksums.txt"
-    find "$CACHE_DIR" -type f -exec sha256sum {} \; | sort -k2 > "$checksum_file"
-    echo "Checksums saved to $checksum_file"
+    for sub in pip npm apt images; do
+        dir="$CACHE_DIR/$sub"
+        if [ -d "$dir" ]; then
+            (cd "$dir" && find . -type f -exec sha256sum {} \;) \
+                | sort -k2 > "$dir/sha256sums.txt"
+        fi
+    done
+
+    manifest="$CACHE_DIR/manifest.txt"
+    echo "BASE_CODENAME=$BASE_CODENAME" > "$manifest"
+    for sub in pip npm apt images; do
+        file="$CACHE_DIR/$sub/sha256sums.txt"
+        if [ -f "$file" ]; then
+            hash=$(sha256sum "$file" | awk '{print $1}')
+            echo "$sub=$hash" >> "$manifest"
+        fi
+    done
+
+    cp "$manifest" "$ROOT_DIR/cache/manifest.txt"
 fi
 

@@ -14,14 +14,19 @@ source "$SCRIPT_DIR/shared_checks.sh"
 
 # Parse options
 DRY_RUN="${DRY_RUN:-0}"
+CHECKSUM="0"
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --dry-run)
             DRY_RUN=1
             shift
             ;;
+        --checksum)
+            CHECKSUM="1"
+            shift
+            ;;
         -h|--help)
-            echo "Usage: $(basename "$0") [--dry-run]" >&2
+            echo "Usage: $(basename "$0") [--dry-run] [--checksum]" >&2
             exit 0
             ;;
         *)
@@ -179,4 +184,10 @@ run_cmd rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 log_step "COMPLETE"
 echo "Dependencies staged under $CACHE_DIR"
+
+if [ "$CHECKSUM" = "1" ]; then
+    checksum_file="$ROOT_DIR/cache/checksums.txt"
+    find "$CACHE_DIR" -type f -exec sha256sum {} \; | sort -k2 > "$checksum_file"
+    echo "Checksums saved to $checksum_file"
+fi
 

@@ -74,7 +74,9 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# Begin STAGING step by verifying the environment
 log_step "STAGING"
+"$SCRIPT_DIR/check_env.sh"
 # Ensure Node.js is available before downloading npm packages
 install_node18
 # Stage dependencies for an offline build, clearing the cache before downloads

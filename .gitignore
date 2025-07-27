@@ -36,6 +36,7 @@ yarn-error.log*
 *.tmp
 .cache/
 cache/
+!cache/apt/*
 pip-log.txt
 pip-delete-this-directory.txt
 

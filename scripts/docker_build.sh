@@ -127,6 +127,13 @@ check_docker_running
 check_cache_dirs
 stage_build_dependencies
 
+# === Sync APT packages into Docker build context ===
+# Dockerfile expects cache/apt to exist in the build context.
+# Copy from /tmp/docker_cache/apt (used by prestage_dependencies.sh) into ./cache/apt
+BUILD_CACHE_DIR="$ROOT_DIR/cache/apt"
+mkdir -p "$BUILD_CACHE_DIR"
+rsync -av --delete "$CACHE_DIR/apt/" "$BUILD_CACHE_DIR/"
+
 # Build frontend assets if missing or forced before verifying cached resources
 if [ "$FORCE_FRONTEND" = true ] || [ ! -d "$ROOT_DIR/frontend/dist" ]; then
     echo "Building frontend assets..."

@@ -321,6 +321,6 @@ This document organizes upcoming features for Whisper Transcriber. Items are gro
 - **Motivation**: Pre-caching dependencies avoids network timeouts and ensures reproducible builds.
 
 ### Checksums for Cached Assets
-- **Summary**: `prestage_dependencies.sh` accepts `--checksum` to generate `cache/checksums.txt` listing SHA-256 sums for cached files.
+- **Summary**: `prestage_dependencies.sh` accepts `--checksum` to write per-directory manifests and a top-level `cache/manifest.txt` with their hashes.
 - **Motivation**: Provides an audit trail for staged images and packages.
 

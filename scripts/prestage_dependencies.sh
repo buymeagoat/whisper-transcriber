@@ -2,12 +2,6 @@
 set -euo pipefail
 trap 'echo "prestage_dependencies.sh failed near line $LINENO" >&2' ERR
 
-# Ensure script is run with root privileges for apt operations
-if [[ $EUID -ne 0 ]]; then
-    echo "Run with sudo to download apt packages" >&2
-    exit 1
-fi
-
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
@@ -15,6 +9,7 @@ source "$SCRIPT_DIR/shared_checks.sh"
 # Parse options
 DRY_RUN="${DRY_RUN:-0}"
 CHECKSUM="0"
+VERIFY_ONLY="0"
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --dry-run)
@@ -25,8 +20,12 @@ while [[ $# -gt 0 ]]; do
             CHECKSUM="1"
             shift
             ;;
+        --verify-only)
+            VERIFY_ONLY="1"
+            shift
+            ;;
         -h|--help)
-            echo "Usage: $(basename "$0") [--dry-run] [--checksum]" >&2
+            echo "Usage: $(basename "$0") [--dry-run] [--checksum] [--verify-only]" >&2
             exit 0
             ;;
         *)
@@ -36,9 +35,16 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [ "$DRY_RUN" != "1" ] && ! check_internet; then
-    echo "Network unreachable. Connect before running or use offline assets." >&2
-    exit 1
+# When not verifying only, ensure root and internet connectivity
+if [ "$VERIFY_ONLY" != "1" ]; then
+    if [[ $EUID -ne 0 ]]; then
+        echo "Run with sudo to download apt packages" >&2
+        exit 1
+    fi
+    if [ "$DRY_RUN" != "1" ] && ! check_internet; then
+        echo "Network unreachable. Connect before running or use offline assets." >&2
+        exit 1
+    fi
 fi
 
 # Execute a command unless DRY_RUN is enabled
@@ -52,6 +58,13 @@ run_cmd() {
 # Default cache directory when not set
 if [ -z "${CACHE_DIR:-}" ]; then
     CACHE_DIR="/tmp/docker_cache"
+fi
+
+export CACHE_DIR
+
+if [ "$VERIFY_ONLY" = "1" ]; then
+    verify_offline_assets
+    exit $?
 fi
 
 # Verify that CACHE_DIR is writable before continuing.
@@ -71,8 +84,6 @@ run_cmd install_node18
 LOG_FILE="$ROOT_DIR/logs/prestage_dependencies.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 exec > >(tee -a "$LOG_FILE") 2>&1
-
-export CACHE_DIR
 
 # Exit early if the cache directory is not writable
 check_cache_writable

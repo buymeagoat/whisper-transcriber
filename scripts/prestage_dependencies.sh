@@ -92,7 +92,7 @@ log_step "APT"
 echo "Downloading apt packages..."
 apt-get update
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-apt-get install -y --download-only --no-install-recommends \
+apt-get install -y --download-only --reinstall --no-install-recommends \
     ffmpeg git curl gosu nodejs docker-compose-plugin
 if ls /var/cache/apt/archives/*.deb >/dev/null 2>&1; then
     ls /var/cache/apt/archives/*.deb \

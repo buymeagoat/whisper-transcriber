@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4@sha256:9ba7531bd80fb0a858632727cf7a112fbfd19b17e94c4e84ced81e24ef1a0dbc
-FROM python:3.11-slim
+FROM python:3.11-jammy
 
 # Install dev requirements when building test images
 ARG INSTALL_DEV=false
@@ -8,7 +8,7 @@ ARG INSTALL_DEV=false
 ARG SECRET_KEY
 
 COPY cache/apt /tmp/apt
-RUN apt-get update && \
+RUN apt-get update || (cat /etc/resolv.conf && ping -c 3 deb.debian.org && exit 1) && \
     apt-get install -y --no-install-recommends ./tmp/apt/*.deb && \
     rm -rf /tmp/apt && \
     apt-get clean && \

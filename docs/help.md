@@ -6,6 +6,7 @@ Follow these steps to install and run Whisper Transcriber.
 - Python 3 and `pip`
 - Node.js 18 *(required to build the frontend; must already be installed when building offline)*
 - `ffmpeg` with `ffprobe`
+- `models/` directory with `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt`
 - Docker and Docker Compose *(optional)*
 
 ## Docker on WSL

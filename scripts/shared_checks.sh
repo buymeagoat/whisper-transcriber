@@ -289,7 +289,8 @@ verify_offline_assets() {
                 req=$(echo "$req" | xargs)
                 [ -z "$req" ] && continue
                 pkg=${req%%[<=>]*}
-                if ! ls "$pip_cache"/"$pkg"-* >/dev/null 2>&1; then
+                local wheel_pkg="${pkg//-/_}"
+                if ! ls "$pip_cache"/"$wheel_pkg"-* >/dev/null 2>&1; then
                     echo "Missing wheel for $pkg in $pip_cache" >&2
                     missing=1
                 fi

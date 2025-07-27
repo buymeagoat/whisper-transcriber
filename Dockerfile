@@ -8,9 +8,11 @@ ARG INSTALL_DEV=false
 ARG SECRET_KEY
 
 COPY cache/apt /tmp/apt
-RUN dpkg -i /tmp/apt/*.deb && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ./tmp/apt/*.deb && \
     rm -rf /tmp/apt && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user to run Celery workers
 RUN groupadd -g 1000 appuser && \

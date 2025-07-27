@@ -28,9 +28,9 @@ secret_file=""
 
 # Remove the temporary secret file on exit or error
 cleanup() {
-    rm -f "$secret_file_runtime"
+    rm -rf "$secret_file_runtime"
     if [ -n "${secret_file:-}" ]; then
-        rm -f "$secret_file"
+        rm -rf "$secret_file"
     fi
 }
 
@@ -166,8 +166,8 @@ ensure_env_file
 
 echo "Environment variables:" >&2
 env | sort | grep -v '^SECRET_KEY=' >&2
-if [ -f "$secret_file_runtime" ]; then
-    rm -f "$secret_file_runtime"
+if [ -e "$secret_file_runtime" ]; then
+    rm -rf "$secret_file_runtime"
 fi
 printf '%s' "$SECRET_KEY" > "$secret_file_runtime"
 
@@ -176,8 +176,8 @@ echo "Building the production image..."
 # Build the standalone image used for production deployments
 if supports_secret; then
     secret_file=$(mktemp)
-    if [ -f "$secret_file" ]; then
-        rm -f "$secret_file"
+    if [ -e "$secret_file" ]; then
+        rm -rf "$secret_file"
     fi
     printf '%s' "$SECRET_KEY" > "$secret_file"
     docker build --network=none --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
@@ -190,8 +190,8 @@ echo "Rebuilding API and worker images..."
 # Build images for the compose stack and start the services
 if supports_secret; then
     secret_file=$(mktemp)
-    if [ -f "$secret_file" ]; then
-        rm -f "$secret_file"
+    if [ -e "$secret_file" ]; then
+        rm -rf "$secret_file"
     fi
     printf '%s' "$SECRET_KEY" > "$secret_file"
     docker compose -f "$ROOT_DIR/docker-compose.yml" build \
@@ -248,5 +248,5 @@ Available test scripts:
 Run the desired script to verify the build.
 If containers encounter issues, use scripts/diagnose_containers.sh for troubleshooting.
 EOF
-rm -f "$secret_file_runtime"
+rm -rf "$secret_file_runtime"
 

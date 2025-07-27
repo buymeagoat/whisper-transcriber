@@ -28,7 +28,7 @@ secret_file="$ROOT_DIR/secret_key.txt"
 
 # Remove the temporary secret file on exit or error
 cleanup() {
-    rm -f "$secret_file"
+    rm -rf "$secret_file"
 }
 
 log_step() {
@@ -105,7 +105,7 @@ check_ffmpeg
 ensure_env_file
 
 log_step "BUILD"
-if [ -d "$secret_file" ]; then
+if [ -e "$secret_file" ]; then
     rm -rf "$secret_file"
 fi
 printf '%s' "$SECRET_KEY" > "$secret_file"
@@ -190,5 +190,5 @@ while true; do
 done
 
 echo "Containers are ready. Use 'docker compose ps' to check status."
-echo "Run scripts/run_tests.sh to execute the test suite." 
-rm -f "$secret_file"
+echo "Run scripts/run_tests.sh to execute the test suite."
+rm -rf "$secret_file"

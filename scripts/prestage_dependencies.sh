@@ -77,7 +77,7 @@ check_cache_writable
 run_cmd rm -rf "$CACHE_DIR"
 
 IMAGES_DIR="$CACHE_DIR/images"
-mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$CACHE_DIR/apt"
+mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$CACHE_DIR/apt" "$ROOT_DIR/cache/apt"
 
 # Echo a marker for major milestones
 log_step() {
@@ -148,8 +148,20 @@ run_cmd curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 run_cmd apt-get install -y --download-only --reinstall --no-install-recommends \
     ffmpeg git curl gosu nodejs docker-compose-plugin
 if ls /var/cache/apt/archives/*.deb >/dev/null 2>&1; then
+    mismatch=0
+    for pkg in /var/cache/apt/archives/*.deb; do
+        deb=$(basename "$pkg")
+        if [[ "$deb" != *"$BASE_CODENAME"* ]]; then
+            echo "Package $deb does not match codename $BASE_CODENAME" >&2
+            mismatch=1
+        fi
+    done
+    if [ $mismatch -ne 0 ]; then
+        echo "Aborting due to codename mismatch" >&2
+        exit 1
+    fi
     ls /var/cache/apt/archives/*.deb \
-        | xargs -n1 basename > "$CACHE_DIR/apt/deb_list.txt"
+        | xargs -n1 basename | tee "$CACHE_DIR/apt/deb_list.txt" > "$ROOT_DIR/cache/apt/deb_list.txt"
     run_cmd cp /var/cache/apt/archives/*.deb "$CACHE_DIR/apt/"
 else
     echo "No deb files found in /var/cache/apt/archives" >&2

@@ -316,7 +316,7 @@ This document organizes upcoming features for Whisper Transcriber. Items are gro
 - **Summary**: start_containers.sh now writes `secret_key.txt` automatically so BuildKit can consume the key without manual steps.
 - **Motivation**: Simplifies container startup by handling temporary secret file creation.
 
-### Reliable Dependency Installation
-- **Summary**: The Dockerfile invokes pip with `--retries 5 --resume-retries 3 --timeout 60` so package downloads automatically resume during intermittent network issues.
-- **Motivation**: Large wheels occasionally time out or drop connections, causing failed builds. Retrying and resuming prevents unnecessary rebuilds.
+### Offline Dependency Installation
+- **Summary**: The Dockerfile installs Python packages from cached wheels using `--no-index --find-links`, so builds succeed without network access.
+- **Motivation**: Pre-caching dependencies avoids network timeouts and ensures reproducible builds.
 

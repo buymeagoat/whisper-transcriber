@@ -79,7 +79,6 @@ done
 log_step "PYTHON"
 echo "Downloading and building Python wheels..."
 pip wheel --wheel-dir "$CACHE_DIR/pip" \
-    pip wheel \
     -r "$ROOT_DIR/requirements.txt" \
     -r "$ROOT_DIR/requirements-dev.txt"
 

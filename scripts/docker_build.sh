@@ -130,6 +130,12 @@ stage_build_dependencies
 # === Sync APT packages into Docker build context ===
 # Dockerfile expects cache/apt to exist in the build context.
 # Copy from /tmp/docker_cache/apt (used by prestage_dependencies.sh) into ./cache/apt
+
+if ! compgen -G "$CACHE_DIR/apt/*.deb" > /dev/null; then
+    echo "[ERROR] No .deb packages found in $CACHE_DIR/apt. Did prestage_dependencies.sh run correctly?" >&2
+    exit 1
+fi
+
 BUILD_CACHE_DIR="$ROOT_DIR/cache/apt"
 mkdir -p "$BUILD_CACHE_DIR"
 rsync -av --delete "$CACHE_DIR/apt/" "$BUILD_CACHE_DIR/"

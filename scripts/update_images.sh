@@ -21,6 +21,7 @@ LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/update_images.log"
 mkdir -p "$LOG_DIR"
 exec > >(tee -a "$LOG_FILE") 2>&1
+export DOCKER_BUILDKIT=1
 
 log_step() {
     echo "===== $1 ====="
@@ -132,12 +133,12 @@ else
         printf '%s' "$SECRET_KEY" > "$secret_file"
         docker compose -f "$COMPOSE_FILE" build \
             --secret id=secret_key,src="$secret_file" \
-            --network=none \
+            --network=host \
             --build-arg INSTALL_DEV=true "${build_targets[@]}"
         rm -f "$secret_file"
     else
         docker compose -f "$COMPOSE_FILE" build \
-            --network=none \
+            --network=host \
             --build-arg SECRET_KEY="$SECRET_KEY" \
             --build-arg INSTALL_DEV=true "${build_targets[@]}"
     fi

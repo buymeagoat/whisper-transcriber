@@ -20,6 +20,7 @@ LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/docker_build.log"
 mkdir -p "$LOG_DIR"
 exec > >(tee -a "$LOG_FILE") 2>&1
+export DOCKER_BUILDKIT=1
 
 # File storing the SECRET_KEY during the build
 secret_file_runtime="$ROOT_DIR/secret_key.txt"
@@ -193,10 +194,10 @@ if supports_secret; then
         rm -rf "$secret_file"
     fi
     printf '%s' "$SECRET_KEY" > "$secret_file"
-    docker build --network=none --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
+    docker build --network=host --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
     rm -f "$secret_file"
 else
-    docker build --network=none --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
+    docker build --network=host --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
 fi
 
 echo "Rebuilding API and worker images..."
@@ -209,12 +210,12 @@ if supports_secret; then
     printf '%s' "$SECRET_KEY" > "$secret_file"
     docker compose -f "$ROOT_DIR/docker-compose.yml" build \
       --secret id=secret_key,src="$secret_file" \
-      --network=none \
+      --network=host \
       --build-arg INSTALL_DEV=true api worker
     rm -f "$secret_file"
 else
     docker compose -f "$ROOT_DIR/docker-compose.yml" build \
-      --network=none \
+      --network=host \
       --build-arg SECRET_KEY="$SECRET_KEY" \
       --build-arg INSTALL_DEV=true api worker
 fi

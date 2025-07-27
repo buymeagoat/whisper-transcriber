@@ -82,6 +82,12 @@ pip wheel --wheel-dir "$CACHE_DIR/pip" \
     -r "$ROOT_DIR/requirements.txt" \
     -r "$ROOT_DIR/requirements-dev.txt"
 
+# Verify the Whisper wheel was created
+if ! ls "$CACHE_DIR/pip"/openai_whisper-*.whl >/dev/null 2>&1; then
+    echo "openai_whisper wheel build failed; expected $CACHE_DIR/pip/openai_whisper-*.whl" >&2
+    exit 1
+fi
+
 log_step "NPM"
 echo "Caching Node modules..."
 npm install --prefix "$ROOT_DIR/frontend"

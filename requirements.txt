@@ -23,7 +23,7 @@ bcrypt<4
 python-jose[cryptography]>=3.3.0
 
 # --- Speech-to-text ---
-openai-whisper==20250625
+openai-whisper==20240930
 openai>=1.14.3
 torch>=2.2.2
 

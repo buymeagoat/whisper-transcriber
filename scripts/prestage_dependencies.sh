@@ -12,6 +12,38 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 
+# Parse options
+DRY_RUN="${DRY_RUN:-0}"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --dry-run)
+            DRY_RUN=1
+            shift
+            ;;
+        -h|--help)
+            echo "Usage: $(basename "$0") [--dry-run]" >&2
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            exit 1
+            ;;
+    esac
+done
+
+if [ "$DRY_RUN" != "1" ] && ! check_internet; then
+    echo "Network unreachable. Connect before running or use offline assets." >&2
+    exit 1
+fi
+
+# Execute a command unless DRY_RUN is enabled
+run_cmd() {
+    echo "+ $*"
+    if [ "$DRY_RUN" != "1" ]; then
+        "$@"
+    fi
+}
+
 # Default cache directory when not set
 if [ -z "${CACHE_DIR:-}" ]; then
     CACHE_DIR="/tmp/docker_cache"
@@ -29,7 +61,7 @@ check_cache_writable() {
 }
 
 # Ensure Node.js 18 is installed before running npm commands
-install_node18
+run_cmd install_node18
 
 LOG_FILE="$ROOT_DIR/logs/prestage_dependencies.log"
 mkdir -p "$(dirname "$LOG_FILE")"
@@ -42,7 +74,7 @@ check_cache_writable
 
 # Always start from a clean cache so staged packages match the
 # current requirements.
-rm -rf "$CACHE_DIR"
+run_cmd rm -rf "$CACHE_DIR"
 
 IMAGES_DIR="$CACHE_DIR/images"
 mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$CACHE_DIR/apt"
@@ -51,6 +83,7 @@ mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$CACHE_DIR/apt"
 log_step() {
     echo "===== $1 ====="
 }
+
 
 # Ensure Docker is running and required cache directories exist
 check_docker_running
@@ -84,42 +117,45 @@ log_step "IMAGES"
 echo "Pulling docker images..."
 for img in "${IMAGES[@]}"; do
     echo "Fetching $img"
-    docker pull "$img"
+    run_cmd docker pull "$img"
     tar_name=$(echo "$img" | sed 's#[/:]#_#g').tar
-    docker save "$img" -o "$IMAGES_DIR/$tar_name"
+    run_cmd docker save "$img" -o "$IMAGES_DIR/$tar_name"
 done
 
 log_step "PYTHON"
 echo "Downloading and building Python wheels..."
-pip wheel --wheel-dir "$CACHE_DIR/pip" \
+run_cmd pip wheel --wheel-dir "$CACHE_DIR/pip" \
     -r "$ROOT_DIR/requirements.txt" \
     -r "$ROOT_DIR/requirements-dev.txt"
 
 # Verify the Whisper wheel was created
-if ! ls "$CACHE_DIR/pip"/openai_whisper-*.whl >/dev/null 2>&1; then
-    echo "openai_whisper wheel build failed; expected $CACHE_DIR/pip/openai_whisper-*.whl" >&2
-    exit 1
+if [ "$DRY_RUN" != "1" ]; then
+    if ! ls "$CACHE_DIR/pip"/openai_whisper-*.whl >/dev/null 2>&1; then
+        echo "openai_whisper wheel build failed; expected $CACHE_DIR/pip/openai_whisper-*.whl" >&2
+        exit 1
+    fi
 fi
 
 log_step "NPM"
 echo "Caching Node modules..."
-npm install --prefix "$ROOT_DIR/frontend"
-npm ci --prefix "$ROOT_DIR/frontend" --cache "$CACHE_DIR/npm"
+run_cmd npm install --prefix "$ROOT_DIR/frontend"
+run_cmd npm ci --prefix "$ROOT_DIR/frontend" --cache "$CACHE_DIR/npm"
 
 log_step "APT"
 echo "Downloading apt packages..."
-apt-get update
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-apt-get install -y --download-only --reinstall --no-install-recommends \
+run_cmd apt-get update
+run_cmd curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+run_cmd apt-get install -y --download-only --reinstall --no-install-recommends \
     ffmpeg git curl gosu nodejs docker-compose-plugin
 if ls /var/cache/apt/archives/*.deb >/dev/null 2>&1; then
     ls /var/cache/apt/archives/*.deb \
         | xargs -n1 basename > "$CACHE_DIR/apt/deb_list.txt"
-    cp /var/cache/apt/archives/*.deb "$CACHE_DIR/apt/"
+    run_cmd cp /var/cache/apt/archives/*.deb "$CACHE_DIR/apt/"
 else
     echo "No deb files found in /var/cache/apt/archives" >&2
 fi
-apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+run_cmd apt-get clean
+run_cmd rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 log_step "COMPLETE"
 echo "Dependencies staged under $CACHE_DIR"

@@ -447,7 +447,7 @@ Another script `scripts/docker_build.sh` performs a full rebuild or an increment
 Pass `--force-frontend` to rebuild the frontend even if `frontend/dist` exists.
 The build scripts store cached packages and Docker images in `/tmp/docker_cache`. You may set the `CACHE_DIR` environment variable to a different path—for example `/mnt/c/whisper_cache`—if you want the cache to persist across WSL resets.
 For auditing purposes the prestage script also writes the wheel filenames to `cache/pip/pip_versions.txt`, lists installed Node packages in `cache/npm/npm_versions.txt` and archives the npm cache as `cache/npm/npm-cache.tar`. Pass `--checksum` to additionally record SHA‑256 sums for everything under `cache/` in `cache/checksums.txt`.
-Run `scripts/check_env.sh` before offline builds to verify DNS resolution and confirm cached `.deb` archives match the `python:3.11-jammy` base image. If WSL2 DNS causes timeouts, set `DNS_SERVER=<ip>` or build with `--network=host` so Docker can reach the registry.
+Run `scripts/check_env.sh` before offline builds to verify DNS resolution, confirm cached `.deb` archives match the `python:3.11-jammy` base image and warn when the cached image digest differs from the current pull. If WSL2 DNS causes timeouts, set `DNS_SERVER=<ip>` or build with `--network=host` so Docker can reach the registry.
 The build helper scripts mirror their output to log files for easier troubleshooting: `logs/start_containers.log`, `logs/docker_build.log`, and `logs/update_images.log`. The container entrypoint also writes to `logs/entrypoint.log` when each service starts. All build logs reside in the `logs/` directory, and each script exits on the first failure to prevent cascading errors.
 
 ## Updating the Application

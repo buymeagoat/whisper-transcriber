@@ -83,7 +83,8 @@ run_cmd rm -rf "$CACHE_DIR"
 
 IMAGES_DIR="$CACHE_DIR/images"
 mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$CACHE_DIR/apt" \
-    "$ROOT_DIR/cache/pip" "$ROOT_DIR/cache/npm" "$ROOT_DIR/cache/apt"
+    "$ROOT_DIR/cache/pip" "$ROOT_DIR/cache/npm" "$ROOT_DIR/cache/apt" \
+    "$ROOT_DIR/cache/images"
 
 # Echo a marker for major milestones
 log_step() {
@@ -126,6 +127,10 @@ for img in "${IMAGES[@]}"; do
     run_cmd docker pull "$img"
     tar_name=$(echo "$img" | sed 's#[/:]#_#g').tar
     run_cmd docker save "$img" -o "$IMAGES_DIR/$tar_name"
+    if [ "$DRY_RUN" != "1" ] && [ "$img" = "python:3.11-jammy" ]; then
+        digest=$(docker image inspect "$img" --format '{{index .RepoDigests 0}}' | awk -F@ '{print $2}')
+        echo "$digest" > "$ROOT_DIR/cache/images/python_3.11_digest.txt"
+    fi
 done
 
 log_step "PYTHON"

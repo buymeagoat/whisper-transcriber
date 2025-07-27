@@ -43,8 +43,9 @@ The application is considered working once these basics are functional:
 - All build helpers automatically install or upgrade Node.js 18 using the NodeSource repository when needed.
 - `run_backend_tests.sh` – runs backend tests and verifies the `/health` and `/version` endpoints, logging output to `logs/test.log`.
 - `diagnose_containers.sh` – checks that Docker is running, verifies cache directories, and prints container and build logs for troubleshooting.
- - `check_env.sh` – validates DNS resolution and ensures cached `.deb` packages
-   correspond to the base image used in the Dockerfile. Cached packages must
+ - `check_env.sh` – validates DNS resolution, ensures cached `.deb` packages
+   correspond to the base image and warns when the saved digest for
+   `python:3.11-jammy` differs from a fresh pull. Cached packages must
    match the `python:3.11-jammy` image to avoid build errors.
  - `run_tests.sh` – preferred wrapper that runs backend, frontend and Cypress
   tests by default. Pass `--backend`, `--frontend` or `--cypress` to run a

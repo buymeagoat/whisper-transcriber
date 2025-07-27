@@ -77,7 +77,8 @@ check_cache_writable
 run_cmd rm -rf "$CACHE_DIR"
 
 IMAGES_DIR="$CACHE_DIR/images"
-mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$CACHE_DIR/apt" "$ROOT_DIR/cache/apt"
+mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$CACHE_DIR/apt" \
+    "$ROOT_DIR/cache/pip" "$ROOT_DIR/cache/npm" "$ROOT_DIR/cache/apt"
 
 # Echo a marker for major milestones
 log_step() {
@@ -134,12 +135,19 @@ if [ "$DRY_RUN" != "1" ]; then
         echo "openai_whisper wheel build failed; expected $CACHE_DIR/pip/openai_whisper-*.whl" >&2
         exit 1
     fi
+    ls "$CACHE_DIR/pip"/*.whl | xargs -n1 basename | sort > "$CACHE_DIR/pip/pip_versions.txt"
+    cp "$CACHE_DIR/pip/pip_versions.txt" "$ROOT_DIR/cache/pip/pip_versions.txt"
 fi
 
 log_step "NPM"
 echo "Caching Node modules..."
 run_cmd npm install --prefix "$ROOT_DIR/frontend"
 run_cmd npm ci --prefix "$ROOT_DIR/frontend" --cache "$CACHE_DIR/npm"
+if [ "$DRY_RUN" != "1" ]; then
+    npm ls --prefix "$ROOT_DIR/frontend" --depth=0 > "$CACHE_DIR/npm/npm_versions.txt"
+    cp "$CACHE_DIR/npm/npm_versions.txt" "$ROOT_DIR/cache/npm/npm_versions.txt"
+    tar -cf "$CACHE_DIR/npm/npm-cache.tar" -C "$CACHE_DIR/npm" .
+fi
 
 log_step "APT"
 echo "Downloading apt packages..."

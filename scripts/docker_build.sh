@@ -15,6 +15,7 @@ if [ -z "${CACHE_DIR:-}" ]; then
     CACHE_DIR="/tmp/docker_cache"
 fi
 source "$SCRIPT_DIR/shared_checks.sh"
+"$SCRIPT_DIR/check_env.sh"
 
 LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/docker_build.log"

@@ -6,6 +6,7 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/full_test.log"
+source "$SCRIPT_DIR/shared_checks.sh"
 
 RUN_BACKEND=false
 RUN_FRONTEND=false
@@ -42,6 +43,14 @@ if ! $RUN_BACKEND && ! $RUN_FRONTEND && ! $RUN_CYPRESS; then
 fi
 
 mkdir -p "$LOG_DIR"
+
+# Verify Node.js is available when frontend or Cypress tests are requested
+if $RUN_FRONTEND || $RUN_CYPRESS; then
+    if ! check_node_version; then
+        echo "Node.js 18 or newer is required to run frontend tests" >&2
+        exit 1
+    fi
+fi
 
 # Echo a marker for major milestones
 log_step() {

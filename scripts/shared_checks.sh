@@ -284,7 +284,8 @@ verify_offline_assets() {
         for req_file in "$ROOT_DIR/requirements.txt" "$ROOT_DIR/requirements-dev.txt"; do
             [ -f "$req_file" ] || continue
             while read -r req; do
-                req=${req%%[*#]*}
+                req=${req%%#*}
+                req=${req%%[*}
                 req=$(echo "$req" | xargs)
                 [ -z "$req" ] && continue
                 pkg=${req%%[<=>]*}

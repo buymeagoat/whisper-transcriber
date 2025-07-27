@@ -77,8 +77,8 @@ for img in "${IMAGES[@]}"; do
 done
 
 log_step "PYTHON"
-echo "Downloading Python packages..."
-pip download -d "$CACHE_DIR/pip" \
+echo "Downloading and building Python wheels..."
+pip wheel --wheel-dir "$CACHE_DIR/pip" \
     pip wheel \
     -r "$ROOT_DIR/requirements.txt" \
     -r "$ROOT_DIR/requirements-dev.txt"

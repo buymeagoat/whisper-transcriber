@@ -390,3 +390,49 @@ verify_built_images() {
     done
 }
 
+# Compare two digests and return 1 when they differ
+check_digest_match() {
+    local expected="$1"
+    local actual="$2"
+    if [ -z "$expected" ] || [ -z "$actual" ]; then
+        echo "Digest values cannot be empty" >&2
+        return 1
+    fi
+    if [ "$expected" != "$actual" ]; then
+        echo "Digest mismatch: expected $expected but found $actual" >&2
+        return 1
+    fi
+}
+
+# Verify architecture of .deb files under the given directory
+check_architecture() {
+    local path="$1"
+    local host_arch
+    host_arch=$(dpkg --print-architecture)
+    local mismatch=0
+    for deb in "$path"/*.deb; do
+        [ -e "$deb" ] || continue
+        local pkg_arch
+        pkg_arch=$(dpkg-deb -f "$deb" Architecture)
+        if [ "$pkg_arch" != "$host_arch" ]; then
+            echo "Package $(basename "$deb") architecture $pkg_arch does not match host $host_arch" >&2
+            mismatch=1
+        fi
+    done
+    [ $mismatch -eq 0 ]
+}
+
+# Ensure manifest contains required keys
+validate_manifest_schema() {
+    local file="$1"
+    local missing=0
+    local required=(BASE_CODENAME BASE_DIGEST TIMESTAMP pip_versions npm_versions)
+    for key in "${required[@]}"; do
+        if ! grep -q "^${key}=" "$file"; then
+            echo "Manifest missing $key" >&2
+            missing=1
+        fi
+    done
+    [ $missing -eq 0 ]
+}
+

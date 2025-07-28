@@ -117,12 +117,10 @@ BASE_CODENAME="${BASE_IMAGE##*-}"
 source /etc/os-release
 HOST_CODENAME="${VERSION_CODENAME:-}"
 
-# Abort when either codename differs from jammy unless overridden
-if [ "${ALLOW_OS_MISMATCH:-}" != "1" ]; then
-    if [ "$BASE_CODENAME" != "jammy" ] || [ "$HOST_CODENAME" != "jammy" ]; then
-        echo "OS codename mismatch: Dockerfile uses '$BASE_CODENAME', host is '$HOST_CODENAME'. Set ALLOW_OS_MISMATCH=1 to bypass." >&2
-        exit 1
-    fi
+# Abort when host codename differs from the base image codename unless overridden
+if [ "${ALLOW_OS_MISMATCH:-}" != "1" ] && [ "$HOST_CODENAME" != "$BASE_CODENAME" ]; then
+    echo "OS codename mismatch: Dockerfile uses '$BASE_CODENAME', host is '$HOST_CODENAME'. Set ALLOW_OS_MISMATCH=1 to bypass." >&2
+    exit 1
 fi
 
 # Gather images used by docker-compose services

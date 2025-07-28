@@ -1,9 +1,8 @@
 # Whisper Transcriber
 
-This project provides a FastAPI backend with a React frontend for running OpenAI Whisper transcription jobs.
+> **For architecture, Docker build details and script internals, see [docs/design_scope.md](docs/design_scope.md).**
 
-> **Note**
-> OpenAI-generated insights are automated and may contain errors. Always verify the output before relying on it.
+Self-hosted transcription service with a FastAPI backend and a React frontend. It wraps the OpenAI Whisper CLI so you can upload audio, monitor progress and retrieve transcripts.
 
 For a step-by-step setup guide, see [docs/help.md](docs/help.md).
 
@@ -11,23 +10,8 @@ For a step-by-step setup guide, see [docs/help.md](docs/help.md).
 
 For prerequisites and installation steps, follow the instructions in
 [docs/help.md](docs/help.md). The guide covers Python and system
-dependencies as well as optional Docker usage. The build scripts will
-install or upgrade Node.js 18 automatically when online. Offline builds
-require Node.js 18 to already be present on the host.
-### Docker on WSL
-To install Docker inside WSL, run:
-1. `sudo apt remove docker docker.io containerd runc`
-2. `sudo apt update && sudo apt install docker.io`
-3. Enable and start the service:
-   ```bash
-   sudo systemctl enable docker
-   sudo service docker start
-   ```
-4. Add your user to the `docker` group with `sudo usermod -aG docker $USER` and log out.
-5. Install the Compose plugin: `sudo apt install docker-compose-plugin`
-Remove Docker Desktop when relying on WSL-native Docker.
-
-
+dependencies as well as optional Docker usage. Node.js 18 is required to build
+the frontend.
 ## Optional Environment Variables
 
 `api/settings.py` reads the following environment variables at startup. `SECRET_KEY` has no default and must be set. When using Docker Compose, variables in a `.env` file at the project root are automatically loaded. Create this file by copying `.env.example` and replacing the placeholder with a unique value.
@@ -53,15 +37,12 @@ Remove Docker Desktop when relying on WSL-native Docker.
 - `DB_CONNECT_ATTEMPTS` – how many times to retry connecting to the database on
   startup (defaults to `10`).
 - `BROKER_CONNECT_ATTEMPTS` – how many times to retry pinging the Celery broker
-  on startup (defaults to `20`). If the API exits immediately with a log like
-  `Celery broker unreachable after 20 attempts. Is the broker running?` (seen in
-  the `scripts/docker_build.sh` output), increase this value or confirm the
-  worker is healthy.
+  on startup (defaults to `20`). Increase this value if the API exits before the
+  worker is ready.
 - `BROKER_PING_TIMEOUT` – how many seconds the worker entrypoint waits for
   RabbitMQ to respond before exiting (defaults to `60`).
-- `API_HEALTH_TIMEOUT` – how many seconds `docker_build.sh` and
-  `start_containers.sh` wait for the API container to become healthy
-  (defaults to `300`).
+- `API_HEALTH_TIMEOUT` – how many seconds to wait for the API container to
+  become healthy (defaults to `300`).
 - `AUTH_USERNAME` and `AUTH_PASSWORD` – *(deprecated)* previous static credentials.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
  - `SECRET_KEY` – **required** secret used to sign JWT tokens. The application
@@ -135,13 +116,30 @@ started:
 python worker.py
 ```
 
-The React UI ships pre-built in `api/static/`. When the frontend must be rebuilt,
-the helper scripts automatically install or upgrade Node.js 18 if needed.
-Pass `--force-frontend` to the build scripts to trigger a new
-`frontend/dist` directory even when one already exists.
+## Example Usage
 
+### Register and Authenticate
+```bash
+curl -X POST -d 'username=user&password=secret' http://localhost:8000/register
+curl -X POST -d 'username=user&password=secret' http://localhost:8000/token
+```
+Use the returned JWT token as `Authorization: Bearer <token>` for subsequent requests.
 
+### Submit a Job
+```bash
+curl -F 'file=@audio.wav' http://localhost:8000/jobs
+```
 
+### Check Status
+```bash
+curl http://localhost:8000/jobs/<id>
+```
+For real-time updates, connect to `/ws/progress/<id>`.
+
+### Download Transcript
+```bash
+curl -OJ http://localhost:8000/jobs/<id>/download?format=txt
+```
 ### User Registration
 
 Create an account by sending your desired username and password to `/register`.
@@ -291,7 +289,6 @@ displayed all files at once.
 - Toast notifications show the result of actions across all pages.
 - Admins can manage user roles from the Settings page.
 - The worker container's health check uses `pgrep` to ensure a Celery process is running and now runs every 5 minutes.
-- `scripts/healthcheck.sh` checks the API using `VITE_API_HOST` and defaults to `http://localhost:8000` when the variable is not set.
 - The Completed Jobs page provides a search box that filters results using the
   `search` query parameter on `/jobs`.
 - The Transcript Viewer page includes a search field to highlight text and can
@@ -301,7 +298,7 @@ displayed all files at once.
   summary, keywords, detected language and sentiment score.
 - Cleanup options can be toggled and saved from the Admin page.
 - `MODEL_DIR` points to the directory that holds the Whisper `.pt` files. The default is `models/`, ignored by Git. **This directory must contain `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` before you build or start the server. Builds will fail if any file is missing.**
-- `frontend/dist/` is generated by running `npm run build` inside the `frontend` directory. The helper scripts build it automatically.
+- `frontend/dist/` is generated by running `npm run build` inside the `frontend` directory.
 - Uploaded files are stored under `uploads/` while transcripts and metadata are
   written to `transcripts/`. Per-job logs and the system log live in `logs/`.
 When `STORAGE_BACKEND=cloud`, these folders act as a cache and transcript files
@@ -313,7 +310,7 @@ Docker builds require the compiled frontend assets in `frontend/dist/` and the W
 
 ### Downloading Whisper Model Files
 
-Obtain the pretrained weights from the [OpenAI Whisper release](https://github.com/openai/whisper/releases) or the [Hugging Face mirror](https://huggingface.co/openai/whisper-large-v3). Place `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` in `models/`. The helper script `scripts/docker_build.sh` stops immediately if any are missing.
+Obtain the pretrained weights from the [OpenAI Whisper release](https://github.com/openai/whisper/releases) or the [Hugging Face mirror](https://huggingface.co/openai/whisper-large-v3). Place `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` in `models/` before building the image.
 
 Example:
 Build the image with a secret key (using BuildKit secrets is preferred):
@@ -380,16 +377,11 @@ job queue backend.
 
 Prepare `models/` with `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt` before running compose.
 
-Ensure `.env` exists with a valid `SECRET_KEY`. The helper
-`scripts/start_containers.sh` will create this file from `.env.example`
-and generate a key automatically when needed. If you start the stack
-manually, copy `.env.example` to `.env` and replace `CHANGE_ME` with your
-key. Include valid database credentials or a `DB_URL` override so the containers
-can connect to PostgreSQL.
+Ensure `.env` exists with a valid `SECRET_KEY`. Copy `.env.example` to `.env`
+and replace `CHANGE_ME` with your key. Include valid database credentials or a
+`DB_URL` override so the containers can connect to PostgreSQL.
 When building with Docker Compose, write the key to a temporary file and pass it
-using Docker's BuildKit secrets feature (recommended). The helper script
-`scripts/start_containers.sh` now creates `secret_key.txt` automatically so you
-only need to supply the key when invoking it manually:
+using Docker's BuildKit secrets feature (recommended):
 ```bash
 printf "%s" "$SECRET_KEY" > secret_key.txt
 docker compose build --secret id=secret_key,src=secret_key.txt api worker
@@ -443,95 +435,6 @@ docker compose restart
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
 
-Another script `scripts/docker_build.sh` performs a full rebuild or an incremental update. Pass `--full` to prune Docker resources and rebuild the images and stack from scratch. Pass `--incremental` to rebuild only services whose Docker image is missing or whose running container reports an unhealthy status. Both `docker_build.sh` and `update_images.sh` stage Docker images and Python packages before any build step. `prestage_dependencies.sh` clears the `cache/` directory and downloads fresh copies each run so network hiccups do not interrupt the process. The script exits when the host codename does not match the Dockerfile base image codename unless `ALLOW_OS_MISMATCH=1` is set. It also aborts when any downloaded `.deb` archive targets a different architecture than the host. Set the environment variable `SKIP_PRESTAGE=1` or pass `--offline` to skip this step and reuse the existing cache. Offline mode does not download Node.js, so install Node.js 18 beforehand. `update_images.sh` inspects the running containers and rebuilds a service only when its image is missing or the container reports an unhealthy status. These scripts source `scripts/shared_checks.sh` which ensures Whisper models and `ffmpeg` are present, `.env` contains a valid `SECRET_KEY`, and the `uploads`, `transcripts` and `logs` directories exist. It also checks that the configured APT mirrors and the NodeSource repository respond before downloading packages. `docker_build.sh` also verifies that the `whisper-transcriber-api` and `whisper-transcriber-worker` images were created successfully before starting the stack. Once running, access the API at `http://localhost:8000`.
-Pass `--force-frontend` to rebuild the frontend even if `frontend/dist` exists.
-The build scripts store cached packages and Docker images in `/tmp/docker_cache`. You may set the `CACHE_DIR` environment variable to a different path—for example `/mnt/c/whisper_cache`—if you want the cache to persist across WSL resets.
-For auditing purposes the prestage script also writes the wheel filenames to `cache/pip/pip_versions.txt`, captures a frozen requirement list in `cache/pip/requirements.lock`, copies `frontend/package-lock.json` to `cache/npm/`, lists installed Node packages in `cache/npm/npm_versions.txt` and archives the npm cache as `cache/npm/npm-cache.tar`. Pass `--checksum` to create `sha256sums.txt` inside each cache directory and a summary `cache/manifest.txt` referencing their hashes and the base image digest.
-Run `scripts/check_env.sh` before offline builds to verify DNS resolution, confirm cached `.deb` archives match the Dockerfile base image and host architecture and ensure the base image digest in `cache/manifest.txt` matches a fresh pull. The script fails on a mismatch unless `ALLOW_DIGEST_MISMATCH=1` is set. If WSL2 DNS causes timeouts, set `DNS_SERVER=<ip>` or build with `--network=host` so Docker can reach the registry.
-The build helper scripts mirror their output to log files for easier troubleshooting: `logs/start_containers.log`, `logs/docker_build.log`, and `logs/update_images.log`. The container entrypoint also writes to `logs/entrypoint.log` when each service starts. All build logs reside in the `logs/` directory, and each script exits on the first failure to prevent cascading errors.
-
-### Dependency Cache
-
-Set the `CACHE_DIR` environment variable to change where dependencies are
-staged. The default location is `/tmp/docker_cache`. After `prestage_dependencies.sh`
-finishes you may replicate the populated cache somewhere else by passing
-`--rsync <path>`. The script uses `rsync -a` to copy the contents of
-`$CACHE_DIR` to that path.
-
-Offline builds reuse whatever is already in `CACHE_DIR`. Delete the directory or
-run `prestage_dependencies.sh` without `--offline` to refresh everything when
-the base image or requirements change. Generating checksums with `--checksum`
-and validating them via `scripts/check_env.sh` helps detect stale packages.
-
-#### Manifest Verification
-
-When checksums are generated a `cache/manifest.txt` file is created. Each line
-has the form `KEY=value` listing the base image digest, a UTC timestamp and the
-SHA-256 sums of the cache directories and version lists:
-
-```text
-BASE_CODENAME=<codename>
-BASE_DIGEST=<digest>
-TIMESTAMP=<time>
-pip=<hash>
-pip_versions=<hash>
-npm=<hash>
-npm_versions=<hash>
-apt=<hash>
-images=<hash>
-```
-
-Run the prestage script with `--checksum` on another machine and compare the
-resulting manifest. Matching hashes confirm the cached packages are identical,
-ensuring builds reproduce consistently.
-
-## Updating the Application
-
-Before rebuilding containers, update the repository:
-```bash
-git fetch
-git pull
-```
-
-Use `sudo scripts/docker_build.sh --full --force` for a clean rebuild when dependencies, the Dockerfile or compose configuration change or if the environment is out of sync. It prunes Docker resources, installs dependencies and rebuilds all images from scratch. Include `--force-frontend` if the React UI needs rebuilding.
-
-Run `sudo scripts/docker_build.sh --incremental` or `sudo scripts/update_images.sh` after pulling the latest code for routine updates. Include `--force-frontend` when the web assets need a fresh build. In incremental mode the script rebuilds a service only when its Docker image is missing or the running container reports an unhealthy status, then restarts any rebuilt services. It exits early if the required Whisper models or `ffmpeg` are not present.
-If containers fail to start, run `scripts/diagnose_containers.sh` to check their status, exit codes, restart counts and health information. The script verifies Docker is running, prints the `SERVICE_TYPE` and `CELERY_BROKER_URL` variables for each service, shows the last 20 log lines from each container, reports on the `cache/images`, `cache/pip`, `cache/npm` and `cache/apt` directories, and dumps the full contents of any build logs in `logs/`, noting the path when a log is missing.
-
-After using either script, execute `scripts/run_tests.sh` to verify the new build.
-
-## Testing
-
-Tests rely on Docker to provide the required services.
-
-Start the containers with `sudo scripts/start_containers.sh` or `docker compose
-up --build` and run the full suite with:
-
-```bash
-./scripts/run_tests.sh
-```
-
-This script runs the backend tests and verifies the `/health` and `/version`
-endpoints, then executes the frontend unit tests and Cypress end‑to‑end tests.
-Output is saved to
-`logs/full_test.log`.
-
-Pass `--backend`, `--frontend`, or `--cypress` to execute only that portion
-of the suite.
-
-Both `scripts/run_tests.sh` and `scripts/run_backend_tests.sh` check that the `api`
-container is running before executing. If it isn't, they exit with the message
-```
-API container is not running. Start the stack with scripts/start_containers.sh
-```
-
-To invoke just the backend tests manually use the same commands inside the
-running container:
-
-```bash
-docker compose exec api coverage run -m pytest -n auto
-docker compose exec api coverage report
-```
 ## Contributing
 
 Run `black .` before committing changes. When adding features or changing configuration, update both `docs/design_scope.md`, `docs/future_updates.md`, and `README.md` so the documentation stays consistent.

@@ -55,15 +55,16 @@ if [ $mismatch -ne 0 ]; then
     exit 1
 fi
 
-# Check that the cached python:3.11-jammy digest matches the current one
+# Check that the cached base image digest matches the current one
 if command -v docker >/dev/null 2>&1; then
-    docker pull --quiet python:3.11-jammy >/dev/null
-    current_digest=$(docker image inspect python:3.11-jammy --format '{{index .RepoDigests 0}}' | awk -F@ '{print $2}')
-    digest_file="$ROOT_DIR/cache/images/python_3.11_digest.txt"
+    docker pull --quiet "$BASE_IMAGE" >/dev/null
+    current_digest=$(docker image inspect "$BASE_IMAGE" --format '{{index .RepoDigests 0}}' | awk -F@ '{print $2}')
+    sanitized=$(echo "$BASE_IMAGE" | sed 's#[/:]#_#g')
+    digest_file="$ROOT_DIR/cache/images/${sanitized}_digest.txt"
     if [ -f "$digest_file" ]; then
         stored_digest=$(cat "$digest_file")
         if [ "$stored_digest" != "$current_digest" ]; then
-            echo "WARNING: cached python:3.11-jammy digest $stored_digest differs from $current_digest" >&2
+            echo "WARNING: cached $BASE_IMAGE digest $stored_digest differs from $current_digest" >&2
         fi
     else
         echo "WARNING: digest file $digest_file missing" >&2

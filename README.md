@@ -463,6 +463,28 @@ run `prestage_dependencies.sh` without `--offline` to refresh everything when
 the base image or requirements change. Generating checksums with `--checksum`
 and validating them via `scripts/check_env.sh` helps detect stale packages.
 
+#### Manifest Verification
+
+When checksums are generated a `cache/manifest.txt` file is created. Each line
+has the form `KEY=value` listing the base image digest, a UTC timestamp and the
+SHA-256 sums of the cache directories and version lists:
+
+```text
+BASE_CODENAME=<codename>
+BASE_DIGEST=<digest>
+TIMESTAMP=<time>
+pip=<hash>
+pip_versions=<hash>
+npm=<hash>
+npm_versions=<hash>
+apt=<hash>
+images=<hash>
+```
+
+Run the prestage script with `--checksum` on another machine and compare the
+resulting manifest. Matching hashes confirm the cached packages are identical,
+ensuring builds reproduce consistently.
+
 ## Updating the Application
 
 Before rebuilding containers, update the repository:

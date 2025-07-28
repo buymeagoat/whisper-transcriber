@@ -1,6 +1,7 @@
 # Quick Start Guide
 
 Follow these steps to install and run Whisper Transcriber.
+For advanced setup, offline usage, and Docker troubleshooting, refer to README.md.
 
 ## Prerequisites
 - Python 3 and `pip`
@@ -8,6 +9,7 @@ Follow these steps to install and run Whisper Transcriber.
 - `ffmpeg` with `ffprobe`
 - `models/` directory with `base.pt`, `small.pt`, `medium.pt`, `large-v3.pt` and `tiny.pt`
 - Docker and Docker Compose *(optional)*
+- Required directories: `models/`, `frontend/dist/`, `uploads/`, `transcripts/`
 
 ## Docker on WSL
 Follow these steps to install Docker inside the WSL distribution:
@@ -29,12 +31,7 @@ Remove Docker Desktop to avoid conflicts when running WSL-native Docker.
   pip install -r requirements.txt
   ```
 ## Configure the application
-- Copy `.env.example` to `.env` and replace the placeholder value.
-- Generate a secret with:
-  ```bash
-  python -c "import secrets; print(secrets.token_hex(32))"
-  ```
-  Use this value for `SECRET_KEY` in `.env`.
+- Create a `.env` file with at least one entry: `SECRET_KEY=<random-string>`
 
 ## Build and run
 The compiled frontend assets live in `frontend/dist/`, which is not committed. Run `npm run build` in the `frontend` directory or use the helper scripts to generate this folder.
@@ -48,8 +45,16 @@ Run `scripts/check_env.sh` before offline builds to validate DNS, confirm cached
   # or
   docker compose up --build
   ```
+### Docker Quickstart
+- Run `scripts/docker_build.sh` to build the container (may download model files and dependencies).
+- Run `scripts/start_containers.sh` to launch the application.
+- Ensure the `frontend/dist` directory exists (use `npm run build` inside `frontend/`).
+- Set `SKIP_PRESTAGE=1` to bypass cache staging if models and deps are already present.
 
 ## Testing and maintenance
 - Use `scripts/run_tests.sh` to run backend, frontend and Cypress tests.
 - `scripts/start_containers.sh` verifies prerequisites and starts the containers.
 
+### Troubleshooting
+- See `README.md` for how to handle Docker build failures, missing models, and permission issues.
+- For common environment or cache problems, run `scripts/check_env.sh`.

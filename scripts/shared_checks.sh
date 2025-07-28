@@ -3,13 +3,28 @@
 
 # Expect ROOT_DIR to be defined by the caller
 
-# Determine the default cache directory. /tmp/docker_cache is used when
-# CACHE_DIR is not set.
-default_cache_dir() {
-    if [ -n "${CACHE_DIR:-}" ]; then
-        echo "$CACHE_DIR"
+# Set CACHE_DIR appropriately depending on the host environment
+set_cache_dir() {
+    if grep -qi microsoft /proc/version; then
+        if [ "${CACHE_DIR:-}" != "/mnt/wsl/shared/docker_cache" ]; then
+            echo "[WARNING] Detected WSL; overriding CACHE_DIR to /mnt/wsl/shared/docker_cache" >&2
+            CACHE_DIR="/mnt/wsl/shared/docker_cache"
+        fi
     else
-        echo "/tmp/docker_cache"
+        if [ -z "${CACHE_DIR:-}" ]; then
+            CACHE_DIR="/tmp/docker_cache"
+        fi
+    fi
+    export CACHE_DIR
+}
+
+# Determine the default cache directory. /tmp/docker_cache is used when
+# CACHE_DIR is not set. In WSL this function returns the WSL path.
+default_cache_dir() {
+    if grep -qi microsoft /proc/version; then
+        echo "${CACHE_DIR:-/mnt/wsl/shared/docker_cache}"
+    else
+        echo "${CACHE_DIR:-/tmp/docker_cache}"
     fi
 }
 

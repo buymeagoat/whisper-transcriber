@@ -113,6 +113,7 @@ COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 # Determine base image from Dockerfile and extract codename
 BASE_IMAGE=$(grep -m1 '^FROM ' "$ROOT_DIR/Dockerfile" | awk '{print $2}')
 BASE_CODENAME="${BASE_IMAGE##*-}"
+BASE_DIGEST=""
 
 # Read host VERSION_CODENAME
 source /etc/os-release
@@ -139,6 +140,7 @@ for img in "${IMAGES[@]}"; do
     run_cmd docker save "$img" -o "$IMAGES_DIR/$tar_name"
     if [ "$DRY_RUN" != "1" ] && [ "$img" = "$BASE_IMAGE" ]; then
         digest=$(docker image inspect "$img" --format '{{index .RepoDigests 0}}' | awk -F@ '{print $2}')
+        BASE_DIGEST="$digest"
         sanitized=$(echo "$img" | sed 's#[/:]#_#g')
         echo "$digest" > "$ROOT_DIR/cache/images/${sanitized}_digest.txt"
     fi
@@ -224,6 +226,9 @@ if [ "$CHECKSUM" = "1" ]; then
 
     manifest="$CACHE_DIR/manifest.txt"
     echo "BASE_CODENAME=$BASE_CODENAME" > "$manifest"
+    if [ -n "$BASE_DIGEST" ]; then
+        echo "BASE_DIGEST=$BASE_DIGEST" >> "$manifest"
+    fi
     for sub in pip npm apt images; do
         file="$CACHE_DIR/$sub/sha256sums.txt"
         if [ -f "$file" ]; then

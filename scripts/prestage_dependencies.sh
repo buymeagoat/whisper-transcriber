@@ -158,6 +158,16 @@ if [ "$DRY_RUN" != "1" ]; then
     fi
     ls "$CACHE_DIR/pip"/*.whl | xargs -n1 basename | sort > "$CACHE_DIR/pip/pip_versions.txt"
     cp "$CACHE_DIR/pip/pip_versions.txt" "$ROOT_DIR/cache/pip/pip_versions.txt"
+
+    # Freeze resolved dependencies against the built wheels
+    tmpenv=$(mktemp -d)
+    run_cmd python -m venv "$tmpenv"
+    run_cmd "$tmpenv/bin/pip" install --no-index --find-links "$CACHE_DIR/pip" \
+        -r "$ROOT_DIR/requirements.txt" \
+        -r "$ROOT_DIR/requirements-dev.txt"
+    "$tmpenv/bin/pip" freeze | sort > "$CACHE_DIR/pip/requirements.lock"
+    cp "$CACHE_DIR/pip/requirements.lock" "$ROOT_DIR/cache/pip/requirements.lock"
+    run_cmd rm -rf "$tmpenv"
 fi
 
 log_step "NPM"
@@ -167,6 +177,8 @@ run_cmd npm ci --prefix "$ROOT_DIR/frontend" --cache "$CACHE_DIR/npm"
 if [ "$DRY_RUN" != "1" ]; then
     npm ls --prefix "$ROOT_DIR/frontend" --depth=0 > "$CACHE_DIR/npm/npm_versions.txt"
     cp "$CACHE_DIR/npm/npm_versions.txt" "$ROOT_DIR/cache/npm/npm_versions.txt"
+    cp "$ROOT_DIR/frontend/package-lock.json" "$CACHE_DIR/npm/package-lock.json"
+    cp "$ROOT_DIR/frontend/package-lock.json" "$ROOT_DIR/cache/npm/package-lock.json"
     tar -cf "$CACHE_DIR/npm/npm-cache.tar" -C "$CACHE_DIR/npm" .
 fi
 

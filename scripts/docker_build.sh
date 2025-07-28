@@ -29,7 +29,7 @@ secret_file=""
 
 # Remove the temporary secret file on exit or error
 cleanup() {
-    rm -rf "$secret_file_runtime"
+    rm -f "$secret_file_runtime"
     if [ -n "${secret_file:-}" ]; then
         rm -rf "$secret_file"
     fi
@@ -141,13 +141,22 @@ BUILD_CACHE_DIR="$ROOT_DIR/cache/apt"
 mkdir -p "$BUILD_CACHE_DIR"
 rsync -av --delete "$CACHE_DIR/apt/" "$BUILD_CACHE_DIR/"
 
+log_step "FRONTEND"
 # Build frontend assets if missing or forced before verifying cached resources
 if [ "$FORCE_FRONTEND" = true ] || [ ! -d "$ROOT_DIR/frontend/dist" ]; then
     echo "Building frontend assets..."
     (cd "$ROOT_DIR/frontend" && npm run build)
 fi
+if [ ! -f "$ROOT_DIR/frontend/dist/index.html" ]; then
+    echo "[ERROR] Frontend build failed or dist/ missing. Run npm run build inside frontend/" >&2
+    exit 1
+fi
 
 verify_offline_assets
+if ! ls "$ROOT_DIR/cache/pip"/wheel-*.whl >/dev/null 2>&1; then
+    echo "[ERROR] Missing wheel package. Add it to requirements-dev.txt and rerun prestage_dependencies.sh" >&2
+    exit 1
+fi
 
 # Remove existing containers and volumes created by this repository
 docker compose -f "$ROOT_DIR/docker-compose.yml" down -v --remove-orphans || true
@@ -181,7 +190,7 @@ ensure_env_file
 echo "Environment variables:" >&2
 env | sort | grep -v '^SECRET_KEY=' >&2
 if [ -e "$secret_file_runtime" ]; then
-    rm -rf "$secret_file_runtime"
+    rm -f "$secret_file_runtime"
 fi
 printf '%s' "$SECRET_KEY" > "$secret_file_runtime"
 
@@ -197,6 +206,7 @@ if supports_secret; then
     docker build --network=none --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
     rm -f "$secret_file"
 else
+    echo "BuildKit secret not found; falling back to --build-arg for SECRET_KEY"
     docker build --network=none --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
 fi
 
@@ -214,6 +224,7 @@ if supports_secret; then
       --build-arg INSTALL_DEV=true api worker
     rm -f "$secret_file"
 else
+    echo "BuildKit secret not found; falling back to --build-arg for SECRET_KEY"
     docker compose -f "$ROOT_DIR/docker-compose.yml" build \
       --network=none \
       --build-arg SECRET_KEY="$SECRET_KEY" \
@@ -262,5 +273,5 @@ Available test scripts:
 Run the desired script to verify the build.
 If containers encounter issues, use scripts/diagnose_containers.sh for troubleshooting.
 EOF
-rm -rf "$secret_file_runtime"
+rm -f "$secret_file_runtime"
 

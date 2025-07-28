@@ -1,6 +1,7 @@
 pytest
 httpx
 black
+wheel
 pytest-asyncio
 coverage
 pytest-postgresql

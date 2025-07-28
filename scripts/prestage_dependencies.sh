@@ -69,6 +69,9 @@ run_cmd() {
 if [ -z "${CACHE_DIR:-}" ]; then
     CACHE_DIR="/tmp/docker_cache"
 fi
+if grep -qi microsoft /proc/version && [ "$CACHE_DIR" = "/tmp/docker_cache" ]; then
+    echo "[WARNING] WSL + /tmp/docker_cache may fail. Use /mnt/wsl/shared/docker_cache instead." >&2
+fi
 
 export CACHE_DIR
 
@@ -98,10 +101,6 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 # Exit early if the cache directory is not writable
 check_cache_writable
 
-# Always start from a clean cache so staged packages match the
-# current requirements.
-run_cmd rm -rf "$CACHE_DIR"
-
 IMAGES_DIR="$CACHE_DIR/images"
 mkdir -p "$IMAGES_DIR" "$CACHE_DIR/pip" "$CACHE_DIR/npm" "$CACHE_DIR/apt" \
     "$ROOT_DIR/cache/pip" "$ROOT_DIR/cache/npm" "$ROOT_DIR/cache/apt" \
@@ -112,12 +111,18 @@ log_step() {
     echo "===== $1 ====="
 }
 
+# Remove any existing cache before staging new packages
+log_step "CLEAN"
+run_cmd rm -rf "$CACHE_DIR"
+
 
 # Ensure Docker is running and required cache directories exist
 check_docker_running
 check_cache_dirs
 
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
+
+log_step "SETUP"
 
 # Determine base image from Dockerfile and extract codename
 BASE_IMAGE=$(grep -m1 '^FROM ' "$ROOT_DIR/Dockerfile" | awk '{print $2}')
@@ -207,7 +212,7 @@ if ls /var/cache/apt/archives/*.deb >/dev/null 2>&1; then
     for pkg in /var/cache/apt/archives/*.deb; do
         deb=$(basename "$pkg")
         if [[ "$deb" != *"$BASE_CODENAME"* ]]; then
-            echo "Package $deb does not match codename $BASE_CODENAME" >&2
+            echo "[ERROR] APT package $deb does not match Dockerfile codename $BASE_CODENAME" >&2
             mismatch=1
         fi
         pkg_arch=$(dpkg-deb -f "$pkg" Architecture)

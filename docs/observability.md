@@ -24,3 +24,11 @@ Run `pgrep -f uvicorn` to verify the API is running or `curl http://localhost:80
 
 Monitor queue length (`queue_length` metric) and job duration (`job_duration_seconds`). Alerts should fire when the queue continues growing or jobs take unusually long. Disk usage under `uploads/`, `transcripts/` and `logs/` should also be watched.
 
+## Frontend Build Status
+
+The build process now verifies that `frontend/dist/index.html` exists before Docker build starts. If missing, the build aborts with an error.
+
+## Cache Location Warnings
+
+When using WSL, `/tmp/docker_cache` may fail due to permission issues. Consider using `/mnt/wsl/shared/docker_cache` instead.
+

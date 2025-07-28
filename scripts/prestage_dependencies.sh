@@ -118,6 +118,7 @@ BASE_DIGEST=""
 # Read host VERSION_CODENAME
 source /etc/os-release
 HOST_CODENAME="${VERSION_CODENAME:-}"
+HOST_ARCH="$(dpkg --print-architecture)"
 
 # Abort when host codename differs from the Dockerfile base unless overridden
 if [ "${ALLOW_OS_MISMATCH:-}" != "1" ] && [ "$HOST_CODENAME" != "$BASE_CODENAME" ]; then
@@ -198,9 +199,14 @@ if ls /var/cache/apt/archives/*.deb >/dev/null 2>&1; then
             echo "Package $deb does not match codename $BASE_CODENAME" >&2
             mismatch=1
         fi
+        pkg_arch=$(dpkg-deb -f "$pkg" Architecture)
+        if [ "$pkg_arch" != "$HOST_ARCH" ]; then
+            echo "Package $deb architecture $pkg_arch does not match host $HOST_ARCH" >&2
+            mismatch=1
+        fi
     done
     if [ $mismatch -ne 0 ]; then
-        echo "Aborting due to codename mismatch" >&2
+        echo "Aborting due to package mismatch" >&2
         exit 1
     fi
     ls /var/cache/apt/archives/*.deb \

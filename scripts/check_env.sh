@@ -77,11 +77,11 @@ if command -v docker >/dev/null 2>&1; then
         exit 1
     fi
     if [ "$stored_digest" != "$current_digest" ]; then
+        echo "Base image digest mismatch: cached $stored_digest vs $current_digest" >&2
         if [ "${ALLOW_DIGEST_MISMATCH:-0}" != "1" ]; then
-            echo "Base image digest mismatch: cached $stored_digest vs $current_digest" >&2
             exit 1
         else
-            echo "WARNING: base image digest mismatch: cached $stored_digest vs $current_digest" >&2
+            echo "ALLOW_DIGEST_MISMATCH=1 set - continuing despite mismatch" >&2
         fi
     fi
 fi

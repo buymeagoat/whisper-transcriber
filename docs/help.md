@@ -38,7 +38,7 @@ Remove Docker Desktop to avoid conflicts when running WSL-native Docker.
 
 ## Build and run
 The compiled frontend assets live in `frontend/dist/`, which is not committed. Run `npm run build` in the `frontend` directory or use the helper scripts to generate this folder.
-Run `scripts/check_env.sh` before offline builds to validate DNS, confirm cached `.deb` packages align with the `python:3.11-jammy` base image and warn when the cached image digest no longer matches. If Docker fails to resolve registry hosts on WSL2, pass `DNS_SERVER=<ip>` to the build scripts or use `--network=host`.
+Run `scripts/check_env.sh` before offline builds to validate DNS, confirm cached `.deb` packages align with the `python:3.11-jammy` base image and **fail** when the cached image digest no longer matches. Set `ALLOW_DIGEST_MISMATCH=1` to ignore this failure. If Docker fails to resolve registry hosts on WSL2, pass `DNS_SERVER=<ip>` to the build scripts or use `--network=host`.
   ```bash
   uvicorn api.main:app
   ```

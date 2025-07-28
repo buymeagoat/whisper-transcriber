@@ -4,6 +4,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 APT_CACHE="$ROOT_DIR/cache/apt"
+MANIFEST="$ROOT_DIR/cache/manifest.txt"
+
+source "$SCRIPT_DIR/shared_checks.sh"
 
 # Verify DNS resolution for package mirrors
 if ! getent hosts archive.ubuntu.com >/dev/null 2>&1; then
@@ -26,7 +29,34 @@ if [ -z "$BASE_CODENAME" ]; then
     exit 1
 fi
 
+source /etc/os-release
+HOST_CODENAME="${VERSION_CODENAME:-}"
 HOST_ARCH="$(dpkg --print-architecture)"
+
+if [ "${ALLOW_OS_MISMATCH:-}" != "1" ] && [ "$HOST_CODENAME" != "$BASE_CODENAME" ]; then
+    echo "OS codename mismatch: Dockerfile uses '$BASE_CODENAME', host is '$HOST_CODENAME'" >&2
+    exit 1
+fi
+
+# Validate manifest schema and compare base image digest
+if [ ! -f "$MANIFEST" ]; then
+    echo "Manifest $MANIFEST missing" >&2
+    exit 1
+fi
+validate_manifest_schema "$MANIFEST" || echo "Warning: manifest missing expected fields" >&2
+
+stored_digest=$(grep '^BASE_DIGEST=' "$MANIFEST" | cut -d= -f2-)
+if command -v docker >/dev/null 2>&1; then
+    docker pull --quiet "$BASE_IMAGE" >/dev/null
+    current_digest=$(docker image inspect "$BASE_IMAGE" --format '{{index .RepoDigests 0}}' | awk -F@ '{print $2}')
+    if ! check_digest_match "$stored_digest" "$current_digest"; then
+        if [ "${ALLOW_DIGEST_MISMATCH:-0}" != "1" ]; then
+            exit 1
+        else
+            echo "ALLOW_DIGEST_MISMATCH=1 set - continuing despite mismatch" >&2
+        fi
+    fi
+fi
 
 # Ensure cached APT packages correspond to the codename
 if [ ! -d "$APT_CACHE" ]; then
@@ -46,44 +76,19 @@ while read -r deb; do
         echo "Package $deb does not match codename $BASE_CODENAME" >&2
         mismatch=1
     fi
-    pkg_arch=$(dpkg-deb -f "$APT_CACHE/$deb" Architecture)
-    if [ "$pkg_arch" != "$HOST_ARCH" ]; then
-        echo "Package $deb architecture $pkg_arch does not match host $HOST_ARCH" >&2
-        mismatch=1
-    fi
     if [ ! -f "$APT_CACHE/$deb" ]; then
         echo "Missing file $APT_CACHE/$deb" >&2
         mismatch=1
     fi
 done < "$APT_CACHE/deb_list.txt"
 
+if ! check_architecture "$APT_CACHE"; then
+    mismatch=1
+fi
+
 if [ $mismatch -ne 0 ]; then
     echo "Cached packages do not align with $BASE_CODENAME or $HOST_ARCH" >&2
     exit 1
-fi
-
-# Check that the cached base image digest matches the current one
-if command -v docker >/dev/null 2>&1; then
-    docker pull --quiet "$BASE_IMAGE" >/dev/null
-    current_digest=$(docker image inspect "$BASE_IMAGE" --format '{{index .RepoDigests 0}}' | awk -F@ '{print $2}')
-    manifest="$ROOT_DIR/cache/manifest.txt"
-    if [ ! -f "$manifest" ]; then
-        echo "Manifest $manifest missing" >&2
-        exit 1
-    fi
-    stored_digest=$(grep '^BASE_DIGEST=' "$manifest" | cut -d= -f2-)
-    if [ -z "$stored_digest" ]; then
-        echo "BASE_DIGEST not found in $manifest" >&2
-        exit 1
-    fi
-    if [ "$stored_digest" != "$current_digest" ]; then
-        echo "Base image digest mismatch: cached $stored_digest vs $current_digest" >&2
-        if [ "${ALLOW_DIGEST_MISMATCH:-0}" != "1" ]; then
-            exit 1
-        else
-            echo "ALLOW_DIGEST_MISMATCH=1 set - continuing despite mismatch" >&2
-        fi
-    fi
 fi
 
 printf 'Environment OK for codename %s\n' "$BASE_CODENAME"

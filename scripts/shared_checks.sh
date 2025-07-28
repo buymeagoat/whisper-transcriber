@@ -86,6 +86,20 @@ check_internet() {
         && curl -sSf https://registry.npmjs.org >/dev/null 2>&1
 }
 
+# Ensure the configured APT repositories are reachable
+check_apt_sources() {
+    echo "Checking APT repository connectivity..." >&2
+    local urls
+    urls=$(grep -hEo 'https?://[^ ]+' /etc/apt/sources.list /etc/apt/sources.list.d/*.list 2>/dev/null | sort -u || true)
+    urls="$urls https://deb.nodesource.com"
+    for url in $urls; do
+        if ! curl -fsI "$url" >/dev/null 2>&1; then
+            echo "Unable to reach $url" >&2
+            return 1
+        fi
+    done
+}
+
 # Verify Node.js is installed and at least version 18
 check_node_version() {
     if ! command -v node >/dev/null 2>&1; then

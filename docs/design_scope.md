@@ -1,26 +1,19 @@
-# Project Design Overview
+# Developer Architecture Reference
 
 > **Note**
 > OpenAI-generated insights are automated and may contain errors. Always verify the output before relying on it.
 
-This repository implements a self‑contained audio transcription service. A FastAPI backend wraps the OpenAI Whisper command line tool and exposes endpoints for uploading audio, tracking progress, and retrieving transcripts.
+This repository implements a self‑contained audio transcription service. A FastAPI backend orchestrates Whisper jobs and serves a React frontend. This document focuses on system design and build tooling for contributors.
 
 ## Documentation Policy
 
 All contributors—including Codex—must update this document and `README.md` whenever features or configuration change. Keeping both files synchronized ensures the instructions remain accurate.
 
-## Minimum Viable Product
-The application is considered working once these basics are functional:
-- Jobs can be submitted with `/jobs` and processed with the Whisper CLI.
-- Job status can be queried and transcripts downloaded.
-- Metadata is generated and stored alongside transcripts.
-- Alembic migrations run automatically so the database schema is up to date.
-- Logs are written for each job and for overall system activity.
 
-## Architecture
+## System Design
 - **FastAPI entry point**: `api/main.py` bootstraps the web app. It mounts static directories, sets up CORS, and defines all API endpoints.
 - **Database layer**: SQLAlchemy ORM models are defined in `api/models.py` (`jobs` and `metadata` tables). `api/orm_bootstrap.py` runs Alembic migrations and validates the schema on startup.
-- **Job flow**:
+## Job Processing Pipeline
   1. Audio is uploaded via `POST /jobs`. The server stores it under `uploads/` and creates a new `Job` record.
   2. `handle_whisper` spawns the Whisper CLI to generate a `.srt` file under `transcripts/{job_id}`. The job status moves from `queued` → `processing`.
   3. On success the transcript is enriched by `metadata_writer.py`, which creates a JSON metadata file and DB entry. Status becomes `completed`. Failures update the status accordingly and save logs under `logs/`.
@@ -68,6 +61,15 @@ docker build --build-arg SECRET_KEY=<key> -t whisper-app .
 ```
 
 Key environment files include `pyproject.toml`, `requirements.txt`, and the `Dockerfile` used to build a runnable image.
+
+
+## Key Backend Modules
+- `api/main.py` – application entry point. Mounts static files and sets up routes.
+- `api/models.py` – SQLAlchemy ORM models.
+- `api/orm_bootstrap.py` – runs migrations and validates schema on startup.
+- `api/metadata_writer.py` – enriches transcripts with metadata.
+- `api/services` – storage and queue abstractions.
+- `worker.py` – background worker when using the broker queue.
 
 ## Configuration
 
@@ -141,28 +143,7 @@ object used throughout the code base. Available variables are:
 
 This document summarizes the repository layout and how the core FastAPI service orchestrates Whisper transcription jobs.
 
-## Current Functionality
-
-### Frontend
-- React-based single page app built with Vite. The prebuilt files live in
-  `frontend/dist/`, which the Dockerfile copies to `api/static/` for serving.
-- Upload page lets users choose audio files and Whisper model size, then starts jobs and links to a status view.
-- Active, Completed and Failed pages display jobs filtered by status with actions to view logs or restart/remove.
-- Completed Jobs now includes a search box that filters results via the `/jobs` `search` query, matching job IDs, filenames or metadata keywords.
-- Transcript viewer shows the final text in a simple styled page.
-- Admin page lists server files, shows CPU/memory usage and KPIs (completed job count, average job time and queue length), and provides buttons to reset the system or download all data.
-
-### Backend
-- REST endpoints handle job submission, progress checks, downloads and admin operations.
-- `/health` verifies the database connection and returns `{"status": "db_error"}`
-  with a 500 code when the query fails.
-- Whisper runs in a background thread writing transcripts to `transcripts/` and logs to `logs/`.
-- Metadata is extracted from each transcript and persisted to the database.
-- Jobs survive server restarts by being rehydrated on startup if processing was incomplete.
 ## Roadmap
 The future feature roadmap is tracked in [future_updates.md](future_updates.md).
 
 
-
-Cleanup retention can be configured via the `/admin/cleanup-config` endpoint.
-The concurrency limit can be adjusted at runtime using `/admin/concurrency`.

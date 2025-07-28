@@ -73,6 +73,6 @@ This page lists all configurable environment variables.
 | CLEANUP_ENABLED | No | True | api/settings.py | Periodic cleanup of old transcripts |
 | CLEANUP_DAYS | No | 30 | api/settings.py | Days to keep transcripts |
 | CLEANUP_INTERVAL_SECONDS | No | 86400 | api/settings.py | Cleanup task interval |
-| CACHE_DIR | No | /tmp/docker_cache | design_scope.md, scripts/* | Directory for build cache |
+| CACHE_DIR | No | /tmp/docker_cache | design_scope.md, scripts/* | Directory for build cache. In WSL, override with /mnt/wsl/shared/docker_cache for reliability. |
 | SKIP_PRESTAGE | No | 0 | design_scope.md, scripts/* | Skip cache refresh during build |
 

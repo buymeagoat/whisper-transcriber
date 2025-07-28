@@ -16,6 +16,10 @@ developers diagnose problems quickly. Logs are saved under `logs/` and the
 - **Docker build fails offline**
   - *Fix*: Execute `prestage_dependencies.sh` beforehand so cached wheels and
     packages are available.
+- **Whisper install fails with "No matching distribution found for wheel"**
+  - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `prestage_dependencies.sh`.
+- **Cache fails to stage in WSL**
+  - *Fix*: Avoid using `/tmp/docker_cache`. Use `/mnt/wsl/shared/docker_cache` instead.
 
 ## Startup Errors
 
@@ -39,6 +43,8 @@ developers diagnose problems quickly. Logs are saved under `logs/` and the
 - **Blank screen on load**
   - *Fix*: Rebuild the frontend with `npm run build` or pass `--force-frontend`
     to the build script.
+- **Frontend build passes but web UI fails to load**
+  - *Fix*: Check that `frontend/dist/index.html` exists. Run `npm run build` manually if needed.
 
 ## Security Misconfiguration
 

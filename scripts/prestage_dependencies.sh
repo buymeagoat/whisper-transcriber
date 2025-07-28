@@ -170,6 +170,7 @@ if [ "$DRY_RUN" != "1" ]; then
     fi
     ls "$CACHE_DIR/pip"/*.whl | xargs -n1 basename | sort > "$CACHE_DIR/pip/pip_versions.txt"
     cp "$CACHE_DIR/pip/pip_versions.txt" "$ROOT_DIR/cache/pip/pip_versions.txt"
+    cp "$CACHE_DIR/pip/pip_versions.txt" "$ROOT_DIR/cache/pip_versions.txt"
 
     # Freeze resolved dependencies against the built wheels
     tmpenv=$(mktemp -d)
@@ -189,6 +190,7 @@ run_cmd npm ci --prefix "$ROOT_DIR/frontend" --cache "$CACHE_DIR/npm"
 if [ "$DRY_RUN" != "1" ]; then
     npm ls --prefix "$ROOT_DIR/frontend" --depth=0 > "$CACHE_DIR/npm/npm_versions.txt"
     cp "$CACHE_DIR/npm/npm_versions.txt" "$ROOT_DIR/cache/npm/npm_versions.txt"
+    cp "$CACHE_DIR/npm/npm_versions.txt" "$ROOT_DIR/cache/npm_versions.txt"
     cp "$ROOT_DIR/frontend/package-lock.json" "$CACHE_DIR/npm/package-lock.json"
     cp "$ROOT_DIR/frontend/package-lock.json" "$ROOT_DIR/cache/npm/package-lock.json"
     tar -cf "$CACHE_DIR/npm/npm-cache.tar" -C "$CACHE_DIR/npm" .
@@ -244,6 +246,7 @@ if [ "$CHECKSUM" = "1" ]; then
     if [ -n "$BASE_DIGEST" ]; then
         echo "BASE_DIGEST=$BASE_DIGEST" >> "$manifest"
     fi
+    echo "TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$manifest"
     for sub in pip npm apt images; do
         file="$CACHE_DIR/$sub/sha256sums.txt"
         if [ -f "$file" ]; then
@@ -251,6 +254,15 @@ if [ "$CHECKSUM" = "1" ]; then
             echo "$sub=$hash" >> "$manifest"
         fi
     done
+
+    if [ -f "$CACHE_DIR/pip/pip_versions.txt" ]; then
+        hash=$(sha256sum "$CACHE_DIR/pip/pip_versions.txt" | awk '{print $1}')
+        echo "pip_versions=$hash" >> "$manifest"
+    fi
+    if [ -f "$CACHE_DIR/npm/npm_versions.txt" ]; then
+        hash=$(sha256sum "$CACHE_DIR/npm/npm_versions.txt" | awk '{print $1}')
+        echo "npm_versions=$hash" >> "$manifest"
+    fi
 
     cp "$manifest" "$ROOT_DIR/cache/manifest.txt"
 fi

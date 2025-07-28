@@ -18,8 +18,10 @@ developers diagnose problems quickly. Logs are saved under `logs/` and the
     packages are available.
 - **Whisper install fails with "No matching distribution found for wheel"**
   - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `prestage_dependencies.sh`.
-- **Cache fails to stage in WSL**
-  - *Fix*: Avoid using `/tmp/docker_cache`. Use `/mnt/wsl/shared/docker_cache` instead.
+- **WSL cache issues**
+  - *Fix*: When running under WSL the scripts automatically switch `CACHE_DIR`
+    to `/mnt/wsl/shared/docker_cache`. Ensure this shared path exists and
+    rerun `prestage_dependencies.sh` if staging fails.
 
 ## Startup Errors
 

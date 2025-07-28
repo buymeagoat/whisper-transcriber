@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 LOG_LINES="${LOG_LINES:-20}"
+source "$SCRIPT_DIR/shared_checks.sh"
 
 # Ensure the Docker daemon is available before proceeding
 if ! docker info >/dev/null 2>&1; then
@@ -12,10 +13,8 @@ if ! docker info >/dev/null 2>&1; then
     exit 1
 fi
 
-# Set CACHE_DIR if not already defined
-if [ -z "${CACHE_DIR:-}" ]; then
-    CACHE_DIR="/tmp/docker_cache"
-fi
+# Initialize CACHE_DIR for this environment
+set_cache_dir
 
 echo "Container status:"
 # Display container status including health information

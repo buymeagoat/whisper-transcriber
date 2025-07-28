@@ -20,3 +20,11 @@ The table below summarizes the helper scripts found under `/scripts`.
 | `update_images.sh` | Incremental rebuild of API and worker images | `--force-frontend` `--offline` | `sudo scripts/update_images.sh --offline` | Skips container restart when images are healthy |
 | `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
 
+## Environment-Sensitive Cache Pathing
+
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+in the shared location.
+

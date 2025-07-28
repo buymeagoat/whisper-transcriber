@@ -5,6 +5,7 @@ trap 'echo "prestage_dependencies.sh failed near line $LINENO" >&2' ERR
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
+set_cache_dir
 
 # Parse options
 DRY_RUN="${DRY_RUN:-0}"
@@ -65,15 +66,7 @@ run_cmd() {
     fi
 }
 
-# Default cache directory when not set
-if [ -z "${CACHE_DIR:-}" ]; then
-    CACHE_DIR="/tmp/docker_cache"
-fi
-if grep -qi microsoft /proc/version && [ "$CACHE_DIR" = "/tmp/docker_cache" ]; then
-    echo "[WARNING] WSL + /tmp/docker_cache may fail. Use /mnt/wsl/shared/docker_cache instead." >&2
-fi
-
-export CACHE_DIR
+# CACHE_DIR already initialized by set_cache_dir in shared_checks.sh
 
 if [ "$VERIFY_ONLY" = "1" ]; then
     verify_offline_assets

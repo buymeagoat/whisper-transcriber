@@ -9,13 +9,9 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-
-# Set CACHE_DIR to a sensible default when unset
-if [ -z "${CACHE_DIR:-}" ]; then
-    CACHE_DIR="/tmp/docker_cache"
-fi
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 source "$SCRIPT_DIR/shared_checks.sh"
+set_cache_dir
 
 LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/update_images.log"

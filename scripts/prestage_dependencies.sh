@@ -45,6 +45,7 @@ if [ "$VERIFY_ONLY" != "1" ]; then
         echo "Network unreachable. Connect before running or use offline assets." >&2
         exit 1
     fi
+    check_apt_sources
 fi
 
 # Execute a command unless DRY_RUN is enabled

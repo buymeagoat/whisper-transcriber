@@ -450,6 +450,19 @@ For auditing purposes the prestage script also writes the wheel filenames to `ca
 Run `scripts/check_env.sh` before offline builds to verify DNS resolution, confirm cached `.deb` archives match the Dockerfile base image and host architecture and ensure the base image digest in `cache/manifest.txt` matches a fresh pull. The script fails on a mismatch unless `ALLOW_DIGEST_MISMATCH=1` is set. If WSL2 DNS causes timeouts, set `DNS_SERVER=<ip>` or build with `--network=host` so Docker can reach the registry.
 The build helper scripts mirror their output to log files for easier troubleshooting: `logs/start_containers.log`, `logs/docker_build.log`, and `logs/update_images.log`. The container entrypoint also writes to `logs/entrypoint.log` when each service starts. All build logs reside in the `logs/` directory, and each script exits on the first failure to prevent cascading errors.
 
+### Dependency Cache
+
+Set the `CACHE_DIR` environment variable to change where dependencies are
+staged. The default location is `/tmp/docker_cache`. After `prestage_dependencies.sh`
+finishes you may replicate the populated cache somewhere else by passing
+`--rsync <path>`. The script uses `rsync -a` to copy the contents of
+`$CACHE_DIR` to that path.
+
+Offline builds reuse whatever is already in `CACHE_DIR`. Delete the directory or
+run `prestage_dependencies.sh` without `--offline` to refresh everything when
+the base image or requirements change. Generating checksums with `--checksum`
+and validating them via `scripts/check_env.sh` helps detect stale packages.
+
 ## Updating the Application
 
 Before rebuilding containers, update the repository:

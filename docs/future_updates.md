@@ -324,3 +324,9 @@ This document organizes upcoming features for Whisper Transcriber. Items are gro
 - **Summary**: `prestage_dependencies.sh` accepts `--checksum` to write per-directory manifests and a top-level `cache/manifest.txt` with their hashes.
 - **Motivation**: Provides an audit trail for staged images and packages.
 
+### Mirroring the Cache
+- **Summary**: `prestage_dependencies.sh` accepts `--rsync <path>` to copy the
+  populated cache directory after staging.
+- **Motivation**: Allows sharing cached packages between machines or preserving
+  them across environment resets.
+

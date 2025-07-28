@@ -10,6 +10,7 @@ source "$SCRIPT_DIR/shared_checks.sh"
 DRY_RUN="${DRY_RUN:-0}"
 CHECKSUM="0"
 VERIFY_ONLY="0"
+RSYNC_DEST=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --dry-run)
@@ -24,8 +25,16 @@ while [[ $# -gt 0 ]]; do
             VERIFY_ONLY="1"
             shift
             ;;
+        --rsync)
+            if [ $# -lt 2 ]; then
+                echo "--rsync requires a destination path" >&2
+                exit 1
+            fi
+            RSYNC_DEST="$2"
+            shift 2
+            ;;
         -h|--help)
-            echo "Usage: $(basename "$0") [--dry-run] [--checksum] [--verify-only]" >&2
+            echo "Usage: $(basename "$0") [--dry-run] [--checksum] [--verify-only] [--rsync <path>]" >&2
             exit 0
             ;;
         *)
@@ -244,5 +253,11 @@ if [ "$CHECKSUM" = "1" ]; then
     done
 
     cp "$manifest" "$ROOT_DIR/cache/manifest.txt"
+fi
+
+if [ -n "$RSYNC_DEST" ]; then
+    echo "Syncing cache to $RSYNC_DEST"
+    mkdir -p "$RSYNC_DEST"
+    run_cmd rsync -a "$CACHE_DIR/" "$RSYNC_DEST/"
 fi
 

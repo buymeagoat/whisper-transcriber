@@ -37,11 +37,13 @@
 | --- | --- | --- |
 | [log_reference.md](log_reference.md) | Log file locations and meaning | Dev, Ops |
 | [observability.md](observability.md) | Health checks and monitoring | Dev, Ops |
+| [file_retention.md](file_retention.md) | File and log cleanup policy | Dev, Ops |
 
 ## 📚 Reference
 | File | Scope/Purpose | Audience |
 | --- | --- | --- |
 | [environment.md](environment.md) | Supported environment variables | Dev, Ops |
 | [api_reference.md](api_reference.md) | HTTP endpoint details | Dev |
+| [faq.md](faq.md) | Common questions and answers | Users, Dev |
 | [upgrade.md](upgrade.md) | How to upgrade versions | Admins, Dev |
 | [CHANGELOG.md](CHANGELOG.md) | Release history | Users, Dev |

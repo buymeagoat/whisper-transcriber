@@ -6,6 +6,7 @@ This document organizes upcoming features for Whisper Transcriber. Items are gro
 - **Open** – prioritized but not yet started.
 - **On Hold** – work paused pending other dependencies.
 - **Partial** – partially implemented; more work remains.
+- **Completed** – finished items kept for reference.
 
 ## Open
 

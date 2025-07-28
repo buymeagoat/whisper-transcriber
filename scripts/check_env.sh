@@ -26,6 +26,8 @@ if [ -z "$BASE_CODENAME" ]; then
     exit 1
 fi
 
+HOST_ARCH="$(dpkg --print-architecture)"
+
 # Ensure cached APT packages correspond to the codename
 if [ ! -d "$APT_CACHE" ]; then
     echo "APT cache directory $APT_CACHE missing" >&2
@@ -44,6 +46,11 @@ while read -r deb; do
         echo "Package $deb does not match codename $BASE_CODENAME" >&2
         mismatch=1
     fi
+    pkg_arch=$(dpkg-deb -f "$APT_CACHE/$deb" Architecture)
+    if [ "$pkg_arch" != "$HOST_ARCH" ]; then
+        echo "Package $deb architecture $pkg_arch does not match host $HOST_ARCH" >&2
+        mismatch=1
+    fi
     if [ ! -f "$APT_CACHE/$deb" ]; then
         echo "Missing file $APT_CACHE/$deb" >&2
         mismatch=1
@@ -51,7 +58,7 @@ while read -r deb; do
 done < "$APT_CACHE/deb_list.txt"
 
 if [ $mismatch -ne 0 ]; then
-    echo "Cached packages do not align with $BASE_CODENAME" >&2
+    echo "Cached packages do not align with $BASE_CODENAME or $HOST_ARCH" >&2
     exit 1
 fi
 

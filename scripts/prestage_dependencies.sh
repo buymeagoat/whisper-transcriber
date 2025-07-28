@@ -118,12 +118,10 @@ BASE_CODENAME="${BASE_IMAGE##*-}"
 source /etc/os-release
 HOST_CODENAME="${VERSION_CODENAME:-}"
 
-# Abort when either codename differs from jammy unless overridden
-if [ "${ALLOW_OS_MISMATCH:-}" != "1" ]; then
-    if [ "$BASE_CODENAME" != "jammy" ] || [ "$HOST_CODENAME" != "jammy" ]; then
-        echo "OS codename mismatch: Dockerfile uses '$BASE_CODENAME', host is '$HOST_CODENAME'. Set ALLOW_OS_MISMATCH=1 to bypass." >&2
-        exit 1
-    fi
+# Abort when host codename differs from the Dockerfile base unless overridden
+if [ "${ALLOW_OS_MISMATCH:-}" != "1" ] && [ "$HOST_CODENAME" != "$BASE_CODENAME" ]; then
+    echo "OS codename mismatch: Dockerfile uses '$BASE_CODENAME', host is '$HOST_CODENAME'. Set ALLOW_OS_MISMATCH=1 to bypass." >&2
+    exit 1
 fi
 
 # Gather images used by docker-compose services
@@ -139,9 +137,10 @@ for img in "${IMAGES[@]}"; do
     run_cmd docker pull "$img"
     tar_name=$(echo "$img" | sed 's#[/:]#_#g').tar
     run_cmd docker save "$img" -o "$IMAGES_DIR/$tar_name"
-    if [ "$DRY_RUN" != "1" ] && [ "$img" = "python:3.11-jammy" ]; then
+    if [ "$DRY_RUN" != "1" ] && [ "$img" = "$BASE_IMAGE" ]; then
         digest=$(docker image inspect "$img" --format '{{index .RepoDigests 0}}' | awk -F@ '{print $2}')
-        echo "$digest" > "$ROOT_DIR/cache/images/python_3.11_digest.txt"
+        sanitized=$(echo "$img" | sed 's#[/:]#_#g')
+        echo "$digest" > "$ROOT_DIR/cache/images/${sanitized}_digest.txt"
     fi
 done
 

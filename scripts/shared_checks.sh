@@ -5,10 +5,12 @@
 
 # Set CACHE_DIR appropriately depending on the host environment
 set_cache_dir() {
+    CACHE_OVERRIDE_WARNING=0
     if grep -qi microsoft /proc/version; then
         if [ "${CACHE_DIR:-}" != "/mnt/wsl/shared/docker_cache" ]; then
             echo "[WARNING] Detected WSL; overriding CACHE_DIR to /mnt/wsl/shared/docker_cache" >&2
             CACHE_DIR="/mnt/wsl/shared/docker_cache"
+            CACHE_OVERRIDE_WARNING=1
         fi
     else
         if [ -z "${CACHE_DIR:-}" ]; then
@@ -16,6 +18,7 @@ set_cache_dir() {
         fi
     fi
     export CACHE_DIR
+    export CACHE_OVERRIDE_WARNING
 }
 
 # Determine the default cache directory. /tmp/docker_cache is used when

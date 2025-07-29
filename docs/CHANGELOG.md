@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2025-09-02
+### Added
+- Modular build switches for `whisper_build.sh` (`--update`, `--frontend-only`, `--validate-only`, `--docker-cleanup`).
+### Changed
+- Documentation updated to explain switch groups and targeted builds.
+
 ## [1.0.2] - 2025-08-15
 ### Removed
 - Legacy scripts `docker_build.sh` and `prestage_dependencies.sh` in favour of `whisper_build.sh`.

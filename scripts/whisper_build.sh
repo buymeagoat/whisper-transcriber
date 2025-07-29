@@ -11,7 +11,7 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
-set_cache_dir
+set_cache_dir  # Codex: cache override for WSL hosts
 "$SCRIPT_DIR/check_env.sh"
 
 LOG_DIR="$ROOT_DIR/logs"
@@ -192,7 +192,7 @@ EOM
 
 if $VERIFY_SOURCES; then
     log_step "VERIFY SOURCES"
-    check_download_sources
+    check_download_sources  # Codex: network connectivity test for package mirrors
 fi
 
 if [ "$MODE" = "full" ]; then
@@ -200,7 +200,7 @@ if [ "$MODE" = "full" ]; then
     download_dependencies
 else
     log_step "OFFLINE VERIFY"
-    verify_cache_integrity
+    verify_cache_integrity  # Codex: offline mode validates cached assets
 fi
 
 docker_build

@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-08-06
+### Changed
+- Consolidated build commands into `whisper_build.sh` and updated documentation.
+### Added
+- `[build-system]` reference and troubleshooting guidance for each build flag.
+### Rationale
+- Provides a single entrypoint for building and ensures future patches record changes here.
+
 ## [1.0.0] - 2025-07-28
 ### Added
 - Build helper scripts with offline support and environment validation

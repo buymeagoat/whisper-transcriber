@@ -57,10 +57,7 @@ trap cleanup EXIT
 MODE="full"
 PURGE_CACHE=false
 VERIFY_SOURCES=false
-
-usage() {
-    print_help
-}
+# Codex: removed legacy usage() helper
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -81,12 +78,12 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -h|--help)
-            usage
+            print_help
             exit 0
             ;;
         *)
             echo "Unknown option: $1" >&2
-            usage >&2
+            print_help >&2
             exit 1
             ;;
     esac

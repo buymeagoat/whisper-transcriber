@@ -3,6 +3,27 @@ set -euo pipefail
 
 # Codex: unified build entrypoint
 
+print_help() {
+    cat <<EOF
+Usage: $(basename "$0") [--full|--offline] [--purge-cache] [--verify-sources]
+
+--full            Full online build (default)
+--offline         Require all assets to be pre-cached
+--purge-cache     Remove CACHE_DIR before staging dependencies
+--verify-sources  Test connectivity to package mirrors and registry
+--help            Show this help message
+EOF
+}
+
+for arg in "$@"; do
+    case "$arg" in
+        -h|--help)
+            print_help
+            exit 0
+            ;;
+    esac
+done  # Codex: help guard
+
 echo "[NOTICE] Legacy build helpers removed. Use this script directly." >&2  # Codex:
 
 if [[ $EUID -ne 0 ]]; then
@@ -38,15 +59,7 @@ PURGE_CACHE=false
 VERIFY_SOURCES=false
 
 usage() {
-    cat <<EOF
-Usage: $(basename "$0") [--full|--offline] [--purge-cache] [--verify-sources]
-
---full            Full online build (default)
---offline         Require all assets to be pre-cached
---purge-cache     Remove CACHE_DIR before staging dependencies
---verify-sources  Test connectivity to package mirrors and registry
---help            Show this help message
-EOF
+    print_help
 }
 
 while [[ $# -gt 0 ]]; do

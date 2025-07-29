@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4@sha256:9ba7531bd80fb0a858632727cf7a112fbfd19b17e94c4e84ced81e24ef1a0dbc
-FROM python:3.11-jammy
+FROM python:3.11-bookworm  # Codex: base image update
 
 # Install dev requirements when building test images
 ARG INSTALL_DEV=false

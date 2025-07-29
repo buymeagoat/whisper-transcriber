@@ -10,9 +10,12 @@ developers diagnose problems quickly. Logs are saved under `logs/` and the
   - *Cause*: `cache/apt` is missing or does not match the Dockerfile base image.
   - *Fix*: Run `scripts/whisper_build.sh --purge-cache` or confirm the base image
     digest is correct.
+- **Docker build fails due to invalid base image**
+  - *Cause*: The `FROM` tag in the Dockerfile references an image that cannot be pulled.
+  - *Fix*: Update the base image to a valid tag like `python:3.11-bookworm` and run `docker pull` to verify.
 - **`--network=host` not supported in Docker Compose**
   - *Cause*: Passing unsupported flags to the compose CLI.
-- *Fix*: Remove the flag or avoid Compose when unsupported.
+  - *Fix*: Remove the flag or avoid Compose when unsupported.
 - **Docker build fails offline**
   - *Fix*: Execute `whisper_build.sh --offline` after staging dependencies so cached wheels and packages are available.
 - **Cache is outdated or missing**

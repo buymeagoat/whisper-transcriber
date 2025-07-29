@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2025-08-15
+### Removed
+- Legacy scripts `docker_build.sh` and `prestage_dependencies.sh` in favour of `whisper_build.sh`.
+### Changed
+- Documentation references updated to designate `whisper_build.sh` as the sole build entrypoint.
+### Rationale
+- Consolidates build logic into a single script to reduce confusion and maintenance burden.
+
 ## [1.0.1] - 2025-08-06
 ### Changed
 - Consolidated build commands into `whisper_build.sh` and updated documentation.

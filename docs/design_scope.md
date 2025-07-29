@@ -29,7 +29,7 @@ All contributors—including Codex—must update this document and `README.md` w
   to `api/static/` for the UI.
 - `scripts/` – helper utilities for Docker builds, testing and container management.
   - `whisper_build.sh` – unified script that stages dependencies, builds Docker images and starts the compose stack. Pass `--offline` to rely solely on cached assets, `--purge-cache` to clear cached packages before downloading and `--verify-sources` to test remote mirrors. Output is saved to `logs/whisper_build.log`.
-  - `docker_build.sh`, `start_containers.sh`, `update_images.sh` and `prestage_dependencies.sh` – deprecated wrappers that now redirect to `whisper_build.sh`.
+  - `start_containers.sh` and `update_images.sh` wrap `whisper_build.sh` to rebuild images and restart the stack.
 - The build scripts store cached packages and Docker images under `/tmp/docker_cache`. Set `CACHE_DIR` to another location—for example `/mnt/c/whisper_cache`—if you need the cache to survive WSL resets. Use `whisper_build.sh --full` to refresh the cache and copy it elsewhere if desired.
 - All build helpers automatically install or upgrade Node.js 18 using the NodeSource repository when needed.
 - `run_backend_tests.sh` – runs backend tests and verifies the `/health` and `/version` endpoints, logging output to `logs/test.log`.

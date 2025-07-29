@@ -15,12 +15,16 @@ developers diagnose problems quickly. Logs are saved under `logs/` and the
 - *Fix*: Remove the flag or avoid Compose when unsupported.
 - **Docker build fails offline**
   - *Fix*: Execute `whisper_build.sh --offline` after staging dependencies so cached wheels and packages are available.
+- **Cache is outdated or missing**
+  - *Fix*: Run `whisper_build.sh --full` to download fresh dependencies and rebuild images.
 - **Whisper install fails with "No matching distribution found for wheel"**
   - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `whisper_build.sh --purge-cache`.
 - **WSL cache issues**
   - *Fix*: When running under WSL the scripts automatically switch `CACHE_DIR`
     to `/mnt/wsl/shared/docker_cache`. Ensure this shared path exists and
     rerun `whisper_build.sh --purge-cache` if staging fails.<!-- # Codex: warns user when WSL override triggers -->
+- **Unable to reach package mirrors**
+  - *Fix*: Use `whisper_build.sh --verify-sources` to confirm network connectivity before running a full build.
 
 ## Startup Errors
 

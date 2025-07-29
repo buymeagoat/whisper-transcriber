@@ -1,5 +1,7 @@
 # Documentation Index
 
+The unified build system is documented under [whisper_build.sh][build-system].
+
 ## Getting Started
 | File | Scope/Purpose | Audience |
 | --- | --- | --- |
@@ -47,3 +49,5 @@
 | [faq.md](faq.md) | Common questions and answers | Users, Dev |
 | [upgrade.md](upgrade.md) | How to upgrade versions | Admins, Dev |
 | [CHANGELOG.md](CHANGELOG.md) | Release history | Users, Dev |
+
+[build-system]: scripts_reference.md#whisper_build.sh

@@ -4,6 +4,8 @@
 
 Self-hosted transcription service with a FastAPI backend and a React frontend. It wraps the OpenAI Whisper CLI so you can upload audio, monitor progress and retrieve transcripts.
 
+All Docker builds now use `scripts/whisper_build.sh`. Previous helper scripts were removed.<!-- # Codex: build entrypoint clarified -->
+
 For a step-by-step setup guide, see [docs/help.md](docs/help.md).
 
 ## Requirements & Installation

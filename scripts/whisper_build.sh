@@ -3,6 +3,8 @@ set -euo pipefail
 
 # Codex: unified build entrypoint
 
+echo "[NOTICE] Legacy build helpers removed. Use this script directly." >&2  # Codex:
+
 if [[ $EUID -ne 0 ]]; then
     echo "Run with sudo to download apt packages" >&2
     exit 1

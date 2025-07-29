@@ -5,12 +5,16 @@ set -euo pipefail
 
 print_help() {
     cat <<EOF
-Usage: $(basename "$0") [--full|--offline] [--purge-cache] [--verify-sources]
+Usage: $(basename "$0") [--full|--offline|--update|--frontend-only|--validate-only] [--purge-cache] [--verify-sources] [--docker-cleanup]
 
 --full            Full online build (default)
 --offline         Require all assets to be pre-cached
+--update          Incrementally refresh dependencies and rebuild
+--frontend-only   Rebuild only frontend assets and containers
+--validate-only   Run validation checks only, no build
 --purge-cache     Remove CACHE_DIR before staging dependencies
 --verify-sources  Test connectivity to package mirrors and registry
+--docker-cleanup  Remove unused Docker images and builders
 --help            Show this help message
 EOF
 }
@@ -57,6 +61,8 @@ trap cleanup EXIT
 MODE="full"
 PURGE_CACHE=false
 VERIFY_SOURCES=false
+# Codex: new mode flags
+DOCKER_CLEANUP=false
 # Codex: removed legacy usage() helper
 
 while [[ $# -gt 0 ]]; do
@@ -67,6 +73,22 @@ while [[ $# -gt 0 ]]; do
             ;;
         --offline)
             MODE="offline"
+            shift
+            ;;
+        --update)  # Codex: update switch
+            MODE="update"
+            shift
+            ;;
+        --frontend-only)  # Codex: frontend-only switch
+            MODE="frontend_only"
+            shift
+            ;;
+        --validate-only)  # Codex: validate-only switch
+            MODE="validate_only"
+            shift
+            ;;
+        --docker-cleanup)  # Codex: docker-cleanup switch
+            DOCKER_CLEANUP=true
             shift
             ;;
         --purge-cache)
@@ -111,6 +133,59 @@ download_dependencies() {
     stage_build_dependencies
 }
 
+# Codex: build helper for frontend-only mode
+docker_build_frontend() {
+    log_step "FRONTEND"
+    echo "Building frontend assets..."
+    (cd "$ROOT_DIR/frontend" && npm run build)
+    if [ ! -f "$ROOT_DIR/frontend/dist/index.html" ]; then
+        echo "[ERROR] Frontend build failed or dist/ missing" >&2
+        exit 1
+    fi
+
+    docker compose -f "$ROOT_DIR/docker-compose.yml" down -v --remove-orphans || true
+
+    ensure_env_file
+    printf '%s' "$SECRET_KEY" > "$secret_file_runtime"
+
+    log_step "BUILD"
+    if supports_secret; then
+        secret_file=$(mktemp)
+        printf '%s' "$SECRET_KEY" > "$secret_file"
+        docker build --network=none --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
+        docker compose -f "$ROOT_DIR/docker-compose.yml" build --secret id=secret_key,src="$secret_file" --network=none api worker
+        rm -f "$secret_file"
+    else
+        docker build --network=none --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
+        docker compose -f "$ROOT_DIR/docker-compose.yml" build --network=none --build-arg SECRET_KEY="$SECRET_KEY" api worker
+    fi
+
+    log_step "STARTUP"
+    docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
+    echo "Frontend containers rebuilt."
+}
+
+# Codex: validation mode helper
+run_validations() {
+    if $VERIFY_SOURCES; then
+        log_step "VERIFY SOURCES"
+        check_download_sources
+    fi
+    if [ "${SKIP_CACHE_CHECKS:-false}" != "true" ]; then
+        verify_cache_integrity
+    fi
+    check_whisper_models
+    check_ffmpeg
+    ensure_env_file
+    echo "Validation successful."
+}
+
+# Codex: docker cleanup helper
+docker_cleanup() {
+    docker image prune -f
+    docker builder prune -f
+}
+
 docker_build() {
     log_step "FRONTEND"
     if [ ! -d "$ROOT_DIR/frontend/dist" ]; then
@@ -122,7 +197,9 @@ docker_build() {
         exit 1
     fi
 
-    verify_cache_integrity
+    if [ "${SKIP_CACHE_CHECKS:-false}" != "true" ]; then
+        verify_cache_integrity
+    fi
 
     docker compose -f "$ROOT_DIR/docker-compose.yml" down -v --remove-orphans || true
 
@@ -207,14 +284,40 @@ if $VERIFY_SOURCES; then
     check_download_sources  # Codex: network connectivity test for package mirrors
 fi
 
-if [ "$MODE" = "full" ]; then
-    log_step "STAGING"
-    download_dependencies
-else
-    log_step "OFFLINE VERIFY"
-    verify_cache_integrity  # Codex: offline mode validates cached assets
-fi
+case "$MODE" in
+    full)
+        log_step "STAGING"
+        download_dependencies
+        docker_build
+        ;;
+    offline)
+        log_step "OFFLINE VERIFY"
+        verify_cache_integrity  # Codex: offline mode validates cached assets
+        docker_build
+        ;;
+    update) # Codex: update workflow
+        log_step "UPDATE"
+        download_dependencies
+        docker_build
+        ;;
+    frontend_only) # Codex: frontend-only workflow
+        log_step "FRONTEND ONLY"
+        download_dependencies
+        SKIP_CACHE_CHECKS=true docker_build_frontend
+        ;;
+    validate_only) # Codex: validate-only workflow
+        log_step "VALIDATION"
+        SKIP_CACHE_CHECKS=true run_validations
+        rm -f "$secret_file_runtime"
+        [ "$DOCKER_CLEANUP" = true ] && docker_cleanup
+        exit 0
+        ;;
+    *)
+        echo "Unknown MODE $MODE" >&2
+        exit 1
+        ;;
+esac
 
-docker_build
 rm -f "$secret_file_runtime"
+[ "$DOCKER_CLEANUP" = true ] && docker_cleanup
 

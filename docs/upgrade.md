@@ -12,7 +12,7 @@ Follow the steps in [backup_and_recovery.md](backup_and_recovery.md) to archive 
 
 ## Validate Models and Dependencies
 
-After pulling a new version, run `scripts/prestage_dependencies.sh` to refresh cached packages and verify Whisper models are present. If the cache is already populated and you are offline, set `SKIP_PRESTAGE=1`.
+After pulling a new version, run `scripts/whisper_build.sh --purge-cache` to refresh cached packages and verify Whisper models are present. If the cache is already populated and you are offline, use `--offline`.
 
 ## Database Migrations
 
@@ -24,7 +24,7 @@ from the project root or allow `uvicorn` to run migrations automatically on star
 
 ## Post-upgrade Steps
 
-1. Rebuild images with `scripts/docker_build.sh --full` or `scripts/update_images.sh`.
+1. Rebuild images with `scripts/whisper_build.sh --purge-cache`.
 2. Re-run `scripts/run_tests.sh` to ensure all tests pass.
-3. Restart the Docker Compose stack with `scripts/start_containers.sh`.
+3. Restart the Docker Compose stack using `scripts/whisper_build.sh`.
 

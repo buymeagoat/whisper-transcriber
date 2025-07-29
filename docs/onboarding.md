@@ -23,7 +23,7 @@ This page helps new contributors get a working environment quickly.
 3. Copy `.env.example` to `.env` and set `SECRET_KEY`.
 4. Start the stack in Docker:
    ```bash
-   sudo scripts/start_containers.sh
+   sudo scripts/whisper_build.sh
    ```
 
 ## Setup Checklist

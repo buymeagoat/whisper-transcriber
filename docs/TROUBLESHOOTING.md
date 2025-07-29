@@ -21,7 +21,7 @@ developers diagnose problems quickly. Logs are saved under `logs/` and the
 - **WSL cache issues**
   - *Fix*: When running under WSL the scripts automatically switch `CACHE_DIR`
     to `/mnt/wsl/shared/docker_cache`. Ensure this shared path exists and
-    rerun `prestage_dependencies.sh` if staging fails.
+    rerun `prestage_dependencies.sh` if staging fails.<!-- # Codex: warns user when WSL override triggers -->
 
 ## Startup Errors
 

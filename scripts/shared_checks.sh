@@ -4,11 +4,12 @@
 # Expect ROOT_DIR to be defined by the caller
 
 # Set CACHE_DIR appropriately depending on the host environment
+# Codex-verified: automatic override to shared path when running under WSL
 set_cache_dir() {
     CACHE_OVERRIDE_WARNING=0
     if grep -qi microsoft /proc/version; then
         if [ "${CACHE_DIR:-}" != "/mnt/wsl/shared/docker_cache" ]; then
-            echo "[WARNING] Detected WSL; overriding CACHE_DIR to /mnt/wsl/shared/docker_cache" >&2
+            echo "[WARNING] Detected WSL; overriding CACHE_DIR to /mnt/wsl/shared/docker_cache" >&2 # Codex:
             CACHE_DIR="/mnt/wsl/shared/docker_cache"
             CACHE_OVERRIDE_WARNING=1
         fi
@@ -25,9 +26,9 @@ set_cache_dir() {
 # CACHE_DIR is not set. In WSL this function returns the WSL path.
 default_cache_dir() {
     if grep -qi microsoft /proc/version; then
-        echo "${CACHE_DIR:-/mnt/wsl/shared/docker_cache}"
+        echo "${CACHE_DIR:-/mnt/wsl/shared/docker_cache}" # Codex:
     else
-        echo "${CACHE_DIR:-/tmp/docker_cache}"
+        echo "${CACHE_DIR:-/tmp/docker_cache}" # Codex:
     fi
 }
 

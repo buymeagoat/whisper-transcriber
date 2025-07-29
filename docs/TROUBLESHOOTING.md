@@ -8,20 +8,19 @@ developers diagnose problems quickly. Logs are saved under `logs/` and the
 
 - **Docker build fails at `dpkg -i /tmp/apt/*.deb`**
   - *Cause*: `cache/apt` is missing or does not match the Dockerfile base image.
-  - *Fix*: Run `scripts/prestage_dependencies.sh` or confirm the base image
+  - *Fix*: Run `scripts/whisper_build.sh --purge-cache` or confirm the base image
     digest is correct.
 - **`--network=host` not supported in Docker Compose**
   - *Cause*: Passing unsupported flags to the compose CLI.
 - *Fix*: Remove the flag or avoid Compose when unsupported.
 - **Docker build fails offline**
-  - *Fix*: Execute `prestage_dependencies.sh` beforehand so cached wheels and
-    packages are available.
+  - *Fix*: Execute `whisper_build.sh --offline` after staging dependencies so cached wheels and packages are available.
 - **Whisper install fails with "No matching distribution found for wheel"**
-  - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `prestage_dependencies.sh`.
+  - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `whisper_build.sh --purge-cache`.
 - **WSL cache issues**
   - *Fix*: When running under WSL the scripts automatically switch `CACHE_DIR`
     to `/mnt/wsl/shared/docker_cache`. Ensure this shared path exists and
-    rerun `prestage_dependencies.sh` if staging fails.<!-- # Codex: warns user when WSL override triggers -->
+    rerun `whisper_build.sh --purge-cache` if staging fails.<!-- # Codex: warns user when WSL override triggers -->
 
 ## Startup Errors
 

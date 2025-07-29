@@ -25,10 +25,10 @@ The table below summarizes the helper scripts found under `/scripts`.
 `whisper_build.sh` now supports targeted builds. Switches are organised into three categories:
 
 **Full**
-- `--full` – build all images and start the stack from scratch.
+- `--full` – build all images from scratch. Docker reuses cached layers when possible.
 
 **Partial**
-- `--update` – rebuild changed components only.
+- `--update` – refresh dependencies and rebuild images using Docker cache.
 - `--frontend-only` – build just the React UI.
 - `--validate-only` – run checks without building images.
 

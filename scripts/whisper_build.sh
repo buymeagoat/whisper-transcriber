@@ -287,16 +287,19 @@ fi
 case "$MODE" in
     full)
         log_step "STAGING"
+        echo "Performing full rebuild using Docker cache. All images will be rebuilt." >&2
         download_dependencies
         docker_build
         ;;
     offline)
         log_step "OFFLINE VERIFY"
+        echo "Performing full rebuild using only cached assets." >&2
         verify_cache_integrity  # Codex: offline mode validates cached assets
         docker_build
         ;;
     update) # Codex: update workflow
         log_step "UPDATE"
+        echo "Refreshing dependencies and rebuilding images using Docker cache." >&2
         download_dependencies
         docker_build
         ;;

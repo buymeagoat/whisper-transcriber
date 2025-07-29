@@ -1,6 +1,6 @@
 # Documentation Index
 
-The unified build system is documented under [whisper_build.sh][build-system].
+The unified build system now supports targeted builds and is documented under [whisper_build.sh][build-system].
 
 ## Getting Started
 | File | Scope/Purpose | Audience |

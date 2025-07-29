@@ -10,7 +10,7 @@ The table below summarizes the helper scripts found under `/scripts`.
 | `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
 | `check_cache_env.sh` | Displays how CACHE_DIR resolves on the current host | `CI` | `scripts/check_cache_env.sh` | Helps verify WSL overrides |
 | `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
-| `whisper_build.sh` | Unified build and startup script | `--full` `--offline` `--purge-cache` `--verify-sources` `--help` | `sudo scripts/whisper_build.sh` | Logs to `logs/whisper_build.log`; sets `CACHE_DIR` automatically under WSL |
+| `whisper_build.sh` | Unified build and startup script | `--full` `--update` `--frontend-only` `--validate-only` `--offline` `--purge-cache` `--docker-cleanup` `--verify-sources` `--help` | `sudo scripts/whisper_build.sh` | Logs to `logs/whisper_build.log`; sets `CACHE_DIR` automatically under WSL |
 | `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
 | `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
 | `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
@@ -19,6 +19,25 @@ The table below summarizes the helper scripts found under `/scripts`.
 | `start_containers.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/start_containers.sh` | Redirects to new script |
 | `update_images.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/update_images.sh` | Redirects to new script |
 | `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+
+## Build Switch Groups
+
+`whisper_build.sh` now supports targeted builds. Switches are organised into three categories:
+
+**Full**
+- `--full` – build all images and start the stack from scratch.
+
+**Partial**
+- `--update` – rebuild changed components only.
+- `--frontend-only` – build just the React UI.
+- `--validate-only` – run checks without building images.
+
+**Utility**
+- `--offline` – skip network access when assets exist locally.
+- `--purge-cache` – remove cached layers before building.
+- `--docker-cleanup` – prune unused Docker resources.
+- `--verify-sources` – validate base image digests.
+- `--help` – display the usage summary.
 
 ## Environment-Sensitive Cache Pathing
 

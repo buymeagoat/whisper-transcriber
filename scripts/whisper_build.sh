@@ -10,7 +10,7 @@ Usage: $(basename "$0") [--full|--offline|--update|--frontend-only|--validate-on
 --full            Full online build (default)
 --offline         Require all assets to be pre-cached
 --update          Incrementally refresh dependencies and rebuild
---frontend-only   Rebuild only frontend assets and containers
+--frontend-only   Build frontend assets only
 --validate-only   Run validation checks only, no build
 --purge-cache     Remove CACHE_DIR before staging dependencies
 --verify-sources  Test connectivity to package mirrors and registry
@@ -45,7 +45,8 @@ LOG_FILE="$LOG_DIR/whisper_build.log"
 mkdir -p "$LOG_DIR"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-"$SCRIPT_DIR/check_env.sh"
+# Codex: ensure check_env.sh output is logged
+bash "$SCRIPT_DIR/check_env.sh" >> "$LOG_FILE" 2>&1
 
 secret_file_runtime="$ROOT_DIR/secret_key.txt"
 secret_file=""
@@ -72,7 +73,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --full)
             if $MODE_SET; then
-                echo "Only one mode flag may be specified" >&2
+                echo "Conflicting switches detected. Only one build mode can be used at a time." >&2
                 exit 1
             fi
             MODE="full"
@@ -81,7 +82,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --offline)
             if $MODE_SET; then
-                echo "Only one mode flag may be specified" >&2
+                echo "Conflicting switches detected. Only one build mode can be used at a time." >&2
                 exit 1
             fi
             MODE="offline"
@@ -90,7 +91,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --update)  # Codex: update switch
             if $MODE_SET; then
-                echo "Only one mode flag may be specified" >&2
+                echo "Conflicting switches detected. Only one build mode can be used at a time." >&2
                 exit 1
             fi
             MODE="update"
@@ -99,7 +100,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --frontend-only)  # Codex: frontend-only switch
             if $MODE_SET; then
-                echo "Only one mode flag may be specified" >&2
+                echo "Conflicting switches detected. Only one build mode can be used at a time." >&2
                 exit 1
             fi
             MODE="frontend_only"
@@ -108,7 +109,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --validate-only)  # Codex: validate-only switch
             if $MODE_SET; then
-                echo "Only one mode flag may be specified" >&2
+                echo "Conflicting switches detected. Only one build mode can be used at a time." >&2
                 exit 1
             fi
             MODE="validate_only"
@@ -164,33 +165,13 @@ download_dependencies() {
 # Codex: build helper for frontend-only mode
 docker_build_frontend() {
     log_step "FRONTEND"
-    echo "Building frontend assets..."
+    echo "Building frontend assets only (--frontend-only)"
     (cd "$ROOT_DIR/frontend" && npm run build)
     if [ ! -f "$ROOT_DIR/frontend/dist/index.html" ]; then
         echo "[ERROR] Frontend build failed or dist/ missing" >&2
         exit 1
     fi
-
-    docker compose -f "$ROOT_DIR/docker-compose.yml" down -v --remove-orphans || true
-
-    ensure_env_file
-    printf '%s' "$SECRET_KEY" > "$secret_file_runtime"
-
-    log_step "BUILD"
-    if supports_secret; then
-        secret_file=$(mktemp)
-        printf '%s' "$SECRET_KEY" > "$secret_file"
-        docker build --network=none --secret id=secret_key,src="$secret_file" -t whisper-app "$ROOT_DIR"
-        docker compose -f "$ROOT_DIR/docker-compose.yml" build --secret id=secret_key,src="$secret_file" --network=none api worker
-        rm -f "$secret_file"
-    else
-        docker build --network=none --build-arg SECRET_KEY="$SECRET_KEY" -t whisper-app "$ROOT_DIR"
-        docker compose -f "$ROOT_DIR/docker-compose.yml" build --network=none --build-arg SECRET_KEY="$SECRET_KEY" api worker
-    fi
-
-    log_step "STARTUP"
-    docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
-    echo "Frontend containers rebuilt."
+    echo "Frontend assets built under frontend/dist"
 }
 
 # Codex: validation mode helper
@@ -211,8 +192,37 @@ run_validations() {
 # Codex: docker cleanup helper
 docker_cleanup() {
     log_step "CLEANUP"
+    echo "Cleaning up unused Docker images (--docker-cleanup)"
     docker image prune -f
     docker builder prune -f
+}
+
+# Codex: incremental rebuild helper
+docker_build_update() {
+    log_step "UPDATE"
+    echo "Performing incremental build (--update)"
+    download_dependencies
+    local hash_file="$LOG_DIR/.update_hash"
+    local current_hash
+    current_hash=$(sha1sum "$ROOT_DIR/Dockerfile" \
+        "$ROOT_DIR/requirements.txt" \
+        "$ROOT_DIR/requirements-dev.txt" \
+        "$ROOT_DIR/frontend/package.json" \
+        "$ROOT_DIR/frontend/package-lock.json" 2>/dev/null | sha1sum | awk '{print $1}')
+    local rebuild=false
+    if [ ! -f "$hash_file" ] || [ "$(cat "$hash_file" 2>/dev/null)" != "$current_hash" ]; then
+        rebuild=true
+        echo "$current_hash" > "$hash_file"
+    fi
+    if ! docker image inspect whisper-app >/dev/null 2>&1; then
+        rebuild=true
+    fi
+    if $rebuild; then
+        docker_build
+    else
+        echo "No dependency changes detected. Skipping Docker rebuild."
+        docker compose -f "$ROOT_DIR/docker-compose.yml" up -d api worker broker db
+    fi
 }
 
 docker_build() {
@@ -327,15 +337,13 @@ case "$MODE" in
         docker_build
         ;;
     update) # Codex: update workflow
-        log_step "UPDATE"
-        echo "Refreshing dependencies and rebuilding images using Docker cache." >&2
-        download_dependencies
-        docker_build
+        docker_build_update
         ;;
     frontend_only) # Codex: frontend-only workflow
         log_step "FRONTEND ONLY"
-        download_dependencies
-        SKIP_CACHE_CHECKS=true docker_build_frontend
+        install_node18
+        (cd "$ROOT_DIR/frontend" && npm install)
+        docker_build_frontend
         ;;
     validate_only) # Codex: validate-only workflow
         log_step "VALIDATION"

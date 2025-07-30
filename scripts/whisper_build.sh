@@ -58,7 +58,9 @@ cleanup() {
 trap 'echo "[ERROR] whisper_build.sh failed near line $LINENO. Check $LOG_FILE for details." >&2; cleanup' ERR
 trap cleanup EXIT
 
+# Track selected mode. Only one mode flag may be provided
 MODE="full"
+MODE_SET=false
 PURGE_CACHE=false
 VERIFY_SOURCES=false
 # Codex: new mode flags
@@ -68,23 +70,48 @@ DOCKER_CLEANUP=false
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --full)
+            if $MODE_SET; then
+                echo "Only one mode flag may be specified" >&2
+                exit 1
+            fi
             MODE="full"
+            MODE_SET=true
             shift
             ;;
         --offline)
+            if $MODE_SET; then
+                echo "Only one mode flag may be specified" >&2
+                exit 1
+            fi
             MODE="offline"
+            MODE_SET=true
             shift
             ;;
         --update)  # Codex: update switch
+            if $MODE_SET; then
+                echo "Only one mode flag may be specified" >&2
+                exit 1
+            fi
             MODE="update"
+            MODE_SET=true
             shift
             ;;
         --frontend-only)  # Codex: frontend-only switch
+            if $MODE_SET; then
+                echo "Only one mode flag may be specified" >&2
+                exit 1
+            fi
             MODE="frontend_only"
+            MODE_SET=true
             shift
             ;;
         --validate-only)  # Codex: validate-only switch
+            if $MODE_SET; then
+                echo "Only one mode flag may be specified" >&2
+                exit 1
+            fi
             MODE="validate_only"
+            MODE_SET=true
             shift
             ;;
         --docker-cleanup)  # Codex: docker-cleanup switch

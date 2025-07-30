@@ -9,6 +9,8 @@ This repository implements a self‑contained audio transcription service. A Fas
 
 All contributors—including Codex—must update this document and `README.md` whenever features or configuration change. Keeping both files synchronized ensures the instructions remain accurate.
 
+## Codex Analyst GPT Integration
+Repository state is inspected and patched through Codex Analyst GPT (CAG) prompts. CAG retrieves file lists and contents on demand and returns diffs that are applied automatically. Patch histories are stored under `docs/patch_logs/`.
 
 ## System Design
 - **FastAPI entry point**: `api/main.py` bootstraps the web app. It mounts static directories, sets up CORS, and defines all API endpoints.

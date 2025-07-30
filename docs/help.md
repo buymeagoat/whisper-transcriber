@@ -27,3 +27,5 @@ docker compose up --build
 ```
 
 See [README.md](../README.md) for troubleshooting, offline setup and Docker details. The [design_scope.md](design_scope.md) document outlines how the system works under the hood.
+
+Codex Analyst GPT (CAG) drives repository audits and patch creation. CAG fetches file lists and contents through prompt-driven commands and returns the diffs to apply, so no manual scripts are needed.

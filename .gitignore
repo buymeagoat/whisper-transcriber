@@ -87,3 +87,15 @@ logs/
 models/
 tests/assets/
 scripts/test_cache_access.sh
+
+# Ignore contents of key runtime directories, but keep the folders themselves
+cache/*
+!cache/.gitkeep
+logs/*
+!logs/.gitkeep
+models/*
+!models/.gitkeep
+transcripts/*
+!transcripts/.gitkeep
+uploads/*
+!uploads/.gitkeep

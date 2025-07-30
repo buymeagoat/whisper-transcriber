@@ -86,3 +86,4 @@ logs/
 *.rej
 models/
 tests/assets/
+scripts/test_cache_access.sh

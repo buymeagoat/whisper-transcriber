@@ -29,7 +29,7 @@ The table below summarizes the helper scripts found under `/scripts`.
 
 **Partial**
 - `--update` – refresh dependencies and rebuild images using Docker cache.
-- `--frontend-only` – build just the React UI.
+- `--frontend-only` – rebuilds the React UI and refreshes the API/worker images.
 - `--validate-only` – run checks without building images.
 
 **Utility**

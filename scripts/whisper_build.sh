@@ -182,6 +182,7 @@ run_validations() {
 
 # Codex: docker cleanup helper
 docker_cleanup() {
+    log_step "CLEANUP"
     docker image prune -f
     docker builder prune -f
 }

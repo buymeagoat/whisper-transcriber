@@ -1,0 +1,445 @@
+==PROMPT==
+=====TASK=====
+Fix `whisper_build.sh` to properly handle `--help` by printing usage info and exiting before running any build logic. Also update the base Docker image from `python:3.11-jammy` to a valid, available image.
+
+=====CONSTRAINTS=====
+- Add a `print_help()` function at the top of `whisper_build.sh`
+- When `--help` is passed, print help text and exit immediately (before WSL override or Docker pull logic runs)
+- Replace `python:3.11-jammy` with `python:3.11-bookworm` or another valid tag
+- Test image validity with `docker pull <image>` in script or during development
+- Add `# Codex:` annotations where the help guard and image change are applied
+- Update `scripts_reference.md` to reflect any changes in supported switches or image behavior
+- Log an error in `TROUBLESHOOTING.md` for invalid Docker base image failures
+
+=====OBJECTIVE=====
+Prevent unintended execution on `--help` and ensure the Docker base image used is valid and pullable. Maintain documentation and Codex traceability.
+
+=====SCOPE=====
+- scripts/whisper_build.sh
+- scripts_reference.md
+- docs/TROUBLESHOOTING.md
+
+=====OUTPUT FORMAT=====
+- ✅ Help text added to script
+- ✅ Base image updated
+- ✅ Doc entries updated
+- ✅ Codex markers applied
+
+👉 Use **Ask Codex** to apply this patch.
+
+==Codex Response==
+
+Summary
+
+Added an early help check in the build script so that running with “--help” prints usage information and exits immediately
+
+Updated the Docker base image to a valid tag, ensuring builds pull from “python:3.11-bookworm”
+
+Documented the new “--help” switch in the scripts reference table
+
+Included troubleshooting guidance for failures caused by an invalid Docker base image tag
+
+Testing
+
+✅ black .
+
+❌ scripts/run_tests.sh (failed to execute because docker was not found)
+
+Network access
+
+Some requests were blocked due to network access restrictions. Consider granting access in environment settings.
+
+mise-versions.jdx.dev
+
+
+Files (4)
+
+Dockerfile
++1
+-1
+
+docs/TROUBLESHOOTING.md
++4
+-1
+
+docs/scripts_reference.md
++1
+-1
+
+scripts/whisper_build.sh
++22
+-9
+Dockerfile
++1
+-1
+
+# syntax=docker/dockerfile:1.4@sha256:9ba7531bd80fb0a858632727cf7a112fbfd19b17e94c4e84ced81e24ef1a0dbc
+# syntax=docker/dockerfile:1.4@sha256:9ba7531bd80fb0a858632727cf7a112fbfd19b17e94c4e84ced81e24ef1a0dbc
+FROM python:3.11-jammy
+FROM python:3.11-bookworm  # Codex: base image update
+
+
+# Install dev requirements when building test images
+# Install dev requirements when building test images
+ARG INSTALL_DEV=false
+ARG INSTALL_DEV=false
+
+
+# Secret used for model validation during build
+# Secret used for model validation during build
+ARG SECRET_KEY
+ARG SECRET_KEY
+
+
+COPY cache/apt /tmp/apt
+COPY cache/apt /tmp/apt
+RUN apt-get update || (cat /etc/resolv.conf && ping -c 3 deb.debian.org && exit 1) && \
+RUN apt-get update || (cat /etc/resolv.conf && ping -c 3 deb.debian.org && exit 1) && \
+    apt-get install -y --no-install-recommends ./tmp/apt/*.deb && \
+    apt-get install -y --no-install-recommends ./tmp/apt/*.deb && \
+    rm -rf /tmp/apt && \
+    rm -rf /tmp/apt && \
+    apt-get clean && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
+
+
+# Create a non-root user to run Celery workers
+# Create a non-root user to run Celery workers
+RUN groupadd -g 1000 appuser && \
+RUN groupadd -g 1000 appuser && \
+    useradd -m -u 1000 -g appuser appuser
+    useradd -m -u 1000 -g appuser appuser
+
+
+RUN mkdir -p /app && chown -R appuser:appuser /app
+RUN mkdir -p /app && chown -R appuser:appuser /app
+
+
+WORKDIR /app
+WORKDIR /app
+ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app
+COPY requirements.txt .
+COPY requirements.txt .
+COPY requirements-dev.txt .
+COPY requirements-dev.txt .
+COPY alembic.ini .
+COPY alembic.ini .
+docs/TROUBLESHOOTING.md
++4
+-1
+
+# Troubleshooting Guide
+# Troubleshooting Guide
+
+
+This page collects common errors and their resolutions to help users and
+This page collects common errors and their resolutions to help users and
+developers diagnose problems quickly. Logs are saved under `logs/` and the
+developers diagnose problems quickly. Logs are saved under `logs/` and the
+`scripts/diagnose_containers.sh` script prints container status and build logs.
+`scripts/diagnose_containers.sh` script prints container status and build logs.
+
+
+## Build Failures
+## Build Failures
+
+
+- **Docker build fails at `dpkg -i /tmp/apt/*.deb`**
+- **Docker build fails at `dpkg -i /tmp/apt/*.deb`**
+  - *Cause*: `cache/apt` is missing or does not match the Dockerfile base image.
+  - *Cause*: `cache/apt` is missing or does not match the Dockerfile base image.
+  - *Fix*: Run `scripts/whisper_build.sh --purge-cache` or confirm the base image
+  - *Fix*: Run `scripts/whisper_build.sh --purge-cache` or confirm the base image
+    digest is correct.
+    digest is correct.
+- **Docker build fails due to invalid base image**
+  - *Cause*: The `FROM` tag in the Dockerfile references an image that cannot be pulled.
+  - *Fix*: Update the base image to a valid tag like `python:3.11-bookworm` and run `docker pull` to verify.
+- **`--network=host` not supported in Docker Compose**
+- **`--network=host` not supported in Docker Compose**
+  - *Cause*: Passing unsupported flags to the compose CLI.
+  - *Cause*: Passing unsupported flags to the compose CLI.
+- *Fix*: Remove the flag or avoid Compose when unsupported.
+  - *Fix*: Remove the flag or avoid Compose when unsupported.
+- **Docker build fails offline**
+- **Docker build fails offline**
+  - *Fix*: Execute `whisper_build.sh --offline` after staging dependencies so cached wheels and packages are available.
+  - *Fix*: Execute `whisper_build.sh --offline` after staging dependencies so cached wheels and packages are available.
+- **Cache is outdated or missing**
+- **Cache is outdated or missing**
+  - *Fix*: Run `whisper_build.sh --full` to download fresh dependencies and rebuild images.
+  - *Fix*: Run `whisper_build.sh --full` to download fresh dependencies and rebuild images.
+- **Whisper install fails with "No matching distribution found for wheel"**
+- **Whisper install fails with "No matching distribution found for wheel"**
+  - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `whisper_build.sh --purge-cache`.
+  - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `whisper_build.sh --purge-cache`.
+- **WSL cache issues**
+- **WSL cache issues**
+  - *Fix*: When running under WSL the scripts automatically switch `CACHE_DIR`
+  - *Fix*: When running under WSL the scripts automatically switch `CACHE_DIR`
+    to `/mnt/wsl/shared/docker_cache`. Ensure this shared path exists and
+    to `/mnt/wsl/shared/docker_cache`. Ensure this shared path exists and
+    rerun `whisper_build.sh --purge-cache` if staging fails.<!-- # Codex: warns user when WSL override triggers -->
+    rerun `whisper_build.sh --purge-cache` if staging fails.<!-- # Codex: warns user when WSL override triggers -->
+- **Unable to reach package mirrors**
+- **Unable to reach package mirrors**
+  - *Fix*: Use `whisper_build.sh --verify-sources` to confirm network connectivity before running a full build.
+  - *Fix*: Use `whisper_build.sh --verify-sources` to confirm network connectivity before running a full build.
+
+
+## Startup Errors
+## Startup Errors
+
+
+- **Application exits due to missing `SECRET_KEY`**
+- **Application exits due to missing `SECRET_KEY`**
+  - *Fix*: Generate a key and set it in `.env` or pass it via the helper script.
+  - *Fix*: Generate a key and set it in `.env` or pass it via the helper script.
+- **API fails to connect to the database**
+- **API fails to connect to the database**
+  - *Fix*: Check `DB_URL`, wait for the database container to start and
+  - *Fix*: Check `DB_URL`, wait for the database container to start and
+    increase connection retries if needed.
+    increase connection retries if needed.
+
+
+## Job Failures
+## Job Failures
+
+
+- **Jobs stuck in queued or processing**
+- **Jobs stuck in queued or processing**
+  - *Fix*: Inspect worker logs and container health. Rebuild containers with
+  - *Fix*: Inspect worker logs and container health. Rebuild containers with
+docs/scripts_reference.md
++1
+-1
+
+# Scripts Reference
+# Scripts Reference
+
+
+👤 Target Audience: Developers
+👤 Target Audience: Developers
+
+
+The table below summarizes the helper scripts found under `/scripts`.
+The table below summarizes the helper scripts found under `/scripts`.
+
+
+| Script | Description | Flags / Env Vars | Example | Notes |
+| Script | Description | Flags / Env Vars | Example | Notes |
+| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `check_cache_env.sh` | Displays how CACHE_DIR resolves on the current host | `CI` | `scripts/check_cache_env.sh` | Helps verify WSL overrides |
+| `check_cache_env.sh` | Displays how CACHE_DIR resolves on the current host | `CI` | `scripts/check_cache_env.sh` | Helps verify WSL overrides |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `whisper_build.sh` | Unified build and startup script | `--full` `--offline` `--purge-cache` `--verify-sources` | `sudo scripts/whisper_build.sh` | Logs to `logs/whisper_build.log`; sets `CACHE_DIR` automatically under WSL |
+| `whisper_build.sh` | Unified build and startup script | `--full` `--offline` `--purge-cache` `--verify-sources` `--help` | `sudo scripts/whisper_build.sh` | Logs to `logs/whisper_build.log`; sets `CACHE_DIR` automatically under WSL |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `start_containers.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/start_containers.sh` | Redirects to new script |
+| `start_containers.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/start_containers.sh` | Redirects to new script |
+| `update_images.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/update_images.sh` | Redirects to new script |
+| `update_images.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/update_images.sh` | Redirects to new script |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+
+
+## Environment-Sensitive Cache Pathing
+## Environment-Sensitive Cache Pathing
+
+
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+in the shared location.<!-- # Codex-verified: CACHE_DIR documentation matches set_cache_dir -->
+in the shared location.<!-- # Codex-verified: CACHE_DIR documentation matches set_cache_dir -->
+
+
+scripts/whisper_build.sh
++22
+-9
+
+#!/usr/bin/env bash
+#!/usr/bin/env bash
+set -euo pipefail
+set -euo pipefail
+
+
+# Codex: unified build entrypoint
+# Codex: unified build entrypoint
+
+
+print_help() {
+    cat <<EOF
+Usage: $(basename "$0") [--full|--offline] [--purge-cache] [--verify-sources]
+
+--full            Full online build (default)
+--offline         Require all assets to be pre-cached
+--purge-cache     Remove CACHE_DIR before staging dependencies
+--verify-sources  Test connectivity to package mirrors and registry
+--help            Show this help message
+EOF
+}
+
+for arg in "$@"; do
+    case "$arg" in
+        -h|--help)
+            print_help
+            exit 0
+            ;;
+    esac
+done  # Codex: help guard
+
+echo "[NOTICE] Legacy build helpers removed. Use this script directly." >&2  # Codex:
+echo "[NOTICE] Legacy build helpers removed. Use this script directly." >&2  # Codex:
+
+
+if [[ $EUID -ne 0 ]]; then
+if [[ $EUID -ne 0 ]]; then
+    echo "Run with sudo to download apt packages" >&2
+    echo "Run with sudo to download apt packages" >&2
+    exit 1
+    exit 1
+fi
+fi
+
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/shared_checks.sh"
+source "$SCRIPT_DIR/shared_checks.sh"
+set_cache_dir  # Codex: cache override for WSL hosts
+set_cache_dir  # Codex: cache override for WSL hosts
+"$SCRIPT_DIR/check_env.sh"
+"$SCRIPT_DIR/check_env.sh"
+
+
+LOG_DIR="$ROOT_DIR/logs"
+LOG_DIR="$ROOT_DIR/logs"
+LOG_FILE="$LOG_DIR/whisper_build.log"
+LOG_FILE="$LOG_DIR/whisper_build.log"
+mkdir -p "$LOG_DIR"
+mkdir -p "$LOG_DIR"
+exec > >(tee -a "$LOG_FILE") 2>&1
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+
+secret_file_runtime="$ROOT_DIR/secret_key.txt"
+secret_file_runtime="$ROOT_DIR/secret_key.txt"
+secret_file=""
+secret_file=""
+
+
+cleanup() {
+cleanup() {
+    rm -f "$secret_file_runtime"
+    rm -f "$secret_file_runtime"
+    if [ -n "${secret_file:-}" ]; then
+    if [ -n "${secret_file:-}" ]; then
+        rm -rf "$secret_file"
+        rm -rf "$secret_file"
+    fi
+    fi
+}
+}
+trap 'echo "[ERROR] whisper_build.sh failed near line $LINENO. Check $LOG_FILE for details." >&2; cleanup' ERR
+trap 'echo "[ERROR] whisper_build.sh failed near line $LINENO. Check $LOG_FILE for details." >&2; cleanup' ERR
+trap cleanup EXIT
+trap cleanup EXIT
+
+
+MODE="full"
+MODE="full"
+PURGE_CACHE=false
+PURGE_CACHE=false
+VERIFY_SOURCES=false
+VERIFY_SOURCES=false
+
+
+usage() {
+usage() {
+    cat <<EOF
+    print_help
+Usage: $(basename "$0") [--full|--offline] [--purge-cache] [--verify-sources]
+
+--full            Full online build (default)
+--offline         Require all assets to be pre-cached
+--purge-cache     Remove CACHE_DIR before staging dependencies
+--verify-sources  Test connectivity to package mirrors and registry
+--help            Show this help message
+EOF
+}
+}
+
+
+while [[ $# -gt 0 ]]; do
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+    case "$1" in
+        --full)
+        --full)
+            MODE="full"
+            MODE="full"
+            shift
+            shift
+            ;;
+            ;;
+        --offline)
+        --offline)
+            MODE="offline"
+            MODE="offline"
+            shift
+            shift
+            ;;
+            ;;
+        --purge-cache)
+        --purge-cache)
+            PURGE_CACHE=true
+            PURGE_CACHE=true
+            shift
+            shift
+            ;;
+            ;;
+        --verify-sources)
+        --verify-sources)
+            VERIFY_SOURCES=true
+            VERIFY_SOURCES=true
+            shift
+            shift
+            ;;
+            ;;
+        -h|--help)
+        -h|--help)
+            usage
+            usage
+            exit 0
+            exit 0
+            ;;
+            ;;
+        *)
+        *)

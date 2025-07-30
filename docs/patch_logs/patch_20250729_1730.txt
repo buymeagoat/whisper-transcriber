@@ -1,0 +1,97 @@
+=====Prompt
+=====TASK=====
+Audit the logic inside `whisper_build.sh` to ensure that every documented switch:
+  - Has a corresponding logic block
+  - Follows the intended behavior for that switch
+  - Logs its status and execution path
+  - Fails gracefully if prerequisites are missing
+  - Matches the help text and documentation descriptions
+
+=====CONSTRAINTS=====
+- The script must correctly support:
+  - --full (default): full online build
+  - --offline: build only from pre-cached assets
+  - --update: refresh dependencies and conditionally rebuild
+  - --frontend-only: build only frontend Docker layers
+  - --validate-only: run validation and exit
+  - --docker-cleanup: remove stale Docker layers
+  - --purge-cache: delete cache before staging
+  - --verify-sources: test connectivity to mirrors
+  - --help: show help and exit
+
+- All cases must:
+  - Print clear log messages indicating the mode selected
+  - Avoid unintentional overlap between modes
+  - Exit with non-zero code on failure
+  - Honor CACHE_DIR and WSL detection
+
+=====OBJECTIVE=====
+Validate that `whisper_build.sh` is internally consistent, correctly maps switches to actions, and adheres to all declared behavior in documentation.
+
+=====SCOPE=====
+- scripts/whisper_build.sh
+
+=====OUTPUT FORMAT=====
+- ✅ Report per switch: Present? Implemented? Safe? Logged?
+- ✅ Note missing, inconsistent, or unlogged behaviors
+- ✅ Recommend patches if required
+
+👉 Use **Ask Codex** to run this audit.
+
+=====Codex Response
+
+whisper_build.sh switch audit
+
+Switch	Present?	Implemented?	Logged?	Notes
+--full	✅	Executes download_dependencies then docker_build for a complete build	✅ uses log_step "STAGING"	Behavior matches documentation.
+--offline	✅	Runs verify_cache_integrity before invoking docker_build	✅ logs OFFLINE VERIFY	Calls verify_cache_integrity again inside docker_build (duplicate). Relies on Node being preinstalled.
+--update	✅	Same flow as --full (downloads and builds all)	✅ logs UPDATE	Docs describe “rebuild changed components only”, but script does not implement incremental behavior.
+--frontend-only	✅	Runs full image build including API/worker via docker_build_frontend	✅ logs FRONTEND ONLY	Documentation states “build just the React UI” but implementation still rebuilds backend layers.
+--validate-only	✅	Calls run_validations and exits early	✅ logs VALIDATION	Behavior matches docs.
+--docker-cleanup	✅	Prunes Docker images/builders when flag set	⚠️ No log output for cleanup action	Consider adding log_step "CLEANUP" for visibility.
+--purge-cache	✅	Deletes $CACHE_DIR before staging deps	✅ prints “Purging cache at ...”	Works as documented.
+--verify-sources	✅	Runs connectivity tests via check_download_sources before build or validation	✅ logs VERIFY SOURCES	Matches docs.
+--help	✅	Displays help text and exits early	✅	Consistent with documentation.
+Additional Observations
+
+Help text lists all switches and matches documentation.
+
+Cache path honors WSL detection through set_cache_dir.
+
+Error trap prints a line number and points to the log file.
+
+check_env.sh is executed before logging is redirected, so its output is not captured in whisper_build.log.
+
+Issues & Recommendations
+
+--update inconsistent with documentation. Script performs a full rebuild instead of “rebuild changed components only.” Either adjust documentation or implement selective rebuild logic.
+
+Suggested task
+Clarify --update behavior or implement incremental rebuild
+
+Start task
+--frontend-only builds more than the frontend. Documentation promises “build just the React UI,” but the script still rebuilds backend images.
+
+Suggested task
+Align --frontend-only with documentation
+
+Start task
+No explicit logging for Docker cleanup.
+
+Suggested task
+Add logging to docker_cleanup
+
+Start task
+Multiple mode flags silently overwrite each other.
+
+Suggested task
+Detect conflicting build modes
+
+Start task
+check_env.sh output not logged.
+
+Suggested task
+Log check_env output
+
+Start task
+Overall, most switches are implemented and logged, but the --update and --frontend-only behaviors do not match the help text, Docker cleanup lacks logging, conflicting flags aren’t detected, and some initialization output is missed in the log file. Addressing these issues will make the script consistent with its documentation and improve usability.

@@ -1,0 +1,832 @@
+=====PROMPT=====
+
+=====Codex Summary=====
+
+Introduced a new set_cache_dir function to enforce WSL cache path overrides, ensuring consistent behavior across scripts
+
+Documented the automatic WSL override for CACHE_DIR in a new “Environment-Sensitive Cache Pathing” section
+
+Updated troubleshooting guidance to explain expected cache fallback on WSL systems
+
+Testing
+
+✅ black --check .
+
+❌ ./scripts/run_tests.sh --backend (failed to run due to missing Docker)
+
+Codex couldn't run certain commands due to environment limitations. Consider configuring a setup script or internet access in your Codex environment to install dependencies.
+
+
+Files (8)
+
+docs/TROUBLESHOOTING.md
++4
+-2
+
+docs/scripts_reference.md
++8
+-0
+
+scripts/diagnose_containers.sh
++3
+-4
+
+scripts/docker_build.sh
++1
+-5
+
+scripts/prestage_dependencies.sh
++2
+-9
+
+scripts/shared_checks.sh
++19
+-4
+
+scripts/start_containers.sh
++1
+-5
+
+scripts/update_images.sh
++1
+-5
+
+docs/TROUBLESHOOTING.md
++4
+-2
+
+=====FILE CHANGES=====
+docs/TROUBLESHOOTING.md
++4
+-2
+
+# Troubleshooting Guide
+# Troubleshooting Guide
+
+
+This page collects common errors and their resolutions to help users and
+This page collects common errors and their resolutions to help users and
+developers diagnose problems quickly. Logs are saved under `logs/` and the
+developers diagnose problems quickly. Logs are saved under `logs/` and the
+`scripts/diagnose_containers.sh` script prints container status and build logs.
+`scripts/diagnose_containers.sh` script prints container status and build logs.
+
+
+## Build Failures
+## Build Failures
+
+
+- **Docker build fails at `dpkg -i /tmp/apt/*.deb`**
+- **Docker build fails at `dpkg -i /tmp/apt/*.deb`**
+  - *Cause*: `cache/apt` is missing or does not match the Dockerfile base image.
+  - *Cause*: `cache/apt` is missing or does not match the Dockerfile base image.
+  - *Fix*: Run `scripts/prestage_dependencies.sh` or confirm the base image
+  - *Fix*: Run `scripts/prestage_dependencies.sh` or confirm the base image
+    digest is correct.
+    digest is correct.
+- **`--network=host` not supported in Docker Compose**
+- **`--network=host` not supported in Docker Compose**
+  - *Cause*: Passing unsupported flags to the compose CLI.
+  - *Cause*: Passing unsupported flags to the compose CLI.
+- *Fix*: Remove the flag or avoid Compose when unsupported.
+- *Fix*: Remove the flag or avoid Compose when unsupported.
+- **Docker build fails offline**
+- **Docker build fails offline**
+  - *Fix*: Execute `prestage_dependencies.sh` beforehand so cached wheels and
+  - *Fix*: Execute `prestage_dependencies.sh` beforehand so cached wheels and
+    packages are available.
+    packages are available.
+- **Whisper install fails with "No matching distribution found for wheel"**
+- **Whisper install fails with "No matching distribution found for wheel"**
+  - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `prestage_dependencies.sh`.
+  - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `prestage_dependencies.sh`.
+- **Cache fails to stage in WSL**
+- **WSL cache issues**
+  - *Fix*: Avoid using `/tmp/docker_cache`. Use `/mnt/wsl/shared/docker_cache` instead.
+  - *Fix*: When running under WSL the scripts automatically switch `CACHE_DIR`
+    to `/mnt/wsl/shared/docker_cache`. Ensure this shared path exists and
+    rerun `prestage_dependencies.sh` if staging fails.
+
+
+## Startup Errors
+## Startup Errors
+
+
+- **Application exits due to missing `SECRET_KEY`**
+- **Application exits due to missing `SECRET_KEY`**
+  - *Fix*: Generate a key and set it in `.env` or pass it via the helper script.
+  - *Fix*: Generate a key and set it in `.env` or pass it via the helper script.
+- **API fails to connect to the database**
+- **API fails to connect to the database**
+  - *Fix*: Check `DB_URL`, wait for the database container to start and
+  - *Fix*: Check `DB_URL`, wait for the database container to start and
+    increase connection retries if needed.
+    increase connection retries if needed.
+
+
+## Job Failures
+## Job Failures
+
+
+- **Jobs stuck in queued or processing**
+- **Jobs stuck in queued or processing**
+  - *Fix*: Inspect worker logs and container health. Rebuild containers with
+  - *Fix*: Inspect worker logs and container health. Rebuild containers with
+    `scripts/update_images.sh` if they are corrupted.
+    `scripts/update_images.sh` if they are corrupted.
+- **Transcript not generated**
+- **Transcript not generated**
+  - *Cause*: Whisper model files are missing or corrupted.
+  - *Cause*: Whisper model files are missing or corrupted.
+  - *Fix*: Re-download `base.pt`, `large-v3.pt` and other models into `models/`.
+  - *Fix*: Re-download `base.pt`, `large-v3.pt` and other models into `models/`.
+
+
+## Web UI or Frontend Issues
+## Web UI or Frontend Issues
+
+
+- **Blank screen on load**
+- **Blank screen on load**
+  - *Fix*: Rebuild the frontend with `npm run build` or pass `--force-frontend`
+  - *Fix*: Rebuild the frontend with `npm run build` or pass `--force-frontend`
+    to the build script.
+    to the build script.
+- **Frontend build passes but web UI fails to load**
+- **Frontend build passes but web UI fails to load**
+  - *Fix*: Check that `frontend/dist/index.html` exists. Run `npm run build` manually if needed.
+  - *Fix*: Check that `frontend/dist/index.html` exists. Run `npm run build` manually if needed.
+docs/scripts_reference.md
++8
+-0
+
+# Scripts Reference
+# Scripts Reference
+
+
+👤 Target Audience: Developers
+👤 Target Audience: Developers
+
+
+The table below summarizes the helper scripts found under `/scripts`.
+The table below summarizes the helper scripts found under `/scripts`.
+
+
+| Script | Description | Flags / Env Vars | Example | Notes |
+| Script | Description | Flags / Env Vars | Example | Notes |
+| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `docker_build.sh` | Full or incremental build of Docker images and stack | `--full` `--incremental` `--offline` `--force-frontend` | `sudo scripts/docker_build.sh --full` | Requires root to install packages |
+| `docker_build.sh` | Full or incremental build of Docker images and stack | `--full` `--incremental` `--offline` `--force-frontend` | `sudo scripts/docker_build.sh --full` | Requires root to install packages |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `prestage_dependencies.sh` | Downloads packages and images for offline builds | `--dry-run` `--checksum` `--verify-only` `CACHE_DIR` | `sudo scripts/prestage_dependencies.sh --checksum` | Requires internet unless run with `--verify-only` |
+| `prestage_dependencies.sh` | Downloads packages and images for offline builds | `--dry-run` `--checksum` `--verify-only` `CACHE_DIR` | `sudo scripts/prestage_dependencies.sh --checksum` | Requires internet unless run with `--verify-only` |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `start_containers.sh` | Builds frontend if needed and launches Docker stack | `--force-frontend` `--offline` | `sudo scripts/start_containers.sh` | Writes log to `logs/start_containers.log` |
+| `start_containers.sh` | Builds frontend if needed and launches Docker stack | `--force-frontend` `--offline` | `sudo scripts/start_containers.sh` | Writes log to `logs/start_containers.log` |
+| `update_images.sh` | Incremental rebuild of API and worker images | `--force-frontend` `--offline` | `sudo scripts/update_images.sh --offline` | Skips container restart when images are healthy |
+| `update_images.sh` | Incremental rebuild of API and worker images | `--force-frontend` `--offline` | `sudo scripts/update_images.sh --offline` | Skips container restart when images are healthy |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+
+
+## Environment-Sensitive Cache Pathing
+
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+in the shared location.
+
+scripts/diagnose_containers.sh
++3
+-4
+
+#!/usr/bin/env bash
+#!/usr/bin/env bash
+set -euo pipefail
+set -euo pipefail
+
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
+COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
+LOG_LINES="${LOG_LINES:-20}"
+LOG_LINES="${LOG_LINES:-20}"
+source "$SCRIPT_DIR/shared_checks.sh"
+
+
+# Ensure the Docker daemon is available before proceeding
+# Ensure the Docker daemon is available before proceeding
+if ! docker info >/dev/null 2>&1; then
+if ! docker info >/dev/null 2>&1; then
+    echo "Docker daemon is not running or not reachable" >&2
+    echo "Docker daemon is not running or not reachable" >&2
+    exit 1
+    exit 1
+fi
+fi
+
+
+# Set CACHE_DIR if not already defined
+# Initialize CACHE_DIR for this environment
+if [ -z "${CACHE_DIR:-}" ]; then
+set_cache_dir
+    CACHE_DIR="/tmp/docker_cache"
+fi
+
+
+echo "Container status:"
+echo "Container status:"
+# Display container status including health information
+# Display container status including health information
+docker compose -f "$COMPOSE_FILE" ps
+docker compose -f "$COMPOSE_FILE" ps
+
+
+# Get list of services defined in the compose file
+# Get list of services defined in the compose file
+services=$(docker compose -f "$COMPOSE_FILE" config --services)
+services=$(docker compose -f "$COMPOSE_FILE" config --services)
+
+
+for svc in $services; do
+for svc in $services; do
+    echo
+    echo
+    echo "===== Inspecting $svc ====="
+    echo "===== Inspecting $svc ====="
+    container_id=$(docker compose -f "$COMPOSE_FILE" ps -q "$svc" 2>/dev/null || true)
+    container_id=$(docker compose -f "$COMPOSE_FILE" ps -q "$svc" 2>/dev/null || true)
+    if [ -n "$container_id" ]; then
+    if [ -n "$container_id" ]; then
+        status=$(docker inspect --format '{{ .State.Status }}' "$container_id" || echo "unknown")
+        status=$(docker inspect --format '{{ .State.Status }}' "$container_id" || echo "unknown")
+        health=$(docker inspect --format '{{ if .State.Health }}{{ .State.Health.Status }}{{ else }}none{{ end }}' "$container_id" || echo "none")
+        health=$(docker inspect --format '{{ if .State.Health }}{{ .State.Health.Status }}{{ else }}none{{ end }}' "$container_id" || echo "none")
+        exit_code=$(docker inspect --format '{{ .State.ExitCode }}' "$container_id" || echo "unknown")
+        exit_code=$(docker inspect --format '{{ .State.ExitCode }}' "$container_id" || echo "unknown")
+        restarts=$(docker inspect --format '{{ .RestartCount }}' "$container_id" || echo "unknown")
+        restarts=$(docker inspect --format '{{ .RestartCount }}' "$container_id" || echo "unknown")
+        echo "Status: $status (Health: $health)  Exit Code: $exit_code  Restarts: $restarts"
+        echo "Status: $status (Health: $health)  Exit Code: $exit_code  Restarts: $restarts"
+        echo "Environment variables:"
+        echo "Environment variables:"
+        docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$container_id" | grep -E '^(SERVICE_TYPE|CELERY_BROKER_URL)=' || true
+        docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$container_id" | grep -E '^(SERVICE_TYPE|CELERY_BROKER_URL)=' || true
+    else
+    else
+        status="not_created"
+        status="not_created"
+        echo "Container not running"
+        echo "Container not running"
+    fi
+    fi
+    echo "===== Last ${LOG_LINES} log lines for $svc ====="
+    echo "===== Last ${LOG_LINES} log lines for $svc ====="
+scripts/docker_build.sh
++1
+-5
+
+#!/usr/bin/env bash
+#!/usr/bin/env bash
+set -euo pipefail
+set -euo pipefail
+
+
+# Ensure the script runs with root privileges for apt operations
+# Ensure the script runs with root privileges for apt operations
+if [[ $EUID -ne 0 ]]; then
+if [[ $EUID -ne 0 ]]; then
+    echo "Run with sudo to download apt packages" >&2
+    echo "Run with sudo to download apt packages" >&2
+    exit 1
+    exit 1
+fi
+fi
+
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Default the cache directory when not explicitly set
+if [ -z "${CACHE_DIR:-}" ]; then
+    CACHE_DIR="/tmp/docker_cache"
+fi
+source "$SCRIPT_DIR/shared_checks.sh"
+source "$SCRIPT_DIR/shared_checks.sh"
+set_cache_dir
+"$SCRIPT_DIR/check_env.sh"
+"$SCRIPT_DIR/check_env.sh"
+
+
+LOG_DIR="$ROOT_DIR/logs"
+LOG_DIR="$ROOT_DIR/logs"
+LOG_FILE="$LOG_DIR/docker_build.log"
+LOG_FILE="$LOG_DIR/docker_build.log"
+mkdir -p "$LOG_DIR"
+mkdir -p "$LOG_DIR"
+exec > >(tee -a "$LOG_FILE") 2>&1
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+
+# File storing the SECRET_KEY during the build
+# File storing the SECRET_KEY during the build
+secret_file_runtime="$ROOT_DIR/secret_key.txt"
+secret_file_runtime="$ROOT_DIR/secret_key.txt"
+# Placeholder for temporary Docker secrets
+# Placeholder for temporary Docker secrets
+secret_file=""
+secret_file=""
+
+
+# Remove the temporary secret file on exit or error
+# Remove the temporary secret file on exit or error
+cleanup() {
+cleanup() {
+    rm -f "$secret_file_runtime"
+    rm -f "$secret_file_runtime"
+    if [ -n "${secret_file:-}" ]; then
+    if [ -n "${secret_file:-}" ]; then
+        rm -rf "$secret_file"
+        rm -rf "$secret_file"
+    fi
+    fi
+}
+}
+
+
+# Echo a marker indicating the current script stage
+# Echo a marker indicating the current script stage
+log_step() {
+log_step() {
+    echo "===== $1 ====="
+    echo "===== $1 ====="
+}
+}
+
+
+scripts/prestage_dependencies.sh
++2
+-9
+
+#!/usr/bin/env bash
+#!/usr/bin/env bash
+set -euo pipefail
+set -euo pipefail
+trap 'echo "prestage_dependencies.sh failed near line $LINENO" >&2' ERR
+trap 'echo "prestage_dependencies.sh failed near line $LINENO" >&2' ERR
+
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/shared_checks.sh"
+source "$SCRIPT_DIR/shared_checks.sh"
+set_cache_dir
+
+
+# Parse options
+# Parse options
+DRY_RUN="${DRY_RUN:-0}"
+DRY_RUN="${DRY_RUN:-0}"
+CHECKSUM="0"
+CHECKSUM="0"
+VERIFY_ONLY="0"
+VERIFY_ONLY="0"
+RSYNC_DEST=""
+RSYNC_DEST=""
+while [[ $# -gt 0 ]]; do
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+    case "$1" in
+        --dry-run)
+        --dry-run)
+            DRY_RUN=1
+            DRY_RUN=1
+            shift
+            shift
+            ;;
+            ;;
+        --checksum)
+        --checksum)
+            CHECKSUM="1"
+            CHECKSUM="1"
+            shift
+            shift
+            ;;
+            ;;
+        --verify-only)
+        --verify-only)
+            VERIFY_ONLY="1"
+            VERIFY_ONLY="1"
+            shift
+            shift
+            ;;
+            ;;
+        --rsync)
+        --rsync)
+            if [ $# -lt 2 ]; then
+            if [ $# -lt 2 ]; then
+                echo "--rsync requires a destination path" >&2
+                echo "--rsync requires a destination path" >&2
+                exit 1
+                exit 1
+            fi
+            fi
+@@ -43,59 +44,51 @@ while [[ $# -gt 0 ]]; do
+            ;;
+            ;;
+    esac
+    esac
+done
+done
+
+
+# When not verifying only, ensure root and internet connectivity
+# When not verifying only, ensure root and internet connectivity
+if [ "$VERIFY_ONLY" != "1" ]; then
+if [ "$VERIFY_ONLY" != "1" ]; then
+    if [[ $EUID -ne 0 ]]; then
+    if [[ $EUID -ne 0 ]]; then
+        echo "Run with sudo to download apt packages" >&2
+        echo "Run with sudo to download apt packages" >&2
+        exit 1
+        exit 1
+    fi
+    fi
+    if [ "$DRY_RUN" != "1" ] && ! check_internet; then
+    if [ "$DRY_RUN" != "1" ] && ! check_internet; then
+        echo "Network unreachable. Connect before running or use offline assets." >&2
+        echo "Network unreachable. Connect before running or use offline assets." >&2
+        exit 1
+        exit 1
+    fi
+    fi
+    check_apt_sources
+    check_apt_sources
+fi
+fi
+
+
+# Execute a command unless DRY_RUN is enabled
+# Execute a command unless DRY_RUN is enabled
+run_cmd() {
+run_cmd() {
+    echo "+ $*"
+    echo "+ $*"
+    if [ "$DRY_RUN" != "1" ]; then
+    if [ "$DRY_RUN" != "1" ]; then
+        "$@"
+        "$@"
+    fi
+    fi
+}
+}
+
+
+# Default cache directory when not set
+# CACHE_DIR already initialized by set_cache_dir in shared_checks.sh
+if [ -z "${CACHE_DIR:-}" ]; then
+    CACHE_DIR="/tmp/docker_cache"
+fi
+if grep -qi microsoft /proc/version && [ "$CACHE_DIR" = "/tmp/docker_cache" ]; then
+    echo "[WARNING] WSL + /tmp/docker_cache may fail. Use /mnt/wsl/shared/docker_cache instead." >&2
+fi
+
+export CACHE_DIR
+
+
+if [ "$VERIFY_ONLY" = "1" ]; then
+if [ "$VERIFY_ONLY" = "1" ]; then
+    verify_offline_assets
+    verify_offline_assets
+    exit $?
+    exit $?
+fi
+fi
+
+
+# Verify that CACHE_DIR is writable before continuing.
+# Verify that CACHE_DIR is writable before continuing.
+check_cache_writable() {
+check_cache_writable() {
+    mkdir -p "$CACHE_DIR" || true
+    mkdir -p "$CACHE_DIR" || true
+    local test_file="$CACHE_DIR/.write_test"
+    local test_file="$CACHE_DIR/.write_test"
+    if ! touch "$test_file" >/dev/null 2>&1; then
+    if ! touch "$test_file" >/dev/null 2>&1; then
+        echo "Cannot write to $CACHE_DIR. Set CACHE_DIR to a writable path or fix permissions." >&2
+        echo "Cannot write to $CACHE_DIR. Set CACHE_DIR to a writable path or fix permissions." >&2
+        exit 1
+        exit 1
+    fi
+    fi
+    rm -f "$test_file"
+    rm -f "$test_file"
+}
+}
+
+
+# Ensure Node.js 18 is installed before running npm commands
+# Ensure Node.js 18 is installed before running npm commands
+run_cmd install_node18
+run_cmd install_node18
+
+
+LOG_FILE="$ROOT_DIR/logs/prestage_dependencies.log"
+LOG_FILE="$ROOT_DIR/logs/prestage_dependencies.log"
+mkdir -p "$(dirname "$LOG_FILE")"
+mkdir -p "$(dirname "$LOG_FILE")"
+exec > >(tee -a "$LOG_FILE") 2>&1
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+
+# Exit early if the cache directory is not writable
+# Exit early if the cache directory is not writable
+scripts/shared_checks.sh
++19
+-4
+
+#!/usr/bin/env bash
+#!/usr/bin/env bash
+# Shared helper functions for build and start scripts
+# Shared helper functions for build and start scripts
+
+
+# Expect ROOT_DIR to be defined by the caller
+# Expect ROOT_DIR to be defined by the caller
+
+
+# Set CACHE_DIR appropriately depending on the host environment
+set_cache_dir() {
+    if grep -qi microsoft /proc/version; then
+        if [ "${CACHE_DIR:-}" != "/mnt/wsl/shared/docker_cache" ]; then
+            echo "[WARNING] Detected WSL; overriding CACHE_DIR to /mnt/wsl/shared/docker_cache" >&2
+            CACHE_DIR="/mnt/wsl/shared/docker_cache"
+        fi
+    else
+        if [ -z "${CACHE_DIR:-}" ]; then
+            CACHE_DIR="/tmp/docker_cache"
+        fi
+    fi
+    export CACHE_DIR
+}
+
+# Determine the default cache directory. /tmp/docker_cache is used when
+# Determine the default cache directory. /tmp/docker_cache is used when
+# CACHE_DIR is not set.
+# CACHE_DIR is not set. In WSL this function returns the WSL path.
+default_cache_dir() {
+default_cache_dir() {
+    if [ -n "${CACHE_DIR:-}" ]; then
+    if grep -qi microsoft /proc/version; then
+        echo "$CACHE_DIR"
+        echo "${CACHE_DIR:-/mnt/wsl/shared/docker_cache}"
+    else
+    else
+        echo "/tmp/docker_cache"
+        echo "${CACHE_DIR:-/tmp/docker_cache}"
+    fi
+    fi
+}
+}
+
+
+# Verify required Whisper model files exist in $ROOT_DIR/models
+# Verify required Whisper model files exist in $ROOT_DIR/models
+check_whisper_models() {
+check_whisper_models() {
+    local model_dir="${MODEL_DIR:-$ROOT_DIR/models}"
+    local model_dir="${MODEL_DIR:-$ROOT_DIR/models}"
+    local required=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
+    local required=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
+    if [ ! -d "$model_dir" ]; then
+    if [ ! -d "$model_dir" ]; then
+        echo "Models directory $model_dir is missing. Place Whisper model files here before running." >&2
+        echo "Models directory $model_dir is missing. Place Whisper model files here before running." >&2
+        return 1
+        return 1
+    fi
+    fi
+    for m in "${required[@]}"; do
+    for m in "${required[@]}"; do
+        if [ ! -f "$model_dir/$m" ]; then
+        if [ ! -f "$model_dir/$m" ]; then
+            echo "Missing $model_dir/$m. Populate the models directory before building." >&2
+            echo "Missing $model_dir/$m. Populate the models directory before building." >&2
+            return 1
+            return 1
+        fi
+        fi
+    done
+    done
+}
+}
+
+
+# Verify ffmpeg is installed and on PATH
+# Verify ffmpeg is installed and on PATH
+check_ffmpeg() {
+check_ffmpeg() {
+    if ! command -v ffmpeg >/dev/null 2>&1; then
+    if ! command -v ffmpeg >/dev/null 2>&1; then
+        echo "ffmpeg executable not found. Please install ffmpeg and ensure it is in your PATH." >&2
+        echo "ffmpeg executable not found. Please install ffmpeg and ensure it is in your PATH." >&2
+        return 1
+        return 1
+    fi
+    fi
+scripts/start_containers.sh
++1
+-5
+
+#!/usr/bin/env bash
+#!/usr/bin/env bash
+set -euo pipefail
+set -euo pipefail
+
+
+# Ensure the script runs with root privileges for apt operations
+# Ensure the script runs with root privileges for apt operations
+if [[ $EUID -ne 0 ]]; then
+if [[ $EUID -ne 0 ]]; then
+    echo "Run with sudo to download apt packages" >&2
+    echo "Run with sudo to download apt packages" >&2
+    exit 1
+    exit 1
+fi
+fi
+
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Determine default cache directory if not provided
+if [ -z "${CACHE_DIR:-}" ]; then
+    CACHE_DIR="/tmp/docker_cache"
+fi
+COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
+COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
+source "$SCRIPT_DIR/shared_checks.sh"
+source "$SCRIPT_DIR/shared_checks.sh"
+set_cache_dir
+
+
+LOG_DIR="$ROOT_DIR/logs"
+LOG_DIR="$ROOT_DIR/logs"
+LOG_FILE="$LOG_DIR/start_containers.log"
+LOG_FILE="$LOG_DIR/start_containers.log"
+mkdir -p "$LOG_DIR"
+mkdir -p "$LOG_DIR"
+# Mirror all output to a startup log for troubleshooting
+# Mirror all output to a startup log for troubleshooting
+exec > >(tee -a "$LOG_FILE") 2>&1
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+
+# File storing the SECRET_KEY during startup
+# File storing the SECRET_KEY during startup
+secret_file="$ROOT_DIR/secret_key.txt"
+secret_file="$ROOT_DIR/secret_key.txt"
+
+
+# Remove the temporary secret file on exit or error
+# Remove the temporary secret file on exit or error
+cleanup() {
+cleanup() {
+    rm -rf "$secret_file"
+    rm -rf "$secret_file"
+}
+}
+
+
+log_step() {
+log_step() {
+    echo "===== $1 ====="
+    echo "===== $1 ====="
+}
+}
+
+
+trap 'echo "[ERROR] start_containers.sh failed near line $LINENO. Check $LOG_FILE for details." >&2; cleanup' ERR
+trap 'echo "[ERROR] start_containers.sh failed near line $LINENO. Check $LOG_FILE for details." >&2; cleanup' ERR
+trap cleanup EXIT
+trap cleanup EXIT
+
+
+FORCE_FRONTEND=false
+FORCE_FRONTEND=false
+OFFLINE=false
+OFFLINE=false
+
+
+scripts/update_images.sh
++1
+-5
+
+#!/usr/bin/env bash
+#!/usr/bin/env bash
+set -euo pipefail
+set -euo pipefail
+
+
+# Ensure the script runs with root privileges for apt operations
+# Ensure the script runs with root privileges for apt operations
+if [[ $EUID -ne 0 ]]; then
+if [[ $EUID -ne 0 ]]; then
+    echo "Run with sudo to download apt packages" >&2
+    echo "Run with sudo to download apt packages" >&2
+    exit 1
+    exit 1
+fi
+fi
+
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Set CACHE_DIR to a sensible default when unset
+if [ -z "${CACHE_DIR:-}" ]; then
+    CACHE_DIR="/tmp/docker_cache"
+fi
+COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
+COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
+source "$SCRIPT_DIR/shared_checks.sh"
+source "$SCRIPT_DIR/shared_checks.sh"
+set_cache_dir
+
+
+LOG_DIR="$ROOT_DIR/logs"
+LOG_DIR="$ROOT_DIR/logs"
+LOG_FILE="$LOG_DIR/update_images.log"
+LOG_FILE="$LOG_DIR/update_images.log"
+mkdir -p "$LOG_DIR"
+mkdir -p "$LOG_DIR"
+exec > >(tee -a "$LOG_FILE") 2>&1
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+
+log_step() {
+log_step() {
+    echo "===== $1 ====="
+    echo "===== $1 ====="
+}
+}
+
+
+trap 'echo "[ERROR] update_images.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
+trap 'echo "[ERROR] update_images.sh failed near line $LINENO. Check $LOG_FILE for details." >&2' ERR
+
+
+FORCE_FRONTEND=false
+FORCE_FRONTEND=false
+OFFLINE=false
+OFFLINE=false
+
+
+usage() {
+usage() {
+    cat <<EOF
+    cat <<EOF
+Usage: $(basename "$0") [--force-frontend] [--offline]
+Usage: $(basename "$0") [--force-frontend] [--offline]
+
+
+--force-frontend Rebuild the frontend even if frontend/dist exists.
+--force-frontend Rebuild the frontend even if frontend/dist exists.
+--offline        Skip prestage_dependencies.sh and use cached packages.
+--offline        Skip prestage_dependencies.sh and use cached packages.
+EOF
+EOF
+}
+}
+
+
+while [[ $# -gt 0 ]]; do
+while [[ $# -gt 0 ]]; do

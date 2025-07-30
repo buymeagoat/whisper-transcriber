@@ -1,0 +1,921 @@
+====PROMPT
+=====TASK=====
+Update all user-facing documentation to reflect the consolidation of build logic into `whisper_build.sh`, and ensure changelog tracking is established for every future patch.
+
+=====CONSTRAINTS=====
+- Update all mentions of `docker_build.sh`, `prestage_dependencies.sh`, and `run_build.sh` to refer to `whisper_build.sh`
+- Document all available switches in `docs/scripts_reference.md` under the new `whisper_build.sh` entry
+- Add troubleshooting guidance for each flag in `docs/TROUBLESHOOTING.md`
+- Annotate `whisper_build.sh` with `# Codex:` markers to indicate validated sections (e.g., cache override, offline mode, network check)
+- Update `docs/index.md` with:
+  - `[build-system]` tag pointing to `scripts_reference.md#whisper_build.sh`
+  - Any updated audience scope, if applicable
+- Add a new entry to `CHANGELOG.md`:
+  - Timestamped
+  - Summary of this unification
+  - Affected files and rationale
+
+=====OBJECTIVE=====
+Ensure all documentation reflects the new build architecture centered on `whisper_build.sh`. Changelog should record this consolidation explicitly for traceability.
+
+=====SCOPE=====
+- whisper_build.sh (add Codex markers)
+- docs/scripts_reference.md
+- docs/TROUBLESHOOTING.md
+- docs/index.md
+- CHANGELOG.md
+
+=====OUTPUT FORMAT=====
+- ✅ Markdown diffs for all updated docs
+- ✅ Codex inline comments
+- ✅ New CHANGELOG.md entry
+- ✅ Note on next expected patch if gaps remain
+
+👉 Use **Ask Codex** to apply this patch.
+
+
+======Codex Reponse
+Summary
+
+Documented the unified build script and automatic CACHE_DIR override in the scripts reference table
+
+Expanded troubleshooting guidance with instructions for using each build flag
+
+Added a note linking to the build system in the documentation index, with a reference anchor at the bottom
+
+Annotated the build script with Codex markers for cache override, network checks, and offline mode validation
+
+Logged the consolidation in CHANGELOG for future traceability
+
+Testing
+
+✅ black --check .
+
+❌ scripts/run_tests.sh --backend (failed to run due to missing Docker)
+
+Network access
+
+Some requests were blocked due to network access restrictions. Consider granting access in environment settings.
+
+pypi.org
+
+
+Files (8)
+
+docs/CHANGELOG.md
++8
+-0
+
+docs/TROUBLESHOOTING.md
++4
+-0
+
+docs/design_scope.md
++1
+-1
+
+docs/future_updates.md
++2
+-2
+
+docs/index.md
++4
+-0
+
+docs/log_reference.md
++3
+-3
+
+docs/scripts_reference.md
++1
+-1
+
+scripts/whisper_build.sh
++3
+-3
+docs/CHANGELOG.md
++8
+-0
+
+# Changelog
+# Changelog
+
+
+All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+
+## [1.0.1] - 2025-08-06
+### Changed
+- Consolidated build commands into `whisper_build.sh` and updated documentation.
+### Added
+- `[build-system]` reference and troubleshooting guidance for each build flag.
+### Rationale
+- Provides a single entrypoint for building and ensures future patches record changes here.
+
+## [1.0.0] - 2025-07-28
+## [1.0.0] - 2025-07-28
+### Added
+### Added
+- Build helper scripts with offline support and environment validation
+- Build helper scripts with offline support and environment validation
+- Security enhancements for secret handling and authentication
+- Security enhancements for secret handling and authentication
+
+
+### Changed
+### Changed
+- Documentation updates for external users and troubleshooting
+- Documentation updates for external users and troubleshooting
+- Improved Docker build reliability
+- Improved Docker build reliability
+
+
+### Fixed
+### Fixed
+- Various script errors and dependency checks
+- Various script errors and dependency checks
+
+
+## [0.6.0] - 2025-07-20
+## [0.6.0] - 2025-07-20
+### Added
+### Added
+- Start and build scripts for Docker images
+- Start and build scripts for Docker images
+- Diagnostics for container health and image caching
+- Diagnostics for container health and image caching
+- Option to verify or stage dependencies before builds
+- Option to verify or stage dependencies before builds
+
+
+### Changed
+### Changed
+- Offline asset checks and caching improvements
+- Offline asset checks and caching improvements
+- Updated test scripts with container checks
+- Updated test scripts with container checks
+
+
+### Fixed
+### Fixed
+- Node installation and caching issues
+- Node installation and caching issues
+
+
+docs/TROUBLESHOOTING.md
++4
+-0
+
+# Troubleshooting Guide
+# Troubleshooting Guide
+
+
+This page collects common errors and their resolutions to help users and
+This page collects common errors and their resolutions to help users and
+developers diagnose problems quickly. Logs are saved under `logs/` and the
+developers diagnose problems quickly. Logs are saved under `logs/` and the
+`scripts/diagnose_containers.sh` script prints container status and build logs.
+`scripts/diagnose_containers.sh` script prints container status and build logs.
+
+
+## Build Failures
+## Build Failures
+
+
+- **Docker build fails at `dpkg -i /tmp/apt/*.deb`**
+- **Docker build fails at `dpkg -i /tmp/apt/*.deb`**
+  - *Cause*: `cache/apt` is missing or does not match the Dockerfile base image.
+  - *Cause*: `cache/apt` is missing or does not match the Dockerfile base image.
+  - *Fix*: Run `scripts/whisper_build.sh --purge-cache` or confirm the base image
+  - *Fix*: Run `scripts/whisper_build.sh --purge-cache` or confirm the base image
+    digest is correct.
+    digest is correct.
+- **`--network=host` not supported in Docker Compose**
+- **`--network=host` not supported in Docker Compose**
+  - *Cause*: Passing unsupported flags to the compose CLI.
+  - *Cause*: Passing unsupported flags to the compose CLI.
+- *Fix*: Remove the flag or avoid Compose when unsupported.
+- *Fix*: Remove the flag or avoid Compose when unsupported.
+- **Docker build fails offline**
+- **Docker build fails offline**
+  - *Fix*: Execute `whisper_build.sh --offline` after staging dependencies so cached wheels and packages are available.
+  - *Fix*: Execute `whisper_build.sh --offline` after staging dependencies so cached wheels and packages are available.
+- **Cache is outdated or missing**
+  - *Fix*: Run `whisper_build.sh --full` to download fresh dependencies and rebuild images.
+- **Whisper install fails with "No matching distribution found for wheel"**
+- **Whisper install fails with "No matching distribution found for wheel"**
+  - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `whisper_build.sh --purge-cache`.
+  - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `whisper_build.sh --purge-cache`.
+- **WSL cache issues**
+- **WSL cache issues**
+  - *Fix*: When running under WSL the scripts automatically switch `CACHE_DIR`
+  - *Fix*: When running under WSL the scripts automatically switch `CACHE_DIR`
+    to `/mnt/wsl/shared/docker_cache`. Ensure this shared path exists and
+    to `/mnt/wsl/shared/docker_cache`. Ensure this shared path exists and
+    rerun `whisper_build.sh --purge-cache` if staging fails.<!-- # Codex: warns user when WSL override triggers -->
+    rerun `whisper_build.sh --purge-cache` if staging fails.<!-- # Codex: warns user when WSL override triggers -->
+- **Unable to reach package mirrors**
+  - *Fix*: Use `whisper_build.sh --verify-sources` to confirm network connectivity before running a full build.
+
+
+## Startup Errors
+## Startup Errors
+
+
+- **Application exits due to missing `SECRET_KEY`**
+- **Application exits due to missing `SECRET_KEY`**
+  - *Fix*: Generate a key and set it in `.env` or pass it via the helper script.
+  - *Fix*: Generate a key and set it in `.env` or pass it via the helper script.
+- **API fails to connect to the database**
+- **API fails to connect to the database**
+  - *Fix*: Check `DB_URL`, wait for the database container to start and
+  - *Fix*: Check `DB_URL`, wait for the database container to start and
+    increase connection retries if needed.
+    increase connection retries if needed.
+
+
+## Job Failures
+## Job Failures
+
+
+- **Jobs stuck in queued or processing**
+- **Jobs stuck in queued or processing**
+  - *Fix*: Inspect worker logs and container health. Rebuild containers with
+  - *Fix*: Inspect worker logs and container health. Rebuild containers with
+    `scripts/update_images.sh` if they are corrupted.
+    `scripts/update_images.sh` if they are corrupted.
+- **Transcript not generated**
+- **Transcript not generated**
+  - *Cause*: Whisper model files are missing or corrupted.
+  - *Cause*: Whisper model files are missing or corrupted.
+  - *Fix*: Re-download `base.pt`, `large-v3.pt` and other models into `models/`.
+  - *Fix*: Re-download `base.pt`, `large-v3.pt` and other models into `models/`.
+
+
+## Web UI or Frontend Issues
+## Web UI or Frontend Issues
+
+
+- **Blank screen on load**
+- **Blank screen on load**
+  - *Fix*: Rebuild the frontend with `npm run build` or pass `--force-frontend`
+  - *Fix*: Rebuild the frontend with `npm run build` or pass `--force-frontend`
+    to the build script.
+    to the build script.
+- **Frontend build passes but web UI fails to load**
+- **Frontend build passes but web UI fails to load**
+  - *Fix*: Check that `frontend/dist/index.html` exists. Run `npm run build` manually if needed.
+  - *Fix*: Check that `frontend/dist/index.html` exists. Run `npm run build` manually if needed.
+docs/design_scope.md
++1
+-1
+
+@@ -8,51 +8,51 @@ This repository implements a self‑contained audio transcription service. A Fas
+## Documentation Policy
+## Documentation Policy
+
+
+All contributors—including Codex—must update this document and `README.md` whenever features or configuration change. Keeping both files synchronized ensures the instructions remain accurate.
+All contributors—including Codex—must update this document and `README.md` whenever features or configuration change. Keeping both files synchronized ensures the instructions remain accurate.
+
+
+
+
+## System Design
+## System Design
+- **FastAPI entry point**: `api/main.py` bootstraps the web app. It mounts static directories, sets up CORS, and defines all API endpoints.
+- **FastAPI entry point**: `api/main.py` bootstraps the web app. It mounts static directories, sets up CORS, and defines all API endpoints.
+- **Database layer**: SQLAlchemy ORM models are defined in `api/models.py` (`jobs` and `metadata` tables). `api/orm_bootstrap.py` runs Alembic migrations and validates the schema on startup.
+- **Database layer**: SQLAlchemy ORM models are defined in `api/models.py` (`jobs` and `metadata` tables). `api/orm_bootstrap.py` runs Alembic migrations and validates the schema on startup.
+## Job Processing Pipeline
+## Job Processing Pipeline
+  1. Audio is uploaded via `POST /jobs`. The server stores it under `uploads/` and creates a new `Job` record.
+  1. Audio is uploaded via `POST /jobs`. The server stores it under `uploads/` and creates a new `Job` record.
+  2. `handle_whisper` spawns the Whisper CLI to generate a `.srt` file under `transcripts/{job_id}`. The job status moves from `queued` → `processing`.
+  2. `handle_whisper` spawns the Whisper CLI to generate a `.srt` file under `transcripts/{job_id}`. The job status moves from `queued` → `processing`.
+  3. On success the transcript is enriched by `metadata_writer.py`, which creates a JSON metadata file and DB entry. Status becomes `completed`. Failures update the status accordingly and save logs under `logs/`.
+  3. On success the transcript is enriched by `metadata_writer.py`, which creates a JSON metadata file and DB entry. Status becomes `completed`. Failures update the status accordingly and save logs under `logs/`.
+
+
+## Important Directories
+## Important Directories
+- `uploads/` – user-uploaded audio files.
+- `uploads/` – user-uploaded audio files.
+- `transcripts/` – per‑job folders containing `.srt` results and metadata.
+- `transcripts/` – per‑job folders containing `.srt` results and metadata.
+- `logs/` – rotating log files for jobs and the system.
+- `logs/` – rotating log files for jobs and the system.
+- When `STORAGE_BACKEND=cloud` these directories serve as a local cache and
+- When `STORAGE_BACKEND=cloud` these directories serve as a local cache and
+  transcript files are synchronized from S3 when requested.
+  transcript files are synchronized from S3 when requested.
+ - `MODEL_DIR` specifies where the Whisper models are stored. By default this directory is `models/` which is local only and never committed. It must contain `base.pt`, `large-v3.pt`, `medium.pt`, `small.pt`, and `tiny.pt` when building the image. The application checks for these files on startup.
+ - `MODEL_DIR` specifies where the Whisper models are stored. By default this directory is `models/` which is local only and never committed. It must contain `base.pt`, `large-v3.pt`, `medium.pt`, `small.pt`, and `tiny.pt` when building the image. The application checks for these files on startup.
+- `frontend/` – React app built into `frontend/dist/` and copied by the Dockerfile
+- `frontend/` – React app built into `frontend/dist/` and copied by the Dockerfile
+  to `api/static/` for the UI.
+  to `api/static/` for the UI.
+- `scripts/` – helper utilities for Docker builds, testing and container management.
+- `scripts/` – helper utilities for Docker builds, testing and container management.
+  - `whisper_build.sh` – unified script that stages dependencies, builds Docker images and starts the compose stack. Pass `--offline` to rely solely on cached assets, `--purge-cache` to clear cached packages before downloading and `--verify-sources` to test remote mirrors. Output is saved to `logs/whisper_build.log`.
+  - `whisper_build.sh` – unified script that stages dependencies, builds Docker images and starts the compose stack. Pass `--offline` to rely solely on cached assets, `--purge-cache` to clear cached packages before downloading and `--verify-sources` to test remote mirrors. Output is saved to `logs/whisper_build.log`.
+  - `docker_build.sh`, `start_containers.sh`, `update_images.sh` and `prestage_dependencies.sh` – deprecated wrappers that now redirect to `whisper_build.sh`.
+  - `docker_build.sh`, `start_containers.sh`, `update_images.sh` and `prestage_dependencies.sh` – deprecated wrappers that now redirect to `whisper_build.sh`.
+- The build scripts store cached packages and Docker images under `/tmp/docker_cache`. Set `CACHE_DIR` to another location—for example `/mnt/c/whisper_cache`—if you need the cache to survive WSL resets. `prestage_dependencies.sh` also accepts `--rsync <path>` to copy the populated cache elsewhere after staging.
+- The build scripts store cached packages and Docker images under `/tmp/docker_cache`. Set `CACHE_DIR` to another location—for example `/mnt/c/whisper_cache`—if you need the cache to survive WSL resets. Use `whisper_build.sh --full` to refresh the cache and copy it elsewhere if desired.
+- All build helpers automatically install or upgrade Node.js 18 using the NodeSource repository when needed.
+- All build helpers automatically install or upgrade Node.js 18 using the NodeSource repository when needed.
+- `run_backend_tests.sh` – runs backend tests and verifies the `/health` and `/version` endpoints, logging output to `logs/test.log`.
+- `run_backend_tests.sh` – runs backend tests and verifies the `/health` and `/version` endpoints, logging output to `logs/test.log`.
+- `diagnose_containers.sh` – checks that Docker is running, verifies cache directories, and prints container and build logs for troubleshooting.
+- `diagnose_containers.sh` – checks that Docker is running, verifies cache directories, and prints container and build logs for troubleshooting.
+ - `check_env.sh` – validates DNS resolution, ensures cached `.deb` packages
+ - `check_env.sh` – validates DNS resolution, ensures cached `.deb` packages
+   correspond to the base image and verifies that the base image digest stored
+   correspond to the base image and verifies that the base image digest stored
+   in `cache/manifest.txt` matches a freshly pulled copy. The script fails on a
+   in `cache/manifest.txt` matches a freshly pulled copy. The script fails on a
+   mismatch unless `ALLOW_DIGEST_MISMATCH=1` is set. Cached packages must match
+   mismatch unless `ALLOW_DIGEST_MISMATCH=1` is set. Cached packages must match
+   the Dockerfile base image to avoid build errors.
+   the Dockerfile base image to avoid build errors.
+ - `run_tests.sh` – preferred wrapper that runs backend, frontend and Cypress
+ - `run_tests.sh` – preferred wrapper that runs backend, frontend and Cypress
+  tests by default. Pass `--backend`, `--frontend` or `--cypress` to run a
+  tests by default. Pass `--backend`, `--frontend` or `--cypress` to run a
+  subset. Results are saved to `logs/full_test.log`.
+  subset. Results are saved to `logs/full_test.log`.
+
+
+Both `models/` and `frontend/dist/` are listed in `.gitignore`. Ensure the
+Both `models/` and `frontend/dist/` are listed in `.gitignore`. Ensure the
+Whisper models are present before running `docker build`. The precompiled
+Whisper models are present before running `docker build`. The precompiled
+frontend assets already live under `frontend/dist/`.
+frontend assets already live under `frontend/dist/`.
+Create a file containing your SECRET_KEY and pass it to BuildKit so the
+Create a file containing your SECRET_KEY and pass it to BuildKit so the
+validation step can load application settings. BuildKit secrets are the
+validation step can load application settings. BuildKit secrets are the
+preferred mechanism:
+preferred mechanism:
+```bash
+```bash
+docker build --secret id=secret_key,src=<file> -t whisper-app .
+docker build --secret id=secret_key,src=<file> -t whisper-app .
+```
+```
+If `docker build` does not support `--secret`, pass the key as a build
+If `docker build` does not support `--secret`, pass the key as a build
+argument instead:
+argument instead:
+```bash
+```bash
+docker build --build-arg SECRET_KEY=<key> -t whisper-app .
+docker build --build-arg SECRET_KEY=<key> -t whisper-app .
+docs/future_updates.md
++2
+-2
+
+@@ -300,34 +300,34 @@ This document organizes upcoming features for Whisper Transcriber. Items are gro
+### Docker Compose Helper Script
+### Docker Compose Helper Script
+- **Summary**: Added `scripts/start_containers.sh` to automatically build the frontend and start the Docker Compose stack.
+- **Summary**: Added `scripts/start_containers.sh` to automatically build the frontend and start the Docker Compose stack.
+- **Motivation**: Simplifies setup by launching the API, worker, broker and database with one command.
+- **Motivation**: Simplifies setup by launching the API, worker, broker and database with one command.
+
+
+### Incremental Image Update Script
+### Incremental Image Update Script
+- **Summary**: Added `scripts/update_images.sh` to rebuild the API and worker images using cached layers.
+- **Summary**: Added `scripts/update_images.sh` to rebuild the API and worker images using cached layers.
+- **Motivation**: Speeds up development by avoiding full image pruning when only code changes.
+- **Motivation**: Speeds up development by avoiding full image pruning when only code changes.
+
+
+### Build Argument for SECRET_KEY
+### Build Argument for SECRET_KEY
+- **Summary**: Dockerfile accepts a `SECRET_KEY` build argument as a fallback when `/run/secrets/secret_key` is not provided during build. BuildKit secrets remain the preferred approach.
+- **Summary**: Dockerfile accepts a `SECRET_KEY` build argument as a fallback when `/run/secrets/secret_key` is not provided during build. BuildKit secrets remain the preferred approach.
+- **Motivation**: `validate_models_dir()` loads settings which require a secret key. Supporting `--build-arg SECRET_KEY=<key>` keeps the build compatible when `docker compose build --secret` is unavailable.
+- **Motivation**: `validate_models_dir()` loads settings which require a secret key. Supporting `--build-arg SECRET_KEY=<key>` keeps the build compatible when `docker compose build --secret` is unavailable.
+
+
+### Prerequisite Checks in start_containers.sh
+### Prerequisite Checks in start_containers.sh
+- **Summary**: start_containers.sh now verifies Whisper models exist and ensures a valid SECRET_KEY in .env. Missing prerequisites abort the build.
+- **Summary**: start_containers.sh now verifies Whisper models exist and ensures a valid SECRET_KEY in .env. Missing prerequisites abort the build.
+- **Motivation**: Prevent confusing runtime errors by validating setup before docker-compose builds the images.
+- **Motivation**: Prevent confusing runtime errors by validating setup before docker-compose builds the images.
+
+
+### Automatic secret_key.txt Creation
+### Automatic secret_key.txt Creation
+- **Summary**: start_containers.sh now writes `secret_key.txt` automatically so BuildKit can consume the key without manual steps.
+- **Summary**: start_containers.sh now writes `secret_key.txt` automatically so BuildKit can consume the key without manual steps.
+- **Motivation**: Simplifies container startup by handling temporary secret file creation.
+- **Motivation**: Simplifies container startup by handling temporary secret file creation.
+
+
+### Offline Dependency Installation
+### Offline Dependency Installation
+- **Summary**: The Dockerfile installs Python packages from cached wheels using `--no-index --find-links`, so builds succeed without network access.
+- **Summary**: The Dockerfile installs Python packages from cached wheels using `--no-index --find-links`, so builds succeed without network access.
+- **Motivation**: Pre-caching dependencies avoids network timeouts and ensures reproducible builds.
+- **Motivation**: Pre-caching dependencies avoids network timeouts and ensures reproducible builds.
+
+
+### Checksums for Cached Assets
+### Checksums for Cached Assets
+- **Summary**: `prestage_dependencies.sh` accepts `--checksum` to write per-directory manifests and a top-level `cache/manifest.txt` with their hashes.
+- **Summary**: `whisper_build.sh` may gain a `--checksum` option to write per-directory manifests and a top-level `cache/manifest.txt` with their hashes.
+- **Motivation**: Provides an audit trail for staged images and packages.
+- **Motivation**: Provides an audit trail for staged images and packages.
+
+
+### Mirroring the Cache
+### Mirroring the Cache
+- **Summary**: `prestage_dependencies.sh` accepts `--rsync <path>` to copy the
+- **Summary**: `whisper_build.sh` may provide `--rsync <path>` to copy the
+  populated cache directory after staging.
+  populated cache directory after staging.
+- **Motivation**: Allows sharing cached packages between machines or preserving
+- **Motivation**: Allows sharing cached packages between machines or preserving
+  them across environment resets.
+  them across environment resets.
+
+
+docs/index.md
++4
+-0
+
+# Documentation Index
+# Documentation Index
+
+
+The unified build system is documented under [whisper_build.sh][build-system].
+
+## Getting Started
+## Getting Started
+| File | Scope/Purpose | Audience |
+| File | Scope/Purpose | Audience |
+| --- | --- | --- |
+| --- | --- | --- |
+| [README.md](../README.md) | Overview and quickstart | Users, Dev, Admin |
+| [README.md](../README.md) | Overview and quickstart | Users, Dev, Admin |
+| [help.md](help.md) | Step-by-step setup instructions | Users |
+| [help.md](help.md) | Step-by-step setup instructions | Users |
+
+
+## 👤 Developer Docs
+## 👤 Developer Docs
+| File | Scope/Purpose | Audience |
+| File | Scope/Purpose | Audience |
+| --- | --- | --- |
+| --- | --- | --- |
+| [onboarding.md](onboarding.md) | First steps for new contributors | Developers |
+| [onboarding.md](onboarding.md) | First steps for new contributors | Developers |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow and code style | Developers |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow and code style | Developers |
+| [scripts_reference.md](scripts_reference.md) | Helper scripts overview | Developers |
+| [scripts_reference.md](scripts_reference.md) | Helper scripts overview | Developers |
+| [testing_strategy.md](testing_strategy.md) | How to run backend and frontend tests | Developers |
+| [testing_strategy.md](testing_strategy.md) | How to run backend and frontend tests | Developers |
+| [versioning_policy.md](versioning_policy.md) | Release and tagging rules | Developers |
+| [versioning_policy.md](versioning_policy.md) | Release and tagging rules | Developers |
+| [future_updates.md](future_updates.md) | Planned features and roadmap | Developers |
+| [future_updates.md](future_updates.md) | Planned features and roadmap | Developers |
+
+
+## 🛠 Operator Docs
+## 🛠 Operator Docs
+| File | Scope/Purpose | Audience |
+| File | Scope/Purpose | Audience |
+| --- | --- | --- |
+| --- | --- | --- |
+| [backup_and_recovery.md](backup_and_recovery.md) | Data preservation and restoration | Admins, Ops |
+| [backup_and_recovery.md](backup_and_recovery.md) | Data preservation and restoration | Admins, Ops |
+| [SECURITY.md](SECURITY.md) | Secrets handling and deployment tips | Admins, Ops |
+| [SECURITY.md](SECURITY.md) | Secrets handling and deployment tips | Admins, Ops |
+| [automation_tasks.md](automation_tasks.md) | Routine maintenance automation | Dev, Ops |
+| [automation_tasks.md](automation_tasks.md) | Routine maintenance automation | Dev, Ops |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and resolutions | Users, Dev |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and resolutions | Users, Dev |
+| [performance_guidelines.md](performance_guidelines.md) | Resource planning and scaling | Admins, Ops |
+| [performance_guidelines.md](performance_guidelines.md) | Resource planning and scaling | Admins, Ops |
+
+
+## 📦 Architecture
+## 📦 Architecture
+| File | Scope/Purpose | Audience |
+| File | Scope/Purpose | Audience |
+| --- | --- | --- |
+| --- | --- | --- |
+| [design_scope.md](design_scope.md) | Architecture and build tooling | Developers |
+| [design_scope.md](design_scope.md) | Architecture and build tooling | Developers |
+| [architecture_diagram.svg](architecture_diagram.svg) | Visual service layout | Developers |
+| [architecture_diagram.svg](architecture_diagram.svg) | Visual service layout | Developers |
+| [architecture_diagram.md](architecture_diagram.md) | ASCII component diagram | Developers |
+| [architecture_diagram.md](architecture_diagram.md) | ASCII component diagram | Developers |
+
+
+## 📊 Observability
+## 📊 Observability
+| File | Scope/Purpose | Audience |
+| File | Scope/Purpose | Audience |
+| --- | --- | --- |
+| --- | --- | --- |
+| [log_reference.md](log_reference.md) | Log file locations and meaning | Dev, Ops |
+| [log_reference.md](log_reference.md) | Log file locations and meaning | Dev, Ops |
+| [observability.md](observability.md) | Health checks and monitoring | Dev, Ops |
+| [observability.md](observability.md) | Health checks and monitoring | Dev, Ops |
+| [file_retention.md](file_retention.md) | File and log cleanup policy | Dev, Ops |
+| [file_retention.md](file_retention.md) | File and log cleanup policy | Dev, Ops |
+
+
+## 📚 Reference
+## 📚 Reference
+| File | Scope/Purpose | Audience |
+| File | Scope/Purpose | Audience |
+| --- | --- | --- |
+| --- | --- | --- |
+| [environment.md](environment.md) | Supported environment variables | Dev, Ops |
+| [environment.md](environment.md) | Supported environment variables | Dev, Ops |
+| [api_reference.md](api_reference.md) | HTTP endpoint details | Dev |
+| [api_reference.md](api_reference.md) | HTTP endpoint details | Dev |
+| [faq.md](faq.md) | Common questions and answers | Users, Dev |
+| [faq.md](faq.md) | Common questions and answers | Users, Dev |
+| [upgrade.md](upgrade.md) | How to upgrade versions | Admins, Dev |
+| [upgrade.md](upgrade.md) | How to upgrade versions | Admins, Dev |
+| [CHANGELOG.md](CHANGELOG.md) | Release history | Users, Dev |
+| [CHANGELOG.md](CHANGELOG.md) | Release history | Users, Dev |
+
+[build-system]: scripts_reference.md#whisper_build.sh
+docs/log_reference.md
++3
+-3
+
+# Log Reference
+# Log Reference
+
+
+This page lists the log files generated or used by Whisper Transcriber. Log paths are relative to the project root unless otherwise noted.
+This page lists the log files generated or used by Whisper Transcriber. Log paths are relative to the project root unless otherwise noted.
+
+
+## Build and Setup Logs
+## Build and Setup Logs
+
+
+### `logs/whisper_build.log`
+### `logs/whisper_build.log`
+- **Generated By:** `scripts/whisper_build.sh`
+- **Generated By:** `scripts/whisper_build.sh`
+- **Purpose:** Unified build output.
+- **Purpose:** Unified build output.
+- **Location:** `logs/whisper_build.log`
+- **Location:** `logs/whisper_build.log`
+- **Rotation/Retention:** Manual; overwritten on each run.
+- **Rotation/Retention:** Manual; overwritten on each run.
+- **Example:**
+- **Example:**
+  ```
+  ```
+  ===== STAGING =====
+  ===== STAGING =====
+  Building the production image...
+  Building the production image...
+  ```
+  ```
+
+
+### `logs/prestage_dependencies.log`
+### `logs/prestage_dependencies.log`
+- **Generated By:** `scripts/prestage_dependencies.sh` *(deprecated wrapper)*
+- **Generated By:** `scripts/prestage_dependencies.sh` *(wrapper for `whisper_build.sh`)*
+- **Purpose:** Redirects to `whisper_build.sh`.
+- **Purpose:** Redirects to `whisper_build.sh`.
+- **Location:** `logs/prestage_dependencies.log`
+- **Location:** `logs/prestage_dependencies.log`
+- **Rotation/Retention:** Manual; overwritten on each run.
+- **Rotation/Retention:** Manual; overwritten on each run.
+- **Example:**
+- **Example:**
+  ```
+  ```
+  ===== PYTHON =====
+  ===== PYTHON =====
+  Writing requirements.lock
+  Writing requirements.lock
+  ```
+  ```
+
+
+### `logs/start_containers.log`
+### `logs/start_containers.log`
+- **Generated By:** `scripts/start_containers.sh` *(deprecated wrapper)*
+- **Generated By:** `scripts/start_containers.sh` *(wrapper for `whisper_build.sh`)*
+- **Purpose:** Redirects to `whisper_build.sh`.
+- **Purpose:** Redirects to `whisper_build.sh`.
+- **Location:** `logs/start_containers.log`
+- **Location:** `logs/start_containers.log`
+- **Rotation/Retention:** Manual; overwritten on each run.
+- **Rotation/Retention:** Manual; overwritten on each run.
+- **Example:**
+- **Example:**
+  ```
+  ```
+  ===== STARTUP =====
+  ===== STARTUP =====
+  API service became healthy
+  API service became healthy
+  ```
+  ```
+
+
+### `logs/update_images.log`
+### `logs/update_images.log`
+- **Generated By:** `scripts/update_images.sh` *(deprecated wrapper)*
+- **Generated By:** `scripts/update_images.sh` *(wrapper for `whisper_build.sh`)*
+- **Purpose:** Redirects to `whisper_build.sh`.
+- **Purpose:** Redirects to `whisper_build.sh`.
+- **Location:** `logs/update_images.log`
+- **Location:** `logs/update_images.log`
+- **Rotation/Retention:** Manual; overwritten on each run.
+- **Rotation/Retention:** Manual; overwritten on each run.
+- **Example:**
+- **Example:**
+  ```
+  ```
+  ===== VERIFICATION =====
+  ===== VERIFICATION =====
+  Checking whisper models...
+  Checking whisper models...
+  ```
+  ```
+
+
+## Test Logs
+## Test Logs
+
+
+### `logs/test.log`
+### `logs/test.log`
+- **Generated By:** `scripts/run_backend_tests.sh`
+- **Generated By:** `scripts/run_backend_tests.sh`
+- **Purpose:** Backend unit test results and API endpoint checks.
+- **Purpose:** Backend unit test results and API endpoint checks.
+- **Location:** `logs/test.log`
+- **Location:** `logs/test.log`
+- **Rotation/Retention:** Manual; overwritten on each run.
+- **Rotation/Retention:** Manual; overwritten on each run.
+- **Example:**
+- **Example:**
+  ```
+  ```
+  ===== BACKEND TESTS =====
+  ===== BACKEND TESTS =====
+  10 passed in 2.3s
+  10 passed in 2.3s
+  ```
+  ```
+
+
+### `logs/full_test.log`
+### `logs/full_test.log`
+- **Generated By:** `scripts/run_tests.sh`
+- **Generated By:** `scripts/run_tests.sh`
+- **Purpose:** Full test suite including frontend and end‑to‑end tests.
+- **Purpose:** Full test suite including frontend and end‑to‑end tests.
+docs/scripts_reference.md
++1
+-1
+
+# Scripts Reference
+# Scripts Reference
+
+
+👤 Target Audience: Developers
+👤 Target Audience: Developers
+
+
+The table below summarizes the helper scripts found under `/scripts`.
+The table below summarizes the helper scripts found under `/scripts`.
+
+
+| Script | Description | Flags / Env Vars | Example | Notes |
+| Script | Description | Flags / Env Vars | Example | Notes |
+| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `check_cache_env.sh` | Displays how CACHE_DIR resolves on the current host | `CI` | `scripts/check_cache_env.sh` | Helps verify WSL overrides |
+| `check_cache_env.sh` | Displays how CACHE_DIR resolves on the current host | `CI` | `scripts/check_cache_env.sh` | Helps verify WSL overrides |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `whisper_build.sh` | Unified build and startup script | `--full` `--offline` `--purge-cache` `--verify-sources` | `sudo scripts/whisper_build.sh` | Logs to `logs/whisper_build.log` |
+| `whisper_build.sh` | Unified build and startup script | `--full` `--offline` `--purge-cache` `--verify-sources` | `sudo scripts/whisper_build.sh` | Logs to `logs/whisper_build.log`; sets `CACHE_DIR` automatically under WSL |
+| `docker_build.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/docker_build.sh` | Redirects to new script |
+| `docker_build.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/docker_build.sh` | Redirects to new script |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `start_containers.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/start_containers.sh` | Redirects to new script |
+| `start_containers.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/start_containers.sh` | Redirects to new script |
+| `update_images.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/update_images.sh` | Redirects to new script |
+| `update_images.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/update_images.sh` | Redirects to new script |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+
+
+## Environment-Sensitive Cache Pathing
+## Environment-Sensitive Cache Pathing
+
+
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+in the shared location.<!-- # Codex-verified: CACHE_DIR documentation matches set_cache_dir -->
+in the shared location.<!-- # Codex-verified: CACHE_DIR documentation matches set_cache_dir -->
+
+
+scripts/whisper_build.sh
++3
+-3
+
+#!/usr/bin/env bash
+#!/usr/bin/env bash
+set -euo pipefail
+set -euo pipefail
+
+
+# Codex: unified build entrypoint
+# Codex: unified build entrypoint
+
+
+if [[ $EUID -ne 0 ]]; then
+if [[ $EUID -ne 0 ]]; then
+    echo "Run with sudo to download apt packages" >&2
+    echo "Run with sudo to download apt packages" >&2
+    exit 1
+    exit 1
+fi
+fi
+
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/shared_checks.sh"
+source "$SCRIPT_DIR/shared_checks.sh"
+set_cache_dir
+set_cache_dir  # Codex: cache override for WSL hosts
+"$SCRIPT_DIR/check_env.sh"
+"$SCRIPT_DIR/check_env.sh"
+
+
+LOG_DIR="$ROOT_DIR/logs"
+LOG_DIR="$ROOT_DIR/logs"
+LOG_FILE="$LOG_DIR/whisper_build.log"
+LOG_FILE="$LOG_DIR/whisper_build.log"
+mkdir -p "$LOG_DIR"
+mkdir -p "$LOG_DIR"
+exec > >(tee -a "$LOG_FILE") 2>&1
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+
+secret_file_runtime="$ROOT_DIR/secret_key.txt"
+secret_file_runtime="$ROOT_DIR/secret_key.txt"
+secret_file=""
+secret_file=""
+
+
+cleanup() {
+cleanup() {
+    rm -f "$secret_file_runtime"
+    rm -f "$secret_file_runtime"
+    if [ -n "${secret_file:-}" ]; then
+    if [ -n "${secret_file:-}" ]; then
+        rm -rf "$secret_file"
+        rm -rf "$secret_file"
+    fi
+    fi
+}
+}
+trap 'echo "[ERROR] whisper_build.sh failed near line $LINENO. Check $LOG_FILE for details." >&2; cleanup' ERR
+trap 'echo "[ERROR] whisper_build.sh failed near line $LINENO. Check $LOG_FILE for details." >&2; cleanup' ERR
+trap cleanup EXIT
+trap cleanup EXIT
+
+
+MODE="full"
+MODE="full"
+PURGE_CACHE=false
+PURGE_CACHE=false
+VERIFY_SOURCES=false
+VERIFY_SOURCES=false
+
+
+usage() {
+usage() {
+    cat <<EOF
+    cat <<EOF
+@@ -170,39 +170,39 @@ docker_build() {
+                break
+                break
+            fi
+            fi
+        fi
+        fi
+        elapsed=$(( $(date +%s) - start_time ))
+        elapsed=$(( $(date +%s) - start_time ))
+        if [ $elapsed -ge $max_wait ]; then
+        if [ $elapsed -ge $max_wait ]; then
+            echo ""
+            echo ""
+            echo "API container failed to become healthy within ${max_wait}s." >&2
+            echo "API container failed to become healthy within ${max_wait}s." >&2
+            docker compose -f "$ROOT_DIR/docker-compose.yml" logs api | tail -n 20 >&2 || true
+            docker compose -f "$ROOT_DIR/docker-compose.yml" logs api | tail -n 20 >&2 || true
+            echo "Run scripts/diagnose_containers.sh for a detailed status report." >&2
+            echo "Run scripts/diagnose_containers.sh for a detailed status report." >&2
+            exit 1
+            exit 1
+        fi
+        fi
+        printf "."
+        printf "."
+        sleep 5
+        sleep 5
+    done
+    done
+
+
+    echo "Images built and containers started."
+    echo "Images built and containers started."
+    cat <<'EOM'
+    cat <<'EOM'
+Available test scripts:
+Available test scripts:
+  scripts/run_tests.sh         - runs backend tests plus frontend unit and Cypress end-to-end tests. Recommended after a full build.
+  scripts/run_tests.sh         - runs backend tests plus frontend unit and Cypress end-to-end tests. Recommended after a full build.
+  scripts/run_backend_tests.sh - executes only the backend tests and verifies the /health and /version endpoints.
+  scripts/run_backend_tests.sh - executes only the backend tests and verifies the /health and /version endpoints.
+EOM
+EOM
+}
+}
+
+
+if $VERIFY_SOURCES; then
+if $VERIFY_SOURCES; then
+    log_step "VERIFY SOURCES"
+    log_step "VERIFY SOURCES"
+    check_download_sources
+    check_download_sources  # Codex: network connectivity test for package mirrors
+fi
+fi
+
+
+if [ "$MODE" = "full" ]; then
+if [ "$MODE" = "full" ]; then
+    log_step "STAGING"
+    log_step "STAGING"
+    download_dependencies
+    download_dependencies
+else
+else
+    log_step "OFFLINE VERIFY"
+    log_step "OFFLINE VERIFY"
+    verify_cache_integrity
+    verify_cache_integrity  # Codex: offline mode validates cached assets
+fi
+fi
+
+
+docker_build
+docker_build
+rm -f "$secret_file_runtime"
+rm -f "$secret_file_runtime"
+

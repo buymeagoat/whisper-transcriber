@@ -1,0 +1,672 @@
+===PROMPT 1===
+=====TASK=====
+Verify that the Whisper Transcriber can be fully built offline after running the prestage script.
+
+=====CONSTRAINTS=====
+- Use `scripts/prestage_dependencies.sh --verify-only` to confirm presence of required `.deb` and `.whl` files
+- Build using `scripts/docker_build.sh --full --offline` with no internet
+- Log all output paths and `CACHE_DIR` value
+- Fail if network access is required
+
+=====OBJECTIVE=====
+Ensure that all cache staging logic works as documented and that the build can be performed in an air-gapped environment.
+
+=====SCOPE=====
+- prestage_dependencies.sh
+- docker_build.sh
+- shared_checks.sh
+
+=====OUTPUT FORMAT=====
+- ✅ Pass/fail result for offline build
+- ✅ Print CACHE_DIR used
+- ✅ Suggest any missing assets
+
+👉 Use **Code mode** to apply this test directly.
+
+===CODEX SUMMARY===
+=====TASK=====
+Verify that the Whisper Transcriber can be fully built offline after running the prestage script.
+
+=====CONSTRAINTS=====
+- Use `scripts/prestage_dependencies.sh --verify-only` to confirm presence of required `.deb` and `.whl` files
+- Build using `scripts/docker_build.sh --full --offline` with no internet
+- Log all output paths and `CACHE_DIR` value
+- Fail if network access is required
+
+=====OBJECTIVE=====
+Ensure that all cache staging logic works as documented and that the build can be performed in an air-gapped environment.
+
+=====SCOPE=====
+- prestage_dependencies.sh
+- docker_build.sh
+- shared_checks.sh
+
+=====OUTPUT FORMAT=====
+- ✅ Pass/fail result for offline build
+- ✅ Print CACHE_DIR used
+- ✅ Suggest any missing assets
+
+👉 Use **Code mode** to apply this test directly.
+Copy
+Result
+
+❌ Offline build failed – prestage_dependencies.sh could not fetch packages due to blocked network access, leaving /tmp/docker_cache empty. Subsequent docker_build.sh --full --offline failed because cache/manifest.txt and .deb/.whl files were missing.
+
+✅ CACHE_DIR: /tmp/docker_cache
+
+❌ Missing assets: pip wheels, npm cache, .deb packages, Docker image tar files. Prestage step could not run due to inaccessible package repositories (mise.jdx.dev).
+
+Log excerpts
+
+Verifying cached pip packages...
+Pip cache directory /tmp/docker_cache/pip missing
+...
+Required offline assets missing under /tmp/docker_cache
+
+Checking APT repository connectivity...
+Unable to reach https://mise.jdx.dev/deb
+prestage_dependencies.sh failed near line 58
+
+OS codename mismatch: Dockerfile uses 'jammy', host is 'noble'
+
+Manifest /workspace/whisper-transcriber/cache/manifest.txt missing
+
+Network access
+
+Some requests were blocked due to network access restrictions, preventing full execution of prestage_dependencies.sh.
+
+mise.jdx.dev: apt repository access blocked
+
+
+===PROMPT 2===
+=====TASK=====
+Add a diagnostic script to verify that CACHE_DIR is set correctly across environments (Linux, WSL, CI).
+
+=====CONSTRAINTS=====
+- Script should output:
+  - Environment type (WSL or native Linux)
+  - Final CACHE_DIR value
+  - Whether override warning was triggered
+
+=====OBJECTIVE=====
+Confirm that set_cache_dir behaves consistently and predictably on WSL vs Linux.
+
+=====SCOPE=====
+- shared_checks.sh
+- new script: scripts/check_cache_env.sh
+
+=====OUTPUT FORMAT=====
+Print example output for both WSL and Linux cases, including any warning text.
+
+👉 Use **Code mode** to apply this script and test.
+
+===CODEX RESPONSE===
+Summary
+
+Introduced a check_cache_env.sh script that shows the environment type, final CACHE_DIR, and whether the WSL override warning was triggered
+
+Modified set_cache_dir in shared_checks.sh to export a CACHE_OVERRIDE_WARNING flag for easier diagnostics
+
+Documented the new script in docs/scripts_reference.md so developers know how to verify cache path behavior
+
+Example output on a Linux host:
+
+Environment: Linux
+CACHE_DIR: /tmp/docker_cache
+Override warning not triggered
+
+Example output on WSL (simulated):
+
+Environment: WSL
+CACHE_DIR: /mnt/wsl/shared/docker_cache
+Override warning triggered
+[WARNING] Detected WSL; overriding CACHE_DIR to /mnt/wsl/shared/docker_cache
+Testing
+
+✅ black .
+
+❌ scripts/run_tests.sh --backend (failed to run Docker)
+
+Codex couldn't run certain commands due to environment limitations. Consider configuring a setup script or internet access in your Codex environment to install dependencies.
+
+
+Files (3)
+
+docs/scripts_reference.md
++1
+-0
+
+scripts/check_cache_env.sh
+New
+
+scripts/shared_checks.sh
++3
+-0
+docs/scripts_reference.md
++1
+-0
+
+# Scripts Reference
+# Scripts Reference
+
+
+👤 Target Audience: Developers
+👤 Target Audience: Developers
+
+
+The table below summarizes the helper scripts found under `/scripts`.
+The table below summarizes the helper scripts found under `/scripts`.
+
+
+| Script | Description | Flags / Env Vars | Example | Notes |
+| Script | Description | Flags / Env Vars | Example | Notes |
+| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `check_cache_env.sh` | Displays how CACHE_DIR resolves on the current host | `CI` | `scripts/check_cache_env.sh` | Helps verify WSL overrides |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `docker_build.sh` | Full or incremental build of Docker images and stack | `--full` `--incremental` `--offline` `--force-frontend` | `sudo scripts/docker_build.sh --full` | Requires root to install packages |
+| `docker_build.sh` | Full or incremental build of Docker images and stack | `--full` `--incremental` `--offline` `--force-frontend` | `sudo scripts/docker_build.sh --full` | Requires root to install packages |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `prestage_dependencies.sh` | Downloads packages and images for offline builds | `--dry-run` `--checksum` `--verify-only` `CACHE_DIR` | `sudo scripts/prestage_dependencies.sh --checksum` | Requires internet unless run with `--verify-only` |
+| `prestage_dependencies.sh` | Downloads packages and images for offline builds | `--dry-run` `--checksum` `--verify-only` `CACHE_DIR` | `sudo scripts/prestage_dependencies.sh --checksum` | Requires internet unless run with `--verify-only` |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `start_containers.sh` | Builds frontend if needed and launches Docker stack | `--force-frontend` `--offline` | `sudo scripts/start_containers.sh` | Writes log to `logs/start_containers.log` |
+| `start_containers.sh` | Builds frontend if needed and launches Docker stack | `--force-frontend` `--offline` | `sudo scripts/start_containers.sh` | Writes log to `logs/start_containers.log` |
+| `update_images.sh` | Incremental rebuild of API and worker images | `--force-frontend` `--offline` | `sudo scripts/update_images.sh --offline` | Skips container restart when images are healthy |
+| `update_images.sh` | Incremental rebuild of API and worker images | `--force-frontend` `--offline` | `sudo scripts/update_images.sh --offline` | Skips container restart when images are healthy |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+
+
+## Environment-Sensitive Cache Pathing
+## Environment-Sensitive Cache Pathing
+
+
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+in the shared location.
+in the shared location.
+
+
+scripts/check_cache_env.sh
+New
++33
+-0
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/shared_checks.sh"
+
+# Initialize CACHE_DIR and capture any warning output
+warn_file=$(mktemp)
+set_cache_dir 2>"$warn_file"
+warning=$(cat "$warn_file")
+rm -f "$warn_file"
+
+# Determine environment type
+if grep -qi microsoft /proc/version; then
+    env_type="WSL"
+else
+    env_type="Linux"
+fi
+
+[ -n "${CI:-}" ] && env_type="$env_type (CI)"
+
+cat <<INFO
+Environment: $env_type
+CACHE_DIR: $CACHE_DIR
+INFO
+
+if [ "${CACHE_OVERRIDE_WARNING:-0}" -eq 1 ]; then
+    echo "Override warning triggered"
+    echo "$warning"
+else
+    echo "Override warning not triggered"
+fi
+scripts/shared_checks.sh
++3
+-0
+
+#!/usr/bin/env bash
+#!/usr/bin/env bash
+# Shared helper functions for build and start scripts
+# Shared helper functions for build and start scripts
+
+
+# Expect ROOT_DIR to be defined by the caller
+# Expect ROOT_DIR to be defined by the caller
+
+
+# Set CACHE_DIR appropriately depending on the host environment
+# Set CACHE_DIR appropriately depending on the host environment
+set_cache_dir() {
+set_cache_dir() {
+    CACHE_OVERRIDE_WARNING=0
+    if grep -qi microsoft /proc/version; then
+    if grep -qi microsoft /proc/version; then
+        if [ "${CACHE_DIR:-}" != "/mnt/wsl/shared/docker_cache" ]; then
+        if [ "${CACHE_DIR:-}" != "/mnt/wsl/shared/docker_cache" ]; then
+            echo "[WARNING] Detected WSL; overriding CACHE_DIR to /mnt/wsl/shared/docker_cache" >&2
+            echo "[WARNING] Detected WSL; overriding CACHE_DIR to /mnt/wsl/shared/docker_cache" >&2
+            CACHE_DIR="/mnt/wsl/shared/docker_cache"
+            CACHE_DIR="/mnt/wsl/shared/docker_cache"
+            CACHE_OVERRIDE_WARNING=1
+        fi
+        fi
+    else
+    else
+        if [ -z "${CACHE_DIR:-}" ]; then
+        if [ -z "${CACHE_DIR:-}" ]; then
+            CACHE_DIR="/tmp/docker_cache"
+            CACHE_DIR="/tmp/docker_cache"
+        fi
+        fi
+    fi
+    fi
+    export CACHE_DIR
+    export CACHE_DIR
+    export CACHE_OVERRIDE_WARNING
+}
+}
+
+
+# Determine the default cache directory. /tmp/docker_cache is used when
+# Determine the default cache directory. /tmp/docker_cache is used when
+# CACHE_DIR is not set. In WSL this function returns the WSL path.
+# CACHE_DIR is not set. In WSL this function returns the WSL path.
+default_cache_dir() {
+default_cache_dir() {
+    if grep -qi microsoft /proc/version; then
+    if grep -qi microsoft /proc/version; then
+        echo "${CACHE_DIR:-/mnt/wsl/shared/docker_cache}"
+        echo "${CACHE_DIR:-/mnt/wsl/shared/docker_cache}"
+    else
+    else
+        echo "${CACHE_DIR:-/tmp/docker_cache}"
+        echo "${CACHE_DIR:-/tmp/docker_cache}"
+    fi
+    fi
+}
+}
+
+
+# Verify required Whisper model files exist in $ROOT_DIR/models
+# Verify required Whisper model files exist in $ROOT_DIR/models
+check_whisper_models() {
+check_whisper_models() {
+    local model_dir="${MODEL_DIR:-$ROOT_DIR/models}"
+    local model_dir="${MODEL_DIR:-$ROOT_DIR/models}"
+    local required=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
+    local required=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
+    if [ ! -d "$model_dir" ]; then
+    if [ ! -d "$model_dir" ]; then
+        echo "Models directory $model_dir is missing. Place Whisper model files here before running." >&2
+        echo "Models directory $model_dir is missing. Place Whisper model files here before running." >&2
+        return 1
+        return 1
+    fi
+    fi
+    for m in "${required[@]}"; do
+    for m in "${required[@]}"; do
+        if [ ! -f "$model_dir/$m" ]; then
+        if [ ! -f "$model_dir/$m" ]; then
+            echo "Missing $model_dir/$m. Populate the models directory before building." >&2
+            echo "Missing $model_dir/$m. Populate the models directory before building." >&2
+            return 1
+            return 1
+        fi
+        fi
+
+
+===PROMPT 3===
+=====TASK=====
+Tag scripts and documentation with Codex validation markers to support automated analysis and doc-to-code linking.
+
+=====CONSTRAINTS=====
+- Use `# Codex-verified:` or `# Codex:` inline comments
+- Place them next to:
+  - CACHE_DIR logic in `shared_checks.sh`
+  - WSL warnings
+  - Doc entries that map to build/cache behavior
+
+=====OBJECTIVE=====
+Improve Codex’s ability to trace doc claims to real code and reduce future drift.
+
+=====SCOPE=====
+- shared_checks.sh
+- prestage_dependencies.sh
+- docs/scripts_reference.md
+- docs/TROUBLESHOOTING.md
+
+=====OUTPUT FORMAT=====
+Patch format with comment insertions and brief rationale
+
+👉 Use **Ask Codex** to review and apply this patch.
+
+===CODEX RESPONSE===
+Summary
+
+Clarified how the build scripts automatically switch to a shared cache location when running under WSL, ensuring consistent cache usage across environments
+
+Documented the environment-sensitive cache behavior in the scripts reference with a Codex marker for traceability
+
+Added a note in the troubleshooting guide linking WSL cache warnings to the corresponding script logic
+
+Testing
+
+❌ scripts/run_tests.sh (failed to run: “docker: command not found”)
+
+Codex couldn't run certain commands due to environment limitations. Consider configuring a setup script or internet access in your Codex environment to install dependencies.
+
+
+Files (3)
+
+docs/TROUBLESHOOTING.md
++1
+-1
+
+docs/scripts_reference.md
++1
+-1
+
+scripts/shared_checks.sh
++4
+-3
+docs/TROUBLESHOOTING.md
++1
+-1
+
+# Troubleshooting Guide
+# Troubleshooting Guide
+
+
+This page collects common errors and their resolutions to help users and
+This page collects common errors and their resolutions to help users and
+developers diagnose problems quickly. Logs are saved under `logs/` and the
+developers diagnose problems quickly. Logs are saved under `logs/` and the
+`scripts/diagnose_containers.sh` script prints container status and build logs.
+`scripts/diagnose_containers.sh` script prints container status and build logs.
+
+
+## Build Failures
+## Build Failures
+
+
+- **Docker build fails at `dpkg -i /tmp/apt/*.deb`**
+- **Docker build fails at `dpkg -i /tmp/apt/*.deb`**
+  - *Cause*: `cache/apt` is missing or does not match the Dockerfile base image.
+  - *Cause*: `cache/apt` is missing or does not match the Dockerfile base image.
+  - *Fix*: Run `scripts/prestage_dependencies.sh` or confirm the base image
+  - *Fix*: Run `scripts/prestage_dependencies.sh` or confirm the base image
+    digest is correct.
+    digest is correct.
+- **`--network=host` not supported in Docker Compose**
+- **`--network=host` not supported in Docker Compose**
+  - *Cause*: Passing unsupported flags to the compose CLI.
+  - *Cause*: Passing unsupported flags to the compose CLI.
+- *Fix*: Remove the flag or avoid Compose when unsupported.
+- *Fix*: Remove the flag or avoid Compose when unsupported.
+- **Docker build fails offline**
+- **Docker build fails offline**
+  - *Fix*: Execute `prestage_dependencies.sh` beforehand so cached wheels and
+  - *Fix*: Execute `prestage_dependencies.sh` beforehand so cached wheels and
+    packages are available.
+    packages are available.
+- **Whisper install fails with "No matching distribution found for wheel"**
+- **Whisper install fails with "No matching distribution found for wheel"**
+  - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `prestage_dependencies.sh`.
+  - *Fix*: Add `wheel` to `requirements-dev.txt` and rerun `prestage_dependencies.sh`.
+- **WSL cache issues**
+- **WSL cache issues**
+  - *Fix*: When running under WSL the scripts automatically switch `CACHE_DIR`
+  - *Fix*: When running under WSL the scripts automatically switch `CACHE_DIR`
+    to `/mnt/wsl/shared/docker_cache`. Ensure this shared path exists and
+    to `/mnt/wsl/shared/docker_cache`. Ensure this shared path exists and
+    rerun `prestage_dependencies.sh` if staging fails.
+    rerun `prestage_dependencies.sh` if staging fails.<!-- # Codex: warns user when WSL override triggers -->
+
+
+## Startup Errors
+## Startup Errors
+
+
+- **Application exits due to missing `SECRET_KEY`**
+- **Application exits due to missing `SECRET_KEY`**
+  - *Fix*: Generate a key and set it in `.env` or pass it via the helper script.
+  - *Fix*: Generate a key and set it in `.env` or pass it via the helper script.
+- **API fails to connect to the database**
+- **API fails to connect to the database**
+  - *Fix*: Check `DB_URL`, wait for the database container to start and
+  - *Fix*: Check `DB_URL`, wait for the database container to start and
+    increase connection retries if needed.
+    increase connection retries if needed.
+
+
+## Job Failures
+## Job Failures
+
+
+- **Jobs stuck in queued or processing**
+- **Jobs stuck in queued or processing**
+  - *Fix*: Inspect worker logs and container health. Rebuild containers with
+  - *Fix*: Inspect worker logs and container health. Rebuild containers with
+    `scripts/update_images.sh` if they are corrupted.
+    `scripts/update_images.sh` if they are corrupted.
+- **Transcript not generated**
+- **Transcript not generated**
+  - *Cause*: Whisper model files are missing or corrupted.
+  - *Cause*: Whisper model files are missing or corrupted.
+  - *Fix*: Re-download `base.pt`, `large-v3.pt` and other models into `models/`.
+  - *Fix*: Re-download `base.pt`, `large-v3.pt` and other models into `models/`.
+
+
+## Web UI or Frontend Issues
+## Web UI or Frontend Issues
+
+
+- **Blank screen on load**
+- **Blank screen on load**
+  - *Fix*: Rebuild the frontend with `npm run build` or pass `--force-frontend`
+  - *Fix*: Rebuild the frontend with `npm run build` or pass `--force-frontend`
+    to the build script.
+    to the build script.
+- **Frontend build passes but web UI fails to load**
+- **Frontend build passes but web UI fails to load**
+  - *Fix*: Check that `frontend/dist/index.html` exists. Run `npm run build` manually if needed.
+  - *Fix*: Check that `frontend/dist/index.html` exists. Run `npm run build` manually if needed.
+docs/scripts_reference.md
++1
+-1
+
+@@ -5,27 +5,27 @@
+The table below summarizes the helper scripts found under `/scripts`.
+The table below summarizes the helper scripts found under `/scripts`.
+
+
+| Script | Description | Flags / Env Vars | Example | Notes |
+| Script | Description | Flags / Env Vars | Example | Notes |
+| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `check_cache_env.sh` | Displays how CACHE_DIR resolves on the current host | `CI` | `scripts/check_cache_env.sh` | Helps verify WSL overrides |
+| `check_cache_env.sh` | Displays how CACHE_DIR resolves on the current host | `CI` | `scripts/check_cache_env.sh` | Helps verify WSL overrides |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `docker_build.sh` | Full or incremental build of Docker images and stack | `--full` `--incremental` `--offline` `--force-frontend` | `sudo scripts/docker_build.sh --full` | Requires root to install packages |
+| `docker_build.sh` | Full or incremental build of Docker images and stack | `--full` `--incremental` `--offline` `--force-frontend` | `sudo scripts/docker_build.sh --full` | Requires root to install packages |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `prestage_dependencies.sh` | Downloads packages and images for offline builds | `--dry-run` `--checksum` `--verify-only` `CACHE_DIR` | `sudo scripts/prestage_dependencies.sh --checksum` | Requires internet unless run with `--verify-only` |
+| `prestage_dependencies.sh` | Downloads packages and images for offline builds | `--dry-run` `--checksum` `--verify-only` `CACHE_DIR` | `sudo scripts/prestage_dependencies.sh --checksum` | Requires internet unless run with `--verify-only` |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `start_containers.sh` | Builds frontend if needed and launches Docker stack | `--force-frontend` `--offline` | `sudo scripts/start_containers.sh` | Writes log to `logs/start_containers.log` |
+| `start_containers.sh` | Builds frontend if needed and launches Docker stack | `--force-frontend` `--offline` | `sudo scripts/start_containers.sh` | Writes log to `logs/start_containers.log` |
+| `update_images.sh` | Incremental rebuild of API and worker images | `--force-frontend` `--offline` | `sudo scripts/update_images.sh --offline` | Skips container restart when images are healthy |
+| `update_images.sh` | Incremental rebuild of API and worker images | `--force-frontend` `--offline` | `sudo scripts/update_images.sh --offline` | Skips container restart when images are healthy |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+
+
+## Environment-Sensitive Cache Pathing
+## Environment-Sensitive Cache Pathing
+
+
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+in the shared location.
+in the shared location.<!-- # Codex-verified: CACHE_DIR documentation matches set_cache_dir -->
+
+
+scripts/shared_checks.sh
++4
+-3
+
+#!/usr/bin/env bash
+#!/usr/bin/env bash
+# Shared helper functions for build and start scripts
+# Shared helper functions for build and start scripts
+
+
+# Expect ROOT_DIR to be defined by the caller
+# Expect ROOT_DIR to be defined by the caller
+
+
+# Set CACHE_DIR appropriately depending on the host environment
+# Set CACHE_DIR appropriately depending on the host environment
+# Codex-verified: automatic override to shared path when running under WSL
+set_cache_dir() {
+set_cache_dir() {
+    CACHE_OVERRIDE_WARNING=0
+    CACHE_OVERRIDE_WARNING=0
+    if grep -qi microsoft /proc/version; then
+    if grep -qi microsoft /proc/version; then
+        if [ "${CACHE_DIR:-}" != "/mnt/wsl/shared/docker_cache" ]; then
+        if [ "${CACHE_DIR:-}" != "/mnt/wsl/shared/docker_cache" ]; then
+            echo "[WARNING] Detected WSL; overriding CACHE_DIR to /mnt/wsl/shared/docker_cache" >&2
+            echo "[WARNING] Detected WSL; overriding CACHE_DIR to /mnt/wsl/shared/docker_cache" >&2 # Codex:
+            CACHE_DIR="/mnt/wsl/shared/docker_cache"
+            CACHE_DIR="/mnt/wsl/shared/docker_cache"
+            CACHE_OVERRIDE_WARNING=1
+            CACHE_OVERRIDE_WARNING=1
+        fi
+        fi
+    else
+    else
+        if [ -z "${CACHE_DIR:-}" ]; then
+        if [ -z "${CACHE_DIR:-}" ]; then
+            CACHE_DIR="/tmp/docker_cache"
+            CACHE_DIR="/tmp/docker_cache"
+        fi
+        fi
+    fi
+    fi
+    export CACHE_DIR
+    export CACHE_DIR
+    export CACHE_OVERRIDE_WARNING
+    export CACHE_OVERRIDE_WARNING
+}
+}
+
+
+# Determine the default cache directory. /tmp/docker_cache is used when
+# Determine the default cache directory. /tmp/docker_cache is used when
+# CACHE_DIR is not set. In WSL this function returns the WSL path.
+# CACHE_DIR is not set. In WSL this function returns the WSL path.
+default_cache_dir() {
+default_cache_dir() {
+    if grep -qi microsoft /proc/version; then
+    if grep -qi microsoft /proc/version; then
+        echo "${CACHE_DIR:-/mnt/wsl/shared/docker_cache}"
+        echo "${CACHE_DIR:-/mnt/wsl/shared/docker_cache}" # Codex:
+    else
+    else
+        echo "${CACHE_DIR:-/tmp/docker_cache}"
+        echo "${CACHE_DIR:-/tmp/docker_cache}" # Codex:
+    fi
+    fi
+}
+}
+
+
+# Verify required Whisper model files exist in $ROOT_DIR/models
+# Verify required Whisper model files exist in $ROOT_DIR/models
+check_whisper_models() {
+check_whisper_models() {
+    local model_dir="${MODEL_DIR:-$ROOT_DIR/models}"
+    local model_dir="${MODEL_DIR:-$ROOT_DIR/models}"
+    local required=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
+    local required=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
+    if [ ! -d "$model_dir" ]; then
+    if [ ! -d "$model_dir" ]; then
+        echo "Models directory $model_dir is missing. Place Whisper model files here before running." >&2
+        echo "Models directory $model_dir is missing. Place Whisper model files here before running." >&2
+        return 1
+        return 1
+    fi
+    fi
+    for m in "${required[@]}"; do
+    for m in "${required[@]}"; do
+        if [ ! -f "$model_dir/$m" ]; then
+        if [ ! -f "$model_dir/$m" ]; then
+            echo "Missing $model_dir/$m. Populate the models directory before building." >&2
+            echo "Missing $model_dir/$m. Populate the models directory before building." >&2
+            return 1
+            return 1
+        fi
+        fi
+    done
+    done
+}
+}
+
+
+# Verify ffmpeg is installed and on PATH
+# Verify ffmpeg is installed and on PATH
+check_ffmpeg() {
+check_ffmpeg() {
+    if ! command -v ffmpeg >/dev/null 2>&1; then
+    if ! command -v ffmpeg >/dev/null 2>&1; then
+        echo "ffmpeg executable not found. Please install ffmpeg and ensure it is in your PATH." >&2
+        echo "ffmpeg executable not found. Please install ffmpeg and ensure it is in your PATH." >&2
+        return 1
+        return 1
+    fi
+    fi

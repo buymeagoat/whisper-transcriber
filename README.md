@@ -437,6 +437,10 @@ docker compose restart
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
 
+## Codex Analyst GPT Workflow
+
+Audits, file fetches and patch generation are now handled entirely by **Codex Analyst GPT (CAG) v2.6**. When contributors request changes, Codex runs the `CPG_repo_audit.py`, `CPG_file_fetcher.py` and `CPG_audit_diff.py` scripts on demand and returns the results inside the conversation. Approved patches are applied automatically and the full diff is saved under `docs/patch_logs/` for reference. Manual ZIP uploads are no longer required—patch logs accumulate in that directory and serve as the canonical history.
+
 ## Contributing
 
 Run `black .` before committing changes. When adding features or changing configuration, update both `docs/design_scope.md`, `docs/future_updates.md`, and `README.md` so the documentation stays consistent.

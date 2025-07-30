@@ -39,12 +39,13 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 set_cache_dir  # Codex: cache override for WSL hosts
-"$SCRIPT_DIR/check_env.sh"
 
 LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/whisper_build.log"
 mkdir -p "$LOG_DIR"
 exec > >(tee -a "$LOG_FILE") 2>&1
+
+"$SCRIPT_DIR/check_env.sh"
 
 secret_file_runtime="$ROOT_DIR/secret_key.txt"
 secret_file=""

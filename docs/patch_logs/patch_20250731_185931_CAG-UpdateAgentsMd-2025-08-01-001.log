@@ -1,0 +1,64 @@
+=====TASK=====
+Update AGENTS.md applying refinements a–g to align with CAG protocol.
+
+=====OBJECTIVE=====
+Clarify diagnostic schema, enforce preflight and snapshot checks, harden patch logging, and normalize terminology.
+
+=====CONSTRAINTS=====
+- Modify only AGENTS.md and create a patch log in /docs/patch_logs/.
+- Capture baseline snapshot via scripts/CPG_repo_audit.py if available.
+- Run environment preflight and report deficiencies.
+
+=====SCOPE=====
+AGENTS.md; new patch log file.
+
+=====DIFFSUMMARY=====
+- Rewrote AGENTS.md: added "Diagnostic Block Schema", "Setup", and "Environment Preflight" sections.
+- Hardened patch logging language and clarified test enforcement.
+- Normalized prompt submission term to "Ask or Code" and removed legacy wording.
+
+=====TIMESTAMP=====
+2025-07-31T18:59:31Z
+
+=====PROMPTID=====
+CAG-UpdateAgentsMd-2025-08-01-001
+
+=====AGENTVERSION=====
+Unknown
+
+=====AGENTHASH=====
+N/A
+
+=====PROMPTHASH=====
+f68c7b7ec1604c0ed64df5b21d5b8f3f1b400d62499d5219b97963e38ed247bc
+
+=====COMMITHASH=====
+4928858f4e4aed27e545684465dbbe17e345aa7d
+
+=====SNAPSHOT=====
+Attempted: scripts/CPG_repo_audit.py (missing, [Errno 2]).
+Using git commit hash and timestamp as baseline.
+
+=====TESTRESULTS=====
+Scripts failed: docker not found. No tests executed.
+
+=====DIAGNOSTICMETA=====
+{ "diagnostic_interpretation": {
+  "a": "Created Diagnostic Block Schema section with ordered keys.",
+  "b": "Added Environment Preflight checks for docker, python, node/npm and gating logic.",
+  "c": "Introduced Setup section and trimmed Baseline Snapshot Enforcement to focus on snapshot freshness.",
+  "d": "Patch Logging now explicitly rejects missing or incomplete logs and details file naming and required fields.",
+  "e": "Test Enforcement references preflight and fallback when environment gaps prevent execution.",
+  "f": "All prompt submission wording uses 'Ask or Code'.",
+  "g": "No legacy container instructions remain." },
+  "preflight": { "docker": false, "docker-compose": false, "python": "3.12.10", "node": "v20.19.4", "npm": "11.4.2" },
+  "snapshot": { "available": false, "commit": "4928858f4e4aed27e545684465dbbe17e345aa7d", "timestamp": "2025-07-31T18:59:27+00:00" },
+  "ambiguities": null,
+  "ask_or_code_confirmed": true,
+  "session": "patch_20250731_185931"
+}
+
+=====DECISIONS=====
+- Proceeded without repo audit script; used git metadata instead.
+- Tests skipped due to missing docker.
+- Patch log includes all mandatory fields; omission would cause rejection per AGENTS.md.

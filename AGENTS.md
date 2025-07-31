@@ -1,75 +1,74 @@
 # Project Setup and Usage
 
 ## Agent Role and Protocol
-You operate as Codex under CAG. All actions must be driven by CAG-generated prompts. Each prompt you act on will include: TASK, OBJECTIVE, CONSTRAINTS, SCOPE, OUTPUT FORMAT, prompt_id. Before responding, you must:
-- Validate scope and constraints; do not proceed if they are missing or unclear (report gap).
-- Execute required actions; do not invent files or behavior.
-- Always include a diagnostic block with these fields: 
-  * attempted_action_summary
-  * instruction_interpretation
-  * successes
-  * failures (with reasons)
-  * skipped_steps (with cause)
-  * missing_inputs
-  * ambiguities detected
-  * resource/environment gaps
-  * suggestions to Builder/CAG
+You operate as Codex under CAG guidance. Each Ask or Code prompt includes **TASK**, **OBJECTIVE**, **CONSTRAINTS**, **SCOPE**, **OUTPUT FORMAT**, and **prompt_id**. Before acting:
+- Validate scope and constraints and report any gaps.
+- Execute only the requested actions—never invent behavior.
+
+## Diagnostic Block Schema
+For every response supply a diagnostic block using these ordered keys:
+1. `attempted_action_summary` – short recap of what you tried.
+2. `instruction_interpretation` – how you understood the prompt.
+3. `successes` – notable successful steps.
+4. `failures` – errors or issues with reasons.
+5. `skipped_steps` – intentionally omitted items with cause.
+6. `missing_inputs` – absent data required to proceed.
+7. `ambiguities_detected` – unclear instructions or conflicts.
+8. `resource_or_environment_gaps` – missing tools or permissions.
+9. `suggestions_to_builder` – recommended follow ups for CAG.
+All keys must appear even if empty.
+
+## Setup
+- Install Python, Node.js, npm, and Docker (plus docker-compose if used).
+- Run `pip install -r requirements.txt` and `pip install -r requirements-dev.txt` if needed.
+- From `frontend/`, run `npm install`.
+- Copy `.env.example` to `.env` and configure variables before running services.
+
+## Environment Preflight
+At session start and before executing tests:
+- Verify required runtime tools: `docker`, `docker-compose`, `python`, `node`, and `npm`.
+- Report any missing tools in diagnostics.
+- If checks fail, do not mark tests as validated until resolved.
 
 ## Baseline Snapshot Enforcement
-On every new session start or any state change before any patch, audit, or analysis:
-- Run `scripts/CPG_repo_audit.py` (or equivalent) to capture canonical snapshot.
-- Snapshot must include: commit hash, timestamp UTC, file/directory tree summary, configuration state, test scripts inventory, dependency graph.
-- Output freshness metadata and compare to last known snapshot; if stale, conflicting, or missing, halt further work and surface explicit diagnostic explaining why.
+Before any patch, audit, or analysis:
+- Run `scripts/CPG_repo_audit.py` (or equivalent) to capture a snapshot containing commit hash, UTC timestamp, directory tree summary, configuration state, test inventory, and dependency graph.
+- Compare freshness with the last snapshot. If stale or missing, halt work and surface diagnostics until a fresh snapshot is provided.
 
 ## Patch Logging
-After any committed patch (behavioral code change):
-- Generate a patch log file under `/docs/patch_logs/` named:  
-  `patch_<YYYYMMDD>_<HHMMSS>_<prompt_id>.log`
-- Log must include:
-  * TASK, OBJECTIVE, CONSTRAINTS, SCOPE
-  * Diff summary (what changed)
-  * Snapshot metadata used as baseline (commit hash, timestamp)
-  * Agent metadata (version string, agent hash, prompt hash)
-  * Test execution results (or explicit failure reason)
-  * Diagnostic block (as above)
-  * Decisions or deviations (if any)
-- If the patch log is missing or any required field is absent, the workflow must be considered incomplete; report and await correction before proceeding.
+After every committed patch:
+- Generate `/docs/patch_logs/patch_<YYYYMMDD>_<HHMMSS>_<prompt_id>.log`.
+- Logs must include: TASK, OBJECTIVE, CONSTRAINTS, SCOPE, DIFFSUMMARY, snapshot metadata, agent metadata, test results, the diagnostic block, and any decisions or deviations.
+- Missing or incomplete patch logs **reject the patch** and block further actions until corrected.
 
 ## Test Enforcement
-Whenever a patch changes behavior and test context exists:
-- Automatically run `scripts/run_tests.sh` (or appropriate test runners discovered via enumeration).
-- Capture test results and include them in the patch log.
-- If tests cannot run (environmental constraints, missing dependencies), include explicit diagnostic describing why and instruction for the Builder to run them manually. Do not mark patch as fully validated until test result presence is resolved.
+- Run `scripts/run_tests.sh` (or discovered test runners) after patches that change behavior.
+- Use Environment Preflight checks to ensure required tools exist before running tests.
+- If preflight fails or tests cannot run, document why and instruct the builder to run them manually. The patch remains unvalidated until test results are available.
 
 ## Dependency and Impact Reporting
-After a patch:
-- Enumerate all affected files/modules.
-- Explain downstream/upstream impact and any required follow-ups in the patch log or next diagnostic.
+After each patch:
+- Enumerate affected files and modules.
+- Explain downstream or upstream impact and required follow-ups in diagnostics or the patch log.
 
 ## Workflow Health Check
-Periodically (on builder request, after every 3 committed patches, or daily if idle):
-- Perform an integrity audit comparing current repository state, patch logs, dependency mappings, and instruction set for drift, missing logs, or compliance failures.
-- Output a concise health report with detected issues and remediation suggestions.
-- Include audit metadata (source method, timestamp, commit, checks performed).
+Periodically or upon request:
+- Audit repository state, patch logs, dependencies, and instructions for drift or compliance issues.
+- Provide a concise health report with timestamp, commit hash, and checks performed.
 
 ## Irreversible Action Safeguards
-Before executing destructive or non-idempotent operations:
-- Detect and flag the irreversible nature.
-- Require explicit builder confirmation in the prompt.
-- If possible, capture a snapshot or backup via Codex tooling.
-- Document risk, fallback, and mitigation in diagnostic and patch log.
+Before destructive or non-idempotent operations:
+- Flag irreversible actions and request explicit confirmation.
+- Capture a snapshot or backup when possible.
+- Document risk, fallback, and mitigation in diagnostics and patch logs.
 
 ## Agent Metadata Recording
-With every major operation (patch, audit, health check):
-- Record and expose:
-  * Agent version identifier
-  * Operational signature or hash (prompt hash)
-  * Snapshot reference (baseline commit/timestamp)
-  * Session identifier
-- Include these in diagnostics and patch logs for traceability.
+With every patch, audit, or health check:
+- Record agent version, operational signature (prompt hash), snapshot reference, and session ID.
+- Include this metadata in diagnostics and patch logs.
 
 ## Prompt Submission Semantics
-Clarify to the builder: use “Ask or Code” to submit prompts; do not assume any particular UI mechanism. Always echo back the received submission method label in diagnostics for alignment.
+All prompts are submitted via **Ask or Code**. Echo this label back in diagnostics for alignment.
 
 ## Silent Fail Prevention
-Never accept or act on bare outputs. If expected diagnostic or metadata is missing, stop progression and request a full resend or clarification from the builder.
+Never accept or act on incomplete outputs. If required diagnostics or metadata are missing, stop and request resubmission.

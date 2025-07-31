@@ -33,9 +33,17 @@ source /etc/os-release
 HOST_CODENAME="${VERSION_CODENAME:-}"
 HOST_ARCH="$(dpkg --print-architecture)"
 
-if [ "${ALLOW_OS_MISMATCH:-}" != "1" ] && [ "$HOST_CODENAME" != "$BASE_CODENAME" ]; then
-    echo "OS codename mismatch: Dockerfile uses '$BASE_CODENAME', host is '$HOST_CODENAME'" >&2
-    exit 1
+if [ "$HOST_CODENAME" != "$BASE_CODENAME" ]; then
+    cat >&2 <<EOF
+OS codename mismatch detected.
+Dockerfile expects '$BASE_CODENAME' but this host reports '$HOST_CODENAME'.
+Set ALLOW_OS_MISMATCH=1 to continue anyway or update your environment to match.
+EOF
+    if [ "${CI:-}" = "1" ] || [ "${ALLOW_OS_MISMATCH:-}" != "1" ]; then
+        exit 1
+    else
+        echo "ALLOW_OS_MISMATCH=1 set - continuing despite mismatch" >&2
+    fi
 fi
 
 # Validate manifest schema and compare base image digest

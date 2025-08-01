@@ -1,3 +1,4 @@
+patch_YYYYMMDD_HHMMSS_UTC_<short>.log
 =====TASK=====
 <brief task description>
 
@@ -16,6 +17,9 @@
 
 =====TIMESTAMP=====
 <UTC timestamp>
+
+=====BUILDER_DATE_TIME (UTC)=====
+<YYYYMMDD HHMMSS>
 
 =====PROMPTID=====
 <identifier for the builder prompt>

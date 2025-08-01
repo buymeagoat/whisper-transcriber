@@ -78,6 +78,8 @@ After each committed patch:
    metadata, agent metadata, test results, full diagnostic block, decisions/deviations**.  
 3. Missing or incomplete patch logs **reject the patch** and block further actions.
 
+Use UTC when constructing patch file names to align with TIMESTAMP (Z).
+
 ---
 
 ## Test Enforcement

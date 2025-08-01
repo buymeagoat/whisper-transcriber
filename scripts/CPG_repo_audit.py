@@ -1,87 +1,85 @@
 #!/usr/bin/env python3
-"""Collect basic repository metadata for Codex patch logging.
-
-Outputs JSON with commit hash, UTC timestamp, a simple directory
-summary, parsed dependency versions and discovered tests.
-"""
+"""Capture repository snapshot metadata for Codex workflows."""
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import subprocess
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Dict
+
+EXCLUDE_DIRS = {".git", "node_modules", ".venv"}
 
 
-def run(cmd: List[str]) -> str:
-    """Return command output or error string."""
+def run(cmd: list[str]) -> str | Dict:
+    """Run command and return output or error string."""
     try:
-        return subprocess.check_output(cmd, text=True, stderr=subprocess.STDOUT).strip()
+        out = subprocess.check_output(cmd, text=True, stderr=subprocess.STDOUT)
+        try:
+            return json.loads(out)
+        except json.JSONDecodeError:
+            return out.strip()
     except Exception as exc:  # noqa: broad-except
         return f"error: {exc}"
 
 
-def get_commit_hash() -> str:
-    return run(["git", "rev-parse", "HEAD"])
+def file_sha1(path: Path) -> str:
+    h = hashlib.sha1()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
 
 
-def get_utc_timestamp() -> str:
-    return datetime.utcnow().isoformat() + "Z"
-
-
-def directory_tree_summary(root: Path) -> Dict[str, Any]:
-    summary: Dict[str, Any] = {"total_files": 0, "dirs": {}}
-    for path, _, files in os.walk(root):
-        if ".git" in path.split(os.sep):
+def collect_tree(root: Path) -> Dict[str, str]:
+    tree: Dict[str, str] = {}
+    for dirpath, dirnames, filenames in os.walk(root):
+        parts = Path(dirpath).parts
+        if any(part in EXCLUDE_DIRS for part in parts):
+            dirnames[:] = []
             continue
-        rel = os.path.relpath(path, root)
-        summary["dirs"][rel] = len(files)
-        summary["total_files"] += len(files)
-    return summary
+        for name in list(dirnames):
+            if name in EXCLUDE_DIRS:
+                dirnames.remove(name)
+        for fname in filenames:
+            fp = Path(dirpath) / fname
+            if any(part in EXCLUDE_DIRS for part in fp.parts):
+                continue
+            rel = fp.relative_to(root)
+            tree[str(rel)] = file_sha1(fp)
+    return tree
 
 
-def parse_requirements() -> Dict[str, str]:
-    deps: Dict[str, str] = {}
-    for req in ["requirements.txt", "requirements-dev.txt"]:
-        if not os.path.exists(req):
-            continue
-        with open(req) as fh:
-            for line in fh:
-                line = line.strip()
-                if not line or line.startswith("#") or line.startswith("-"):
-                    continue
-                if "==" in line:
-                    name, ver = line.split("==", 1)
-                else:
-                    name, ver = line, ""
-                deps[name] = ver
-    return deps
+def pip_freeze() -> list[str] | str:
+    out = run([sys.executable, "-m", "pip", "freeze"])
+    return out.splitlines() if isinstance(out, str) else out
 
 
-def collect_tests() -> List[str] | str:
-    try:
-        out = subprocess.check_output(
-            [sys.executable, "-m", "pytest", "--collect-only", "-q"],
-            text=True,
-            stderr=subprocess.STDOUT,
-        )
-        return [line.strip() for line in out.splitlines() if line.strip()]
-    except Exception as exc:  # noqa: broad-except
-        return f"error: {exc}"
+def npm_ls() -> Dict | str:
+    result = run(["npm", "ls", "--depth=0", "--json"])
+    return result
 
 
 def main() -> None:
     root = Path(__file__).resolve().parents[1]
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     audit = {
-        "commit": get_commit_hash(),
-        "timestamp": get_utc_timestamp(),
-        "tree": directory_tree_summary(root),
-        "dependencies": parse_requirements(),
-        "tests": collect_tests(),
+        "commit": run(["git", "rev-parse", "HEAD"]),
+        "timestamp": ts,
+        "tree": collect_tree(root),
+        "pip_freeze": pip_freeze(),
+        "npm_ls": npm_ls(),
     }
-    json.dump(audit, sys.stdout, indent=2)
+    snap_dir = root / "snapshots"
+    snap_dir.mkdir(exist_ok=True)
+    snap_path = snap_dir / f"snapshot_{ts}.json"
+    with open(snap_path, "w") as fh:
+        json.dump(audit, fh, indent=2)
+    sha256 = hashlib.sha256(snap_path.read_bytes()).hexdigest()
+    print(f"{snap_path} {sha256}")
 
 
 if __name__ == "__main__":

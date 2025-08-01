@@ -1,0 +1,51 @@
+=====TASK=====
+Add SPEC_HASHES to PatchLogging LogMustInclude list.
+
+=====OBJECTIVE=====
+Update dense CAG instructions so patch logs include spec hashes.
+
+=====CONSTRAINTS=====
+- Only modify instructions/cag_dense.txt.
+- Create new instructions directory if needed and add patch log.
+
+=====SCOPE=====
+instructions/cag_dense.txt
+
+=====DIFFSUMMARY=====
+- Appended SPEC_HASHES to PatchLogging LogMustInclude list.
+- Created instructions directory.
+
+=====TIMESTAMP=====
+2025-08-01T15:03:59Z
+
+=====PROMPTID=====
+UpdatePatchLoggingSpec
+
+=====AGENTVERSION=====
+Unknown
+
+=====AGENTHASH=====
+N/A
+
+=====PROMPTHASH=====
+N/A
+
+=====COMMITHASH=====
+abf0cbe13ffda10b64ab7fbff6cf5c11ea59b9ed
+
+=====SPEC_HASHES=====
+N/A
+
+=====SNAPSHOT=====
+Attempted: scripts/CPG_repo_audit.py (missing, [Errno 2]). Using git commit hash and timestamp as baseline.
+
+=====TESTRESULTS=====
+Docker not installed; tests skipped.
+
+=====DIAGNOSTICMETA=====
+{ "preflight": { "docker": false, "docker-compose": false, "python": "Python 3.12.10", "node": "v20.19.4", "npm": "11.4.2" } }
+
+=====DECISIONS=====
+- Created instructions/cag_dense.txt with PatchLogging line.
+- Appended SPEC_HASHES to LogMustInclude list.
+- Could not run repo audit or tests due to missing docker.

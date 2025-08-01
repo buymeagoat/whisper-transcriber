@@ -1,0 +1,62 @@
+patch_20250730_201819_461ebc2cdb1a3c939600755bd634dde5d52dba06.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Record missing patch log from history
+
+=====CONSTRAINTS=====
+- Placeholder for legacy snapshot and agent metadata
+
+=====SCOPE=====
+LEGACY commit 461ebc2cdb1a3c939600755bd634dde5d52dba06
+
+=====DIFFSUMMARY=====
+commit 461ebc2cdb1a3c939600755bd634dde5d52dba06
+Merge: 86496a6 86fecaa
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Wed Jul 30 14:18:19 2025 -0600
+
+    Merge pull request #528 from buymeagoat/codex/update-documentation-for-cag-v2.6-architecture
+    
+    Update CAG workflow docs
+
+ README.md                                |  4 ++++
+ frontend/src/components/PatchUploader.js | 11 +++++++++++
+ 2 files changed, 15 insertions(+)
+
+=====TIMESTAMP=====
+2025-07-30T20:18:19Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 191117
+
+=====PROMPTID=====
+legacy-backfill-batch-001
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+461ebc2cdb1a3c939600755bd634dde5d52dba06
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+legacy-backfill
+
+=====DECISIONS=====
+- Auto-generated from commit history

@@ -1,0 +1,61 @@
+patch_20250730_144037_23ceb224ce9ef7ce6d22f2353a79a74cda191fd9.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Record missing patch log from history
+
+=====CONSTRAINTS=====
+- Placeholder for legacy snapshot and agent metadata
+
+=====SCOPE=====
+LEGACY commit 23ceb224ce9ef7ce6d22f2353a79a74cda191fd9
+
+=====DIFFSUMMARY=====
+commit 23ceb224ce9ef7ce6d22f2353a79a74cda191fd9
+Merge: db8f7bb bf45231
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Wed Jul 30 08:40:37 2025 -0600
+
+    Merge pull request #525 from buymeagoat/codex/patch-whisper_build.sh-for-build-mode-fixes
+    
+    Fix whisper_build build mode logic
+
+ scripts/whisper_build.sh | 78 ++++++++++++++++++++++++++----------------------
+ 1 file changed, 43 insertions(+), 35 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-30T14:40:37Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 191117
+
+=====PROMPTID=====
+legacy-backfill-batch-001
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+23ceb224ce9ef7ce6d22f2353a79a74cda191fd9
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+legacy-backfill
+
+=====DECISIONS=====
+- Auto-generated from commit history

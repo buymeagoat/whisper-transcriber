@@ -1,0 +1,49 @@
+=====TASK=====
+Create directory scripts/dry_run_prompt_examples/ and add echo_alias_map.md.
+
+=====OBJECTIVE=====
+Provide a dry-run prompt that prints alias mappings from AGENTS.md.
+
+=====CONSTRAINTS=====
+- Keep content concise.
+- Place file under scripts/dry_run_prompt_examples/.
+
+=====SCOPE=====
+scripts/dry_run_prompt_examples/echo_alias_map.md
+
+=====DIFFSUMMARY=====
+- Created echo_alias_map.md with simple prompt.
+
+=====TIMESTAMP=====
+2025-08-01T15:22:42Z
+
+=====PROMPTID=====
+EchoAliasMap
+
+=====AGENTVERSION=====
+Unknown
+
+=====AGENTHASH=====
+N/A
+
+=====PROMPTHASH=====
+N/A
+
+=====COMMITHASH=====
+813aa06cedbe99ea4d254999385b3dcd983e2d94
+
+=====SPEC_HASHES=====
+c49149643820ef9da9bd0f636db533a7f9f83d80fe218cba191c8187121d2814
+
+=====SNAPSHOT=====
+Attempted: scripts/CPG_repo_audit.py (missing, [Errno 2]). Using git commit hash and timestamp as baseline.
+
+=====TESTRESULTS=====
+Docker not installed; tests skipped.
+
+=====DIAGNOSTICMETA=====
+{ "preflight": { "docker": false, "docker-compose": false, "python": "Python 3.12.10", "node": "v20.19.4", "npm": "11.4.2" } }
+
+=====DECISIONS=====
+- Created directory and file for dry-run example.
+- Could not run repo audit or tests due to missing docker.

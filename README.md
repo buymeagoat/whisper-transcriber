@@ -13,7 +13,14 @@ For a step-by-step setup guide, see [docs/help.md](docs/help.md).
 For prerequisites and installation steps, follow the instructions in
 [docs/help.md](docs/help.md). The guide covers Python and system
 dependencies as well as optional Docker usage. Node.js 18 is required to build
-the frontend.
+the frontend. Install the React dependencies with:
+
+```bash
+cd frontend && npm install
+```
+
+To build offline, prime a cache directory and run `npm ci --cache <path>` before
+invoking `npm run build`.
 ## Optional Environment Variables
 
 `api/settings.py` reads the following environment variables at startup. `SECRET_KEY` has no default and must be set. When using Docker Compose, variables in a `.env` file at the project root are automatically loaded. Create this file by copying `.env.example` and replacing the placeholder with a unique value.

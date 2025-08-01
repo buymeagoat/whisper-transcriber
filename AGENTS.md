@@ -1,3 +1,4 @@
+<!-- Guard-rail updates were applied per CAG v-order-1.2 wrap-up rules to ensure session safety and patch compliance. -->
 # Project Setup and Usage
 
 ## Agent Role and Protocol

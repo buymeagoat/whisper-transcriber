@@ -1,3 +1,56 @@
+patch_20250731_190500_UTC_CAG-UpdateAgentsMd.log
+=====TASK=====
+Normalize legacy patch log to standard template
+
+=====OBJECTIVE=====
+Convert old log to new format for archival
+
+=====CONSTRAINTS=====
+- Original log lacked structured metadata
+
+=====SCOPE=====
+docs/patch_logs/
+
+=====DIFFSUMMARY=====
+N/A (legacy log)
+
+=====TIMESTAMP=====
+2025-07-31T19:05:00Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 163602
+
+=====PROMPTID=====
+normalize-patchlogs-utc-001
+
+=====AGENTVERSION=====
+Unknown
+
+=====AGENTHASH=====
+N/A
+
+=====PROMPTHASH=====
+4ecae15b69c10bb9ded2dcc63c68c4ee3d91e11fdf7b46e3066c7575110f8493
+
+=====COMMITHASH=====
+TBD
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+Attempted: scripts/CPG_repo_audit.py (missing). Using git metadata.
+
+=====TESTRESULTS=====
+Not executed; docker missing.
+
+=====DIAGNOSTICMETA=====
+{"info": "legacy conversion"}
+
+=====DECISIONS=====
+- Converted legacy log to template
+
+=====ORIGINAL LOG=====
 =====TASK=====
 Update AGENTS.md applying refinements a–g to align with CAG protocol.
 

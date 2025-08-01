@@ -1,0 +1,341 @@
+patch_20250729_150400_UTC.log
+=====TASK=====
+Normalize legacy patch log to standard template
+
+=====OBJECTIVE=====
+Convert old log to new format for archival
+
+=====CONSTRAINTS=====
+- Original log lacked structured metadata
+
+=====SCOPE=====
+docs/patch_logs/
+
+=====DIFFSUMMARY=====
+N/A (legacy log)
+
+=====TIMESTAMP=====
+2025-07-29T15:04:00Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 163602
+
+=====PROMPTID=====
+normalize-patchlogs-utc-001
+
+=====AGENTVERSION=====
+Unknown
+
+=====AGENTHASH=====
+N/A
+
+=====PROMPTHASH=====
+4ecae15b69c10bb9ded2dcc63c68c4ee3d91e11fdf7b46e3066c7575110f8493
+
+=====COMMITHASH=====
+TBD
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+Attempted: scripts/CPG_repo_audit.py (missing). Using git metadata.
+
+=====TESTRESULTS=====
+Not executed; docker missing.
+
+=====DIAGNOSTICMETA=====
+{"info": "legacy conversion"}
+
+=====DECISIONS=====
+- Converted legacy log to template
+
+=====ORIGINAL LOG=====
+=====PROMPT
+=====TASK=====
+Redo the documentation and changelog update for the recent whisper_build.sh patch that added modular build switches.
+
+=====CONSTRAINTS=====
+- You MUST output the full markdown diffs for each file:
+  - `docs/scripts_reference.md`
+  - `docs/index.md`
+  - `CHANGELOG.md`
+- Do NOT summarize. Show exact file content changes line by line.
+- List all new switches:
+  - --update
+  - --frontend-only
+  - --validate-only
+  - --docker-cleanup
+- Group switches logically in `scripts_reference.md` (e.g., full, partial, utilities)
+- In `index.md`, explicitly state that targeted and modular builds are now supported
+- In `CHANGELOG.md`, include a new entry (e.g., version 1.0.3) with:
+  - Date
+  - Summary of new switches
+  - Reference to `whisper_build.sh` as the affected file
+  - Optional link to documentation
+
+=====OBJECTIVE=====
+Ensure all documentation and changelog entries reflect the expanded capabilities of whisper_build.sh, with clear and committable changes.
+
+=====SCOPE=====
+- docs/scripts_reference.md
+- docs/index.md
+- CHANGELOG.md
+
+=====OUTPUT FORMAT=====
+- ✅ Markdown diffs for each file
+- ✅ No summaries
+- ✅ Copy-paste ready content
+
+👉 Use **Ask Codex** to apply this corrected patch.
+
+
+=====CODEX RESPONSE
+
+Summary
+
+Documented that the unified build system now supports targeted builds under whisper_build.sh
+
+Expanded the whisper_build.sh entry to list all available switches and added a new “Build Switch Groups” section outlining Full, Partial, and Utility options
+
+Logged version 1.0.3 with new modular build switches in the changelog
+
+Testing
+
+✅ black --check .
+
+❌ scripts/run_tests.sh --backend (failed to run docker)
+
+Network access
+
+Some requests were blocked due to network access restrictions. Consider granting access in environment settings.
+
+blocked: github.com
+
+
+Files (3)
+
+docs/CHANGELOG.md
++6
+-0
+
+docs/index.md
++1
+-1
+
+docs/scripts_reference.md
++20
+-1
+docs/CHANGELOG.md
++6
+-0
+
+# Changelog
+# Changelog
+
+
+All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+
+## [1.0.3] - 2025-09-02
+### Added
+- Modular build switches for `whisper_build.sh` (`--update`, `--frontend-only`, `--validate-only`, `--docker-cleanup`).
+### Changed
+- Documentation updated to explain switch groups and targeted builds.
+
+## [1.0.2] - 2025-08-15
+## [1.0.2] - 2025-08-15
+### Removed
+### Removed
+- Legacy scripts `docker_build.sh` and `prestage_dependencies.sh` in favour of `whisper_build.sh`.
+- Legacy scripts `docker_build.sh` and `prestage_dependencies.sh` in favour of `whisper_build.sh`.
+### Changed
+### Changed
+- Documentation references updated to designate `whisper_build.sh` as the sole build entrypoint.
+- Documentation references updated to designate `whisper_build.sh` as the sole build entrypoint.
+### Rationale
+### Rationale
+- Consolidates build logic into a single script to reduce confusion and maintenance burden.
+- Consolidates build logic into a single script to reduce confusion and maintenance burden.
+
+
+## [1.0.1] - 2025-08-06
+## [1.0.1] - 2025-08-06
+### Changed
+### Changed
+- Consolidated build commands into `whisper_build.sh` and updated documentation.
+- Consolidated build commands into `whisper_build.sh` and updated documentation.
+### Added
+### Added
+- `[build-system]` reference and troubleshooting guidance for each build flag.
+- `[build-system]` reference and troubleshooting guidance for each build flag.
+### Rationale
+### Rationale
+- Provides a single entrypoint for building and ensures future patches record changes here.
+- Provides a single entrypoint for building and ensures future patches record changes here.
+
+
+## [1.0.0] - 2025-07-28
+## [1.0.0] - 2025-07-28
+### Added
+### Added
+- Build helper scripts with offline support and environment validation
+- Build helper scripts with offline support and environment validation
+- Security enhancements for secret handling and authentication
+- Security enhancements for secret handling and authentication
+
+
+### Changed
+### Changed
+- Documentation updates for external users and troubleshooting
+- Documentation updates for external users and troubleshooting
+- Improved Docker build reliability
+- Improved Docker build reliability
+
+
+docs/index.md
++1
+-1
+
+# Documentation Index
+# Documentation Index
+
+
+The unified build system is documented under [whisper_build.sh][build-system].
+The unified build system now supports targeted builds and is documented under [whisper_build.sh][build-system].
+
+
+## Getting Started
+## Getting Started
+| File | Scope/Purpose | Audience |
+| File | Scope/Purpose | Audience |
+| --- | --- | --- |
+| --- | --- | --- |
+| [README.md](../README.md) | Overview and quickstart | Users, Dev, Admin |
+| [README.md](../README.md) | Overview and quickstart | Users, Dev, Admin |
+| [help.md](help.md) | Step-by-step setup instructions | Users |
+| [help.md](help.md) | Step-by-step setup instructions | Users |
+
+
+## 👤 Developer Docs
+## 👤 Developer Docs
+| File | Scope/Purpose | Audience |
+| File | Scope/Purpose | Audience |
+| --- | --- | --- |
+| --- | --- | --- |
+| [onboarding.md](onboarding.md) | First steps for new contributors | Developers |
+| [onboarding.md](onboarding.md) | First steps for new contributors | Developers |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow and code style | Developers |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow and code style | Developers |
+| [scripts_reference.md](scripts_reference.md) | Helper scripts overview | Developers |
+| [scripts_reference.md](scripts_reference.md) | Helper scripts overview | Developers |
+| [testing_strategy.md](testing_strategy.md) | How to run backend and frontend tests | Developers |
+| [testing_strategy.md](testing_strategy.md) | How to run backend and frontend tests | Developers |
+| [versioning_policy.md](versioning_policy.md) | Release and tagging rules | Developers |
+| [versioning_policy.md](versioning_policy.md) | Release and tagging rules | Developers |
+| [future_updates.md](future_updates.md) | Planned features and roadmap | Developers |
+| [future_updates.md](future_updates.md) | Planned features and roadmap | Developers |
+
+
+## 🛠 Operator Docs
+## 🛠 Operator Docs
+| File | Scope/Purpose | Audience |
+| File | Scope/Purpose | Audience |
+| --- | --- | --- |
+| --- | --- | --- |
+| [backup_and_recovery.md](backup_and_recovery.md) | Data preservation and restoration | Admins, Ops |
+| [backup_and_recovery.md](backup_and_recovery.md) | Data preservation and restoration | Admins, Ops |
+| [SECURITY.md](SECURITY.md) | Secrets handling and deployment tips | Admins, Ops |
+| [SECURITY.md](SECURITY.md) | Secrets handling and deployment tips | Admins, Ops |
+| [automation_tasks.md](automation_tasks.md) | Routine maintenance automation | Dev, Ops |
+| [automation_tasks.md](automation_tasks.md) | Routine maintenance automation | Dev, Ops |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and resolutions | Users, Dev |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and resolutions | Users, Dev |
+| [performance_guidelines.md](performance_guidelines.md) | Resource planning and scaling | Admins, Ops |
+| [performance_guidelines.md](performance_guidelines.md) | Resource planning and scaling | Admins, Ops |
+docs/scripts_reference.md
++20
+-1
+
+# Scripts Reference
+# Scripts Reference
+
+
+👤 Target Audience: Developers
+👤 Target Audience: Developers
+
+
+The table below summarizes the helper scripts found under `/scripts`.
+The table below summarizes the helper scripts found under `/scripts`.
+
+
+| Script | Description | Flags / Env Vars | Example | Notes |
+| Script | Description | Flags / Env Vars | Example | Notes |
+| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `check_env.sh` | Verifies host tools and base image versions before builds | `ALLOW_OS_MISMATCH`, `ALLOW_DIGEST_MISMATCH` | `scripts/check_env.sh` | Fails if required cache files or Docker are missing |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `diagnose_containers.sh` | Prints container status and recent logs for troubleshooting | `LOG_LINES` | `scripts/diagnose_containers.sh` | Useful when containers fail to start |
+| `check_cache_env.sh` | Displays how CACHE_DIR resolves on the current host | `CI` | `scripts/check_cache_env.sh` | Helps verify WSL overrides |
+| `check_cache_env.sh` | Displays how CACHE_DIR resolves on the current host | `CI` | `scripts/check_cache_env.sh` | Helps verify WSL overrides |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `docker-entrypoint.sh` | Entry script used inside containers to start the API or worker | `SERVICE_TYPE`, `BROKER_PING_TIMEOUT` | Invoked automatically by Docker | Creates log under `/app/logs/entrypoint.log` |
+| `whisper_build.sh` | Unified build and startup script | `--full` `--offline` `--purge-cache` `--verify-sources` `--help` | `sudo scripts/whisper_build.sh` | Logs to `logs/whisper_build.log`; sets `CACHE_DIR` automatically under WSL |
+| `whisper_build.sh` | Unified build and startup script | `--full` `--update` `--frontend-only` `--validate-only` `--offline` `--purge-cache` `--docker-cleanup` `--verify-sources` `--help` | `sudo scripts/whisper_build.sh` | Logs to `logs/whisper_build.log`; sets `CACHE_DIR` automatically under WSL |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `healthcheck.sh` | Container health probe used by Docker | `SERVICE_TYPE`, `VITE_API_HOST` | Invoked by Docker healthcheck | Exits non-zero when API or worker is unhealthy |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_backend_tests.sh` | Runs Python unit tests inside the API container | `VITE_API_HOST` | `scripts/run_backend_tests.sh` | Requires Docker Compose stack to be running |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `run_tests.sh` | Executes backend tests, frontend unit tests and Cypress e2e tests | `--backend` `--frontend` `--cypress` | `scripts/run_tests.sh --backend` | Logs saved to `logs/full_test.log` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `server_entry.py` | Python entry point for local development | `PORT` | `python scripts/server_entry.py` | Starts Uvicorn with settings from `.env` |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `shared_checks.sh` | Library of common functions used by other scripts | N/A | Sourced by other scripts | Not executed directly |
+| `start_containers.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/start_containers.sh` | Redirects to new script |
+| `start_containers.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/start_containers.sh` | Redirects to new script |
+| `update_images.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/update_images.sh` | Redirects to new script |
+| `update_images.sh` | Deprecated wrapper for `whisper_build.sh` | N/A | `scripts/update_images.sh` | Redirects to new script |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+| `validate_manifest.sh` | Checks the cache manifest against local Docker images | `--summary` `--json` | `scripts/validate_manifest.sh --summary` | Detects mismatches between cached and installed versions |
+
+
+## Build Switch Groups
+
+`whisper_build.sh` now supports targeted builds. Switches are organised into three categories:
+
+**Full**
+- `--full` – build all images and start the stack from scratch.
+
+**Partial**
+- `--update` – rebuild changed components only.
+- `--frontend-only` – build just the React UI.
+- `--validate-only` – run checks without building images.
+
+**Utility**
+- `--offline` – skip network access when assets exist locally.
+- `--purge-cache` – remove cached layers before building.
+- `--docker-cleanup` – prune unused Docker resources.
+- `--verify-sources` – validate base image digests.
+- `--help` – display the usage summary.
+
+## Environment-Sensitive Cache Pathing
+## Environment-Sensitive Cache Pathing
+
+
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+Most build scripts rely on a common cache directory. By default `CACHE_DIR`
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
+in the shared location.<!-- # Codex-verified: CACHE_DIR documentation matches set_cache_dir -->
+in the shared location.<!-- # Codex-verified: CACHE_DIR documentation matches set_cache_dir -->

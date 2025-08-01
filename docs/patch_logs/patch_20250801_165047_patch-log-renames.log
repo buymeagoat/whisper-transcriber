@@ -1,0 +1,45 @@
+=====TASK=====
+Rename early patch logs so file names include a brief description.
+
+=====OBJECTIVE=====
+Ensure all patch logs follow the naming convention patch_<YYYYMMDD>_<HHMMSS>_<description>.log.
+
+=====CONSTRAINTS=====
+- Preserve log contents.
+- Only rename files lacking a description.
+
+=====SCOPE=====
+/docs/patch_logs/*UTC.log
+
+=====DIFFSUMMARY=====
+9ab5fbd Rename early patch logs with descriptions
+ ...atch_20250728_235200_UTC.log => patch_20250728_235200_SetCacheDir.log} | 0
+ ..._001800_UTC.log => patch_20250729_001800_OfflineBuildVerification.log} | 0
+ ...20250729_010800_UTC.log => patch_20250729_010800_UnifyBuildScript.log} | 0
+ ...h_20250729_012200_UTC.log => patch_20250729_012200_DocsUnifyBuild.log} | 0
+ ...50729_015800_UTC.log => patch_20250729_015800_RemoveLegacyScripts.log} | 0
+ ...141000_UTC.log => patch_20250729_141000_HandleHelpUpdateBaseImage.log} | 0
+ ...50729_143000_UTC.log => patch_20250729_143000_RemoveUsageFunction.log} | 0
+ ...0729_144200_UTC.log => patch_20250729_144200_ModularBuildSwitches.log} | 0
+ ...729_150400_UTC.log => patch_20250729_150400_UpdateDocsForSwitches.log} | 0
+ ...20250729_223000_UTC.log => patch_20250729_223000_AuditSwitchLogic.log} | 0
+ ..._20250730_143800_UTC.log => patch_20250730_143800_FixBuildLogging.log} | 0
+ 11 files changed, 0 insertions(+), 0 deletions(-)
+=====SNAPSHOT=====
+commit: 9ab5fbd014508c50e8185f5eabd1bb3490231713
+=====METADATA=====
+agent: codex
+prompt_id: patch-log-renames
+timestamp: 20250801T165047Z
+=====TEST RESULTS=====
+Codex couldn't run certain commands due to environment limitations. Consider configuring a setup script or internet access in your Codex environment to install dependencies.
+=====DIAGNOSTIC=====
+attempted_action_summary: renamed 11 patch logs to include descriptive names; tests failed due to missing docker
+instruction_interpretation: follow instructions to update filenames with descriptions
+successes: files renamed and committed
+failures: tests unable to run
+skipped_steps: repo audit script not found
+missing_inputs: none
+ambiguities_detected: none
+resource_or_environment_gaps: docker not installed
+suggestions_to_builder: install docker or adjust tests

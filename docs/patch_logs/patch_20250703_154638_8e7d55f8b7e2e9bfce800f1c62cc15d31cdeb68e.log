@@ -1,0 +1,58 @@
+patch_20250703_154638_8e7d55f8b7e2e9bfce800f1c62cc15d31cdeb68e.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 8e7d55f8b7e2e9bfce800f1c62cc15d31cdeb68e
+
+=====DIFFSUMMARY=====
+8e7d55f Merge pull request #238 from buymeagoat/codex/add-file-size-limit-check-for-uploads
+
+ README.md                 |  2 ++
+ api/services/storage.py   |  6 ++++++
+ api/settings.py           |  1 +
+ tests/test_upload_size.py | 17 +++++++++++++++++
+ 4 files changed, 26 insertions(+)
+
+=====TIMESTAMP=====
+2025-07-03T15:46:38Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-005
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+8e7d55f8b7e2e9bfce800f1c62cc15d31cdeb68e
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

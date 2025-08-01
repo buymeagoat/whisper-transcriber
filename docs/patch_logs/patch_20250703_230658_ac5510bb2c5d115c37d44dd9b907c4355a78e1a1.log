@@ -1,0 +1,56 @@
+patch_20250703_230658_ac5510bb2c5d115c37d44dd9b907c4355a78e1a1.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit ac5510bb2c5d115c37d44dd9b907c4355a78e1a1
+
+=====DIFFSUMMARY=====
+ac5510b Add docker_build.sh script with cleanup
+ README.md               |  1 +
+ docs/design_scope.md    |  1 +
+ scripts/docker_build.sh | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+)
+
+=====TIMESTAMP=====
+2025-07-03T23:06:58Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-005
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+ac5510bb2c5d115c37d44dd9b907c4355a78e1a1
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

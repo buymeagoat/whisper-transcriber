@@ -1,0 +1,59 @@
+patch_20250627_215317_deb7a412c32b71b06da7659d292bb36bea7ee1db.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit deb7a412c32b71b06da7659d292bb36bea7ee1db
+
+=====DIFFSUMMARY=====
+deb7a41 Add concurrency config endpoints
+ README.md                       |  7 +++--
+ api/routes/admin.py             | 32 ++++++++++++++++++-
+ api/schemas.py                  | 10 ++++++
+ api/services/config.py          | 14 +++++++++
+ docs/design_scope.md            |  7 +++--
+ tests/test_admin_concurrency.py | 69 +++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 133 insertions(+), 6 deletions(-)
+
+=====TIMESTAMP=====
+2025-06-27T21:53:17Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-004
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+deb7a412c32b71b06da7659d292bb36bea7ee1db
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

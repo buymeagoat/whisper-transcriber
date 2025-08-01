@@ -1,0 +1,57 @@
+patch_20250629_154353_f11d6d6d6896ee9f37f645f376d30d99c4c80bf4.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit f11d6d6d6896ee9f37f645f376d30d99c4c80bf4
+
+=====DIFFSUMMARY=====
+f11d6d6 Make DB connection attempts configurable
+ README.md            |  5 +++++
+ api/orm_bootstrap.py | 31 ++++++++++++++++++++++---------
+ api/settings.py      |  1 +
+ docs/design_scope.md |  2 ++
+ 4 files changed, 30 insertions(+), 9 deletions(-)
+
+=====TIMESTAMP=====
+2025-06-29T15:43:53Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-004
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+f11d6d6d6896ee9f37f645f376d30d99c4c80bf4
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

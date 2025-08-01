@@ -1,0 +1,55 @@
+patch_20250627_235846_4563aa3963f0a17ca649968244093b1e9666562e.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 4563aa3963f0a17ca649968244093b1e9666562e
+
+=====DIFFSUMMARY=====
+4563aa3 Merge pull request #155 from buymeagoat/codex/delete-row-and-re-align-table-in-docs/design_scope.md
+
+ docs/design_scope.md | 1 -
+ 1 file changed, 1 deletion(-)
+
+=====TIMESTAMP=====
+2025-06-27T23:58:46Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-004
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+4563aa3963f0a17ca649968244093b1e9666562e
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

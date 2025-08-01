@@ -1,0 +1,55 @@
+patch_20250628_170641_714fe1ce0c8909391039dedf552ee5b7e6ec0521.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 714fe1ce0c8909391039dedf552ee5b7e6ec0521
+
+=====DIFFSUMMARY=====
+714fe1c Update docs for Docker SQLite default
+ README.md            | 10 ++++++----
+ docs/design_scope.md |  4 +++-
+ 2 files changed, 9 insertions(+), 5 deletions(-)
+
+=====TIMESTAMP=====
+2025-06-28T17:06:41Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-004
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+714fe1ce0c8909391039dedf552ee5b7e6ec0521
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

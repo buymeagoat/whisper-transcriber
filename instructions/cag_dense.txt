@@ -1,0 +1,1 @@
+PatchLogging:C:EachCommittedPatch:XGeneratesLog /docs/patch_logs/ named patch_<YYYYMMDD><HHMMSS><short>.log;LogMustInclude(TASK,OBJECTIVE,CONSTRAINTS,SCOPE,DIFF,TS,prompt_id,AV,AH,CH,TESTRES,DIAGMETA,BDT,SPEC_HASHES);RejectWorkflowIfLogMissing;

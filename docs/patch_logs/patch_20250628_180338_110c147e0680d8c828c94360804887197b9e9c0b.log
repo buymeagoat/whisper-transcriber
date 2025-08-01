@@ -1,0 +1,56 @@
+patch_20250628_180338_110c147e0680d8c828c94360804887197b9e9c0b.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 110c147e0680d8c828c94360804887197b9e9c0b
+
+=====DIFFSUMMARY=====
+110c147 Remove DB setting
+ api/settings.py    | 9 +--------
+ tests/conftest.py  | 2 +-
+ tests/test_jobs.py | 5 ++++-
+ 3 files changed, 6 insertions(+), 10 deletions(-)
+
+=====TIMESTAMP=====
+2025-06-28T18:03:38Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-004
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+110c147e0680d8c828c94360804887197b9e9c0b
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

@@ -1,0 +1,59 @@
+patch_20250628_181325_e8cc04541b21f8c6ed3fd4f5b1316a0cad08bdf0.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit e8cc04541b21f8c6ed3fd4f5b1316a0cad08bdf0
+
+=====DIFFSUMMARY=====
+e8cc045 Simplify DB configuration
+ Dockerfile            |  1 -
+ README.md             | 21 +++++----------------
+ api/config.py         | 10 ++++++----
+ api/migrations/env.py |  7 ++++---
+ api/orm_bootstrap.py  |  2 +-
+ docs/design_scope.md  |  9 +++------
+ 6 files changed, 19 insertions(+), 31 deletions(-)
+
+=====TIMESTAMP=====
+2025-06-28T18:13:25Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-004
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+e8cc04541b21f8c6ed3fd4f5b1316a0cad08bdf0
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

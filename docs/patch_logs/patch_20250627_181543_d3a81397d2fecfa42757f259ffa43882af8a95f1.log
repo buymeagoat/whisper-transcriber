@@ -1,0 +1,61 @@
+patch_20250627_181543_d3a81397d2fecfa42757f259ffa43882af8a95f1.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit d3a81397d2fecfa42757f259ffa43882af8a95f1
+
+=====DIFFSUMMARY=====
+d3a8139 Add status filter for jobs
+ README.md                                | 10 ++++---
+ api/routes/jobs.py                       |  4 +--
+ api/services/jobs.py                     | 20 ++++++++++++--
+ frontend/src/pages/ActiveJobsPage.jsx    |  2 +-
+ frontend/src/pages/CompletedJobsPage.jsx |  6 +++--
+ frontend/src/pages/FailedJobsPage.jsx    |  6 +++--
+ frontend/src/store/jobsSlice.js          |  8 ++++--
+ tests/test_jobs_api.py                   | 45 ++++++++++++++++++++++++++++++++
+ 8 files changed, 86 insertions(+), 15 deletions(-)
+
+=====TIMESTAMP=====
+2025-06-27T18:15:43Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-004
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+d3a81397d2fecfa42757f259ffa43882af8a95f1
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

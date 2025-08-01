@@ -1,0 +1,63 @@
+patch_20250627_212256_fcebc32b6dffac7c1114c202370a21dc1dd8dc2a.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit fcebc32b6dffac7c1114c202370a21dc1dd8dc2a
+
+=====DIFFSUMMARY=====
+fcebc32 Add transcript analysis endpoint and UI
+ README.md                                 |  3 ++
+ api/routes/jobs.py                        | 27 ++++++++++-
+ api/schemas.py                            |  7 +++
+ api/services/analysis.py                  | 75 +++++++++++++++++++++++++++++++
+ api/services/jobs.py                      | 28 ++++++++++++
+ api/settings.py                           |  2 +
+ docs/design_scope.md                      |  2 +-
+ frontend/src/pages/TranscriptViewPage.jsx | 24 ++++++++++
+ requirements.txt                          |  1 +
+ tests/test_analyze_api.py                 | 42 +++++++++++++++++
+ 10 files changed, 209 insertions(+), 2 deletions(-)
+
+=====TIMESTAMP=====
+2025-06-27T21:22:56Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-004
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+fcebc32b6dffac7c1114c202370a21dc1dd8dc2a
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

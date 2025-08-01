@@ -1,0 +1,60 @@
+patch_20250627_215331_fae5b93098cb6ca1637ce2c327013e77bd0bc4a8.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit fae5b93098cb6ca1637ce2c327013e77bd0bc4a8
+
+=====DIFFSUMMARY=====
+fae5b93 Merge pull request #151 from buymeagoat/codex/add-concurrency-config-and-endpoints
+
+ README.md                       |  7 +++--
+ api/routes/admin.py             | 32 ++++++++++++++++++-
+ api/schemas.py                  | 10 ++++++
+ api/services/config.py          | 14 +++++++++
+ docs/design_scope.md            |  7 +++--
+ tests/test_admin_concurrency.py | 69 +++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 133 insertions(+), 6 deletions(-)
+
+=====TIMESTAMP=====
+2025-06-27T21:53:31Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-004
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+fae5b93098cb6ca1637ce2c327013e77bd0bc4a8
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

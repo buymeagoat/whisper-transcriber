@@ -1,0 +1,60 @@
+patch_20250628_181435_c5f8a51a9564c6f08f8b168c6af46c148c9a824c.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit c5f8a51a9564c6f08f8b168c6af46c148c9a824c
+
+=====DIFFSUMMARY=====
+c5f8a51 Merge pull request #174 from buymeagoat/codex/remove-db_path-and-simplify-db_url-logic
+
+ Dockerfile            |  1 -
+ README.md             | 21 +++++----------------
+ api/config.py         | 10 ++++++----
+ api/migrations/env.py |  7 ++++---
+ api/orm_bootstrap.py  |  2 +-
+ docs/design_scope.md  |  9 +++------
+ 6 files changed, 19 insertions(+), 31 deletions(-)
+
+=====TIMESTAMP=====
+2025-06-28T18:14:35Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-004
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+c5f8a51a9564c6f08f8b168c6af46c148c9a824c
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

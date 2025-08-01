@@ -1,0 +1,63 @@
+patch_20250729_002546_1e74865ed988f32e6b90751eaf2bce8a6f584314.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Record missing patch log from history
+
+=====CONSTRAINTS=====
+- Placeholder for legacy snapshot and agent metadata
+
+=====SCOPE=====
+LEGACY commit 1e74865ed988f32e6b90751eaf2bce8a6f584314
+
+=====DIFFSUMMARY=====
+commit 1e74865ed988f32e6b90751eaf2bce8a6f584314
+Merge: 4bb9036 e2b910c
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Mon Jul 28 18:25:46 2025 -0600
+
+    Merge pull request #511 from buymeagoat/4fpsi7-codex/add-diagnostic-script-for-cache_dir-verification
+    
+    Add cache dir diagnostic script
+
+ docs/scripts_reference.md  |  1 +
+ scripts/check_cache_env.sh | 33 +++++++++++++++++++++++++++++++++
+ scripts/shared_checks.sh   |  3 +++
+ 3 files changed, 37 insertions(+)
+
+=====TIMESTAMP=====
+2025-07-29T00:25:46Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 191117
+
+=====PROMPTID=====
+legacy-backfill-batch-001
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+1e74865ed988f32e6b90751eaf2bce8a6f584314
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+legacy-backfill
+
+=====DECISIONS=====
+- Auto-generated from commit history

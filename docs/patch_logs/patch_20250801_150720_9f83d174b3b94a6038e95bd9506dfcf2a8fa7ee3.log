@@ -1,0 +1,62 @@
+patch_20250801_150720_9f83d174b3b94a6038e95bd9506dfcf2a8fa7ee3.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Record missing patch log from history
+
+=====CONSTRAINTS=====
+- Placeholder for legacy snapshot and agent metadata
+
+=====SCOPE=====
+LEGACY commit 9f83d174b3b94a6038e95bd9506dfcf2a8fa7ee3
+
+=====DIFFSUMMARY=====
+commit 9f83d174b3b94a6038e95bd9506dfcf2a8fa7ee3
+Merge: abf0cbe 8d7e106
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Fri Aug 1 09:07:20 2025 -0600
+
+    Merge pull request #536 from buymeagoat/codex/locate-instructions/cag_dense.txt-and-modify-patchlogging
+    
+    Update PatchLogging spec with SPEC_HASHES
+
+ ...atch_20250801_150357_UpdatePatchLoggingSpec.log | 51 ++++++++++++++++++++++
+ instructions/cag_dense.txt                         |  1 +
+ 2 files changed, 52 insertions(+)
+
+=====TIMESTAMP=====
+2025-08-01T15:07:20Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 191117
+
+=====PROMPTID=====
+legacy-backfill-batch-001
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+9f83d174b3b94a6038e95bd9506dfcf2a8fa7ee3
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+legacy-backfill
+
+=====DECISIONS=====
+- Auto-generated from commit history

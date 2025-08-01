@@ -1,0 +1,65 @@
+patch_20250729_015855_c85b4d6acde64fa83778a1014993685c0e935a20.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Record missing patch log from history
+
+=====CONSTRAINTS=====
+- Placeholder for legacy snapshot and agent metadata
+
+=====SCOPE=====
+LEGACY commit c85b4d6acde64fa83778a1014993685c0e935a20
+
+=====DIFFSUMMARY=====
+commit c85b4d6acde64fa83778a1014993685c0e935a20
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Mon Jul 28 19:58:55 2025 -0600
+
+    docs: unify build instructions
+
+ docs/CHANGELOG.md         | 8 ++++++++
+ docs/TROUBLESHOOTING.md   | 4 ++++
+ docs/design_scope.md      | 2 +-
+ docs/future_updates.md    | 4 ++--
+ docs/index.md             | 4 ++++
+ docs/log_reference.md     | 6 +++---
+ docs/scripts_reference.md | 2 +-
+ scripts/whisper_build.sh  | 6 +++---
+ 8 files changed, 26 insertions(+), 10 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-29T01:58:55Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 191117
+
+=====PROMPTID=====
+legacy-backfill-batch-001
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+c85b4d6acde64fa83778a1014993685c0e935a20
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+legacy-backfill
+
+=====DECISIONS=====
+- Auto-generated from commit history

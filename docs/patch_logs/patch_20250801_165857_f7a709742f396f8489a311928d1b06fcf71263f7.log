@@ -1,0 +1,69 @@
+patch_20250801_165857_f7a709742f396f8489a311928d1b06fcf71263f7.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Record missing patch log from history
+
+=====CONSTRAINTS=====
+- Placeholder for legacy snapshot and agent metadata
+
+=====SCOPE=====
+LEGACY commit f7a709742f396f8489a311928d1b06fcf71263f7
+
+=====DIFFSUMMARY=====
+commit f7a709742f396f8489a311928d1b06fcf71263f7
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Fri Aug 1 10:58:57 2025 -0600
+
+    Add patch log for renaming
+
+ ...C.log => patch_20250728_235200_SetCacheDir.log} |  0
+ ...h_20250729_001800_OfflineBuildVerification.log} |  0
+ ... => patch_20250729_010800_UnifyBuildScript.log} |  0
+ ...og => patch_20250729_012200_DocsUnifyBuild.log} |  0
+ ... patch_20250729_015800_RemoveLegacyScripts.log} |  0
+ ..._20250729_141000_HandleHelpUpdateBaseImage.log} |  0
+ ... patch_20250729_143000_RemoveUsageFunction.log} |  0
+ ...patch_20250729_144200_ModularBuildSwitches.log} |  0
+ ...atch_20250729_150400_UpdateDocsForSwitches.log} |  0
+ ... => patch_20250729_223000_AuditSwitchLogic.log} |  0
+ ...g => patch_20250730_143800_FixBuildLogging.log} |  0
+ .../patch_20250801_165047_patch-log-renames.log    | 45 ++++++++++++++++++++++
+ 12 files changed, 45 insertions(+)
+
+=====TIMESTAMP=====
+2025-08-01T16:58:57Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 191117
+
+=====PROMPTID=====
+legacy-backfill-batch-001
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+f7a709742f396f8489a311928d1b06fcf71263f7
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+legacy-backfill
+
+=====DECISIONS=====
+- Auto-generated from commit history

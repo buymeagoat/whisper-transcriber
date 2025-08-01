@@ -1,0 +1,66 @@
+patch_20250728_225858_6db62100f6df490a52c21911ff19ef0c11210a91.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Record missing patch log from history
+
+=====CONSTRAINTS=====
+- Placeholder for legacy snapshot and agent metadata
+
+=====SCOPE=====
+LEGACY commit 6db62100f6df490a52c21911ff19ef0c11210a91
+
+=====DIFFSUMMARY=====
+commit 6db62100f6df490a52c21911ff19ef0c11210a91
+Merge: 597f125 426d2eb
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Mon Jul 28 16:58:58 2025 -0600
+
+    Merge pull request #509 from buymeagoat/codex/patch-build-scripts-and-update-documentation
+    
+    Update build scripts and docs
+
+ docs/TROUBLESHOOTING.md          |  6 ++++++
+ docs/environment.md              |  2 +-
+ docs/observability.md            |  8 ++++++++
+ requirements-dev.txt             |  1 +
+ scripts/docker_build.sh          | 17 ++++++++++++++---
+ scripts/prestage_dependencies.sh | 15 ++++++++++-----
+ 6 files changed, 40 insertions(+), 9 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-28T22:58:58Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 191117
+
+=====PROMPTID=====
+legacy-backfill-batch-001
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+6db62100f6df490a52c21911ff19ef0c11210a91
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+legacy-backfill
+
+=====DECISIONS=====
+- Auto-generated from commit history

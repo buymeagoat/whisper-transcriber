@@ -1,0 +1,57 @@
+patch_20250702_190729_96682c83938d3b6d81a2f075c6b6104f3cb7fff4.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 96682c83938d3b6d81a2f075c6b6104f3cb7fff4
+
+=====DIFFSUMMARY=====
+96682c8 Add broker connection retry
+ README.md            |  2 ++
+ api/app_state.py     | 26 +++++++++++++++++---------
+ api/settings.py      |  1 +
+ docs/design_scope.md |  2 ++
+ 4 files changed, 22 insertions(+), 9 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-02T19:07:29Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-005
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+96682c83938d3b6d81a2f075c6b6104f3cb7fff4
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

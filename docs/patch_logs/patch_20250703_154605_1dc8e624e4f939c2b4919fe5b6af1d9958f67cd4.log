@@ -1,0 +1,57 @@
+patch_20250703_154605_1dc8e624e4f939c2b4919fe5b6af1d9958f67cd4.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 1dc8e624e4f939c2b4919fe5b6af1d9958f67cd4
+
+=====DIFFSUMMARY=====
+1dc8e62 Enforce upload size limit
+ README.md                 |  2 ++
+ api/services/storage.py   |  6 ++++++
+ api/settings.py           |  1 +
+ tests/test_upload_size.py | 17 +++++++++++++++++
+ 4 files changed, 26 insertions(+)
+
+=====TIMESTAMP=====
+2025-07-03T15:46:05Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-005
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+1dc8e624e4f939c2b4919fe5b6af1d9958f67cd4
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

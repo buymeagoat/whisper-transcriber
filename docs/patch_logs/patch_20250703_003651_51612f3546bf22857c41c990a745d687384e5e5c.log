@@ -1,0 +1,57 @@
+patch_20250703_003651_51612f3546bf22857c41c990a745d687384e5e5c.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 51612f3546bf22857c41c990a745d687384e5e5c
+
+=====DIFFSUMMARY=====
+51612f3 Merge pull request #230 from buymeagoat/codex/restrict-accepted-models-in-jobs.py
+
+ api/routes/jobs.py     |  9 ++++++++-
+ tests/test_jobs.py     | 14 ++++++++++++++
+ tests/test_jobs_api.py | 10 ++++++++++
+ 3 files changed, 32 insertions(+), 1 deletion(-)
+
+=====TIMESTAMP=====
+2025-07-03T00:36:51Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-005
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+51612f3546bf22857c41c990a745d687384e5e5c
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

@@ -1,0 +1,57 @@
+patch_20250627_000412_b31adde4bad7098e4b58da0685aea953915028f5.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit b31adde4bad7098e4b58da0685aea953915028f5
+
+=====DIFFSUMMARY=====
+b31adde Add periodic cleanup task
+
+api/app_state.py      | 41 +++++++++++++++++++++++++++-
+ api/main.py           |  3 +++
+ tests/test_cleanup.py | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 117 insertions(+), 1 deletion(-)
+
+=====TIMESTAMP=====
+2025-06-27T00:04:12Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-003
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+b31adde4bad7098e4b58da0685aea953915028f5
+
+=====SPEC_HASHES=====
+b56c464f9d3865da0d92d36f4ea508203ad295a8fcd86343f412fb7654514a50
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

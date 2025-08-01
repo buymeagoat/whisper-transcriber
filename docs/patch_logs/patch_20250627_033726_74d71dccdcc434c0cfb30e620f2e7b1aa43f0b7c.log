@@ -1,0 +1,59 @@
+patch_20250627_033726_74d71dccdcc434c0cfb30e620f2e7b1aa43f0b7c.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 74d71dccdcc434c0cfb30e620f2e7b1aa43f0b7c
+
+=====DIFFSUMMARY=====
+74d71dc Merge pull request #131 from buymeagoat/codex/add-whisper_bin,-whisper_language,-and-model_dir-settings
+
+README.md            | 9 ++++++---
+ api/app_state.py     | 6 +++---
+ api/paths.py         | 2 +-
+ api/settings.py      | 6 ++++++
+ docs/design_scope.md | 5 ++++-
+ 5 files changed, 20 insertions(+), 8 deletions(-)
+
+=====TIMESTAMP=====
+2025-06-27T03:37:26Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-003
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+74d71dccdcc434c0cfb30e620f2e7b1aa43f0b7c
+
+=====SPEC_HASHES=====
+b56c464f9d3865da0d92d36f4ea508203ad295a8fcd86343f412fb7654514a50
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

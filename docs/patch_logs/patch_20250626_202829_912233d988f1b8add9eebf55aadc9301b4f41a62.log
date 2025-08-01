@@ -1,0 +1,61 @@
+patch_20250626_202829_912233d988f1b8add9eebf55aadc9301b4f41a62.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 912233d988f1b8add9eebf55aadc9301b4f41a62
+
+=====DIFFSUMMARY=====
+912233d refactor frontend with shared components
+
+frontend/src/components/Button.jsx        | 20 ++++++++
+ frontend/src/components/PageContainer.jsx | 12 +++++
+ frontend/src/components/Table.jsx         | 43 +++++++++++++++++
+ frontend/src/global.css                   | 41 ++++++++++++++++
+ frontend/src/main.jsx                     |  1 +
+ frontend/src/pages/ActiveJobsPage.jsx     | 58 ++++++++--------------
+ frontend/src/pages/CompletedJobsPage.jsx  | 80 +++++++++----------------------
+ 7 files changed, 158 insertions(+), 97 deletions(-)
+
+=====TIMESTAMP=====
+2025-06-26T20:28:29Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-003
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+912233d988f1b8add9eebf55aadc9301b4f41a62
+
+=====SPEC_HASHES=====
+b56c464f9d3865da0d92d36f4ea508203ad295a8fcd86343f412fb7654514a50
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

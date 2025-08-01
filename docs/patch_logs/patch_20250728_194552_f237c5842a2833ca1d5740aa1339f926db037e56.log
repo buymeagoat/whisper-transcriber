@@ -1,0 +1,56 @@
+patch_20250728_194552_f237c5842a2833ca1d5740aa1339f926db037e56.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit f237c5842a2833ca1d5740aa1339f926db037e56
+
+=====DIFFSUMMARY=====
+f237c58 Merge pull request #502 from buymeagoat/codex/add-contributing.md-and-troubleshooting.md
+
+ docs/CONTRIBUTING.md    | 47 +++++++++++++++++++++++++++++++++++++++++
+ docs/TROUBLESHOOTING.md | 56 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 103 insertions(+)
+
+=====TIMESTAMP=====
+2025-07-28T19:45:52Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 194741
+
+=====PROMPTID=====
+legacy-backfill-batch-002
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+f237c5842a2833ca1d5740aa1339f926db037e56
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

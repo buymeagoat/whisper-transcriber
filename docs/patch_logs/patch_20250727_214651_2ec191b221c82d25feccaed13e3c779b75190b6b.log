@@ -1,0 +1,59 @@
+patch_20250727_214651_2ec191b221c82d25feccaed13e3c779b75190b6b.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 2ec191b221c82d25feccaed13e3c779b75190b6b
+
+=====DIFFSUMMARY=====
+2ec191b Merge pull request #483 from buymeagoat/codex/store-and-verify-python-digest
+
+ README.md                        |  2 +-
+ docs/design_scope.md             |  5 +++--
+ docs/help.md                     |  2 +-
+ scripts/check_env.sh             | 15 +++++++++++++++
+ scripts/prestage_dependencies.sh |  7 ++++++-
+ 5 files changed, 26 insertions(+), 5 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-27T21:46:51Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 194741
+
+=====PROMPTID=====
+legacy-backfill-batch-002
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+2ec191b221c82d25feccaed13e3c779b75190b6b
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

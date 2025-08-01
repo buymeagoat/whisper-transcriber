@@ -1,0 +1,55 @@
+patch_20250728_190131_ccc282e7db8d7221dbbc93a8ad3cf3dd25e1bc7c.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit ccc282e7db8d7221dbbc93a8ad3cf3dd25e1bc7c
+
+=====DIFFSUMMARY=====
+ccc282e Merge pull request #497 from buymeagoat/codex/refactor-readme.md-for-external-audience
+
+ README.md | 167 +++++++++++++-------------------------------------------------
+ 1 file changed, 35 insertions(+), 132 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-28T19:01:31Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 194741
+
+=====PROMPTID=====
+legacy-backfill-batch-002
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+ccc282e7db8d7221dbbc93a8ad3cf3dd25e1bc7c
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

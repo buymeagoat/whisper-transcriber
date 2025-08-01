@@ -1,0 +1,54 @@
+patch_20250727_154722_969a2ae37e17265c81406b3dafe6a1c1b266bc7c.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 969a2ae37e17265c81406b3dafe6a1c1b266bc7c
+
+=====DIFFSUMMARY=====
+969a2ae Improve requirement parsing in offline check
+ scripts/shared_checks.sh | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+=====TIMESTAMP=====
+2025-07-27T15:47:22Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 194741
+
+=====PROMPTID=====
+legacy-backfill-batch-002
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+969a2ae37e17265c81406b3dafe6a1c1b266bc7c
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

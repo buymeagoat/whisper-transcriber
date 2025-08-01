@@ -1,0 +1,56 @@
+patch_20250728_003735_99cc869707e93d427d0f99873feb8193514b6f21.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 99cc869707e93d427d0f99873feb8193514b6f21
+
+=====DIFFSUMMARY=====
+99cc869 Document new lockfiles
+ README.md                        |  2 +-
+ docs/design_scope.md             |  2 +-
+ scripts/prestage_dependencies.sh | 12 ++++++++++++
+ 3 files changed, 14 insertions(+), 2 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-28T00:37:35Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 194741
+
+=====PROMPTID=====
+legacy-backfill-batch-002
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+99cc869707e93d427d0f99873feb8193514b6f21
+
+=====SPEC_HASHES=====
+6bfaa5a80ab85a494b5e35d9cc68b1ec039d330a4386e8ac011f130556dbb7a1
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

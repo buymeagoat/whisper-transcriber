@@ -73,9 +73,10 @@ At session start **and** before tests:
 ## Patch Logging
 After each committed patch:
 
-1. Generate `/docs/patch_logs/patch_<YYYYMMDD>_<HHMMSS>_<prompt_id>.log`.  
+1. Generate `/docs/patch_logs/patch_<YYYYMMDD><HHMMSS>_<short>.log`.
 2. Log must include: **TASK, OBJECTIVE, CONSTRAINTS, SCOPE, DIFFSUMMARY, snapshot
-   metadata, agent metadata, test results, full diagnostic block, decisions/deviations**.  
+   metadata, agent metadata, test results, full diagnostic block, SPEC_HASHES,
+   decisions/deviations**.
 3. Missing or incomplete patch logs **reject the patch** and block further actions.
 
 Use UTC when constructing patch file names to align with TIMESTAMP (Z).

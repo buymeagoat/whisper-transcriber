@@ -1,0 +1,71 @@
+patch_20250722_042414_f0136614590b57831033d43b7fc976d0771f8f44.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit f0136614590b57831033d43b7fc976d0771f8f44
+
+=====DIFFSUMMARY=====
+commit f0136614590b57831033d43b7fc976d0771f8f44
+Merge: 82e76c0 064c7b1
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Mon Jul 21 22:24:14 2025 -0600
+
+    Merge pull request #369 from buymeagoat/codex/remove-network=host-from-docker-build-commands
+    
+    Fix compose build options
+
+ scripts/docker_build.sh | 2 --
+ 1 file changed, 2 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-22T04:24:14Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+f0136614590b57831033d43b7fc976d0771f8f44
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

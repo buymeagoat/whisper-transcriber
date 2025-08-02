@@ -1,0 +1,73 @@
+patch_20250723_174403_e7b244b7e2a0071c98ce18794ef9656cc6a1e8f8.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit e7b244b7e2a0071c98ce18794ef9656cc6a1e8f8
+
+=====DIFFSUMMARY=====
+commit e7b244b7e2a0071c98ce18794ef9656cc6a1e8f8
+Merge: 122ffe6 12f8413
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Wed Jul 23 11:44:03 2025 -0600
+
+    Merge pull request #387 from buymeagoat/codex/update-script-execution-order-and-add-error-handling
+    
+    Move verify_offline_assets after staging dependencies
+
+ scripts/docker_build.sh     | 4 ++--
+ scripts/start_containers.sh | 6 +++---
+ scripts/update_images.sh    | 6 +++---
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-23T17:44:03Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+e7b244b7e2a0071c98ce18794ef9656cc6a1e8f8
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

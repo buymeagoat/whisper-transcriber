@@ -1,0 +1,71 @@
+patch_20250723_185320_ad14e289aaf1d37a3024d457a58fa2bdd3122add.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit ad14e289aaf1d37a3024d457a58fa2bdd3122add
+
+=====DIFFSUMMARY=====
+commit ad14e289aaf1d37a3024d457a58fa2bdd3122add
+Merge: 41af161 b5caf3c
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Wed Jul 23 12:53:20 2025 -0600
+
+    Merge pull request #392 from buymeagoat/codex/update-repository-commands-in-docker_build.sh
+    
+    Enforce offline docker build workflow
+
+ scripts/docker_build.sh | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-23T18:53:20Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+ad14e289aaf1d37a3024d457a58fa2bdd3122add
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

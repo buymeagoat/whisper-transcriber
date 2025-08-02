@@ -1,0 +1,71 @@
+patch_20250723_184251_41af161dcb51d7ec99c71636468744d210b8e44e.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit 41af161dcb51d7ec99c71636468744d210b8e44e
+
+=====DIFFSUMMARY=====
+commit 41af161dcb51d7ec99c71636468744d210b8e44e
+Merge: 46a0b4d 2645e81
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Wed Jul 23 12:42:51 2025 -0600
+
+    Merge pull request #391 from buymeagoat/codex/add-local-apt_cache-to-shared_checks.sh
+    
+    Fix apt cache variable
+
+ scripts/shared_checks.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+=====TIMESTAMP=====
+2025-07-23T18:42:51Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+41af161dcb51d7ec99c71636468744d210b8e44e
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

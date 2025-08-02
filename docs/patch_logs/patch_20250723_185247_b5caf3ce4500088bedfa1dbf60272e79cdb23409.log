@@ -1,0 +1,68 @@
+patch_20250723_185247_b5caf3ce4500088bedfa1dbf60272e79cdb23409.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit b5caf3ce4500088bedfa1dbf60272e79cdb23409
+
+=====DIFFSUMMARY=====
+commit b5caf3ce4500088bedfa1dbf60272e79cdb23409
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Wed Jul 23 12:52:47 2025 -0600
+
+    Update docker build script order and offline network
+
+ scripts/docker_build.sh | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-23T18:52:47Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+b5caf3ce4500088bedfa1dbf60272e79cdb23409
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

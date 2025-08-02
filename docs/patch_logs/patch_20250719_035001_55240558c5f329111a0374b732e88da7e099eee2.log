@@ -1,0 +1,73 @@
+patch_20250719_035001_55240558c5f329111a0374b732e88da7e099eee2.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit 55240558c5f329111a0374b732e88da7e099eee2
+
+=====DIFFSUMMARY=====
+commit 55240558c5f329111a0374b732e88da7e099eee2
+Merge: 62d176d 5702257
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Fri Jul 18 21:50:01 2025 -0600
+
+    Merge pull request #345 from buymeagoat/codex/modify-dockerfile-for-multi-stage-build
+    
+    Add optional dev dependencies
+
+ Dockerfile               | 5 ++++-
+ scripts/docker_build.sh  | 6 ++++--
+ scripts/update_images.sh | 6 ++++--
+ 3 files changed, 12 insertions(+), 5 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-19T03:50:01Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+55240558c5f329111a0374b732e88da7e099eee2
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

@@ -1,0 +1,72 @@
+patch_20250722_172253_a40bf8615f6efabb32a228242677f0bedff28741.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit a40bf8615f6efabb32a228242677f0bedff28741
+
+=====DIFFSUMMARY=====
+commit a40bf8615f6efabb32a228242677f0bedff28741
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Tue Jul 22 11:22:53 2025 -0600
+
+    Rename install log
+
+ docs/{20250720-1730_logs => install_logs/20250720-1730.log} | 0
+ docs/{ => install_logs}/20250721-1925.log                   | 0
+ docs/{ => install_logs}/20250721-2314.log                   | 0
+ docs/{ => install_logs}/20250722-0938.log                   | 0
+ docs/{ => install_logs}/20250722-1153.log                   | 0
+ 5 files changed, 0 insertions(+), 0 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-22T17:22:53Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+a40bf8615f6efabb32a228242677f0bedff28741
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

@@ -1,0 +1,70 @@
+patch_20250723_174337_12f84136fdd439053f06840dc75e2ebd9b66cb7c.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit 12f84136fdd439053f06840dc75e2ebd9b66cb7c
+
+=====DIFFSUMMARY=====
+commit 12f84136fdd439053f06840dc75e2ebd9b66cb7c
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Wed Jul 23 11:43:37 2025 -0600
+
+    Ensure offline assets verified after staging
+
+ scripts/docker_build.sh     | 4 ++--
+ scripts/start_containers.sh | 6 +++---
+ scripts/update_images.sh    | 6 +++---
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-23T17:43:37Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+12f84136fdd439053f06840dc75e2ebd9b66cb7c
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

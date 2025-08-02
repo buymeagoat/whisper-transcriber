@@ -1,0 +1,55 @@
+patch_20250705_004529_874c36d2a78abce0536f830b4cf97a809d9987eb.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 874c36d2a78abce0536f830b4cf97a809d9987eb
+
+=====DIFFSUMMARY=====
+874c36d doc: note stack restart after compose changes
+ README.md          | 11 +++++++++--
+ docker-compose.yml |  2 ++
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-05T00:45:29Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-006
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+874c36d2a78abce0536f830b4cf97a809d9987eb
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

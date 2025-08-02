@@ -1,0 +1,54 @@
+patch_20250706_162040_9ac556a26dc3bd6f27cd38f86384cb94b4244cc3.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 9ac556a26dc3bd6f27cd38f86384cb94b4244cc3
+
+=====DIFFSUMMARY=====
+9ac556a Use partial for queued whisper jobs
+ api/routes/jobs.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-06T16:20:40Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-006
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+9ac556a26dc3bd6f27cd38f86384cb94b4244cc3
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

@@ -1,0 +1,69 @@
+patch_20250719_150924_397a04f7261d7b20921014827ae616cbfce53d76.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit 397a04f7261d7b20921014827ae616cbfce53d76
+
+=====DIFFSUMMARY=====
+commit 397a04f7261d7b20921014827ae616cbfce53d76
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Sat Jul 19 09:09:24 2025 -0600
+
+    Add container diagnostics script
+
+ README.md                      |  1 +
+ scripts/diagnose_containers.sh | 19 +++++++++++++++++++
+ 2 files changed, 20 insertions(+)
+
+=====TIMESTAMP=====
+2025-07-19T15:09:24Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+397a04f7261d7b20921014827ae616cbfce53d76
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

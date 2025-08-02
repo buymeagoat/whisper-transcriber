@@ -1,0 +1,74 @@
+patch_20250720_011057_a25fa60967a82e4291c1962c633ff43e1d646248.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit a25fa60967a82e4291c1962c633ff43e1d646248
+
+=====DIFFSUMMARY=====
+commit a25fa60967a82e4291c1962c633ff43e1d646248
+Merge: db62340 ed484f1
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Sat Jul 19 19:10:57 2025 -0600
+
+    Merge pull request #354 from buymeagoat/codex/delete-integration_tests.sh-and-update-docs
+    
+    Integrate health checks into backend tests
+
+ README.md                    |  5 +++--
+ docs/design_scope.md         |  2 +-
+ scripts/integration_tests.sh | 20 --------------------
+ scripts/run_backend_tests.sh | 16 +++++++++++++++-
+ 4 files changed, 19 insertions(+), 24 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-20T01:10:57Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+a25fa60967a82e4291c1962c633ff43e1d646248
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

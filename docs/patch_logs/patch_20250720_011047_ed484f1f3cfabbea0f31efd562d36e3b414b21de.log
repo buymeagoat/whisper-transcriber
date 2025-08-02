@@ -1,0 +1,71 @@
+patch_20250720_011047_ed484f1f3cfabbea0f31efd562d36e3b414b21de.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit ed484f1f3cfabbea0f31efd562d36e3b414b21de
+
+=====DIFFSUMMARY=====
+commit ed484f1f3cfabbea0f31efd562d36e3b414b21de
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Sat Jul 19 19:10:47 2025 -0600
+
+    Remove integration_tests script and update docs
+
+ README.md                    |  5 +++--
+ docs/design_scope.md         |  2 +-
+ scripts/integration_tests.sh | 20 --------------------
+ scripts/run_backend_tests.sh | 16 +++++++++++++++-
+ 4 files changed, 19 insertions(+), 24 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-20T01:10:47Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+ed484f1f3cfabbea0f31efd562d36e3b414b21de
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

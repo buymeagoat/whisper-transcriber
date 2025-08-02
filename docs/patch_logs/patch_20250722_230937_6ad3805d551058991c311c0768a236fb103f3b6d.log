@@ -1,0 +1,69 @@
+patch_20250722_230937_6ad3805d551058991c311c0768a236fb103f3b6d.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit 6ad3805d551058991c311c0768a236fb103f3b6d
+
+=====DIFFSUMMARY=====
+commit 6ad3805d551058991c311c0768a236fb103f3b6d
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Tue Jul 22 17:09:37 2025 -0600
+
+    Add build image verification
+
+ README.md               |  2 +-
+ scripts/docker_build.sh | 13 +++++++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+=====TIMESTAMP=====
+2025-07-22T23:09:37Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+6ad3805d551058991c311c0768a236fb103f3b6d
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

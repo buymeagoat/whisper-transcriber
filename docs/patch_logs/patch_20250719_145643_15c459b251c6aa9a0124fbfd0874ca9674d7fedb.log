@@ -1,0 +1,71 @@
+patch_20250719_145643_15c459b251c6aa9a0124fbfd0874ca9674d7fedb.log
+=====TASK=====
+Back-fill missing patch logs using commit history.
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                    DIFFSUMMARY (git show --stat),
+                    snapshot_metadata=LEGACY-N/A,
+                    agent_metadata=LEGACY-N/A,
+                    test_results=LEGACY-N/A,
+                    diagnostic block noting legacy status,
+                    SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit 15c459b251c6aa9a0124fbfd0874ca9674d7fedb
+
+=====DIFFSUMMARY=====
+commit 15c459b251c6aa9a0124fbfd0874ca9674d7fedb
+Merge: f950446 1bc9087
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Sat Jul 19 08:56:43 2025 -0600
+
+    Merge pull request #347 from buymeagoat/codex/update-docker-compose-for-rabbitmq-nodename
+    
+    Set RabbitMQ nodename in compose
+
+ docker-compose.yml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+=====TIMESTAMP=====
+2025-07-19T14:56:43Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-008
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+15c459b251c6aa9a0124fbfd0874ca9674d7fedb
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

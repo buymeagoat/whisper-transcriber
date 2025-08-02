@@ -1,0 +1,57 @@
+patch_20250708_002420_101c10f3479293485e4d3c8c05122fc608551a56.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 101c10f3479293485e4d3c8c05122fc608551a56
+
+=====DIFFSUMMARY=====
+101c10f Merge pull request #305 from buymeagoat/codex/debug-application-access-issue-on-localhost
+
+ README.md               |  2 +-
+ docs/design_scope.md    |  2 +-
+ scripts/docker_build.sh | 11 ++++++-----
+ 3 files changed, 8 insertions(+), 7 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-08T00:24:20Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-006
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+101c10f3479293485e4d3c8c05122fc608551a56
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

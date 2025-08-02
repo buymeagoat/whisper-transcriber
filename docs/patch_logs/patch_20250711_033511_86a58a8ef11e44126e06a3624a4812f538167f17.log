@@ -1,0 +1,56 @@
+patch_20250711_033511_86a58a8ef11e44126e06a3624a4812f538167f17.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 86a58a8ef11e44126e06a3624a4812f538167f17
+
+=====DIFFSUMMARY=====
+86a58a8 Merge pull request #327 from buymeagoat/codex/respect-broker_connect_attempts-in-check_celery_connection
+
+ api/app_state.py             | 18 ++++++++++++------
+ tests/test_celery_startup.py | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+), 6 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-11T03:35:11Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-006
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+86a58a8ef11e44126e06a3624a4812f538167f17
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

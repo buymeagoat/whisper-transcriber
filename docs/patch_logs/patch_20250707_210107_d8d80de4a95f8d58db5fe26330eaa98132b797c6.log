@@ -1,0 +1,57 @@
+patch_20250707_210107_d8d80de4a95f8d58db5fe26330eaa98132b797c6.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit d8d80de4a95f8d58db5fe26330eaa98132b797c6
+
+=====DIFFSUMMARY=====
+d8d80de Add integration test script and update docs
+ README.md                    |  8 +++-----
+ docs/design_scope.md         |  1 +
+ scripts/integration_tests.sh | 20 ++++++++++++++++++++
+ scripts/run_tests.sh         | 13 +++++++++++--
+ 4 files changed, 35 insertions(+), 7 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-07T21:01:07Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-006
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+d8d80de4a95f8d58db5fe26330eaa98132b797c6
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

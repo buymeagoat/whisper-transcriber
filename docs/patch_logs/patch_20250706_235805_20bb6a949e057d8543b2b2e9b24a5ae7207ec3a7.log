@@ -1,0 +1,55 @@
+patch_20250706_235805_20bb6a949e057d8543b2b2e9b24a5ae7207ec3a7.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 20bb6a949e057d8543b2b2e9b24a5ae7207ec3a7
+
+=====DIFFSUMMARY=====
+20bb6a9 Use VITE_API_HOST in healthcheck
+ README.md              | 1 +
+ scripts/healthcheck.sh | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+=====TIMESTAMP=====
+2025-07-06T23:58:05Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-006
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+20bb6a949e057d8543b2b2e9b24a5ae7207ec3a7
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

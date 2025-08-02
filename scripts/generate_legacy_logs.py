@@ -1,6 +1,6 @@
 import subprocess, datetime, pathlib, json
-start='6a46418e06efd889fcddf47885258f0402620dba'
-end='ca9481f1db68fb1aef3316ab8d9a687309b40c40'
+start='95fb51e6c2a2dc26dd609c2b3846d65341448264'
+end='db9b76ccce1242fa62fa304019c4f1c9801ccff1'
 logdir=pathlib.Path('docs/patch_logs')
 spec_hash=subprocess.check_output(['scripts/hash_utils.sh','cag_agents_hash','AGENTS.md']).decode().strip()
 commits=subprocess.check_output(['git','rev-list','--reverse',f'{start}..{end}']).decode().split()
@@ -34,10 +34,10 @@ Commit {h}
 {dt.strftime('%Y-%m-%dT%H:%M:%SZ')}
 
 =====BUILDER_DATE_TIME (UTC)=====
-20250801 194741
+20250801 200929
 
 =====PROMPTID=====
-legacy-backfill-batch-002
+legacy-backfill-batch-006
 
 =====AGENTVERSION=====
 LEGACY-N/A

@@ -1,0 +1,55 @@
+patch_20250726_170121_7fd64ff156c2e2771cdf3fa0c8bc6ff59d1d50e1.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 7fd64ff156c2e2771cdf3fa0c8bc6ff59d1d50e1
+
+=====DIFFSUMMARY=====
+7fd64ff docs: add WSL docker install steps
+ README.md    | 12 ++++++++++++
+ docs/help.md | 13 +++++++++++++
+ 2 files changed, 25 insertions(+)
+
+=====TIMESTAMP=====
+2025-07-26T17:01:21Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-010
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+7fd64ff156c2e2771cdf3fa0c8bc6ff59d1d50e1
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

@@ -1,0 +1,83 @@
+patch_20250728_215927_c807c88798537e7523f768b6c1aa7dd6c77b6044.log
+=====TASK=====
+generate_legacy_patch_logs
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                  DIFFSUMMARY (git show --stat),
+                  snapshot_metadata=LEGACY-N/A,
+                  agent_metadata=LEGACY-N/A,
+                  test_results=LEGACY-N/A,
+                  diagnostic block noting legacy status,
+                  SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit c807c88798537e7523f768b6c1aa7dd6c77b6044
+
+=====DIFFSUMMARY=====
+commit c807c88798537e7523f768b6c1aa7dd6c77b6044
+Author: buymeagoat <53793097+buymeagoat@users.noreply.github.com>
+Date:   Mon Jul 28 15:59:27 2025 -0600
+
+    Add file retention doc, FAQ, and update references
+
+ docs/api_reference.md  | 152 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------------------
+ docs/faq.md            |  22 ++++++++++++++
+ docs/file_retention.md |  25 ++++++++++++++++
+ docs/index.md          |   2 ++
+ 4 files changed, 163 insertions(+), 38 deletions(-)
+
+=====SNAPSHOT_METADATA=====
+LEGACY-N/A
+
+=====AGENT_METADATA=====
+LEGACY-N/A
+
+=====TEST_RESULTS=====
+LEGACY-N/A
+
+=====TIMESTAMP=====
+2025-07-28T15:59:27-06:00
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-011
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+c807c88798537e7523f768b6c1aa7dd6c77b6044
+
+=====DIAGNOSTIC=====
+attempted_action_summary: legacy patch log generation
+instruction_interpretation: back-fill missing patch log
+successes: [legacy patch log generated]
+failures: []
+skipped_steps: []
+missing_inputs: []
+ambiguities_detected: []
+resource_or_environment_gaps: [docker not installed]
+suggestions_to_builder: []
+
+=====SPEC_HASHES=====
+instructions/cag_dense.txt: 91e6f079e77169722181257dc72fbef4ecb0b0006c251b31eba2c8fb8f99983d
+AGENTS.md: 2990df15ee8eca212e0fd78f42f638ae17a6d067f8106dd5a639d2ac957efb25
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

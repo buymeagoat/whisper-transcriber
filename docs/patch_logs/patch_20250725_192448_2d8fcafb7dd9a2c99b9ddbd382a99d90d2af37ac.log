@@ -1,0 +1,72 @@
+patch_20250725_192448_2d8fcafb7dd9a2c99b9ddbd382a99d90d2af37ac.log
+=====TASK=====
+generate_legacy_patch_logs
+
+=====OBJECTIVE=====
+Back-fill missing patch logs using commit history.
+
+=====CONSTRAINTS=====
+- AtomicPatch: create ≤100 new logs in this batch; abort on error.
+- Filename pattern: patch_<UTC YYYYMMDD>_<HHMMSS>_<commit_hash>.log
+- Required fields: TASK, OBJECTIVE, CONSTRAINTS, SCOPE,
+                  DIFFSUMMARY (git show --stat),
+                  snapshot_metadata=LEGACY-N/A,
+                  agent_metadata=LEGACY-N/A,
+                  test_results=LEGACY-N/A,
+                  diagnostic block noting legacy status,
+                  SPEC_HASHES (current CAG & agents.md).
+- Skip commits already covered by docs/patch_logs/*.log
+- Preserve existing logs; no edits.
+
+=====SCOPE=====
+Commit 2d8fcafb7dd9a2c99b9ddbd382a99d90d2af37ac
+
+=====DIFFSUMMARY=====
+2d8fcaf Implement broker queue shutdown
+ api/services/job_queue.py | 7 +++++--
+ tests/test_queue.py       | 7 +++++++
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-25T19:24:48Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-009
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+2d8fcafb7dd9a2c99b9ddbd382a99d90d2af37ac
+
+=====SPEC_HASHES=====
+dc8a013c0f35058c795920c3066582fb3a49b0ae5696470c63154e62ac6efc70
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTIC=====
+attempted_action_summary: Backfill legacy patch log from commit history.
+instruction_interpretation: Generate patch log without modifying repository state.
+successes: Patch log generated.
+failures:
+skipped_steps:
+missing_inputs:
+ambiguities_detected:
+resource_or_environment_gaps:
+suggestions_to_builder:
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

@@ -1,0 +1,62 @@
+patch_20250726_043630_db6aca77ed42969991fe631f61f0271749ac79f8.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit db6aca77ed42969991fe631f61f0271749ac79f8
+
+=====DIFFSUMMARY=====
+db6aca7 Merge pull request #443 from buymeagoat/codex/update-shell-scripts-for-wsl-support
+
+ README.md                        |  2 +-
+ docs/design_scope.md             |  2 +-
+ scripts/diagnose_containers.sh   | 11 +++++++++--
+ scripts/docker_build.sh          | 11 ++++++++++-
+ scripts/prestage_dependencies.sh | 10 +++++++++-
+ scripts/shared_checks.sh         | 32 +++++++++++++++++++++++---------
+ scripts/start_containers.sh      | 11 ++++++++++-
+ scripts/update_images.sh         | 12 +++++++++++-
+ 8 files changed, 74 insertions(+), 17 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-26T04:36:30Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-010
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+db6aca77ed42969991fe631f61f0271749ac79f8
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

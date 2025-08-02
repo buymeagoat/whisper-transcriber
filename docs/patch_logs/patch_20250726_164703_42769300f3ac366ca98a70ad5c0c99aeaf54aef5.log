@@ -1,0 +1,59 @@
+patch_20250726_164703_42769300f3ac366ca98a70ad5c0c99aeaf54aef5.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 42769300f3ac366ca98a70ad5c0c99aeaf54aef5
+
+=====DIFFSUMMARY=====
+4276930 Simplify cache dir handling in scripts
+ scripts/diagnose_containers.sh   |  9 ++-------
+ scripts/docker_build.sh          |  9 ++-------
+ scripts/prestage_dependencies.sh |  8 ++------
+ scripts/shared_checks.sh         |  6 ++----
+ scripts/start_containers.sh      |  9 ++-------
+ scripts/update_images.sh         | 10 ++--------
+ 6 files changed, 12 insertions(+), 39 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-26T16:47:03Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-010
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+42769300f3ac366ca98a70ad5c0c99aeaf54aef5
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

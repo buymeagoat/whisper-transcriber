@@ -1,0 +1,55 @@
+patch_20250711_033455_acbceebfd3086a467f51cc2df2b120368c2cb39d.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit acbceebfd3086a467f51cc2df2b120368c2cb39d
+
+=====DIFFSUMMARY=====
+acbceeb Respect broker connect attempts for Celery
+ api/app_state.py             | 18 ++++++++++++------
+ tests/test_celery_startup.py | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+), 6 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-11T03:34:55Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-006
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+acbceebfd3086a467f51cc2df2b120368c2cb39d
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

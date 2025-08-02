@@ -1,0 +1,58 @@
+patch_20250708_195157_8eb7a763fa8a780261b39c17a6be9db43d8b6154.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 8eb7a763fa8a780261b39c17a6be9db43d8b6154
+
+=====DIFFSUMMARY=====
+8eb7a76 Add shared build helper
+ README.md                   |  2 +-
+ scripts/docker_build.sh     | 23 +++----------------
+ scripts/shared_checks.sh    | 55 +++++++++++++++++++++++++++++++++++++++++++++
+ scripts/start_containers.sh | 43 ++++-------------------------------
+ scripts/update_images.sh    | 14 +++---------
+ 5 files changed, 66 insertions(+), 71 deletions(-)
+
+=====TIMESTAMP=====
+2025-07-08T19:51:57Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-006
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+8eb7a763fa8a780261b39c17a6be9db43d8b6154
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

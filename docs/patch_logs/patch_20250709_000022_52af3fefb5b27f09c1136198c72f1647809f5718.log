@@ -1,0 +1,54 @@
+patch_20250709_000022_52af3fefb5b27f09c1136198c72f1647809f5718.log
+=====TASK=====
+Backfill legacy patch log
+
+=====OBJECTIVE=====
+Reconstruct patch metadata for auditing.
+
+=====CONSTRAINTS=====
+- No repository changes
+- Use commit history only
+
+=====SCOPE=====
+Commit 52af3fefb5b27f09c1136198c72f1647809f5718
+
+=====DIFFSUMMARY=====
+52af3fe fix start script unbound arg
+ scripts/start_containers.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+=====TIMESTAMP=====
+2025-07-09T00:00:22Z
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250801 200929
+
+=====PROMPTID=====
+legacy-backfill-batch-006
+
+=====AGENTVERSION=====
+LEGACY-N/A
+
+=====AGENTHASH=====
+LEGACY-N/A
+
+=====PROMPTHASH=====
+LEGACY-N/A
+
+=====COMMITHASH=====
+52af3fefb5b27f09c1136198c72f1647809f5718
+
+=====SPEC_HASHES=====
+10ba62ac16c28028ead0d8892258ab67b59de208559b0027d4835794228c3167
+
+=====SNAPSHOT=====
+LEGACY-N/A
+
+=====TESTRESULTS=====
+LEGACY-N/A
+
+=====DIAGNOSTICMETA=====
+{"legacy_backfill": true}
+
+=====DECISIONS=====
+- Legacy patch log generated from commit history.

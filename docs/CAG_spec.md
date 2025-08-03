@@ -21,10 +21,11 @@ InputRedaction:B:MustHashSecretsBeforeSend;Else:Halt;
 AtomicPatch:C:IfPatchSpans>1File:RequireAtomicCommitOrRevert;NoPartialState;
 MergeCheck:C:AbortIfUnmergedConflictMarkers;
 BinaryGuard:C:IfDiff>1MBOrBinary:PromptBConfirm;
-PathCreation:C:IfReferencedFileMissing:PromptBCreateOrAbort;IfBApproves:CreateStub;
+PathCreation:C:IfReferencedFileMissing:AutoGeneratePatchLog;
+AutoGeneratePatchLog:C:When /docs/patch_logs/patch_<YYYYMMDD>_<HHMMSS>_<prompt_id>.log missing:CreateStubUsingStandardTemplateWithPlaceholders(snapshot_metadata,agent_metadata,test_results,diagnostic_block,degraded_snapshot_acknowledgment);CommitStubAndProceedWithPatchLogPopulation;
 PatchLogFinalization:C:AGENTS.md updates done before patch-log step;Patch log gen is final task;C must not bundle patch log creation with upstream edits;Before naming/creating patch log,C confirms B-supplied date/time(YYYYMMDD HHMMSS);If absent:pause ask;After receiving,emit patch-log instruction;PatchLogIsFinalSeparateStep;Include BDT and any degraded snapshot note;
 PatchLogging:C:EachCommittedPatch:XGeneratesLog /docs/patch_logs/ named patch_<YYYYMMDD><HHMMSS>_<short>.log;LogMustInclude(TASK,OBJECTIVE,CONSTRAINTS,SCOPE,DIFF,TS,prompt_id,AV,AH,CH,TESTRES,DIAGMETA,BDT,SPEC_HASHES);RejectWorkflowIfLogMissing;
-TestEnforcement:C:EveryBehaviorPatch:XRunsAllTestsAndLogs;IfTestsFailOrUnavailable:XOutputsReason;RejectPatchWithoutTestData;
+TestEnforcement:C:EveryBehaviorPatch:XRunsAllTestsAndLogs;IfDockerOrComposeMissing:LogWarning(ContainerizedTestsSkipped:<error>);MarkPatchConditionallyValidatedPendingManualResults;ElseIfTestsFailOrCannotRun:XOutputsReason;RejectPatchWithoutTestData;
 TestingEnumeration:C:OnTestingOrBuildContext:PromptX:ListAllTests,Runners;IfNoneFound:RequireXDiagnostic(Why,Fix);
 SessionSummary:C:OnBRequestOrAfter3Patches:OutputSummary(PromptIDs,FilesChanged,Decisions,OutstandingDependencies);
 WorkflowHealthCheck:C:OnBRequest,After3Patches,OrDailyIdle:RunIntegrityAudit;CompareState,PatchLogs,DependencyMap,InstructionSet;ReportDrift,Gaps,ComplianceFailures;BlockWorkflowIfCritical;
@@ -44,3 +45,5 @@ Failure:C:IfXBreachesConstraint:LogRejected;EmitFallback(NarrowScopeOrStricterCo
 AutoRollback:C:IfFallbackTriggeredAndFilesModified:Revert;
 RuntimeAutomation:IfManualRuntimeStep:GenXPatchToAutomateOrLog;
 PreservedBehaviors:CanonicalInputViaXOnly;PriorLogicRetained;RevertInstructionsAlwaysPresent;StatelessValidation;DigestSummariesOptional;NoManualZipping;
+
+DiagnosticAlias:C:Map attempted_action_summary=What;instruction_interpretation=Interpretation;successes=Success;failures=Failure;skipped_steps=Skipped;missing_inputs=Missing;ambiguities_detected=Ambiguity;resource_or_environment_gaps=ResourceGap;suggestions_to_builder=Suggestion;

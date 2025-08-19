@@ -1,0 +1,29 @@
+Task: Update operating blueprint to reflect revised CAG instruction densification behavior.
+Objective: Codify that rationale lines are not required in the densified CAG instructions and require bundle headers at file top; update generation pipeline for Architect-led densification.
+Constraints: Preserve existing behavior and rule structure; do not alter roles, gates, or functional logic.
+Scope: {edit: /docs/OPERATING_BLUEPRINT.md, create_if_missing: false}
+Diff summary: docs/OPERATING_BLUEPRINT.md | 16 ++++++++++++++-- (1 file changed, 14 insertions(+), 2 deletions(-))
+Commit timestamp: 20250819_210816
+Builder UTC timestamp: 20250819_210816
+prompt_id: eff9cc7a-786a-4b07-9576-df83ebe4673a
+agent_version: 1
+agent_hash: 0000000
+prompt_hash: 0000000
+commit_hash: TBD
+spec_hashes: N/A
+snapshot: N/A
+test_results: 5 failed, 15 passed, 43 warnings, 41 errors in 3.65s
+bundle: {Bundle-ID:1, Bundle-UTC:20250819, Blueprint-Version:2}
+lane: Fast-Path
+risk: low
+decisions_or_deviations: tests failed due to missing dependencies.
+DIAGMETA:
+  attempted_action_summary: Updated Blueprint documentation.
+  instruction_interpretation: Clarified densification rules and rationale exceptions.
+  successes: Blueprint sections updated.
+  failures: Test suite errors.
+  skipped_steps: none
+  missing_inputs: api module for tests
+  ambiguities_detected: none
+  resource_or_environment_gaps: testing dependencies absent
+  suggestions_to_builder: provide environment with required modules

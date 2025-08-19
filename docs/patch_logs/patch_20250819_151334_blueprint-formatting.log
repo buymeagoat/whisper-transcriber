@@ -1,0 +1,17 @@
+TASK: reformat_blueprint_headings
+OBJECTIVE: Normalize markdown headings and spacing in docs/blueprint_v1.3.md
+CONSTRAINTS: formatting-only; preserve content; fix HALT.Retention spacing
+SCOPE: docs/blueprint_v1.3.md
+DIFFSUMMARY: heading levels normalized; HALT.  Retention spacing corrected
+TS: 2025-08-19T15:13:34Z
+prompt_id: fix_formatting_blueprint_v1.3_verify_lossless
+AV: n/a
+AH: n/a
+CH: 614a05d725068d9a5cf930687af6cf4a5a8b8086
+BDT: 20250819 151334
+snapshot_metadata: snapshot_20250819T151227Z.json sha256=362f9edf34d0612babb7e481c1f90af2dcdbfef4d2f405566830d1ab3c72e296 commit=201ac730bc663a4a036a66701df3ec488c81c6fd
+agent_metadata: version=n/a hash=n/a
+test_results: scripts/run_tests.sh failed: docker: command not found
+full_diagnostic_block: attempted_action_summary=Normalized headings and spacing in blueprint; instruction_interpretation=Apply formatting per prompt; successes=File updated and committed; failures=Tests failed (docker command not found); skipped_steps=None; missing_inputs=None; ambiguities_detected=None; resource_or_environment_gaps=docker missing; suggestions_to_builder=Install docker to run tests
+SPEC_HASHES: docs/blueprint_v1.3.md=8f99536914b58ec4fd7c0e1a0da301c959cfc0519f6ca3eb615a82d330461e92 docs/CAG_spec.md=3b90b3b7e9868ded569220b3bf8e1b39583aa52471a8e359ed27b0348cac37a2 AGENTS.md=2445111f1cec15aa23525acaca8b80ccc57fa2809cf6deaa9f6ac51cb23ddd44
+decisions_deviations: none

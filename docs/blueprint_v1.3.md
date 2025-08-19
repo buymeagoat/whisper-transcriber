@@ -96,7 +96,7 @@ To ensure CAG, Codex, and Builder/Architect always operate on the same authorita
   - `AGENTS.md` ↔ `/docs/AGENTS_mirror.md`
 - Any deviation constitutes **drift**. CAG/Codex report drift; only Architect/Builder can restore.
 
-4) Audit Demand (Recovery Protocol)
+## 4) Audit Demand (Recovery Protocol)
 
 Trigger: any SPEC_HASH mismatch or mirror inequality.
 
@@ -185,7 +185,7 @@ The following files must exist in the repository root (or specified path) for an
 **Hard Gate:** If any of these files are missing, outdated, or misplaced, the session halts and triggers an **Audit Demand**.  
 All references to file naming, hashes, and datetime values across this Blueprint must use explicit formats (e.g., `YYYYMMDD_HHMMSS` for timestamps, 64-hex for SHA256) rather than placeholders.
 
-3) Audit Artifacts
+## 3) Audit Artifacts
 
 Codex must generate audit files in the format:handoff_repo_state_YYYYMMDD_HHMMSS.md
 
@@ -209,7 +209,7 @@ UTC timestamp,
 
 Builder confirmation reference (if used).
 
-Files missing any required field are invalid and trigger HALT.Retention: all audit artifacts must be preserved ≥1 year, rotated monthly, and archived under /docs/audit/archive/.
+Files missing any required field are invalid and trigger HALT.  Retention: all audit artifacts must be preserved ≥1 year, rotated monthly, and archived under /docs/audit/archive/.
 
 ## 4) Enforcement of Document Presence
 - During INIT → READY transition, Codex must verify presence and integrity of the Mandatory File Set.  
@@ -227,7 +227,7 @@ Files missing any required field are invalid and trigger HALT.Retention: all aud
 
 > Rationale: These controls prevent blind starts, ensure project documentation exists in predictable locations, and enforce that Codex is the only authority to write repository artifacts while CAG and Builder/Architect enforce presence and alignment.
 
-Builder Responsibilities
+# Builder Responsibilities
 
 Relay complete outputs/diagnostics between CAG and Codex without omission or corruption.
 
@@ -268,7 +268,7 @@ Exception: Even if under LOC/file thresholds, any change that modifies API contr
 * Requires design brief, rollback plan, dependency map, test plan, and explicit Builder confirmation token.  
 * Snapshot: full audit script (`scripts/CPG_repo_audit.py`) required.
 
-Format-only multi-file changes
+### Format-only multi-file changes
 
 Treated as Audit-Path (light). Requirements:
 
@@ -278,7 +278,7 @@ Rollback and dependency map optional.
 
 All other Audit-Path rules apply.
 
-Process Lifecycle
+# Process Lifecycle
 
 INIT → READY → PATCHING → VERIFYING → LOGGING → COMPLETE → (optional) POSTMORTEM → (if unrecoverable) ABORT
 
@@ -326,7 +326,7 @@ POSTMORTEM: optional stage after COMPLETE or ABORT; produces postmortem_<UTC>.md
 * If audit script missing: prompt Builder to create or approve stub.  
 * Snapshots must include unique commit_hash+UTC; duplicates/backwards/hashes rejected.
 
-Exception & Escalation
+# Exception & Escalation
 
 Mirror drift detected by CAG (via AGENTS_mirror.md) → halt; escalate to Architect.
 
@@ -348,7 +348,7 @@ Builder actions must be logged in architect_delegation_<UTC>.md in /docs/audit/.
 
 Architect must review and ratify retroactively.
 
-Security & Data Handling
+# Security & Data Handling
 
 Secrets/credentials must be hashed/redacted.
 
@@ -494,7 +494,7 @@ Schema:
 
 Telemetry logs are appended to `/docs/telemetry/patch_telemetry.jsonl` (UTC), rotated weekly, retained ≥1 year.
 
-Change Management
+# Change Management
 
 Any Blueprint change requires Architect approval and mirror regeneration.
 
@@ -514,7 +514,7 @@ If conflicts arise: Blueprint overrides for repository/system governance; UOC ov
 
 Architect adjudicates any overlap.
 
-CI Integration
+# CI Integration
 
 Run on every PR and session init (Architect-controlled checks):
 

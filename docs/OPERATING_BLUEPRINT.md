@@ -545,6 +545,41 @@ CI publishes a minimal artifact noting `Bundle-ID`, `Bundle-UTC`, and `Blueprint
 * After such changes, the Architect directs subsequent patches to propagate the updated bundle header and content to mirrors and masters.
 > Rationale: centralizes governance and prevents uncoordinated instruction drift.
 
+## Role Instruction Generation & Propagation (Blueprint as Sole Origin)
+
+**Bundle Header (shared across governed artifacts)**
+Bundle-ID: <INT> # Monotonic; increments when this Blueprint changes
+Bundle-UTC: <YYYYMMDD> # UTC date only
+Blueprint-Version: 2
+Source-of-Truth: OPERATING_BLUEPRINT.md
+
+> Rationale: A single monotonic Bundle-ID and UTC date keep all governed artifacts in lockstep without hashes.
+
+**Generated Artifacts**
+- `/docs/CAG_instructions_master.md` — human-readable draft of CAG’s Instructions.
+- `/AGENTS.md` — human-readable Codex-side instructions.
+- Both include the Bundle header from this Blueprint.
+
+**How “green” is determined (Model G2)**
+- Mirrors byte-equal within each pair.
+- All governed artifacts share identical Bundle-ID and Bundle-UTC.
+
+**Propagation workflow**
+1) Architect requests generation → Codex runs `scripts/generate_role_instructions.py`.
+2) Architect densifies `/docs/CAG_instructions_master.md` into an ≤8000-char version and pastes it into the CAG.
+3) Architect propagates:
+   - Copy densified CAG text into `/docs/CAG_spec.md` (Codex-visible).
+   - Copy `/AGENTS.md` into `/docs/AGENTS_mirror.md` (CAG-visible).
+4) CI validates Model G2 (bundle headers + mirror byte-equality).
+
+**Edits flow only from the Blueprint**
+- Any change to CAG’s instructions or AGENTS.md must originate from a Blueprint change (which increments Bundle-ID).
+- Direct edits to `/AGENTS.md`, `/docs/CAG_spec.md`, or `/docs/AGENTS_mirror.md` are prohibited; regenerate instead.
+
+**CI additions**
+- Verify `/AGENTS.md` and `/docs/CAG_instructions_master.md` carry the Bundle header.
+- Verify mirrors are byte-equal once Architect propagates.
+
 # What You Gain
 
 * Deterministic, test-backed patches.  

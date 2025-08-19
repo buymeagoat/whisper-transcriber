@@ -42,6 +42,9 @@ Harden the collaboration model between C (CAG) and X (Codex) using GPT-5 Thinkin
 Every major rule or gate MUST include a `> Rationale:` line explaining its intent.
 > Rationale: ensures governance decisions remain transparent and auditable.
 
+- Rationale lines are **not required** in the densified CAG instruction file (`/docs/CAG_spec.md`).
+> Rationale: The densified version is derived from the rationale-backed human-readable form.
+
 # Current Canon
 
 * BuilderContract: ExplicitBuilderIntentForActions; NoCAGActionWithoutB; BRelaysXResponses; NoHiddenStateBetweenSessions; COnlySourcesViaX; BConfirmsIntentBeforeExecutionPrompt.
@@ -101,6 +104,9 @@ To ensure CAG, Codex, and Builder/Architect operate on the same authoritative in
   - `Bundle-UTC`
   - `Blueprint-Version: 2`
 > Rationale: single bundle header replaces per-file hash equality.
+
+- The densified CAG instructions (`/docs/CAG_spec.md`) must embed the bundle header at the **top of the file**, not inline.
+> Rationale: Ensures identity metadata is preserved in CAG's instruction window context.
 
 ## Audit Demand (Recovery Protocol)
 - Trigger: mirror inequality or mismatched `Bundle-ID`/`Bundle-UTC` values.
@@ -558,7 +564,9 @@ Source-of-Truth: OPERATING_BLUEPRINT.md
 **Generated Artifacts**
 - `/docs/CAG_instructions_master.md` — human-readable draft of CAG’s Instructions.
 - `/AGENTS.md` — human-readable Codex-side instructions.
-- Both include the Bundle header from this Blueprint.
+- `/docs/CAG_spec.md` — densified version of CAG instructions (Codex-visible).
+- All include the Bundle header from this Blueprint.
+> Rationale: Aligns file references with actual artifact roles.
 
 **How “green” is determined (Model G2)**
 - Mirrors byte-equal within each pair.
@@ -573,8 +581,12 @@ Source-of-Truth: OPERATING_BLUEPRINT.md
 4) CI validates Model G2 (bundle headers + mirror byte-equality).
 
 **Edits flow only from the Blueprint**
-- Any change to CAG’s instructions or AGENTS.md must originate from a Blueprint change (which increments Bundle-ID).
+- Any change to CAG’s instructions or AGENTS.md must originate from a Blueprint change,
+  or from Architect-led densification of Codex-generated CAG instructions,
+  provided the source text originates from a Blueprint-approved generation prompt.
+> Rationale: Supports compression of system-governed logic into CAG’s instruction window.
 - Direct edits to `/AGENTS.md`, `/docs/CAG_spec.md`, or `/docs/AGENTS_mirror.md` are prohibited; regenerate instead.
+> Rationale: centralizes governance and prevents uncoordinated instruction drift.
 
 **CI additions**
 - Verify `/AGENTS.md` and `/docs/CAG_instructions_master.md` carry the Bundle header.

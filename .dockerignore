@@ -18,6 +18,9 @@ Thumbs.db
 uploads/
 transcripts/
 logs/
+/docs/patch_logs/
+/docs/audit/
+/docs/telemetry/
 
 # frontend
 frontend/node_modules/

@@ -12,7 +12,11 @@ It defines roles, rules, lifecycle, lanes, mirrors, compliance gates, and teleme
 All other instruction files — **CAG_Instructions, /docs/CAG_spec.md, AGENTS.md, /docs/AGENTS_mirror.md** — must explicitly reference this Blueprint and conform to it.  
 If this Blueprint itself drifts out of sync with its mirrors or execution instructions, **all operations halt until the Architect restores alignment**.
 
-**Visibility Constraints (Authoritative):**  
+## File Identity
+- Canonical filename is `/docs/OPERATING_BLUEPRINT.md`. SPEC_HASH governs identity; filename is stable but non-cryptographic.
+> Rationale: clarifies authoritative path while tying trust to cryptographic hash, not mutable names.
+
+**Visibility Constraints (Authoritative):**
 - **CAG** can see: `CAG_Instructions`, this **Blueprint**, `/Personalized_ChatGPT_Instructions_v1.0_densified.md`, and **`/docs/AGENTS_mirror.md`**. CAG **cannot** see `/docs/CAG_spec.md`.  
 - **Codex** can see: `AGENTS.md`, `/Personalized_ChatGPT_Instructions_v1.0_densified.md`, and **`/docs/CAG_spec.md`**. Codex **cannot** see `/docs/AGENTS_mirror.md`.  
 - **Architect/Builder** can see **all** files and is the **only** party who can directly verify and restore mirror alignment across the system.
@@ -31,6 +35,10 @@ Out of scope: product-specific business requirements and domain code; those live
 # Objective
 
 Harden the collaboration model between C (CAG) and X (Codex) using GPT-5 Thinking while preserving explicit contracts and constraints. Deliver a deterministic operating structure, evaluation criteria, and an upgrade path that preserves token efficiency and eliminates dependency on Copilot.
+
+## Rationale Requirement
+Every major rule or gate MUST include a `> Rationale:` line explaining its intent.
+> Rationale: ensures governance decisions remain transparent and auditable.
 
 # Current Canon
 
@@ -52,6 +60,22 @@ This version fixes ambiguity in snapshot modes, clarifies patch logging rules, i
 * **X (Codex)**: Executor; fetches live state, applies patches atomically, runs tests, generates diagnostics, patch logs; **halts on any inconsistency detected in CAG_spec.md** and escalates to Architect; **cannot** verify `/docs/AGENTS_mirror.md`.
 * **A (Architect)**: Custodian of this Blueprint; governs mirrors; resolves disputes; approves exceptions; **only authority to restore Blueprint drift and to verify/restore system-wide mirror alignment (the only party with visibility into all files).**
 
+## Role Usage Boundaries
+Builder = daily operational driver (scope, acceptance criteria, timestamps, confirmation tokens, relaying diagnostics). Architect = governance custodian (mirror restoration, disputes/exceptions, Blueprint drift, cross-mirror verification).
+
+| Trigger | Invoke |
+| --- | --- |
+| Schema change | Architect |
+| Mirror drift or exception dispute | Architect |
+| Single-file non-schema fix | Builder |
+| Routine diagnostics relay | Builder |
+
+> Rationale: clarifies escalation thresholds and prevents role drift.
+
+## Ask vs Code Decisioning (CAG rule)
+CAG must always indicate whether the Builder should use Ask or Code. When CAG provides a Codex-ready prompt, Builder need only press Code—no additional decisioning required.
+> Rationale: removes ambiguity in execution mode and preserves auditability.
+
 # Mirror Responsibilities
 
 * **Awareness (per-agent visibility limits):**  
@@ -60,7 +84,7 @@ This version fixes ambiguity in snapshot modes, clarifies patch logging rules, i
 * **Enforcement (Architect/Builder):**  
   - **Mirror pairs must be byte-for-byte identical; Architect/Builder verifies both pairs. Any deviation = halt until restored.**  
 * **System Integrity:**  
-  - **All five files** must be aligned for system-wide operations: `{CAG_Instructions, /docs/CAG_spec.md, /AGENTS.md, /docs/AGENTS_mirror.md, /docs/CAG_Codex_Collaboration_Blueprint.md}`.  
+  - **All five files** must be aligned for system-wide operations: `{CAG_Instructions, /docs/CAG_spec.md, /AGENTS.md, /docs/AGENTS_mirror.md, /docs/OPERATING_BLUEPRINT.md}`.
   - Agents act only on what they can see; cross-pair validation is an **Architect/Builder** responsibility.
 
 # Structural Integrity & Drift Detection
@@ -68,7 +92,7 @@ This version fixes ambiguity in snapshot modes, clarifies patch logging rules, i
 To ensure CAG, Codex, and Builder/Architect always operate on the same authoritative instruction sets, the following rules are mandatory.
 
 ## 1) SPEC_HASH Embedding (Authoritative Identity)
-- Each **core file** — **Blueprint.md**, **CAG_Instructions.txt**, **AGENTS.md** — MUST embed:
+- Each **core file** — **OPERATING_BLUEPRINT.md**, **CAG_Instructions.txt**, **AGENTS.md** — MUST embed:
   - **SPEC_HASH**: SHA-256 of the file’s exact bytes as committed (UTF-8, LF line endings; no BOM; no normalization).
   - **Blueprint-Version**: matches this Blueprint’s version string.
   - **Approved-At (UTC)**: Architect/Builder approval timestamp.
@@ -114,6 +138,9 @@ Reissues a green state confirmation (session gate reopen).
 
 CAG and Codex must not self-heal drift.
 
+- If drift is detected, **CAG and Codex HALT all outputs**, including Ask-mode responses. No partial reasoning or patch generation is permitted until the Architect restores alignment and issues a green state.
+> Rationale: prevents action on divergent instruction sets and enforces Architect-led recovery.
+
 Logging Requirement: Architect/Builder must produce a mirror_recovery_<UTC>.md file in /docs/audit/ documenting:
 
 source-of-truth selection,
@@ -135,7 +162,7 @@ Partial Corruption: If metadata fields match but file content differs, this is t
 
 ## 6) CI Enforcement (Pre-Session & Per-PR)
 - CI MUST recompute SHA-256 for:
-  - `Blueprint.md`, `CAG_Instructions.txt`, `/docs/CAG_spec.md`
+  - `OPERATING_BLUEPRINT.md`, `CAG_Instructions.txt`, `/docs/CAG_spec.md`
   - `AGENTS.md`, `/docs/AGENTS_mirror.md`
 - CI **FAILS** if:
   - Any mirror pair is not byte-for-byte identical, or
@@ -156,6 +183,8 @@ Partial Corruption: If metadata fields match but file content differs, this is t
   - `SPEC_HASHES` are equal across CAG, Codex, and Blueprint,
   - Latest **Approved-At (UTC)** matches across all embedded fields.
 - **Close** (HALT) on any drift signal from §2–§7.
+- Sessions do not expire; each new session with CAG requires the INIT → READY handshake; no timeout policy.
+> Rationale: preserves continuity while enforcing consistent re-initialization.
 
 > Rationale: These controls create cryptographic provenance for instructions, force per-exchange baseline proof, and make drift both immediately visible and non-actionable until Architect/Builder restores a green state.
 
@@ -180,7 +209,7 @@ The following files must exist in the repository root (or specified path) for an
 - **`testing_strategy.md`** – test execution plan and CI enforcement rules.  
 - **`/docs/CAG_spec.md`** – mirror of CAG instructions (Codex-visible).  
 - **`/docs/AGENTS_mirror.md`** – mirror of AGENTS.md (CAG-visible).  
-- **`/docs/CAG_Codex_Collaboration_Blueprint.md`** – authoritative copy of this Blueprint.
+- **`/docs/OPERATING_BLUEPRINT.md`** – authoritative copy of this Blueprint.
 
 **Hard Gate:** If any of these files are missing, outdated, or misplaced, the session halts and triggers an **Audit Demand**.  
 All references to file naming, hashes, and datetime values across this Blueprint must use explicit formats (e.g., `YYYYMMDD_HHMMSS` for timestamps, 64-hex for SHA256) rather than placeholders.
@@ -209,7 +238,16 @@ UTC timestamp,
 
 Builder confirmation reference (if used).
 
-Files missing any required field are invalid and trigger HALT.  Retention: all audit artifacts must be preserved ≥1 year, rotated monthly, and archived under /docs/audit/archive/.
+Files missing any required field are invalid and trigger HALT. Retention: all audit artifacts are preserved indefinitely; they may be rotated into archive subfolders for manageability but are never deleted.
+
+```yaml
+loc_delta: {added: <int>, deleted: <int>}
+files_changed: {code: <int>, tests: <int>, docs: <int>, other: <int>}
+drift_detected: <bool>
+recovery_steps: [<string>]
+```
+These embeds are mandatory for each audit artifact to support longitudinal, machine-readable analysis.
+> Rationale: permanent, structured audit records enable reliable recovery and historical review.
 
 ## 4) Enforcement of Document Presence
 - During INIT → READY transition, Codex must verify presence and integrity of the Mandatory File Set.  
@@ -380,8 +418,25 @@ Fields:
 
 * File naming: `patch_<YYYYMMDD><HHMMSS>_<short>.log (UTC)`.  
 * Must include: TASK, OBJECTIVE, CONSTRAINTS, SCOPE, DIFFSUMMARY, TS, prompt_id, AV, AH, CH, BDT, snapshot_metadata, agent_metadata, test_results, DIAGMETA (9-key), SPEC_HASHES, decisions/deviations.  
-* Patch log is created immediately after commit (final step). Reject patch if missing/incomplete.  
+* Patch log is created immediately after commit (final step). Reject patch if missing/incomplete.
 * **Update AGENTS.md (or its CAG-side mirror) before writing the patch log; abort if ordering fails.**
+* Retention: Patch logs are preserved indefinitely as historical accounting of the project.
+> Rationale: ensures a complete, enduring audit trail.
+* Each patch log MUST embed the following structured metadata block:
+```json
+{
+  "loc_delta": {"added": <int>, "deleted": <int>},
+  "files_changed": {"code": <int>, "tests": <int>, "docs": <int>, "other": <int>},
+  "coverage_delta": "<+/-X.Y%|unknown>",
+  "risk_level": "low|medium|high",
+  "lane": "fast|audit",
+  "drift_detected": true|false,
+  "halt_events": <int>,
+  "decision_path": ["ask|code", ...]
+}
+```
+* These embeds are mandatory for each patch log to support longitudinal, machine-readable analysis.
+> Rationale: structured data enables automated historical analysis and risk tracking.
 
 # Decision Tree
 
@@ -547,7 +602,7 @@ If telemetry append fails, patch may not merge. Telemetry entry must exist befor
 
 # Operational Requirements & Locations
 
-* Place `/docs/CAG_Codex_Collaboration_Blueprint.md` in repo.  
+* Place `/docs/OPERATING_BLUEPRINT.md` in repo.
 * Place `/docs/CAG_spec.md` and `/docs/AGENTS_mirror.md` as mirrors.  
 * **Attach to CAG:** Blueprint, `/docs/AGENTS_mirror.md`, `/Personalized_ChatGPT_Instructions_v1.0_densified.md`.  
 * **Attach to Codex:** Blueprint, `/docs/CAG_spec.md`, `/Personalized_ChatGPT_Instructions_v1.0_densified.md`.  

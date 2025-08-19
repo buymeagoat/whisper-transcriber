@@ -3,22 +3,24 @@ Mode=CriticalEngineering;
 
 # Preamble
 
-**Blueprint-Version: v1.3**  
-**Approved-By: Architect**  
-**Approved-At (UTC): 2025-08-19 14:21**
+Bundle-ID: 1
+Bundle-UTC: 20250819
+Blueprint-Version: 2
+Source-of-Truth: OPERATING_BLUEPRINT.md
+Approved-By: Architect
 
-This document is the **master authority** for the CAG–Codex system.  
+This document is the **master authority** for the CAG–Codex system.
 It defines roles, rules, lifecycle, lanes, mirrors, compliance gates, and telemetry.  
 All other instruction files — **CAG_Instructions, /docs/CAG_spec.md, AGENTS.md, /docs/AGENTS_mirror.md** — must explicitly reference this Blueprint and conform to it.  
 If this Blueprint itself drifts out of sync with its mirrors or execution instructions, **all operations halt until the Architect restores alignment**.
 
 ## File Identity
-- Canonical filename is `/docs/OPERATING_BLUEPRINT.md`. SPEC_HASH governs identity; filename is stable but non-cryptographic.
-> Rationale: clarifies authoritative path while tying trust to cryptographic hash, not mutable names.
+- Canonical filename is `/docs/OPERATING_BLUEPRINT.md`. Bundle-ID and Bundle-UTC govern identity; filename is stable but non-cryptographic.
+> Rationale: clarifies authoritative path while tying trust to a shared bundle header, not mutable names.
 
 **Visibility Constraints (Authoritative):**
-- **CAG** can see: `CAG_Instructions`, this **Blueprint**, `/Personalized_ChatGPT_Instructions_v1.0_densified.md`, and **`/docs/AGENTS_mirror.md`**. CAG **cannot** see `/docs/CAG_spec.md`.  
-- **Codex** can see: `AGENTS.md`, `/Personalized_ChatGPT_Instructions_v1.0_densified.md`, and **`/docs/CAG_spec.md`**. Codex **cannot** see `/docs/AGENTS_mirror.md`.  
+- **CAG** can see: `CAG_Instructions`, this **Blueprint**, and **`/docs/AGENTS_mirror.md`**. CAG **cannot** see `/docs/CAG_spec.md`.
+- **Codex** can see: `AGENTS.md` and **`/docs/CAG_spec.md`**. Codex **cannot** see `/docs/AGENTS_mirror.md`.
 - **Architect/Builder** can see **all** files and is the **only** party who can directly verify and restore mirror alignment across the system.
 
 # Purpose & Scope
@@ -44,9 +46,9 @@ Every major rule or gate MUST include a `> Rationale:` line explaining its inten
 
 * BuilderContract: ExplicitBuilderIntentForActions; NoCAGActionWithoutB; BRelaysXResponses; NoHiddenStateBetweenSessions; COnlySourcesViaX; BConfirmsIntentBeforeExecutionPrompt.
 * Workflow: Baseline snapshot required; all edits via XPrompt; atomic patches; patch logs; tests enforced; health checks; rollback.
-* Freshness & Provenance: Live state fetch for every patch; TS+Hash required; reject cached state.
+* Freshness & Provenance: Live state fetch for every patch; commit hash and timestamp required; reject cached state.
 * Safeguards: Concurrency guard; destructive-change confirmations; dependency awareness; binary guard.
-* Logging/Trace: Patch logs under /docs/patch_logs/; AGENTS.md updates before logs; test enumeration.
+* Logging/Trace: Patch logs under /docs/patch_logs/; update AGENTS metadata before logs only when it changes; test enumeration.
 * Style/Format: Strict XPrompt structure; alias consistency; no drift; diff summaries; diagnostics mandatory.
 
 # Gaps Addressed
@@ -78,115 +80,47 @@ CAG must always indicate whether the Builder should use Ask or Code. When CAG pr
 
 # Mirror Responsibilities
 
-* **Awareness (per-agent visibility limits):**  
-  - **CAG**: uses **`/docs/AGENTS_mirror.md`** as its **only** window into Codex; **cannot** access `/AGENTS.md` directly.  
+* **Awareness (per-agent visibility limits):**
+  - **CAG**: uses **`/docs/AGENTS_mirror.md`** as its **only** window into Codex; **cannot** access `/AGENTS.md` directly.
   - **Codex**: uses **`/docs/CAG_spec.md`** as its **only** window into CAG; **cannot** access `CAG_Instructions` directly.
-* **Enforcement (Architect/Builder):**  
-  - **Mirror pairs must be byte-for-byte identical; Architect/Builder verifies both pairs. Any deviation = halt until restored.**  
-* **System Integrity:**  
-  - **All five files** must be aligned for system-wide operations: `{CAG_Instructions, /docs/CAG_spec.md, /AGENTS.md, /docs/AGENTS_mirror.md, /docs/OPERATING_BLUEPRINT.md}`.
+* **Enforcement (Architect/Builder):**
+  - Mirror pairs must be byte-for-byte identical; Architect/Builder verifies both pairs. Any deviation = halt until restored.
+* **Green State (Model G2):**
+  - Green iff both mirror pairs are byte-for-byte identical **and** `CAG_Instructions`, `/docs/CAG_spec.md`, `AGENTS.md`, `/docs/AGENTS_mirror.md`, and this Blueprint share identical `Bundle-ID` and `Bundle-UTC` header values.
+  > Rationale: G2 unifies alignment on minimal, monotonic metadata.
+* **System Integrity:**
   - Agents act only on what they can see; cross-pair validation is an **Architect/Builder** responsibility.
 
-# Structural Integrity & Drift Detection
+# Bundle Header & Drift Detection
 
-To ensure CAG, Codex, and Builder/Architect always operate on the same authoritative instruction sets, the following rules are mandatory.
+To ensure CAG, Codex, and Builder/Architect operate on the same authoritative instruction sets, the following rules apply.
 
-## 1) SPEC_HASH Embedding (Authoritative Identity)
-- Each **core file** — **OPERATING_BLUEPRINT.md**, **CAG_Instructions.txt**, **AGENTS.md** — MUST embed:
-  - **SPEC_HASH**: SHA-256 of the file’s exact bytes as committed (UTF-8, LF line endings; no BOM; no normalization).
-  - **Blueprint-Version**: matches this Blueprint’s version string.
-  - **Approved-At (UTC)**: Architect/Builder approval timestamp.
-- Each **mirror file** — **/docs/CAG_spec.md** (mirror of CAG_Instructions) and **/docs/AGENTS_mirror.md** (mirror of AGENTS.md) — MUST embed the **same three fields**.
-- **Format (example within each file):**
-  ~~~
-  SPEC_HASH: <64-hex-sha256>
-  Blueprint-Version: v1.1.1
-  Approved-At (UTC): <YYYY-MM-DDTHH:MM:SSZ>
-  ~~~
+## Bundle Header Embedding (Authoritative Identity)
+- Each core file — **OPERATING_BLUEPRINT.md**, **CAG_Instructions.txt**, **AGENTS.md** — and their mirrors `/docs/CAG_spec.md` and `/docs/AGENTS_mirror.md` MUST embed:
+  - `Bundle-ID`
+  - `Bundle-UTC`
+  - `Blueprint-Version: 2`
+> Rationale: single bundle header replaces per-file hash equality.
 
-## 2) Prompt & Response Drift Check (Per-Exchange Proof)
-- All **Ask/Code** prompts and all agent responses MUST include a `SPEC_HASHES` mapping:
-  ~~~
-  SPEC_HASHES: { blueprint: <sha>, cag: <sha>, codex: <sha> }
-  ~~~
-- **Codex** MUST echo the received `SPEC_HASHES` inside its diagnostic block.
-- **CAG** MUST record the `SPEC_HASHES` it observes for the exchange.
-- **Builder/Architect** MUST relay both sides unaltered.
-- **Hard Gate:** If any of the three hashes differ at any time, **HALT immediately** and issue an **Audit Demand** (see §4).
+## Audit Demand (Recovery Protocol)
+- Trigger: mirror inequality or mismatched `Bundle-ID`/`Bundle-UTC` values.
+- Effect: all operations HALT until Architect/Builder select a canonical source, regenerate mirrors, reset bundle headers, and reissue a green state.
+> Rationale: drift resolution remains an Architect/Builder task.
 
-## 3) Byte-for-Byte Mirror Requirement (Strict)
-- Mirror pairs MUST be **byte-for-byte identical**:
-  - `CAG_Instructions.txt` ↔ `/docs/CAG_spec.md`
-  - `AGENTS.md` ↔ `/docs/AGENTS_mirror.md`
-- Any deviation constitutes **drift**. CAG/Codex report drift; only Architect/Builder can restore.
+## Logging Enforcement (Immutable Evidence)
+- Every patch log MUST record `Bundle-ID`, `Bundle-UTC`, and `Blueprint-Version` observed at commit time.
+> Rationale: bundle metadata links logs to governed state.
 
-## 4) Audit Demand (Recovery Protocol)
+## Telemetry & Health Checks (Continuous Assurance)
+- Append current `Bundle-ID` and `Bundle-UTC` to telemetry and session health reports.
+- The periodic **Workflow Health Check** verifies mirror byte-equality and bundle header consistency.
+> Rationale: continuous verification without hash overhead.
 
-Trigger: any SPEC_HASH mismatch or mirror inequality.
-
-Effect: all operations HALT until Architect/Builder:
-
-Runs a mirror audit for all core + mirror files.
-
-Selects the canonical source-of-truth.
-
-Regenerates mirrors from the canonical source.
-
-Recomputes and republishes SPEC_HASH values.
-
-Reissues a green state confirmation (session gate reopen).
-
-CAG and Codex must not self-heal drift.
-
-- If drift is detected, **CAG and Codex HALT all outputs**, including Ask-mode responses. No partial reasoning or patch generation is permitted until the Architect restores alignment and issues a green state.
-> Rationale: prevents action on divergent instruction sets and enforces Architect-led recovery.
-
-Logging Requirement: Architect/Builder must produce a mirror_recovery_<UTC>.md file in /docs/audit/ documenting:
-
-source-of-truth selection,
-
-regeneration steps taken, and
-
-the new SPEC_HASH values.
-
-Partial Corruption: If metadata fields match but file content differs, this is treated as drift and escalated as above.
-
-
-## 5) Logging Enforcement (Immutable Evidence)
-- Every patch log MUST record the SPEC hashes observed at commit time:
-  ~~~
-  SPEC_HASHES: { blueprint: <sha>, cag: <sha>, codex: <sha> }
-  ~~~
-- Logs **REJECTED** if any hash is missing or blank.
-- Deterministic ordering applies: **Update `AGENTS.md` (or its CAG-side mirror) BEFORE writing the patch log**; abort if ordering fails.
-
-## 6) CI Enforcement (Pre-Session & Per-PR)
-- CI MUST recompute SHA-256 for:
-  - `OPERATING_BLUEPRINT.md`, `CAG_Instructions.txt`, `/docs/CAG_spec.md`
-  - `AGENTS.md`, `/docs/AGENTS_mirror.md`
-- CI **FAILS** if:
-  - Any mirror pair is not byte-for-byte identical, or
-  - Any embedded **Blueprint-Version** or **Approved-At (UTC)** field differs across the five files.
-- CI publishes the current `SPEC_HASHES` bundle as a build artifact.
-
-## 7) Telemetry & Health Checks (Continuous Assurance)
-- Append the current `SPEC_HASHES` to telemetry and session health reports.
-- The periodic **Workflow Health Check** MUST verify:
-  - Mirror byte-equality,
-  - Hash equality across all five files,
-  - Latest Architect/Builder approval timestamp consistency.
-- Any failure escalates to **Audit Demand** and closes session gates.
-
-## 8) Session Gates (Open/Close Criteria)
-- **Open** only when:
-  - All five files pass CI mirror checks,
-  - `SPEC_HASHES` are equal across CAG, Codex, and Blueprint,
-  - Latest **Approved-At (UTC)** matches across all embedded fields.
-- **Close** (HALT) on any drift signal from §2–§7.
+## Session Gates (Open/Close Criteria)
+- **Open** only when both mirror pairs are byte-identical and all governed artifacts share identical `Bundle-ID` and `Bundle-UTC` values (Model G2).
+- **Close** (HALT) on any mirror inequality or bundle mismatch.
 - Sessions do not expire; each new session with CAG requires the INIT → READY handshake; no timeout policy.
-> Rationale: preserves continuity while enforcing consistent re-initialization.
-
-> Rationale: These controls create cryptographic provenance for instructions, force per-exchange baseline proof, and make drift both immediately visible and non-actionable until Architect/Builder restores a green state.
+> Rationale: ties session availability to bundle coherence while preserving continuity.
 
 # Repository Bootstrap & Mandatory Artifacts
 
@@ -200,19 +134,21 @@ To ensure CAG, Codex, and Builder/Architect operate against a consistent and ver
 ## 2) Mandatory File Set
 The following files must exist in the repository root (or specified path) for any session to proceed:
 
-- **`README.md`** – repository overview and entry point.  
-  - If a file named `index.md` exists instead of `README.md`, this is treated as **non-compliant** and triggers an **Audit Demand**. Codex must rename or regenerate the file as `README.md`.  
-- **`design_scope.md`** – project design and scope definition.  
-- **`future_updates.md`** – backlog of planned or deferred changes.  
-- **`CHANGELOG.md`** – sequential history of applied patches.  
-- **`SECURITY.md`** – security practices, restrictions, and handling rules.  
-- **`testing_strategy.md`** – test execution plan and CI enforcement rules.  
-- **`/docs/CAG_spec.md`** – mirror of CAG instructions (Codex-visible).  
-- **`/docs/AGENTS_mirror.md`** – mirror of AGENTS.md (CAG-visible).  
+- **`README.md`** – repository overview and entry point.
+  - If a file named `index.md` exists instead of `README.md`, Codex may auto-create a minimal `README.md` on first session under **Grace Mode**; thereafter, rename or regenerate as needed.
+- **`design_scope.md`** – project design and scope definition.
+- **`future_updates.md`** – backlog of planned or deferred changes.
+- **`CHANGELOG.md`** – sequential history of applied patches.
+- **`SECURITY.md`** – security practices, restrictions, and handling rules.
+- **`testing_strategy.md`** – test execution plan and CI enforcement rules.
+- **`/docs/CAG_spec.md`** – mirror of CAG instructions (Codex-visible).
+- **`/docs/AGENTS_mirror.md`** – mirror of AGENTS.md (CAG-visible).
 - **`/docs/OPERATING_BLUEPRINT.md`** – authoritative copy of this Blueprint.
 
-**Hard Gate:** If any of these files are missing, outdated, or misplaced, the session halts and triggers an **Audit Demand**.  
-All references to file naming, hashes, and datetime values across this Blueprint must use explicit formats (e.g., `YYYYMMDD_HHMMSS` for timestamps, 64-hex for SHA256) rather than placeholders.
+**Grace Mode (default):** On the first session, missing mandatory documents trigger a warning and Codex may auto-create minimal stubs. After the first successful patch, absence of any mandatory file becomes a hard gate and triggers an **Audit Demand**.
+
+All references to file naming and timestamps across this Blueprint must use explicit formats (e.g., `YYYYMMDD_HHMMSS`) rather than placeholders.
+> Rationale: Grace Mode smooths onboarding yet enforces compliance once work begins.
 
 ## 3) Audit Artifacts
 
@@ -232,7 +168,9 @@ commit_hash,
 
 repo_tree_hash,
 
-SPEC_HASHES,
+bundle_id,
+
+bundle_utc,
 
 UTC timestamp,
 
@@ -250,11 +188,10 @@ These embeds are mandatory for each audit artifact to support longitudinal, mach
 > Rationale: permanent, structured audit records enable reliable recovery and historical review.
 
 ## 4) Enforcement of Document Presence
-- During INIT → READY transition, Codex must verify presence and integrity of the Mandatory File Set.  
-- If any file is missing:
-  - **HALT** the session.  
-  - CAG must escalate to Builder/Architect.  
-  - Builder/Architect decides whether Codex should generate the missing document(s).
+- During INIT → READY transition, Codex verifies presence of the Mandatory File Set.
+- Under Grace Mode, missing files generate a warning and may be auto-created.
+- After the first successful patch, any missing file triggers **HALT** and Architect/Builder escalation.
+> Rationale: gradual enforcement reduces setup friction.
 
 ## 5) Audit Path Start Condition
 - **Audit-Path cannot begin** until:
@@ -292,11 +229,13 @@ Replay detected → HALT and escalate to Architect.
 
 Fast-Path (small, local, reversible)
 
-Trigger: ≤150 LOC net change (adds+deletes), single production file plus ≤1 related test file, non-binary, no schema/API/security/external deps, no renames/deletes.
+Trigger: net LOC ≤150, changed_files ≤2 (one production file + ≤1 related test file), no renames/deletes, no binary files, no API/schema/security flags, no network egress.
+> Rationale: explicit inputs prevent misclassification of lane.
 
 Snapshot: meta-only audit allowed (scripts/CPG_repo_audit.py --mode=meta) capturing commit_hash, capture_time_utc, repo_tree_hash, path_scoped_tree_hash, test_runner_presence.
 
-Patch Log: required after commit; filename schema = patch_<YYYYMMDD><HHMMSS>_<short>.log (UTC).
+Patch Log: required after commit; filename schema = patch_<YYYYMMDD_HHMMSS>_<short>.log (UTC).
+> Rationale: underscore timestamps ensure stable filenames.
 
 Exception: Even if under LOC/file thresholds, any change that modifies API contracts, schemas, or security logic MUST escalate to Audit-Path.
 
@@ -340,9 +279,9 @@ POSTMORTEM: optional stage after COMPLETE or ABORT; produces postmortem_<UTC>.md
 
 **Hard Gates (halt if failed):**
 
-* **CAG session gate:** **`/docs/AGENTS_mirror.md` must be green** (no inconsistency observed by CAG in its only visible mirror).  
-* **Codex session gate:** **`/docs/CAG_spec.md` must be green** (no inconsistency observed by Codex in its only visible mirror).  
-* **Architect system gate:** **All five files green** (Architect-validated alignment across `{CAG_Instructions, /docs/CAG_spec.md, /AGENTS.md, /docs/AGENTS_mirror.md, Blueprint}`).  
+* **CAG session gate:** `/docs/AGENTS_mirror.md` must be green under Model G2 from CAG's perspective.
+* **Codex session gate:** `/docs/CAG_spec.md` must be green under Model G2 from Codex's perspective.
+* **Architect system gate:** mirror pairs byte-identical and all governed artifacts share `Bundle-ID` and `Bundle-UTC`.
 * LiveSnapshot: meta-only allowed for Fast-Path, full for Audit-Path.  
 * Atomic patch enforcement (multi-file).  
 * Diagnostics block present and complete (9-key schema).  
@@ -394,7 +333,8 @@ No PII beyond necessity.
 
 Patch logs immutable ≥1 year unless Architect approves archival.
 
-External calls = network egress (HTTP, SSH), package registry, toolchain execs. Only allowed in Audit-Path if SCOPE explicitly permits.
+External calls = network egress only (HTTP/SSH/package registry/etc.). Local toolchain executables and test runners are allowed on Fast-Path. Network egress requires explicit SCOPE permission.
+> Rationale: narrows the boundary to network activity while enabling local tooling.
 
 Builder is prohibited from embedding secrets or credentials in prompts.
 
@@ -416,10 +356,12 @@ Fields:
 
 # Patch Logging
 
-* File naming: `patch_<YYYYMMDD><HHMMSS>_<short>.log (UTC)`.  
-* Must include: TASK, OBJECTIVE, CONSTRAINTS, SCOPE, DIFFSUMMARY, TS, prompt_id, AV, AH, CH, BDT, snapshot_metadata, agent_metadata, test_results, DIAGMETA (9-key), SPEC_HASHES, decisions/deviations.  
+* File naming: `patch_<YYYYMMDD_HHMMSS>_<short>.log` (UTC).
+> Rationale: underscore timestamps ensure stable filenames.
+* Must include: TASK, OBJECTIVE, CONSTRAINTS, SCOPE, DIFFSUMMARY, TS, prompt_id, AV, AH, CH, BDT, snapshot_metadata, agent_metadata, test_results, DIAGMETA (9-key), Bundle-ID, Bundle-UTC, Blueprint-Version, decisions/deviations.
 * Patch log is created immediately after commit (final step). Reject patch if missing/incomplete.
-* **Update AGENTS.md (or its CAG-side mirror) before writing the patch log; abort if ordering fails.**
+* If AGENTS metadata changes, update `AGENTS.md` (or its CAG-side mirror) before writing the patch log; otherwise ordering is flexible.
+> Rationale: avoids unnecessary rejections when AGENTS metadata is unchanged.
 * Retention: Patch logs are preserved indefinitely as historical accounting of the project.
 > Rationale: ensures a complete, enduring audit trail.
 * Each patch log MUST embed the following structured metadata block:
@@ -454,65 +396,46 @@ Fields:
 * Report token budget on every patch.  
 * If no runner, scaffold minimal runner and record rationale.
 
-Evaluation Checklist (score 0–2; target ≥14/18)
+ Evaluation Checklist (score 0–2; target ≥14/18)
 
-LiveSnapshot metadata present/fresh.
-
-SCOPE respected.
-
-Atomic commit applied.
-
-Patch log created with DIAGMETA.
-
-Tests run or runner scaffolded.
-
-Rollback instructions present (Audit-Path).
-
-ConcurrencyGuard enforced.
-
-BinaryGuard enforced.
-
-Dependency map or none confirmed.
-
-No secrets in prompts.
-
-Acceptance criteria met.
-
-Token budget reported.
-
-Diff summary present/readable.
-
-Related file impacts evaluated.
-
-Health check status updated.
-
-Version & commit hash recorded.
-
-Builder approval token captured for risky changes.
-
-No hidden state between sessions.
+- [CHK-LIVESNAPSHOT] LiveSnapshot metadata present/fresh.
+- [CHK-SCOPE] SCOPE respected.
+- [CHK-ATOMIC] Atomic commit applied.
+- [CHK-PATCHLOG] Patch log created with DIAGMETA.
+- [CHK-TESTS] Tests run or runner scaffolded.
+- [CHK-ROLLBACK] Rollback instructions present (Audit-Path).
+- [CHK-CONCURRENCY] ConcurrencyGuard enforced.
+- [CHK-BINARY] BinaryGuard enforced.
+- [CHK-DEPMAP] Dependency map or none confirmed.
+- [CHK-SECRETS] No secrets in prompts.
+- [CHK-ACCEPT] Acceptance criteria met.
+- [CHK-TOKEN] Token budget reported.
+- [CHK-DIFF] Diff summary present/readable.
+- [CHK-IMPACTS] Related file impacts evaluated.
+- [CHK-HEALTH] Health check status updated.
+- [CHK-VERSION] Version & commit hash recorded.
+- [CHK-BUILDER-TOKEN] Builder approval token captured for risky changes.
+- [CHK-NOHIDDEN] No hidden state between sessions.
 
 If the evaluation score <14, the patch is REJECTED unless Architect explicitly overrides in writing.
 
 Critical items: failure of any of the following = automatic HALT regardless of total score:
 
-6 (Rollback instructions),
-
-7 (ConcurrencyGuard),
-
-8 (BinaryGuard),
-
-17 (Builder confirmation token).
+- CHK-ROLLBACK
+- CHK-CONCURRENCY
+- CHK-BINARY
+- CHK-BUILDER-TOKEN
+> Rationale: stable IDs decouple enforcement from list ordering.
 
 # Spec-First Template
 
 ~~~~
 TASK: Implement <feature/bugfix> in <file(s)> via Fast-Path.
 OBJECTIVE: <Given/When/Then> + expectations.
-CONSTRAINTS: Single-file; context=2; auto patch-log; add/adjust minimal tests; no external calls.
+CONSTRAINTS: Single-file; context=2; auto patch-log; add/adjust minimal tests; no network egress.
 SCOPE: {edit: <path>, create_if_missing: <true/false>}
 OUTPUTFORMAT: {patches, tests, DIAGMETA, DIFFSUMMARY}
-TIMESTAMP: <UTC YYYYMMDD HHMMSS>
+TIMESTAMP: <UTC YYYYMMDD_HHMMSS>
 prompt_id: <UUID or commit hash>
 ~~~~
 
@@ -521,7 +444,7 @@ prompt_id: <UUID or commit hash>
 **Fast-Path Example**  
 * B: “Add null-check in utils/parse.ts; date strings can be null.”  
 * C: Compiles Spec-First → X.  
-* X: Applies patch, logs `patch_<UTC>.log`, runs tests or scaffolds minimal.  
+* X: Applies patch, logs `patch_<YYYYMMDD_HHMMSS>.log`, runs tests or scaffolds minimal.
 
 **Audit-Path Example**  
 * B: “Refactor auth to JWT, remove sessions.”  
@@ -534,7 +457,9 @@ Schema:
 
 ~~~~
 {
-  "ts": "<UTC ISO8601>",
+  "ts": "<UTC YYYYMMDD_HHMMSS>",
+  "bundle_id": <int>,
+  "bundle_utc": "<YYYYMMDD>",
   "session_id": "<id>",
   "lane": "fast|audit",
   "mirrors_green": true|false,
@@ -573,7 +498,9 @@ Architect adjudicates any overlap.
 
 Run on every PR and session init (Architect-controlled checks):
 
-Mirror checks for both mirror pairs (Architect-visible): CAG_Instructions ↔ /docs/CAG_spec.md, /AGENTS.md ↔ /docs/AGENTS_mirror.md.
+Mirror checks for both mirror pairs (Architect-visible): `CAG_Instructions` ↔ `/docs/CAG_spec.md`, `AGENTS.md` ↔ `/docs/AGENTS_mirror.md`.
+
+Verify identical `Bundle-ID` and `Bundle-UTC` across governed artifacts.
 
 Lane eligibility check (thresholds).
 
@@ -581,11 +508,12 @@ Patch log presence & schema validation.
 
 Telemetry append check.
 
-CI scripts: scripts/cag_check_mirrors.sh, scripts/cag_lane_check.sh, scripts/cag_patchlog_check.py; non-zero exit on failure.
-
-CI enforcement scripts themselves must embed SPEC_HASH headers. Drift in these scripts = HALT.
+CI scripts: `scripts/cag_check_mirrors.sh`, `scripts/cag_lane_check.sh`, `scripts/cag_patchlog_check.py`; non-zero exit on failure.
 
 If telemetry append fails, patch may not merge. Telemetry entry must exist before merge.
+
+CI publishes a minimal artifact noting `Bundle-ID`, `Bundle-UTC`, and `Blueprint-Version`.
+> Rationale: ensures mirrors and bundle headers are consistent without hash overhead.
 
 # Risks & Mitigations
 
@@ -603,12 +531,19 @@ If telemetry append fails, patch may not merge. Telemetry entry must exist befor
 # Operational Requirements & Locations
 
 * Place `/docs/OPERATING_BLUEPRINT.md` in repo.
-* Place `/docs/CAG_spec.md` and `/docs/AGENTS_mirror.md` as mirrors.  
-* **Attach to CAG:** Blueprint, `/docs/AGENTS_mirror.md`, `/Personalized_ChatGPT_Instructions_v1.0_densified.md`.  
-* **Attach to Codex:** Blueprint, `/docs/CAG_spec.md`, `/Personalized_ChatGPT_Instructions_v1.0_densified.md`.  
-* Ensure mirrors green before any session (**Architect validates all five files**).  
-* Validate Fast-Path & Audit-Path separately.  
+* Place `/docs/CAG_spec.md` and `/docs/AGENTS_mirror.md` as mirrors.
+* **Attach to CAG:** Blueprint and `/docs/AGENTS_mirror.md`.
+* **Attach to Codex:** Blueprint and `/docs/CAG_spec.md`.
+* Ensure mirrors green before any session (**Architect validates all five files**).
+* Validate Fast-Path & Audit-Path separately.
 * Track KPIs and telemetry.
+
+# Hierarchy & Propagation
+
+* `OPERATING_BLUEPRINT.md` is the sole origin for procedural changes.
+* Any changes to CAG instructions or `AGENTS.md` must originate from a Blueprint change.
+* After such changes, the Architect directs subsequent patches to propagate the updated bundle header and content to mirrors and masters.
+> Rationale: centralizes governance and prevents uncoordinated instruction drift.
 
 # What You Gain
 
@@ -627,7 +562,7 @@ OBJECTIVE: <criteria>
 CONSTRAINTS: Fast-Path; single-file; atomic; context=2; auto patch-log; no secrets; token_budget=<N>.
 SCOPE: {edit: <path>, create_if_missing: false}
 OUTPUTFORMAT: {patches, tests(minimal_ok), DIAGMETA, DIFFSUMMARY}
-TIMESTAMP: <UTC YYYYMMDD HHMMSS>
+TIMESTAMP: <UTC YYYYMMDD_HHMMSS>
 prompt_id: <UUID or commit hash>
 ~~~~
 
@@ -639,6 +574,6 @@ OBJECTIVE: <criteria>
 CONSTRAINTS: Audit-Path; multi-file allowed; require Builder confirmation token; rollback required; enumerate dependencies; full tests.
 SCOPE: {paths: [..], create_missing: ask}
 OUTPUTFORMAT: {design_brief, risk_matrix, staged_patches, test_plan, DIAGMETA, DIFFSUMMARY}
-TIMESTAMP: <UTC YYYYMMDD HHMMSS>
+TIMESTAMP: <UTC YYYYMMDD_HHMMSS>
 prompt_id: <UUID or commit hash>
 ~~~~

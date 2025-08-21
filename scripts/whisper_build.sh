@@ -43,7 +43,7 @@ set_cache_dir  # Codex: cache override for WSL hosts
 LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/whisper_build.log"
 mkdir -p "$LOG_DIR"
-exec > >(tee -a "$LOG_FILE") 2>&1
+exec > >(awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush(); }' | tee -a "$LOG_FILE") 2>&1
 
 # Codex: ensure check_env.sh output is logged
 bash "$SCRIPT_DIR/check_env.sh" >> "$LOG_FILE" 2>&1

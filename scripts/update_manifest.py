@@ -46,7 +46,8 @@ def main():
     with open(MANIFEST_PATH, 'w') as f:
         for file in files:
             f.write(file + '\n')
-    print(f"Manifest updated: {MANIFEST_PATH} ({len(files)} files)")
+    from datetime import datetime
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Manifest updated: {MANIFEST_PATH} ({len(files)} files)")
 
 if __name__ == '__main__':
     main()

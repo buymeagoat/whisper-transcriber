@@ -1,0 +1,53 @@
+# ===== whisper-transcriber requirements.txt =====
+# Pinned to moderately recent, stable versions.
+# Install with:  pip install -r requirements.txt
+# ------------------------------------------------
+
+# --- Core web stack ---
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+psutil>=5.9.8
+
+# --- Multipart uploads & files ---
+python-multipart>=0.0.6
+aiofiles>=23.2.1
+
+# --- Database & migrations ---
+sqlalchemy>=2.0.30
+alembic>=1.13.1
+psycopg2-binary>=2.9
+
+# --- Auth / security (future-proofing) ---
+passlib[bcrypt]>=1.7.4
+bcrypt<4
+python-jose[cryptography]>=3.3.0
+
+# --- Speech-to-text ---
+openai-whisper==20240930
+openai>=1.14.3
+torch>=2.2.2
+
+# --- Audio helpers ---
+pydub>=0.25.1
+pyttsx3>=2.90
+
+# --- Background task queue ---
+celery>=5.3
+
+# Language detection and sentiment
+langdetect>=1.0.9
+vaderSentiment>=3.3.2
+
+# --- .env file support ---
+python-dotenv>=1.1.0
+pydantic-settings>=2.2.1
+
+# --- JSON performance boost (optional but auto-detected by FastAPI) ---
+orjson>=3.10.0
+prometheus-client>=0.20.0
+boto3>=1.34.0
+
+
+# ------------------------------------------------
+# System prerequisite (not pip, required at runtime):
+#   sudo apt-get install -y ffmpeg

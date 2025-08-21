@@ -1,0 +1,14 @@
+./package-lock.json
+./src/App.jsx
+./src/main.jsx
+./src/pages/AdminPage.jsx
+./src/pages/TranscriptViewPage.jsx
+./src/pages/UploadPage.jsx
+./src/pages/FailedJobsPage.jsx
+./src/pages/CompletedJobsPage.jsx
+./src/pages/JobProgressPage.jsx
+./src/pages/ActiveJobsPage.jsx
+./src/pages/JobStatusPage.jsx
+./package.json
+./vite.config.js
+./eslint.config.js

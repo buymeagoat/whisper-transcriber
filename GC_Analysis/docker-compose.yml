@@ -1,0 +1,109 @@
+services:
+  api:
+    build:
+      context: .
+      secrets:
+        - secret_key
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVICE_TYPE=api
+      - PORT=8000 # change to run the API on a different port
+      - VITE_API_HOST=http://localhost:8000
+      - JOB_QUEUE_BACKEND=broker
+      - CELERY_BROKER_URL=amqp://guest:guest@broker:5672//
+      - CELERY_BACKEND_URL=rpc://
+      - DB_URL=postgresql+psycopg2://whisper:whisper@db:5432/whisper
+      - SECRET_KEY=${SECRET_KEY}
+    secrets:
+      - secret_key
+    volumes:
+      - ./uploads:/app/uploads
+      - ./transcripts:/app/transcripts
+      - ./logs:/app/logs
+      - ./models:/app/models:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
+      worker:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: whisper
+      POSTGRES_PASSWORD: whisper
+      POSTGRES_DB: whisper
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "whisper"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  broker:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_NODENAME=rabbit@broker
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    build:
+      context: .
+      secrets:
+        - secret_key
+    command: python worker.py
+    restart: on-failure
+    environment:
+      - SERVICE_TYPE=worker
+      - VITE_API_HOST=http://localhost:8000
+      - JOB_QUEUE_BACKEND=broker
+      - CELERY_BROKER_URL=amqp://guest:guest@broker:5672//
+      - CELERY_BACKEND_URL=rpc://
+      - DB_URL=postgresql+psycopg2://whisper:whisper@db:5432/whisper
+      - SECRET_KEY=${SECRET_KEY}
+    secrets:
+      - secret_key
+    volumes:
+      - ./uploads:/app/uploads
+      - ./transcripts:/app/transcripts
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  db_data:
+  rabbitmq_data:
+
+secrets:
+  secret_key:
+    file: ./secret_key.txt

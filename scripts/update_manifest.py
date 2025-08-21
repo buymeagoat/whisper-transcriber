@@ -6,7 +6,7 @@ import os
 
 EXCLUDE_DIRS = {'.git', 'venv', 'node_modules', 'logs/app', 'logs/**/raw'}
 EXCLUDE_FILES = {'*.log', '*.tmp'}
-MANIFEST_PATH = 'local_manifest.txt'
+MANIFEST_PATH = os.path.join('cache', 'manifest.txt')
 
 
 def should_exclude(path):

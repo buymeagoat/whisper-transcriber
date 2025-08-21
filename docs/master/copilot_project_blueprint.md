@@ -13,6 +13,8 @@ Defines the mandatory, reproducible workflow for Copilot-driven coding across al
 - VSCode tasks: automate scripts, sync, and pull.
 
 ## Workflow (Every Change)
+15. After any change to master documents or other critical files, Copilot must always provide explicit instructions and ready-to-copy commands for pushing to main and merging, ensuring all repositories remain in sync and the process is fully trusted.
+14. For any step that requires manual execution (e.g., syncing local repo, updating manifest), Copilot must always provide explicit instructions and ready-to-copy commands for the user to execute.
 1. Make code change.
 2. Update/add tests (log rationale if not applicable).
 3. Run manifest/log scripts.
@@ -22,9 +24,10 @@ Defines the mandatory, reproducible workflow for Copilot-driven coding across al
 7. Copilot must automatically identify and remove obsolete files, empty directories, and legacy artifacts.
 8. Copilot must document risk level and rollback steps for every change in the log file.
 9. Open PR, merge to main.
-10. Pull latest locally.
-11. Copilot references manifest for file awareness.
-12. All artifact generation is mandatory and automatic.
+10. After merging, always pull the latest changes to your local repository to keep it in sync with remote.
+11. After pulling, update your manifest file to match the current repository state. Immediately stage, commit, and push the updated manifest so all collaborators and Copilot have access to the latest version.
+12. Copilot references manifest for file awareness.
+13. All artifact generation is mandatory and automatic.
 
 ## Quickstart
 - Copy this file to `/docs/master/` in new repos.

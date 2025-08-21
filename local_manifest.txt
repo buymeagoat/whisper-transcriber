@@ -7,12 +7,6 @@ LICENSE
 README.md
 alembic.ini
 api/__init__.py
-api/__pycache__/__init__.cpython-310.pyc
-api/__pycache__/errors.cpython-310.pyc
-api/__pycache__/main.cpython-310.pyc
-api/__pycache__/metadata_writer.cpython-310.pyc
-api/__pycache__/paths.cpython-310.pyc
-api/__pycache__/settings.cpython-310.pyc
 api/app_state.py
 api/config_validator.py
 api/errors.py
@@ -22,15 +16,11 @@ api/main.py
 api/metadata_writer.py
 api/middlewares/access_log.py
 api/migrations/README
-api/migrations/__pycache__/env.cpython-310.pyc
 api/migrations/env.py
 api/migrations/script.py.mako
 api/migrations/versions/127b8323c9f5_expand_status_enum.py
 api/migrations/versions/600b2cda9baf_add_started_and_finished_at.py
 api/migrations/versions/8f53d7a793bb_add_user_table_and_metadata_fields.py
-api/migrations/versions/__pycache__/029c88b44f1c_initial_schema.cpython-310.pyc
-api/migrations/versions/__pycache__/d99ff9e35597_baseline.cpython-310.pyc
-api/migrations/versions/__pycache__/e9a7d25a7408_check_status_enum_completeness.cpython-310.pyc
 api/migrations/versions/a664c766e9de_add_user_settings_table.py
 api/migrations/versions/b8b3752f3e16_add_must_change_password_column.py
 api/migrations/versions/d99ff9e35597_baseline.py
@@ -65,7 +55,6 @@ api/services/user_settings.py
 api/services/users.py
 api/settings.py
 api/static/index.html
-api/utils/__pycache__/logger.cpython-310.pyc
 api/utils/db_lock.py
 api/utils/logger.py
 api/utils/model_validation.py
@@ -103,11 +92,6 @@ docs/versioning_policy.md
 frontend/.env
 frontend/.env.example
 frontend/README.md
-frontend/dist/assets/index-BDvkJlP1.css
-frontend/dist/assets/index-ClxLvC7X.js
-frontend/dist/index.html
-frontend/dist/vite.svg
-frontend/dist/whisper-favicon.png
 frontend/eslint.config.js
 frontend/frontend-filelist.txt
 frontend/index.html
@@ -158,10 +142,6 @@ frontend/src/store/notificationsSlice.js
 frontend/vite.config.js
 frontend/vitest.config.js
 instructions/cag_dense.txt
-local_manifest.txt
-logs/copy_diff_files_for_gc_analysis.sh
-logs/repo_audit_filtered.md
-logs/repo_audit_full.md
 models/base.pt
 models/large-v3.pt
 models/medium.pt
@@ -174,6 +154,7 @@ requirements.txt
 scripts/backfill_patch_logs.py
 scripts/check_cache_env.sh
 scripts/check_env.sh
+scripts/cleanup_local_repo.sh
 scripts/diagnose_containers.sh
 scripts/docker-entrypoint.sh
 scripts/healthcheck.sh
@@ -189,14 +170,6 @@ scripts/update_images.sh
 scripts/update_manifest.py
 scripts/validate_manifest.sh
 scripts/whisper_build.sh
-snapshots/snapshot_20250801T205622Z.json
-snapshots/snapshot_20250801T213342Z.json
-snapshots/snapshot_20250802T003429Z.json
-snapshots/snapshot_20250802T155724Z.json
-snapshots/snapshot_20250802T161510Z.json
-snapshots/snapshot_20250802T163818Z.json
-snapshots/snapshot_20250819T151227Z.json
-tests/__pycache__/test_jobs.cpython-310-pytest-8.4.0.pyc
 tests/conftest.py
 tests/test_access_log.py
 tests/test_admin_cleanup_config.py
@@ -224,7 +197,4 @@ tests/test_rehydrate_jobs.py
 tests/test_tts_api.py
 tests/test_upload_size.py
 tests/test_user_settings.py
-transcripts/Infrastructure_Meeting.srt
-uploads/Infrastructure_Meeting.m4a
-uploads/New Recording 31.m4a:Zone.Identifier
 worker.py

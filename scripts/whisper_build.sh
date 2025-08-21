@@ -45,6 +45,10 @@ LOG_FILE="$LOG_DIR/whisper_build.log"
 mkdir -p "$LOG_DIR"
 exec > >(awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush(); }' | tee -a "$LOG_FILE") 2>&1
 
+
+# Codex: generate manifest before environment checks
+python3 "$SCRIPT_DIR/update_manifest.py"
+
 # Codex: ensure check_env.sh output is logged
 bash "$SCRIPT_DIR/check_env.sh" >> "$LOG_FILE" 2>&1
 

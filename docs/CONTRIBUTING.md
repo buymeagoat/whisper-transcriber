@@ -4,6 +4,12 @@ Thank you for wanting to contribute to Whisper Transcriber.
 This document explains how to get a development environment running and the
 conventions used for submitting changes.
 
+## Repository Governance
+All contributions must follow the standards and automation rules in [docs/OPERATING_BLUEPRINT.md](docs/OPERATING_BLUEPRINT.md).
+- Use the PR template for all pull requests
+- Update the changelog and per-change logs in `/logs/`
+- Ensure tests and build logs are present before merging
+
 ## Getting Started
 
 See [help.md](help.md) for a step-by-step setup guide. We recommend creating a

@@ -2,6 +2,9 @@
 
 This document outlines how to deploy and operate Whisper Transcriber securely.
 
+## Repository Security Governance
+All security practices and standards are defined in [docs/OPERATING_BLUEPRINT.md](docs/OPERATING_BLUEPRINT.md) and enforced by CI/CD and Copilot automation.
+
 ## Overview
 - API authentication uses JWT tokens with role-based access control.
 - Admin routes and log retrieval require an `admin` role.

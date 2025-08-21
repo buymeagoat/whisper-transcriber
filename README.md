@@ -1,12 +1,21 @@
 # Whisper Transcriber
 
 > **For architecture, Docker build details and script internals, see [docs/design_scope.md](docs/design_scope.md).**
+> **For repository standards, automation, and governance, see [docs/OPERATING_BLUEPRINT.md](docs/OPERATING_BLUEPRINT.md).**
 
 Self-hosted transcription service with a FastAPI backend and a React frontend. It wraps the OpenAI Whisper CLI so you can upload audio, monitor progress and retrieve transcripts.
 
 All Docker builds now use `scripts/whisper_build.sh`. Previous helper scripts were removed.<!-- # Codex: build entrypoint clarified -->
 
 For a step-by-step setup guide, see [docs/help.md](docs/help.md).
+
+## Repository Governance & Automation
+
+This repository follows a Copilot-centric, automation-first model. All changes must:
+- Adhere to the standards in [docs/OPERATING_BLUEPRINT.md](docs/OPERATING_BLUEPRINT.md)
+- Update the changelog and per-change logs in `/logs/`
+- Use the PR template and CI/CD gates for all merges
+- Store build and change logs for historical analysis
 
 ## Requirements & Installation
 

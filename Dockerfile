@@ -4,8 +4,6 @@ FROM python:3.11-bookworm  # Codex: base image update
 # Install dev requirements when building test images
 ARG INSTALL_DEV=false
 
-# Secret used for model validation during build
-ARG SECRET_KEY
 
 COPY cache/apt /tmp/apt
 RUN apt-get update || (cat /etc/resolv.conf && ping -c 3 deb.debian.org && exit 1) && \

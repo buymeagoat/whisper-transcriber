@@ -38,3 +38,20 @@ This page lists all configurable environment variables.
 
 | Variable Name | Required? | Default Value | Used In | Description |
 | --- | --- | --- | --- | --- |
+
+# Environment Setup for whisper-transcriber
+
+## Required .env Variables
+
+Create a `.env` file in the project root with the following:
+
+```
+SECRET_KEY=your_secret_value
+```
+
+- `SECRET_KEY` is required for API authentication and cryptographic operations.
+- Never commit your actual `.env` file to version control.
+
+## Usage
+- Docker Compose will automatically load variables from `.env`.
+- The application expects `SECRET_KEY` to be set at runtime.

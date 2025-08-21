@@ -2,8 +2,6 @@ services:
   api:
     build:
       context: .
-      secrets:
-        - secret_key
     restart: on-failure
     ports:
       - "8000:8000"
@@ -16,8 +14,6 @@ services:
       - CELERY_BACKEND_URL=rpc://
       - DB_URL=postgresql+psycopg2://whisper:whisper@db:5432/whisper
       - SECRET_KEY=${SECRET_KEY}
-    secrets:
-      - secret_key
     volumes:
       - ./uploads:/app/uploads
       - ./transcripts:/app/transcripts

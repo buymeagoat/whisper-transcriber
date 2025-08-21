@@ -42,12 +42,72 @@ def collect_files(root):
     return sorted(files)
 
 def main():
+    import subprocess
+    from datetime import datetime
     files = collect_files('.')
+    # Gather required metadata
+    # BASE_CODENAME from Dockerfile base image
+    base_image = None
+    base_codename = None
+    base_digest = None
+    dockerfile_path = 'Dockerfile'
+    try:
+        with open(dockerfile_path) as df:
+            for line in df:
+                if line.startswith('FROM '):
+                    base_image = line.split()[1].strip()
+                    break
+        if base_image:
+            # Get codename from base image
+            result = subprocess.run([
+                'docker', 'run', '--rm', base_image,
+                'bash', '-c', 'source /etc/os-release && echo $VERSION_CODENAME'
+            ], capture_output=True, text=True)
+            base_codename = result.stdout.strip() if result.returncode == 0 else ''
+            # Get digest from base image
+            result = subprocess.run([
+                'docker', 'image', 'inspect', base_image,
+                '--format', '{{index .RepoDigests 0}}'
+            ], capture_output=True, text=True)
+            if result.returncode == 0 and '@' in result.stdout:
+                base_digest = result.stdout.strip().split('@')[1]
+            else:
+                base_digest = ''
+    except Exception:
+        base_codename = ''
+        base_digest = ''
+    # TIMESTAMP
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    # pip_versions
+    pip_versions = ''
+    pip_versions_path = 'cache/pip/pip_versions.txt'
+    if os.path.exists(pip_versions_path):
+        try:
+            import hashlib
+            with open(pip_versions_path, 'rb') as pf:
+                pip_versions = hashlib.sha256(pf.read()).hexdigest()
+        except Exception:
+            pip_versions = ''
+    # npm_versions
+    npm_versions = ''
+    npm_versions_path = 'cache/npm/npm_versions.txt'
+    if os.path.exists(npm_versions_path):
+        try:
+            import hashlib
+            with open(npm_versions_path, 'rb') as nf:
+                npm_versions = hashlib.sha256(nf.read()).hexdigest()
+        except Exception:
+            npm_versions = ''
     with open(MANIFEST_PATH, 'w') as f:
+        f.write(f"BASE_CODENAME={base_codename}\n")
+        f.write(f"BASE_DIGEST={base_digest}\n")
+        f.write(f"TIMESTAMP={timestamp}\n")
+        f.write(f"pip_versions={pip_versions}\n")
+        f.write(f"npm_versions={npm_versions}\n")
+        f.write("\n")
         for file in files:
             f.write(file + '\n')
-    from datetime import datetime
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Manifest updated: {MANIFEST_PATH} ({len(files)} files)")
+    print(f"[{timestamp}] Manifest updated: {MANIFEST_PATH} ({len(files)} files)")
 
 if __name__ == '__main__':
     main()

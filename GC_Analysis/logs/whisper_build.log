@@ -1,0 +1,36 @@
+Unable to find image 'python:3.11-bookworm' locally
+3.11-bookworm: Pulling from library/python
+ebed137c7c18: Pulling fs layer
+c2e76af9483f: Pulling fs layer
+37f838b71c6b: Pulling fs layer
+873a4c802874: Pulling fs layer
+86a35ac8b270: Pulling fs layer
+d66dc9ad63ea: Pulling fs layer
+95c430539c3d: Pulling fs layer
+873a4c802874: Waiting
+86a35ac8b270: Waiting
+d66dc9ad63ea: Waiting
+95c430539c3d: Waiting
+c2e76af9483f: Verifying Checksum
+c2e76af9483f: Download complete
+ebed137c7c18: Verifying Checksum
+ebed137c7c18: Download complete
+ebed137c7c18: Pull complete
+c2e76af9483f: Pull complete
+86a35ac8b270: Verifying Checksum
+86a35ac8b270: Download complete
+37f838b71c6b: Verifying Checksum
+95c430539c3d: Verifying Checksum
+95c430539c3d: Download complete
+d66dc9ad63ea: Verifying Checksum
+d66dc9ad63ea: Download complete
+37f838b71c6b: Pull complete
+873a4c802874: Verifying Checksum
+873a4c802874: Download complete
+873a4c802874: Pull complete
+86a35ac8b270: Pull complete
+d66dc9ad63ea: Pull complete
+95c430539c3d: Pull complete
+Digest: sha256:c1239cb82bf08176c4c90421ab425a1696257b098d9ce21e68de9319c255a47d
+Status: Downloaded newer image for python:3.11-bookworm
+OS codename mismatch: Dockerfile uses 'bookworm', host is 'jammy'

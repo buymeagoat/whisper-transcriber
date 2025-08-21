@@ -1,0 +1,439 @@
+[2025-07-06 16:46:48,552] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: _run() started
+[2025-07-06 16:46:48,554] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: Launching subprocess: /usr/local/bin/whisper /app/uploads/0ad7d48e8de5457b91fcdcdd9dea0829_Don Erdman Radio Broadcast - Side 1.mp3 --model tiny --model_dir /app/models --output_dir /app/transcripts/0ad7d48e8de5457b91fcdcdd9dea0829 --output_format srt --language en --verbose True
+[2025-07-06 16:46:48,555] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: FINAL CMD: /usr/local/bin/whisper /app/uploads/0ad7d48e8de5457b91fcdcdd9dea0829_Don Erdman Radio Broadcast - Side 1.mp3 --model tiny --model_dir /app/models --output_dir /app/transcripts/0ad7d48e8de5457b91fcdcdd9dea0829 --output_format srt --language en --verbose True
+[2025-07-06 16:46:57,739] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDERR: /usr/local/lib/python3.11/site-packages/whisper/transcribe.py:132: UserWarning: FP16 is not supported on CPU; using FP32 instead
+[2025-07-06 16:46:57,739] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDERR: warnings.warn("FP16 is not supported on CPU; using FP32 instead")
+[2025-07-06 16:51:26,084] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [00:30.000 --> 00:34.000]  This is K-O-L-L-M
+[2025-07-06 16:51:26,084] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [00:36.000 --> 00:39.000]  This is K-O-L-M
+[2025-07-06 16:51:26,084] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [00:39.000 --> 00:42.000]  15-20
+[2025-07-06 16:51:26,085] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [00:45.000 --> 00:48.000]  New music, more fun
+[2025-07-06 16:51:26,085] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [00:48.000 --> 00:50.000]  It's the swing in one
+[2025-07-06 16:51:26,085] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [00:50.000 --> 00:52.000]  K-O-L-M
+[2025-07-06 16:51:26,085] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [00:52.000 --> 00:54.000]  15-20
+[2025-07-06 16:51:26,085] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:00.000 --> 01:03.000]  Stay with us for the news
+[2025-07-06 16:51:26,085] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:03.000 --> 01:06.000]  On K-O-L-L-M
+[2025-07-06 16:51:26,086] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:06.000 --> 01:09.000]  15-20
+[2025-07-06 16:51:26,086] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:19.000 --> 01:22.000]  K-O-L-M 15-20
+[2025-07-06 16:51:26,086] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:24.000 --> 01:26.000]  New music, more fun
+[2025-07-06 16:51:26,086] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:26.000 --> 01:29.000]  15-20
+[2025-07-06 16:51:26,086] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:29.000 --> 01:33.000]  This is K-O-L-L-M
+[2025-07-06 16:51:26,086] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:33.000 --> 01:37.000]  The station that really cares
+[2025-07-06 16:51:26,087] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:43.000 --> 01:44.000]  15-20
+[2025-07-06 16:51:26,087] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:44.000 --> 01:45.000]  15-20
+[2025-07-06 16:51:26,087] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:45.000 --> 01:49.000]  K-O-L-L-L-M
+[2025-07-06 16:51:26,087] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:49.000 --> 01:50.000]  15-20
+[2025-07-06 16:51:26,087] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:50.000 --> 01:51.000]  15-20
+[2025-07-06 16:51:26,087] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [01:51.000 --> 01:58.000]  We're there. We're there. We're there. We're there.
+[2025-07-06 16:51:26,088] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:00.000 --> 02:03.000]  If you follow what sport
+[2025-07-06 16:51:26,088] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:03.000 --> 02:07.000]  K-O-L-M
+[2025-07-06 16:51:26,088] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:07.000 --> 02:08.000]  15-20
+[2025-07-06 16:51:26,088] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:08.000 --> 02:14.000]  K-O-L-L-M
+[2025-07-06 16:51:26,088] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:14.000 --> 02:24.000]  We're your kind of people.
+[2025-07-06 16:51:26,088] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:24.000 --> 02:28.000]  We're your kind of sound.
+[2025-07-06 16:51:26,089] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:28.000 --> 02:31.000]  Let's play together next.
+[2025-07-06 16:51:26,089] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:31.000 --> 02:34.000]  All over town.
+[2025-07-06 16:51:26,089] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:34.000 --> 02:39.000]  K-O-L-M-15-20.
+[2025-07-06 16:51:26,089] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:39.000 --> 02:41.000]  In Rochester.
+[2025-07-06 16:51:26,089] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:44.000 --> 02:48.000]  No back to music.
+[2025-07-06 16:51:26,089] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [02:48.000 --> 02:53.000]  On K-O-L-M-15-20.
+[2025-07-06 16:51:26,089] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [03:02.000 --> 03:06.000]  K-O-L-M-15-20.
+[2025-07-06 16:51:26,090] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [03:06.000 --> 03:10.000]  The only way to fight.
+[2025-07-06 16:51:26,090] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [03:14.000 --> 03:20.000]  We have a news tube.
+[2025-07-06 16:51:26,090] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [03:20.000 --> 03:24.000]  Now it's time to news you.
+[2025-07-06 16:51:26,090] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [03:24.000 --> 03:28.000]  K-O-L-M-15-20.
+[2025-07-06 16:51:26,090] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [03:28.000 --> 03:34.000]  In Rochester.
+[2025-07-06 16:51:26,090] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [03:34.000 --> 03:40.000]  On K-O-L-M-15-20.
+[2025-07-06 16:51:26,091] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [03:41.000 --> 03:45.000]  On K-O-L-M-15-20.
+[2025-07-06 16:51:26,091] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [03:45.000 --> 03:50.000]  On K-O-L-M-15-20.
+[2025-07-06 16:51:26,091] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [03:56.000 --> 04:01.000]  K-O-L-M-15-20.
+[2025-07-06 16:51:26,091] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [04:11.000 --> 04:14.000]  No working all play.
+[2025-07-06 16:51:26,091] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [04:14.000 --> 04:19.000]  Makes the perfect man for your weekend.
+[2025-07-06 16:51:26,091] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [04:19.000 --> 04:30.000]  K-O-L-M-15-20.
+[2025-07-06 16:51:26,092] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [04:30.000 --> 04:34.000]  K-O-L-M-15-20.
+[2025-07-06 16:51:26,092] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [04:40.000 --> 04:43.000]  The tunes are all hits.
+[2025-07-06 16:51:26,092] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [04:43.000 --> 04:45.000]  And the fun never quits.
+[2025-07-06 16:51:26,092] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [04:45.000 --> 04:49.000]  On K-O-L-M-15-20.
+[2025-07-06 16:51:26,092] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [04:49.000 --> 04:51.000]  In Rochester.
+[2025-07-06 16:51:26,092] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [04:56.000 --> 04:59.000]  This was a record that was.
+[2025-07-06 16:51:26,093] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [04:59.000 --> 05:01.000]  On K-O-L-M-15-20.
+[2025-07-06 16:51:26,093] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:01.000 --> 05:04.000]  The station that played a big...
+[2025-07-06 16:51:26,093] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:11.000 --> 05:15.000]  K-O-L-M-15.
+[2025-07-06 16:51:26,093] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:15.000 --> 05:18.000]  K-O-L-M-15.
+[2025-07-06 16:51:26,093] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:18.000 --> 05:20.000]  K-O-L-M-15.
+[2025-07-06 16:51:26,093] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:20.000 --> 05:23.000]  K-O-L-M-15.
+[2025-07-06 16:51:26,094] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:26.000 --> 05:31.000]  The one with a fun...
+[2025-07-06 16:51:26,094] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:31.000 --> 05:33.000]  K-O-L-M-15.
+[2025-07-06 16:51:26,094] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:33.000 --> 05:34.000]  K-O-L-M-15.
+[2025-07-06 16:51:26,094] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:34.000 --> 05:36.000]  It's song, Earthman.
+[2025-07-06 16:51:26,094] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:36.000 --> 05:38.000]  And the girl world.
+[2025-07-06 16:51:26,094] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:38.000 --> 05:54.920]  The M&C Square dance club holds a regular weekly dance Thursday at the Isaac Walton
+[2025-07-06 16:51:26,094] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [05:54.920 --> 06:01.040]  Cabin and 830 p.m. World War I veterans are having a pot-lock dinner Friday at the American
+[2025-07-06 16:51:26,094] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [06:01.040 --> 06:05.880]  Legion club rooms at noon. Pearl Bayley will present a show and the males have a toy
+[2025-07-06 16:51:26,094] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [06:05.960 --> 06:11.460]  theater tonight at 830. The Rochester Garden Club will be meeting next Thursday in the
+[2025-07-06 16:51:26,094] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [06:11.460 --> 06:16.720]  South Hall of the Mayo City of the auditorium at 8 p.m. Playing at the theaters now on the
+[2025-07-06 16:51:26,095] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [06:16.720 --> 06:21.280]  screen at the time, the poppy at the lower sound of music at the Chateau Murderer's
+[2025-07-06 16:51:26,095] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [06:21.280 --> 06:25.120]  Row, and at 721 Funeral in Berlin.
+[2025-07-06 16:51:26,095] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [06:25.120 --> 06:30.040]  If you would like your church or club activities advertised free of charge, send a postcard
+[2025-07-06 16:51:26,095] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [06:30.080 --> 06:35.280]  one week in advance to KOLM Radio, Rochester, Minnesota.
+[2025-07-06 16:51:26,095] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [06:37.280 --> 06:41.960]  Two degrees above zero and Rochester shooting for that high today in the mid-20s.
+[2025-07-06 16:51:26,095] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [06:41.960 --> 06:47.200]  Warmer weather on the way for today tomorrow and on Friday. Three and a half minutes
+[2025-07-06 16:51:26,095] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [06:47.200 --> 06:51.040]  now before nine news headlines coming your way at nine on the 15-20 spot.
+[2025-07-06 16:51:26,095] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [07:00.040 --> 07:06.040]  Let's go and make another course in orchestra and melody and more.
+[2025-07-06 16:51:26,096] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [08:00.040 --> 08:16.040]  You know I will wait. If you name the date, you know I can't wait.
+[2025-07-06 16:51:26,096] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [08:16.040 --> 08:30.000]  Play me part of heart. I'll wait for my heart. So if I'll fly away and say
+[2025-07-06 16:51:26,096] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [08:30.000 --> 08:38.000]  you hope I'm right. There's fathers melody. We'll bring you back to me.
+[2025-07-06 16:51:26,096] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [08:38.000 --> 08:45.000]  We'll be done. Take this song to my love.
+[2025-07-06 16:51:26,096] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [08:45.000 --> 08:51.000]  Shoot you little girl. Go and find my love.
+[2025-07-06 16:51:26,096] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [08:51.000 --> 08:57.000]  There's a lot of joy.
+[2025-07-06 16:51:26,096] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [08:57.000 --> 09:01.000]  There's a lot of joy.
+[2025-07-06 16:51:26,096] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [09:01.000 --> 09:06.000]  There's a lot of joy.
+[2025-07-06 16:51:26,096] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [09:06.000 --> 09:10.000]  There's a lot of joy.
+[2025-07-06 16:51:26,096] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [09:10.000 --> 09:12.000]  There's a lot of joy.
+[2025-07-06 16:51:26,096] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [09:12.000 --> 09:15.000]  There you have the sounds of rake on of the chorus and orchestra.
+[2025-07-06 16:51:26,097] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [09:15.040 --> 09:17.000]  Your melody.
+[2025-07-06 16:51:26,097] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [09:17.000 --> 09:20.000]  There's more-one-fifteen-twenty-ready adieu.
+[2025-07-06 16:51:26,097] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [09:20.000 --> 09:33.040]  Tango us on the news time, now, you're a Nana Clark on the 15-20 spot.
+[2025-07-06 16:51:26,097] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [09:35.040 --> 09:43.040]  They're so cute.
+[2025-07-06 16:51:26,097] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [09:43.040 --> 10:13.000]  We've got to make way now for a news at nine here on the 15-20 spot and we'll start
+[2025-07-06 16:51:26,097] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [10:13.000 --> 10:17.640]  things off right after the news was Sunday Posi, a little signal girl for you, that had
+[2025-07-06 16:51:26,097] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [10:17.640 --> 10:22.440]  been here and thanks to being with us, who'd back in just five with more recovered sounds.
+[2025-07-06 16:51:26,097] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [10:22.440 --> 10:31.440]  This is K.O.L.L.M. in Rochester, Minnesota.
+[2025-07-06 16:51:26,097] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [10:31.440 --> 10:32.920]  The correct time is...
+[2025-07-06 16:51:26,097] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [10:32.920 --> 10:33.920]  9 o'clock.
+[2025-07-06 16:51:26,098] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [10:33.920 --> 10:40.080]  Time for you to choose a dependable, accurate, or mega-ratch from Blical Jewelry's 2-10 first
+[2025-07-06 16:51:26,098] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [10:40.080 --> 10:46.320]  diagonal South West, your quality jewelry store, because has a fine selection of fashionable
+[2025-07-06 16:51:26,098] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [10:46.320 --> 10:49.520]  or mega-ratches for both men and women.
+[2025-07-06 16:51:26,098] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [10:49.520 --> 10:58.080]  Local Jewelers registered Jewelers are American Gem society.
+[2025-07-06 16:51:26,098] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [10:58.080 --> 11:05.600]  And a pleasant good morning to you, Donardman reporting, Rochester School Board at last
+[2025-07-06 16:51:26,098] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:05.600 --> 11:12.040]  night and approve of Superintendent James Moons, request to contact LRB and company architects
+[2025-07-06 16:51:26,098] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:12.040 --> 11:15.920]  to go ahead to draw a plan for a new Northern Heights Elementary School.
+[2025-07-06 16:51:26,098] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:15.920 --> 11:20.360]  The school has expected to cost possibly 15% more than first thought.
+[2025-07-06 16:51:26,098] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:20.360 --> 11:26.000]  If plans are approved, beds can start in May of this year, construction in July and a building
+[2025-07-06 16:51:26,098] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:26.000 --> 11:28.640]  could be finished in 13 months.
+[2025-07-06 16:51:26,098] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:28.640 --> 11:33.640]  It was a great take action that will terminate employment of long-term substitute teachers,
+[2025-07-06 16:51:26,099] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:33.640 --> 11:35.840]  and also those reaching the age of retirement.
+[2025-07-06 16:51:26,099] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:35.840 --> 11:40.560]  Dr. Moon also made a request for additional staff members in order to move ahead.
+[2025-07-06 16:51:26,099] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:40.560 --> 11:46.120]  Moon asked for approval for 52 teachers for the next school year and deferred until the next
+[2025-07-06 16:51:26,099] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:46.120 --> 11:48.520]  board meeting possible additional ones.
+[2025-07-06 16:51:26,099] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:48.520 --> 11:50.560]  The board approved this request.
+[2025-07-06 16:51:26,099] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:50.560 --> 11:54.360]  The Planning Commission in Park Board, along with the members of the City Council, discussed
+[2025-07-06 16:51:26,099] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:54.360 --> 11:57.360]  plans for another auditorium area in Rochester.
+[2025-07-06 16:51:26,099] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [11:57.360 --> 12:01.240]  Since mentioned, where soldiers failed and near the present auditorium.
+[2025-07-06 16:51:26,099] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:01.240 --> 12:05.960]  Two of the biggest factors to be considered, they felt was parking and accessibility.
+[2025-07-06 16:51:26,099] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:05.960 --> 12:12.640]  The Park Board set a unified plan must be reached before they can present it to the City Council.
+[2025-07-06 16:51:26,099] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:12.640 --> 12:16.720]  Rochester Fireman continued to probe the ruins of the Norton Hotel on efforts to determine
+[2025-07-06 16:51:26,100] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:16.720 --> 12:21.400]  what caused the $300,000 fire that claimed three lives.
+[2025-07-06 16:51:26,100] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:21.400 --> 12:26.680]  At last report authorities have accounted for all 30 persons registered at the hotel.
+[2025-07-06 16:54:39,115] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:26.680 --> 12:31.480]  At the time of the fire, the last one to be accounted for was 45-year-old a Solvester
+[2025-07-06 16:54:39,115] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:31.480 --> 12:37.240]  Sherman of Alexandria, who strolling the Rochester newspaper office this morning, pointing
+[2025-07-06 16:54:39,115] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:37.240 --> 12:41.420]  to his name on the unaccounted list on the news page and said, quote, I'm not messing
+[2025-07-06 16:54:39,115] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:41.420 --> 12:43.320]  on right here, I'm cold.
+[2025-07-06 16:54:39,115] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:43.320 --> 12:45.120]  He had a little legislature.
+[2025-07-06 16:54:39,115] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:45.120 --> 12:49.960]  The Housegate preliminary approval to a bill to extend the use of metal-studded snow tires
+[2025-07-06 16:54:39,115] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:49.960 --> 12:52.000]  in Minnesota for two more years.
+[2025-07-06 16:54:39,115] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:52.000 --> 12:57.160]  The Senate gave committee approval to the amendment to the U.S. Constitution on presidential
+[2025-07-06 16:54:39,115] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:57.160 --> 12:58.160]  succession.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [12:58.160 --> 13:03.080]  Amendment would clarify the house and whose of filling vacancies should either the vice-president
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:03.080 --> 13:06.520]  or president die or become incapacitated.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:06.520 --> 13:08.960]  And a representative Gary at it inmates.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:08.960 --> 13:11.880]  The prisoners would have to go back to jail at night.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:11.880 --> 13:17.120]  The plan is supported by the State Bar Association and who had cost an estimated $100,000
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:17.120 --> 13:18.760]  to get started.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:18.760 --> 13:22.320]  It ends to end the strike at Honeywell Incorporated Twin Cities Assembly Plants, my
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:22.320 --> 13:23.320]  no headway.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:23.320 --> 13:28.120]  A federal mediator is scheduled to present suggestions in the week-old strike today.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:28.120 --> 13:33.840]  Meanwhile, a third attorney for this dissentment that is, dissent members of the 10,500
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:33.840 --> 13:38.400]  striking members of Teamsters' local 1145 has recently.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:38.400 --> 13:42.120]  You see, people got to check their call lights all the time.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:42.120 --> 13:43.120]  Make sure they're lit.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:43.120 --> 13:46.720]  I feel sure God at Luckyville, real lit night and day.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:48.760 --> 13:53.920]  A safe car is a car with headlights, tail lights and turn signals all in perfect working
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:53.920 --> 13:54.920]  condition.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [13:54.920 --> 14:00.200]  Next time you stop for gas, have your service man check your lights once around rightly.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:00.200 --> 14:05.000]  It takes him just 30 seconds to circle your car and inspect it for defective lights.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:05.000 --> 14:06.000]  Do it now.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:06.000 --> 14:08.160]  See and be seen for safety.
+[2025-07-06 16:54:39,116] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:08.160 --> 14:12.840]  From the Environmental Science Service of the Bureau, here's light as forecast for Rochester
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:12.840 --> 14:13.840]  and vicinity.
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:14.400 --> 14:20.240]  Today, variable kindness and warmer, two snow florees, high temperature in the mid-20s.
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:20.240 --> 14:23.840]  Southwesturally winds tend to 20 miles per hour.
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:23.840 --> 14:28.640]  Tonight, mostly cloudy and not so cold, handsome snow florees, low temperature
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:28.640 --> 14:30.760]  10 to 15 degrees.
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:30.760 --> 14:36.360]  On Thursday, partly cloudy and warmer, high in the lower 30s, the outlook for Friday,
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:36.360 --> 14:38.360]  little temperature change.
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:38.360 --> 14:43.520]  The brown ability for measurable precipitation, both today and tonight, 20 percent,
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:43.520 --> 14:44.520]  Thursday, 10 percent.
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:44.520 --> 14:47.440]  Now, back to 15, 20, radio.
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:47.440 --> 14:51.520]  Currently, 75 percent humidity, the wind's southwesternly, 10 miles per hour, the
+[2025-07-06 16:54:39,117] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:51.520 --> 14:54.520]  parametric pressure is 30.10 and falling.
+[2025-07-06 16:54:39,118] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:54.520 --> 14:59.640]  The overnight low, one degree above zero, yesterday's high, 13, three tenths of an inch
+[2025-07-06 16:54:39,118] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [14:59.640 --> 15:00.640]  of snow falling.
+[2025-07-06 16:54:39,118] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [15:00.640 --> 15:05.280]  The last 24 hours, the wind chill indexed 22 degrees below zero.
+[2025-07-06 16:54:39,118] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [15:05.280 --> 15:08.280]  And now at 906, two degrees above zero.
+[2025-07-06 16:54:39,118] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [15:08.280 --> 15:18.280]  Now back to 15, 20, radio.
+[2025-07-06 16:54:39,118] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [15:18.280 --> 15:30.680]  The single girl, all alone in a great big time, the single girl, gets so
+[2025-07-06 16:54:39,118] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [15:30.680 --> 15:36.680]  warm, light, heard and high.
+[2025-07-06 16:54:39,118] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [15:36.680 --> 15:45.680]  The lights are bringing you and the people are only, and the nights can get so lonely,
+[2025-07-06 16:54:39,119] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [15:45.680 --> 15:54.680]  the single girl beats us, we've love and met and to need all.
+[2025-07-06 16:54:39,119] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [15:54.680 --> 16:04.680]  Now the single girl, one degree above zero, fifteen percent.
+[2025-07-06 16:54:39,119] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:04.680 --> 16:13.680]  All the single girl, I know all the time, and the light.
+[2025-07-06 16:54:39,119] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:13.680 --> 16:21.680]  Nobody loves me because nobody loves me, nobody takes the time to go slow.
+[2025-07-06 16:54:39,119] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:21.680 --> 16:26.680]  The single-boogan needs a sweet loving man to play.
+[2025-07-06 16:54:39,119] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:26.680 --> 16:28.680]  No.
+[2025-07-06 16:54:39,119] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:28.680 --> 16:29.680]  No.
+[2025-07-06 16:54:39,119] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:29.680 --> 16:32.680]  But I got a mate.
+[2025-07-06 16:54:39,120] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:32.680 --> 16:34.680]  Oh, wait.
+[2025-07-06 16:54:39,120] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:34.680 --> 16:36.680]  There's wind.
+[2025-07-06 16:54:39,120] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:36.680 --> 16:39.680]  I got a mate.
+[2025-07-06 16:54:39,120] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:39.680 --> 16:40.680]  Ha ha.
+[2025-07-06 16:54:39,120] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:40.680 --> 16:43.680]  Need a night time alone.
+[2025-07-06 16:54:39,120] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:43.680 --> 16:47.680]  To get me through the day.
+[2025-07-06 16:54:39,120] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:47.680 --> 16:51.680]  Maybe I'm a single-boogan.
+[2025-07-06 16:54:39,120] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:51.680 --> 16:57.680]  Oh, no, no, no, no, no.
+[2025-07-06 16:54:39,121] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [16:57.680 --> 17:00.680]  I'm a single-boogan.
+[2025-07-06 16:54:39,121] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:00.680 --> 17:02.680]  And I get so tired.
+[2025-07-06 16:54:39,121] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:02.680 --> 17:07.680]  No, no, no, no.
+[2025-07-06 16:54:39,121] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:07.680 --> 17:09.680]  But there's a man.
+[2025-07-06 16:54:39,121] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:09.680 --> 17:12.680]  How he had to know.
+[2025-07-06 16:54:39,121] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:12.680 --> 17:15.680]  He's somewhere in a heavy afternoon.
+[2025-07-06 16:54:39,121] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:15.680 --> 17:18.680]  He's someday out of my head.
+[2025-07-06 16:54:39,121] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:18.680 --> 17:21.680]  The sweet loving man can play.
+[2025-07-06 16:54:39,122] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:21.680 --> 17:24.680]  Oh, no, no, no, no, no.
+[2025-07-06 16:54:39,122] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:24.680 --> 17:29.680]  The single-boogan needs a sweet loving man to play.
+[2025-07-06 16:54:39,122] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:29.680 --> 17:33.680]  Oh, no, no, no, no, no, no.
+[2025-07-06 16:54:39,122] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:33.680 --> 17:39.680]  The single-boogan needs a sweet loving man to play.
+[2025-07-06 16:54:39,122] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:40.680 --> 17:42.680]  The sounds of Sunday pose.
+[2025-07-06 16:54:39,122] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:42.680 --> 17:43.680]  Okay, well, I'm ready.
+[2025-07-06 16:54:39,122] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:43.680 --> 17:47.680]  All of a starting things off here on a Wednesday morning of the Donnerdman Show,
+[2025-07-06 16:54:39,122] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:47.680 --> 17:48.680]  and the welcome aboard.
+[2025-07-06 16:54:39,123] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:48.680 --> 17:49.680]  Nice to have you with us.
+[2025-07-06 16:54:39,123] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:49.680 --> 17:53.680]  Eight and a half minutes past man, a clock two degrees above zero.
+[2025-07-06 16:54:39,123] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:53.680 --> 17:55.680]  That was a little tune entitled a single girl.
+[2025-07-06 16:54:39,123] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:55.680 --> 17:57.680]  Save during greater Rochester store plus.
+[2025-07-06 16:54:39,123] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:57.680 --> 17:59.680]  Starts going on a business sale.
+[2025-07-06 16:54:39,123] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [17:59.680 --> 18:01.680]  Everything must be sold regardless of cars.
+[2025-07-06 16:54:39,123] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:01.680 --> 18:07.680]  Save 45, 55, 65% and more on hundreds of items throughout the entire store.
+[2025-07-06 16:54:39,123] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:07.680 --> 18:10.680]  The prices have been slashed on sporting equipment, ski jackets,
+[2025-07-06 16:54:39,124] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:10.680 --> 18:12.680]  insulated boots, rain suits.
+[2025-07-06 16:54:39,124] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:12.680 --> 18:15.680]  Also, drastic reductions on Parker, shoes, sleeping bags.
+[2025-07-06 16:54:39,124] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:15.680 --> 18:17.680]  While he talking is in much more.
+[2025-07-06 16:54:39,124] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:17.680 --> 18:21.680]  Quantities are limited, so shopperally at the greater Rochester surplus store.
+[2025-07-06 16:54:39,124] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:21.680 --> 18:23.680]  306 South Broadway.
+[2025-07-06 16:54:39,124] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:23.680 --> 18:24.680]  Don't miss out.
+[2025-07-06 16:54:39,124] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:24.680 --> 18:26.680]  Greater Rochester surplus stores.
+[2025-07-06 16:54:39,124] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:26.680 --> 18:28.680]  Going out of business sale is now in full swing.
+[2025-07-06 16:54:39,125] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:28.680 --> 18:29.680]  I'm up down.
+[2025-07-06 16:54:39,125] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:29.680 --> 18:31.680]  Thank you very much there, gentlemen.
+[2025-07-06 16:54:39,125] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:31.680 --> 18:34.680]  Two degrees above shooting for a high in the mid-20s today.
+[2025-07-06 16:54:39,125] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:35.680 --> 18:40.680]  The Tunes are all hits and the fun.
+[2025-07-06 16:54:39,125] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:40.680 --> 18:45.680]  There are hits on KOLM 5020.
+[2025-07-06 16:54:39,125] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:45.680 --> 18:47.680]  In Rochester.
+[2025-07-06 16:54:39,125] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:47.680 --> 18:50.680]  Bobby, there are some stuff to the gay while on mic after this word.
+[2025-07-06 16:54:39,125] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:50.680 --> 18:54.680]  You know again, Morgana's dryer never forgets how dry you like your clothes.
+[2025-07-06 16:54:39,126] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:54.680 --> 18:55.680]  That's right.
+[2025-07-06 16:54:39,126] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:55.680 --> 18:59.680]  Whether Ken Morgana's dryer, you just set the controls for the degree of dryness
+[2025-07-06 16:54:39,126] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [18:59.680 --> 19:00.680]  you desire.
+[2025-07-06 16:54:39,126] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:00.680 --> 19:03.680]  The electronic sensor constantly feels closed
+[2025-07-06 16:54:39,126] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:03.680 --> 19:06.680]  as they tumble and reports the degree of moisture
+[2025-07-06 16:54:39,126] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:06.680 --> 19:09.680]  still left in the clothes to the solid state dryness control.
+[2025-07-06 16:54:39,126] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:09.680 --> 19:13.680]  When the degree of dryness you may never have to set it again.
+[2025-07-06 16:54:39,127] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:13.680 --> 19:16.680]  See the new Ken Morgana's dryer's at Sears.
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:16.680 --> 19:19.680]  Priced as low as $119.
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:19.680 --> 19:20.680]  Delivered.
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:20.680 --> 19:22.680]  I don't want you buy your gas dryer at Sears.
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:22.680 --> 19:25.680]  You receive a free 18 piece cannon towel set
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:25.680 --> 19:28.680]  plus $10 credit towards the installation.
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:28.680 --> 19:31.680]  Shop Sears in the cross road shopping center.
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:32.680 --> 19:35.680]  There's Bob Darin as promised to love and you.
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:35.680 --> 19:41.680]  If you are wondering what I'm gonna do.
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:41.680 --> 19:46.680]  While you are sleeping, I'm asleep and too.
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:46.680 --> 19:49.680]  Will I'm just sitting here loving you?
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:49.680 --> 19:52.680]  Close my eyes and loving you.
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:52.680 --> 19:57.680]  I'm just sitting back sitting here loving you.
+[2025-07-06 16:57:19,602] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [19:58.680 --> 20:03.680]  I have been wondering just what I would do.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:03.680 --> 20:08.680]  If I weren't sleeping here, I'm not from you.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:08.680 --> 20:11.680]  I'd be outside finding you.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:11.680 --> 20:14.680]  Walking on the avenue finding you.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:14.680 --> 20:18.680]  But I'm just sitting back sitting here loving you.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:18.680 --> 20:22.680]  I've been met and ever seen you running right.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:22.680 --> 20:25.680]  Fingers on the floor, you wouldn't calm it down.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:25.680 --> 20:28.680]  She can even get me up.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:28.680 --> 20:30.680]  All my feet.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:30.680 --> 20:36.680]  Will I got to take care of something that's almost free.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:36.680 --> 20:41.680]  I've been walking all my streets alone.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:41.680 --> 20:47.680]  I would keep walking to keep from going home.
+[2025-07-06 16:57:19,603] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:47.680 --> 20:50.680]  I couldn't quite barely come to you.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:50.680 --> 20:52.680]  Now I can't see the devil leaving you.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:52.680 --> 20:57.680]  Cause I'm just sitting back sitting here loving you.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [20:57.680 --> 21:01.680]  I've been looking all my streets alone.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:01.680 --> 21:06.680]  I could keep walking to keep from going home.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:06.680 --> 21:09.680]  I couldn't quite barely come to you.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:09.680 --> 21:14.680]  I've been looking all my streets alone.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:14.680 --> 21:19.680]  I could keep walking to keep from going home.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:19.680 --> 21:22.680]  I couldn't quite barely come to you.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:22.680 --> 21:25.680]  Now I can't see the devil leaving you.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:25.680 --> 21:29.680]  Cause I'm just sitting back sitting here loving you.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:29.680 --> 21:34.680]  I'm just sitting back sitting here loving you.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:34.680 --> 21:39.680]  I'm just sitting back sitting here loving you.
+[2025-07-06 16:57:19,604] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:39.680 --> 21:41.680]  All right, thanks very much.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:41.680 --> 21:44.680]  Bobby Darren, I'm Kate while I'm ready on the Donardman Show.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:44.680 --> 21:46.680]  This is Wednesday morning just for you.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:46.680 --> 21:49.680]  And a little too little title to love and you.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:49.680 --> 21:51.680]  Twelve and a half minutes now past nine o'clock.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:51.680 --> 21:53.680]  Two degrees above zero, John Cameron.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:53.680 --> 21:55.680]  This is John Cameron's Waysie.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:55.680 --> 21:57.680]  You know the evidence is all around us.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [21:57.680 --> 22:01.680]  We really do live in the age of specialization.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:01.680 --> 22:06.680]  Our expanding economy has created the need for the many special services available to us.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:06.680 --> 22:10.680]  For example, a few years ago, achened our block.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:10.680 --> 22:15.680]  Discovered a real need for a reliable income tax service that anyone could afford.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:15.680 --> 22:20.680]  So they specialize their service to handle only income taxes.
+[2025-07-06 16:57:19,605] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:20.680 --> 22:23.680]  And they remembered an important idea courtesy.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:23.680 --> 22:28.680]  Today there are more than 1,500 block offices serving people.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:28.680 --> 22:30.680]  And treating them as they like to be treated.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:30.680 --> 22:31.680]  H&R block.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:31.680 --> 22:34.680]  There's no finer tax service in America.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:34.680 --> 22:38.680]  See H&R block 112 north Broadway.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:39.680 --> 22:42.680]  Open 9 a.m. to 9 p.m. weekdays.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:42.680 --> 22:45.680]  Saturday and Sunday 9 a.m. to 5 p.m.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:45.680 --> 22:48.680]  Remember, H&R block is open.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:48.680 --> 22:51.680]  Saturday and Sunday from 9 a.m. to 5 p.m.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:51.680 --> 22:52.680]  Quick.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:52.680 --> 22:58.680]  Here's your chance to win a six pack a diet Pepsi.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [22:58.680 --> 23:01.680]  Whether you're watching your weight or setting a face.
+[2025-07-06 16:57:19,606] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:01.680 --> 23:04.680]  You'll enjoy delicious refreshing diet Pepsi.
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:04.680 --> 23:06.680]  Now, if you are a member of your family,
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:06.680 --> 23:09.680]  it's not been a quick quiz winner in the past 30 days.
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:09.680 --> 23:12.680]  And you know the answer to this question.
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:12.680 --> 23:16.680]  Call K-O-L-M radio at 288-2411.
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:16.680 --> 23:20.680]  That's 288-2411.
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:20.680 --> 23:23.680]  Alright, this one's good for one six pack a diet Pepsi.
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:23.680 --> 23:25.680]  You could see the Pepsi colabalin company.
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:25.680 --> 23:28.680]  Now, you tell me, and what year?
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:28.680 --> 23:33.680]  And what year was the United States Weather Bureau established?
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:33.680 --> 23:36.680]  He sold home tax this year.
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:36.680 --> 23:54.680]  As I stepped down front the scale.
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [23:54.680 --> 24:01.680]  Oh, looks the same as I step down from the chamber
+[2025-07-06 16:57:19,607] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [24:01.680 --> 24:12.680]  And let him eat me, is my mama all alone
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [24:12.680 --> 24:18.680]  Down the road and look, and there runs Mary
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [24:19.680 --> 24:25.680]  Here I go, and let him select Cherries, it's good to touch
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [24:25.680 --> 24:32.680]  The green green grass, the home
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [24:32.680 --> 24:37.680]  We have a quick quiz winner, we do have a winner, thank you very much for calling
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [24:37.680 --> 24:45.680]  All reaching, smiling sweetly, it's good to touch
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [24:45.680 --> 24:53.680]  The green green grass, the home
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [24:53.680 --> 25:02.680]  Your house is still standing, go to paint his craft and drag
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [25:03.680 --> 25:12.680]  And let that old old tree that I used to play on
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [25:12.680 --> 25:19.680]  Down the lane, I walk with my sweet Mary
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [25:19.680 --> 25:26.680]  Care of the wood and the slack Cherries, it's good to touch
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [25:26.680 --> 25:35.680]  The green green grass, the home
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [25:35.680 --> 25:40.680]  Then I awake and look around me
+[2025-07-06 16:57:19,608] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [25:40.680 --> 25:45.680]  At four great walls that surround me
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [25:45.680 --> 25:53.680]  And I realized, yes, I was only dreaming
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [25:53.680 --> 25:56.680]  But it's good to touch
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [25:56.680 --> 26:00.680]  The green green grass, the home
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:00.680 --> 26:05.680]  On and on, we want a day break
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:05.680 --> 26:10.680]  Again, I'll touch the green grass
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:13.680 --> 26:18.680]  Yes, they all come to see me
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:18.680 --> 26:26.680]  In the shade of that old tree as they lay me
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:26.680 --> 26:39.680]  With the green green grass of home
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:39.680 --> 26:43.680]  Are you ever the sands of Tom Jones on K. Well, I'm a radio
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:43.680 --> 26:46.680]  And a little tune entitled The Green Green grass of home
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:46.680 --> 26:49.680]  Well, we had a quick quiz when our name is Mrs. Farrell Femsky
+[2025-07-06 16:57:19,609] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:49.680 --> 26:52.680]  Of 224 11th Street Northwest
+[2025-07-06 16:57:19,610] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:52.680 --> 26:54.680]  One orself a free six pack of diet Pepsi
+[2025-07-06 16:57:19,610] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:54.680 --> 26:57.680]  For telling us that the United States weather burrow
+[2025-07-06 16:57:19,610] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [26:57.680 --> 27:02.680]  Was established in the year 1870, 1870
+[2025-07-06 16:57:19,610] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:02.680 --> 27:04.680]  When the weather burrow was established
+[2025-07-06 16:57:19,610] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:04.680 --> 27:07.680]  And our congratulations to all the weathermen
+[2025-07-06 16:57:19,610] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:07.680 --> 27:10.680]  They do a mighty fine job, they've got a tough job to do
+[2025-07-06 16:57:19,610] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:10.680 --> 27:12.680]  You know, when you're looking for quality furniture
+[2025-07-06 16:57:19,610] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:12.680 --> 27:14.680]  Price, you can afford look first to Andy's furniture
+[2025-07-06 16:57:19,611] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:14.680 --> 27:16.680]  Andy's carries every style at furniture
+[2025-07-06 16:57:19,611] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:16.680 --> 27:18.680]  Just to type to fit your taste
+[2025-07-06 16:57:19,611] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:18.680 --> 27:20.680]  Are you searching for that just right chair
+[2025-07-06 16:57:19,611] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:20.680 --> 27:22.680]  If it ends at the decor of your home
+[2025-07-06 16:57:19,611] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:22.680 --> 27:24.680]  Well, check first at Andy's
+[2025-07-06 16:57:19,611] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:24.680 --> 27:26.680]  Or how about a new kitchen or a dinette set
+[2025-07-06 16:57:19,611] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:26.680 --> 27:28.680]  Andy's furniture has what you want
+[2025-07-06 16:57:19,611] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:28.680 --> 27:30.680]  Yes, Andy's has what you want in quality
+[2025-07-06 17:00:13,149] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:30.680 --> 27:32.680]  Name brand furniture and accessories
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:32.680 --> 27:36.680]  Drive to Andy's just a key 11th Avenue northeast
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:36.680 --> 27:38.680]  Tonight's street that's Andy's furniture
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:38.680 --> 27:42.680]  11th 16 9th Street northeast here in Rochester
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:42.680 --> 27:46.680]  18 minutes now passed nine o'clock brand new set of readings from the department
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:46.680 --> 27:48.680]  Commerce weather bureau at the Rochester port
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:48.680 --> 27:50.680]  Seven degrees will scratch, excuse my noise
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:50.680 --> 27:54.680]  We'll scratch off the old ones are seven degrees now above zero
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:54.680 --> 27:58.680]  75% humidity the wind saw south westerly ten miles per hour
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [27:58.680 --> 28:02.680]  The better measure pressure 30 point zero nine and falling the wind and chill
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:02.680 --> 28:04.680]  The wind and chill yeah
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:04.680 --> 28:08.680]  Oh, no boy forget it it's 13 below
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:10.680 --> 28:14.680]  Us backster the coercing orchestra
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:14.680 --> 28:16.680]  Oh
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:16.680 --> 28:18.680]  Oh
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:18.680 --> 28:20.680]  Oh
+[2025-07-06 17:00:13,150] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:20.680 --> 28:22.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:22.680 --> 28:24.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:24.680 --> 28:26.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:26.680 --> 28:28.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:28.680 --> 28:30.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:30.680 --> 28:32.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:32.680 --> 28:34.680]  Oh, you are sweet heart
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:34.680 --> 28:36.680]  Hell been Franklin in the silver lake shopping center
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:36.680 --> 28:38.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:38.680 --> 28:42.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:42.680 --> 28:44.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:44.680 --> 28:46.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:46.680 --> 28:48.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:48.680 --> 28:50.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:50.680 --> 28:54.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:54.680 --> 28:56.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [28:56.680 --> 29:00.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:00.680 --> 29:02.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:02.680 --> 29:06.680]  Oh
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:06.680 --> 29:10.680]  The steam 20 top of your radio dial, the station that always has something different.
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:10.680 --> 29:16.680]  Don't miss the Joe Pine Show on KOLM Monday through Friday at 12.30 and Sunday's at 205.
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:16.680 --> 29:20.680]  That Sunday's at 205 on 15.20 radio.
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:22.680 --> 29:26.680]  Here we go now with the Bosos EcoSinger.
+[2025-07-06 17:00:13,151] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:36.680 --> 29:40.680]  Here we go now with the Bosos EcoSinger.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:40.680 --> 29:42.680]  Here we go now with the Bosos EcoSinger.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:44.680 --> 29:46.680]  You take one way.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:48.680 --> 29:50.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:50.680 --> 29:52.680]  One, you know the sound.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [29:54.680 --> 29:58.680]  You've made a lot of money.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [30:06.680 --> 30:08.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [30:36.680 --> 30:38.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [31:06.680 --> 31:08.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [31:36.680 --> 31:38.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [32:06.680 --> 32:08.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [32:36.680 --> 32:38.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [33:06.680 --> 33:08.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [33:36.680 --> 33:38.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [34:06.680 --> 34:08.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [34:36.680 --> 34:38.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [35:06.680 --> 35:08.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [35:36.680 --> 35:38.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [36:06.680 --> 36:08.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [36:36.680 --> 36:38.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [37:06.680 --> 37:08.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [37:36.680 --> 37:38.680]  One, you push that.
+[2025-07-06 17:00:13,152] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [38:06.680 --> 38:08.680]  One, you push that.
+[2025-07-06 17:00:13,153] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [38:36.680 --> 38:38.680]  You
+[2025-07-06 17:00:13,153] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [39:06.680 --> 39:08.680]  You
+[2025-07-06 17:00:13,153] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [39:36.680 --> 39:38.680]  You
+[2025-07-06 17:00:13,153] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [40:06.680 --> 40:08.680]  You
+[2025-07-06 17:00:13,153] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [40:36.680 --> 40:38.680]  You
+[2025-07-06 17:00:13,153] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [41:06.680 --> 41:08.680]  You
+[2025-07-06 17:00:13,153] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [41:36.680 --> 41:38.680]  You
+[2025-07-06 17:00:13,153] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [42:06.680 --> 42:08.680]  You
+[2025-07-06 17:00:13,153] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [42:36.680 --> 42:38.680]  You
+[2025-07-06 17:00:13,153] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [43:06.680 --> 43:08.680]  You
+[2025-07-06 17:00:13,153] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: STDOUT: [43:08.680 --> 43:10.680]  You
+[2025-07-06 17:00:14,070] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: Whisper exited with code 0
+[2025-07-06 17:00:14,070] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: Starting metadata_writer...
+[2025-07-06 17:00:14,182] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: [0ad7d48e8de5457b91fcdcdd9dea0829] metadata_writer wrote /app/transcripts/0ad7d48e8de5457b91fcdcdd9dea0829/metadata.json
+[2025-07-06 17:00:14,182] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: [0ad7d48e8de5457b91fcdcdd9dea0829] transcript_txt_path exists: True
+[2025-07-06 17:00:14,182] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: [0ad7d48e8de5457b91fcdcdd9dea0829] abstract preview: 1 00:00:30,000 --> 00:00:34,000 This is K-O-L-L-M 2 00:00:36,000 --> 00:00:39,00
+[2025-07-06 17:00:14,197] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: [0ad7d48e8de5457b91fcdcdd9dea0829] metadata inserted via ORM
+[2025-07-06 17:00:14,197] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: metadata_writer complete.
+[2025-07-06 17:00:14,205] INFO [0ad7d48e8de5457b91fcdcdd9dea0829]: status -> COMPLETED committed

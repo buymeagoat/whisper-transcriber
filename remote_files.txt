@@ -1117,6 +1117,8 @@ frontend/src/store/notificationsSlice.js
 frontend/vite.config.js
 frontend/vitest.config.js
 instructions/cag_dense.txt
+local_files.txt
+local_vs_remote_diff.txt
 logs/.gitkeep
 logs/app/.gitkeep
 logs/archive/.gitkeep
@@ -1127,6 +1129,7 @@ logs/metrics/.gitkeep
 models/.gitkeep
 pyproject.toml
 rabbitmq.conf
+remote_files.txt
 requirements-dev.txt
 requirements.txt
 scripts/CPG_repo_audit.py

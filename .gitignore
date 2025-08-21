@@ -1,3 +1,4 @@
+!/GC_Analysis/logs/
 # === Python ===
 __pycache__/
 *.py[cod]

@@ -1,16 +1,51 @@
-# Whisper Transcriber Operating Blueprint
+# Copilot Project Blueprint (Master)
 
-Version: 1.0 (Copilot-centric)  
-Status: Adopted  
+## Purpose
+Defines the mandatory, reproducible workflow for Copilot-driven coding across all projects. Ensures automation, auditability, and uniform experience.
+
+## Required Artifacts & Automation
+- Manifest file (`local_manifest.txt`): tracks all local files, including non-synced ones.
+- Change log (`/logs/changes/change_<UTC>.md`): per-change documentation.
+- Build log (`/logs/builds/build_<UTC>.md`): build/CI summary.
+- CHANGELOG.md: Conventional Commits history.
+- Automation scripts: for manifest/log generation.
+- Pre-commit hook: runs scripts before commit.
+- VSCode tasks: automate scripts, sync, and pull.
+
+## Workflow (Every Change)
+1. Make code change.
+2. Update/add tests (log rationale if not applicable).
+3. Run manifest/log scripts.
+4. Update CHANGELOG.md.
+5. Copilot must automatically stage, commit (with a conventional message), and push all changes after every modification—no manual git steps required.
+6. Copilot must automatically update manifest, changelog, per-change log, and build summary files for every change.
+7. Copilot must automatically identify and remove obsolete files, empty directories, and legacy artifacts.
+8. Copilot must document risk level and rollback steps for every change in the log file.
+9. Open PR, merge to main.
+10. Pull latest locally.
+11. Copilot references manifest for file awareness.
+12. All artifact generation is mandatory and automatic.
+
+## Quickstart
+- Copy this file to `/docs/master/` in new repos.
+- Add required scripts to `/scripts/`.
+- Set up pre-commit hook and VSCode tasks.
+- Ensure `/logs/` structure exists.
+- Reference this workflow in `README.md`.
+
+
+# Copilot Project Blueprint (Master)
+
+Version: 1.0 (Copilot-centric)
+Status: Adopted
 Source-of-Truth: This file
 
 ## Purpose
-
-This Blueprint defines the single-role operating model for building and maintaining applications with GitHub Copilot as the primary automation engine. It replaces prior multi-role governance with repository-first scaffolding, standards, and logging. The goal: every change is consistent, testable, reviewable, and historically analyzable without per-change instructions.
+This Blueprint defines the single-role operating model for building and maintaining applications with GitHub Copilot as the automation engine. It replaces prior multi-role governance with repository-first scaffolding, standards, and logging. The goal: every change is consistent, testable, reviewable, and historically analyzable without per-change instructions.
 
 ## Repository Scaffolding (must exist before coding)
 
-### Required top-level files
+### Required top-level files & directories
 - README.md – project overview and quickstart.
 - CHANGELOG.md – human-readable history (Conventional Commits headings).
 - CONTRIBUTING.md – commit/PR rules, testing, security.
@@ -21,14 +56,13 @@ This Blueprint defines the single-role operating model for building and maintain
 - .github/copilot-instructions.md – repository instructions for Copilot.
 - .github/pull_request_template.md – required sections for change/build/test logs.
 - .github/workflows/ci.yml – lint, tests, build, artifact upload, and log sync.
-
-### Logging topology (centralized under /logs)
 - /logs/changes/ – one file per change (change_<UTC>.md).
 - /logs/builds/ – build summaries (build_<UTC>.md) plus CI artifacts (or links).
 - /logs/app/ – runtime application logs (rotated by app; not committed).
 - /logs/audit/ – incident reports, postmortems (postmortem_<UTC>.md).
 - /logs/metrics/ – optional JSONL telemetry for trend analysis.
 - /logs/archive/ – quarterly archives if you want to prune the root log dirs.
+- /scripts/ – automation scripts for manifest/log generation, testing, build, etc.
 
 ### .gitignore minimum
 - /logs/app/
@@ -55,6 +89,7 @@ This Blueprint defines the single-role operating model for building and maintain
 - Secret scanning enabled; secrets never committed.
 - Dependency updates use lockfiles and are reviewed.
 - Known-vuln checks (e.g., npm audit/pip audit) run in CI.
+- Container security, network hardening, authentication/authorization, vulnerability monitoring.
 
 ## Change Management (what Copilot must do automatically)
 
@@ -116,6 +151,29 @@ Template:
 - Ignored: /logs/app (runtime), any /raw/ subfolders.
 - Rotation: Build/change logs may be archived by quarter into /logs/archive/YYYYQn/.
 
+## Onboarding & Environment Setup
+- Use virtual environments for Python.
+- Install dependencies from `requirements.txt` and `requirements-dev.txt`.
+- For frontend, install Node packages and build UI.
+- Copy `.env.example` to `.env` and set secrets before running.
+
+## File Retention & Backup
+- Regularly rotate and archive logs.
+- Use `/logs/archive/` for quarterly log pruning.
+- Backup and recovery procedures for database and runtime data.
+
+## Troubleshooting & Observability
+- Use provided scripts for diagnostics and health checks.
+- Store troubleshooting guides and observability docs in `/docs/`.
+
+## Performance Guidelines
+- Document performance tuning and scaling strategies.
+- Monitor metrics via `/logs/metrics/`.
+
+## Integration & Extensibility
+- Document integration points and API references.
+- Maintain extensibility guidelines for new features.
+
 ## Minimal Governance (single-role)
 - No multi-agent mirrors or role separation.
 - The only authoritative governance is this Blueprint + CI.
@@ -146,5 +204,4 @@ Ensure: tests added/updated, build passes, CHANGELOG & logs generated, rollback 
 - [ ] Security and test standards enforced
 
 ---
-
 This Blueprint supersedes all previous multi-role governance. All legacy role-based files and instructions should be archived or deleted. All new work must follow this Copilot-centric, automation-first model.

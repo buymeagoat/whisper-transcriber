@@ -1,3 +1,19 @@
+# Preflight checks: ensure required directories and files exist
+preflight_checks() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running preflight checks..."
+    for dir in "$ROOT_DIR/cache/apt" "$ROOT_DIR/cache/pip" "$ROOT_DIR/cache/npm" "$ROOT_DIR/cache/images"; do
+        [ -d "$dir" ] || mkdir -p "$dir"
+    done
+    [ -f "$ROOT_DIR/cache/apt/deb_list.txt" ] || touch "$ROOT_DIR/cache/apt/deb_list.txt"
+    [ -f "$ROOT_DIR/.env" ] || echo "SECRET_KEY=CHANGE_ME" > "$ROOT_DIR/.env"
+    # Whisper model files check
+    model_dir="$ROOT_DIR/models"
+    required_models=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
+    for m in "${required_models[@]}"; do
+        [ -f "$model_dir/$m" ] || echo "[$(date '+%Y-%m-%d %H:%M:%S')] Warning: missing model file $model_dir/$m" >&2
+    done
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Preflight checks complete."
+}
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -45,6 +61,10 @@ LOG_FILE="$LOG_DIR/whisper_build.log"
 mkdir -p "$LOG_DIR"
 exec > >(awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush(); }' | tee -a "$LOG_FILE") 2>&1
 
+
+
+# Run preflight checks before anything else
+preflight_checks
 
 # Codex: generate manifest before environment checks
 python3 "$SCRIPT_DIR/update_manifest.py"

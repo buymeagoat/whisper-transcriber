@@ -183,6 +183,10 @@ cache_docker_images() {
     for img in "${images[@]}"; do
         local tar="$image_cache/$(echo $img | sed 's#[/:]#_#g').tar"
         if [ ! -f "$tar" ]; then
+            if [ "${MODE:-}" = "offline" ]; then
+                echo "[ERROR] Cached Docker image $tar missing for offline mode" | tee -a "$LOG_FILE" >&2
+                exit 1
+            fi
             echo "[INFO] Saving Docker image $img to $tar..." | tee -a "$LOG_FILE"
             docker pull "$img"
             docker save "$img" -o "$tar"

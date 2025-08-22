@@ -1,10 +1,54 @@
 # Preflight checks: ensure required directories and files exist
 preflight_checks() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running preflight checks..."
-    for dir in "$ROOT_DIR/cache/apt" "$ROOT_DIR/cache/pip" "$ROOT_DIR/cache/npm" "$ROOT_DIR/cache/images"; do
-        [ -d "$dir" ] || mkdir -p "$dir"
+    # Check for required executables
+    for exe in python3 pip node npm docker ffmpeg; do
+        if ! command -v "$exe" >/dev/null 2>&1; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Required executable '$exe' not found in PATH." >&2
+            exit 1
+        fi
     done
-    [ -f "$ROOT_DIR/cache/apt/deb_list.txt" ] || touch "$ROOT_DIR/cache/apt/deb_list.txt"
+    # Check for docker compose (v2)
+    if ! docker compose version >/dev/null 2>&1; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: 'docker compose' command not available. Install Docker Compose v2." >&2
+        exit 1
+    fi
+    # Check for sudo/root access
+    if [[ $EUID -ne 0 ]]; then
+        if ! command -v sudo >/dev/null 2>&1; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Sudo required for some operations, but 'sudo' not found." >&2
+            exit 1
+        fi
+    fi
+    # Check Node.js version
+    node_version=$(node --version | sed 's/^v//')
+    node_major=${node_version%%.*}
+    if [ "$node_major" -lt 18 ]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Node.js 18 or newer is required. Found $node_version" >&2
+        exit 1
+    fi
+    # Check internet connectivity
+    if ! curl -sSf https://pypi.org >/dev/null 2>&1; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: No internet connectivity to pypi.org." >&2
+        exit 1
+    fi
+    if ! curl -sSf https://registry.npmjs.org >/dev/null 2>&1; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: No internet connectivity to registry.npmjs.org." >&2
+        exit 1
+    fi
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running preflight checks..."
+    # Use default_cache_dir logic from shared_checks.sh
+    CACHE_DIR=""
+    if grep -qi microsoft /proc/version; then
+        CACHE_DIR="/mnt/wsl/shared/docker_cache"
+    else
+        CACHE_DIR="/tmp/docker_cache"
+    fi
+    base="$CACHE_DIR"
+    dirs=("$base/images" "$base/pip" "$base/npm" "$base/apt")
+    for d in "${dirs[@]}"; do
+        [ -d "$d" ] || mkdir -p "$d"
+    done
+    [ -f "$base/apt/deb_list.txt" ] || touch "$base/apt/deb_list.txt"
     [ -f "$ROOT_DIR/.env" ] || echo "SECRET_KEY=CHANGE_ME" > "$ROOT_DIR/.env"
     # Whisper model files check
     model_dir="$ROOT_DIR/models"

@@ -46,6 +46,10 @@ set_cache_dir  # Codex: cache override for WSL hosts
 LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/whisper_build.log"
 mkdir -p "$LOG_DIR"
+# Maximum retries for pip cache population failures (configurable via MAX_RETRIES)
+MAX_RETRIES="${MAX_RETRIES:-3}"
+# Exit code used when pip cache retries are exhausted (see copilot_agentic_loop.sh)
+PIP_RETRY_EXIT_CODE=88
 # Add build attempt header
 
 echo "" >> "$LOG_FILE"
@@ -74,12 +78,25 @@ ensure_cache_permissions() {
 populate_pip_cache() {
     local cache_dir="$(default_cache_dir)"
     local pip_cache="$cache_dir/pip"
+    local retry_file="$LOG_DIR/pip_retry_count"
     echo "[INFO] Populating pip cache for offline build..." | tee -a "$LOG_FILE"
     pip download -d "$pip_cache" -r "$ROOT_DIR/requirements.txt"
     if [ $? -ne 0 ]; then
         echo "[ERROR] pip cache population failed. Check pip logs for details." | tee -a "$LOG_FILE"
+        local count=0
+        if [ -f "$retry_file" ]; then
+            count=$(cat "$retry_file")
+        fi
+        count=$((count+1))
+        echo "$count" > "$retry_file"
+        if [ "$count" -ge "$MAX_RETRIES" ]; then
+            echo "[ERROR] pip cache population failed $count times; exceeding max retries ($MAX_RETRIES)." | tee -a "$LOG_FILE"
+            echo "[ERROR] Exiting with code $PIP_RETRY_EXIT_CODE" | tee -a "$LOG_FILE"
+            exit $PIP_RETRY_EXIT_CODE
+        fi
         exit 1
     fi
+    rm -f "$retry_file"
     mkdir -p "$ROOT_DIR/cache/pip"
     rsync -a "$pip_cache/" "$ROOT_DIR/cache/pip/"
     if ! ls "$ROOT_DIR/cache/pip"/*.whl >/dev/null 2>&1; then

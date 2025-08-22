@@ -41,7 +41,7 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
 set_cache_dir  # Codex: cache override for WSL hosts
 
-
+# End of whisper_build.sh
 LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/whisper_build.log"
 mkdir -p "$LOG_DIR"

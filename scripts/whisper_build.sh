@@ -260,6 +260,8 @@ while [[ $# -gt 0 ]]; do
                 echo "Conflicting switches detected. Only one build mode can be used at a time." >&2
                 exit 1
             fi
+                echo "[INFO] Ensuring pytest is installed from PyPI..."
+                pip install pytest --index-url https://pypi.org/simple
                 if ! pip install --no-index --find-links "$pip_cache" -r "$ROOT_DIR/requirements.txt"; then
                     echo "[WARNING] Cached pip install failed. Retrying with online PyPI for missing packages..."
                     pip install -r "$ROOT_DIR/requirements.txt"

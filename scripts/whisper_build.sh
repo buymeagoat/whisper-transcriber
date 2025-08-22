@@ -317,8 +317,7 @@ preflight_checks() {
             echo "[WARNING] Cache directory $dir is not writable. Attempting to set permissions..."
             chmod 0777 "$dir" 2>/dev/null
             if ! touch "$dir/.perm_check"; then
-                echo "[ERROR] Cache directory $dir is still not writable after chmod."
-                tee -a "$LOG_FILE"
+                echo "[ERROR] Cache directory $dir is still not writable after chmod." | tee -a "$LOG_FILE" >&2
                 exit 1
             else
                 echo "[INFO] Permissions for $dir updated to 0777."

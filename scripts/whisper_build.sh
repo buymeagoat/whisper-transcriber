@@ -479,8 +479,8 @@ docker_build() {
     done
 
 
-        echo "Images built and containers started."
-        cat <<EOM
+                echo "Images built and containers started."
+cat <<EOM
 Available test scripts:
     scripts/run_tests.sh         - runs backend tests plus frontend unit and Cypress end-to-end tests. Recommended after a full build.
     scripts/run_backend_tests.sh - executes only the backend tests and verifies the /health and /version endpoints.

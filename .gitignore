@@ -38,7 +38,8 @@ yarn-error.log*
 *.tmp
 .cache/
 cache/
-!cache/apt/*
+# Allow VS Code tasks.json for build automation
+!.vscode/tasks.json
 pip-log.txt
 pip-delete-this-directory.txt
 

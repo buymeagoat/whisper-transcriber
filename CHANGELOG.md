@@ -9,3 +9,15 @@
 
 ### Fixed
 - Ensures all cache directories are updated before Docker build starts.
+
+## Unreleased
+### Fixed
+- build(agentic): auto-populate missing wheels in cache/pip [20250822_155632]
+
+## Unreleased
+### Fixed
+- build(agentic): auto-populate missing wheels in cache/pip [20250822_155909]
+
+## Unreleased
+### Fixed
+- build(agentic): auto-populate missing wheels in cache/pip [20250822_160508]

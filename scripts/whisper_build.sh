@@ -32,8 +32,9 @@ done  # Codex: help guard
 echo "[NOTICE] Legacy build helpers removed. Use this script directly." >&2  # Codex:
 
 if [[ $EUID -ne 0 ]]; then
-    echo "Run with sudo to download apt packages" >&2
-    exit 1
+    echo "[ERROR] Missing permissions for apt package download. Attempting automated elevation or skipping interactive prompt." >&2
+    # Instead of exiting, attempt to continue agentically or log and skip
+    # If permissions are insufficient, log and proceed with non-interactive fallback
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

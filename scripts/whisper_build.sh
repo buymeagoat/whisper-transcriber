@@ -35,8 +35,18 @@ populate_apt_cache() {
     echo "[INFO] npm cache populated. Running offline install..." | tee -a "$LOG_FILE"
     npm ci --offline --prefix "$frontend_dir" --cache "$npm_cache"
     if [ $? -ne 0 ]; then
-        echo "[ERROR] npm offline install failed. Some dependencies may be missing from cache." | tee -a "$LOG_FILE"
-        exit 1
+        echo "[WARN] npm offline install failed. Retrying online to populate missing cache." | tee -a "$LOG_FILE"
+        npm ci --prefix "$frontend_dir" --cache "$npm_cache"
+        if [ $? -ne 0 ]; then
+            echo "[ERROR] npm online install failed after offline failure. Check npm logs for details." | tee -a "$LOG_FILE"
+            exit 1
+        fi
+        echo "[INFO] Retrying offline install after cache update..." | tee -a "$LOG_FILE"
+        npm ci --offline --prefix "$frontend_dir" --cache "$npm_cache"
+        if [ $? -ne 0 ]; then
+            echo "[ERROR] npm offline install failed again. Some dependencies may still be missing from cache." | tee -a "$LOG_FILE"
+            exit 1
+        fi
     fi
 }
 # Preflight checks: ensure required directories and files exist

@@ -57,11 +57,18 @@ echo "========== NEW BUILD ATTEMPT: $(date '+%Y-%m-%d %H:%M:%S') ==========" >> 
 
 # Function definitions (move to top)
 populate_pip_cache() {
-    local pip_cache="$CACHE_DIR/pip"
+    local cache_dir="$(default_cache_dir)"
+    local pip_cache="$cache_dir/pip"
     echo "[INFO] Populating pip cache for offline build..." | tee -a "$LOG_FILE"
     pip download -d "$pip_cache" -r "$ROOT_DIR/requirements.txt"
     if [ $? -ne 0 ]; then
         echo "[ERROR] pip cache population failed. Check pip logs for details." | tee -a "$LOG_FILE"
+        exit 1
+    fi
+    mkdir -p "$ROOT_DIR/cache/pip"
+    rsync -a "$pip_cache/" "$ROOT_DIR/cache/pip/"
+    if ! ls "$ROOT_DIR/cache/pip"/*.whl >/dev/null 2>&1; then
+        echo "[ERROR] No wheel files found in $ROOT_DIR/cache/pip" | tee -a "$LOG_FILE"
         exit 1
     fi
     echo "[INFO] pip cache populated."

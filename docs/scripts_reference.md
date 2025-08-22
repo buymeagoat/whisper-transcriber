@@ -45,5 +45,5 @@ Most build scripts rely on a common cache directory. By default `CACHE_DIR`
 is `/tmp/docker_cache`. When the host is WSL, the scripts automatically
 override this path to `/mnt/wsl/shared/docker_cache` and print a warning.
 Setting `CACHE_DIR` manually is ignored under WSL so the cache always resides
-in the shared location.<!-- # Codex-verified: CACHE_DIR documentation matches set_cache_dir -->
+in the shared location.
 

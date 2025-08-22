@@ -2,7 +2,7 @@
 set -euo pipefail
 set -x
 
-# Codex: unified build entrypoint
+
 
 print_help() {
     cat <<EOF
@@ -27,9 +27,9 @@ for arg in "$@"; do
             exit 0
             ;;
     esac
-done  # Codex: help guard
+done
 
-echo "[NOTICE] Legacy build helpers removed. Use this script directly." >&2  # Codex:
+
 
 if [[ $EUID -ne 0 ]]; then
     echo "[ERROR] Missing permissions for apt package download. Attempting automated elevation or skipping interactive prompt." >&2
@@ -40,7 +40,7 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/shared_checks.sh"
-set_cache_dir  # Codex: cache override for WSL hosts
+set_cache_dir
 
 # End of whisper_build.sh
 LOG_DIR="$ROOT_DIR/logs"
@@ -333,10 +333,8 @@ preflight_checks() {
 # Run preflight checks before anything else
 preflight_checks
 
-# Codex: generate manifest before environment checks
 python3 "$SCRIPT_DIR/update_manifest.py"
 
-# Codex: ensure check_env.sh output is logged
 bash "$SCRIPT_DIR/check_env.sh" >> "$LOG_FILE" 2>&1
 
 secret_file_runtime="$ROOT_DIR/secret_key.txt"
@@ -356,9 +354,7 @@ MODE="full"
 MODE_SET=false
 PURGE_CACHE=false
 VERIFY_SOURCES=false
-# Codex: new mode flags
 DOCKER_CLEANUP=false
-# Codex: removed legacy usage() helper
 
 
 # Improved argument parsing: only shift once per loop, handle zero args
@@ -470,7 +466,6 @@ download_dependencies() {
     validate_cache_step npm
 }
 
-# Codex: build helper for frontend-only mode
 docker_build_frontend() {
     log_step "FRONTEND"
     echo "Building frontend assets only (--frontend-only)"
@@ -482,7 +477,6 @@ docker_build_frontend() {
     echo "Frontend assets built under frontend/dist"
 }
 
-# Codex: validation mode helper
 run_validations() {
     if $VERIFY_SOURCES; then
         log_step "VERIFY SOURCES"
@@ -497,7 +491,6 @@ run_validations() {
     echo "Validation successful."
 }
 
-# Codex: docker cleanup helper
 docker_cleanup() {
     log_step "CLEANUP"
     echo "Cleaning up unused Docker images (--docker-cleanup)"
@@ -505,7 +498,6 @@ docker_cleanup() {
     docker builder prune -f
 }
 
-# Codex: incremental rebuild helper
 docker_build_update() {
     log_step "UPDATE"
     echo "Performing incremental build (--update)"
@@ -631,7 +623,7 @@ EOM
 
 if $VERIFY_SOURCES; then
     log_step "VERIFY SOURCES"
-    check_download_sources  # Codex: network connectivity test for package mirrors
+    check_download_sources
 fi
 
 case "$MODE" in
@@ -644,22 +636,22 @@ case "$MODE" in
     offline)
         log_step "OFFLINE VERIFY"
         echo "Performing full rebuild using only cached assets." >&2
-        verify_cache_integrity  # Codex: offline mode validates cached assets
+        verify_cache_integrity
         populate_npm_cache
         validate_cache_step npm
         docker_build
         ;;
-    update) # Codex: update workflow
+    update)
         docker_build_update
         ;;
-    frontend_only) # Codex: frontend-only workflow
+    frontend_only)
         log_step "FRONTEND ONLY"
         install_node18
         populate_npm_cache
         validate_cache_step npm
         docker_build_frontend
         ;;
-    validate_only) # Codex: validate-only workflow
+    validate_only)
         log_step "VALIDATION"
         SKIP_CACHE_CHECKS=true run_validations
         rm -f "$secret_file_runtime"

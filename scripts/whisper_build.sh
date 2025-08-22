@@ -27,9 +27,9 @@ populate_apt_cache() {
     local npm_cache="$CACHE_DIR/npm"
     local frontend_dir="$ROOT_DIR/frontend"
     echo "[INFO] Populating npm cache for offline build..." | tee -a "$LOG_FILE"
-    npm ci --prefix "$frontend_dir" --cache "$npm_cache"
+    npm install --prefix "$frontend_dir" --cache "$npm_cache"
     if [ $? -ne 0 ]; then
-        echo "[ERROR] npm cache population failed. Check npm logs for details." | tee -a "$LOG_FILE"
+        echo "[ERROR] npm install failed. Check npm logs for details." | tee -a "$LOG_FILE"
         exit 1
     fi
     echo "[INFO] npm cache populated. Running offline install..." | tee -a "$LOG_FILE"

@@ -46,20 +46,11 @@ LOG_DIR="$ROOT_DIR/logs"
 LOG_FILE="$LOG_DIR/whisper_build.log"
 mkdir -p "$LOG_DIR"
 # Add build attempt header
-if ! command -v awk >/dev/null 2>&1; then
-    echo "[ERROR] awk not found. Logging will be plain."
-    LOG_AWK=false
-else
-    LOG_AWK=true
-fi
 
 echo "" >> "$LOG_FILE"
 echo "========== NEW BUILD ATTEMPT: $(date '+%Y-%m-%d %H:%M:%S') ==========" >> "$LOG_FILE"
-if [ "$LOG_AWK" = true ]; then
-    exec > >(awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush(); }' | tee -a "$LOG_FILE") 2>&1
-else
-    exec > >(tee -a "$LOG_FILE") 2>&1
-fi
+# Remove exec > >(awk ...) and fallback logic for compatibility
+# All output will be logged using tee -a "$LOG_FILE" in each command
 
 
 

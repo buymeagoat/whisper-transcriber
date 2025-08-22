@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Full Build (whisper_build.sh)",
+      "type": "shell",
+  "command": "bash scripts/copilot_agentic_build.sh",
+      "group": "build",
+      "isBackground": false,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

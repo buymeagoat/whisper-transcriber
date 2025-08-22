@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -21,8 +21,8 @@ class Settings(BaseSettings):
     db_connect_attempts: int = Field(10, env="DB_CONNECT_ATTEMPTS")
     broker_connect_attempts: int = Field(20, env="BROKER_CONNECT_ATTEMPTS")
     allow_registration: bool = Field(True, env="ALLOW_REGISTRATION")
-    auth_username: str = Field("admin", env="AUTH_USERNAME")
-    auth_password: str = Field("admin", env="AUTH_PASSWORD")
+    auth_username: str = Field(..., env="AUTH_USERNAME")
+    auth_password: str = Field(..., env="AUTH_PASSWORD")
     secret_key: str = Field(..., env="SECRET_KEY")
     access_token_expire_minutes: int = Field(60, env="ACCESS_TOKEN_EXPIRE_MINUTES")
     max_concurrent_jobs: int = Field(2, env="MAX_CONCURRENT_JOBS")
@@ -57,9 +57,7 @@ class Settings(BaseSettings):
     # Not configurable via environment
     algorithm: str = "HS256"
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
 import logging

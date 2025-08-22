@@ -4,6 +4,8 @@ import wave
 
 # Ensure required settings exist before importing the application
 os.environ.setdefault("SECRET_KEY", "test-secret")
+os.environ.setdefault("AUTH_USERNAME", "admin")
+os.environ.setdefault("AUTH_PASSWORD", "admin")
 
 import pytest
 from fastapi import FastAPI

@@ -225,9 +225,21 @@ download_dependencies() {
         echo "Purging cache at $CACHE_DIR" >&2
         rm -rf "$CACHE_DIR"
     fi
-    install_node18
-    check_docker_running
-    stage_build_dependencies
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Installing Node.js 18..."
+    if ! install_node18; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Node.js installation failed." >&2
+        exit 1
+    fi
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Checking if Docker is running..."
+    if ! check_docker_running; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Docker daemon is not running. Start Docker and retry." >&2
+        exit 1
+    fi
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Staging build dependencies..."
+    if ! stage_build_dependencies; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to stage build dependencies. Check cache directories and network." >&2
+        exit 1
+    fi
 }
 
 # Codex: build helper for frontend-only mode

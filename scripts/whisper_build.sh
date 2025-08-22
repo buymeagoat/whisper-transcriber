@@ -60,6 +60,7 @@ preflight_checks() {
 }
 #!/usr/bin/env bash
 set -euo pipefail
+set -x
 
 # Codex: unified build entrypoint
 

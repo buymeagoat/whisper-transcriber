@@ -291,13 +291,19 @@ preflight_checks() {
     fi
     base="$CACHE_DIR"
     dirs=("$base/images" "$base/pip" "$base/npm" "$base/apt")
-    for d in "${dirs[@]}"; do
-        [ -d "$d" ] || mkdir -p "$d"
-    done
-    [ -f "$base/apt/deb_list.txt" ] || touch "$base/apt/deb_list.txt"
-    [ -f "$ROOT_DIR/.env" ] || echo "SECRET_KEY=CHANGE_ME" > "$ROOT_DIR/.env"
-    # Whisper model files check
-    model_dir="$ROOT_DIR/models"
+    for dir in "${dirs[@]}"; do
+        mkdir -p "$dir"
+        if ! touch "$dir/.perm_check"; then
+            echo "[WARNING] Cache directory $dir is not writable. Attempting to set permissions..."
+            chmod 0777 "$dir" 2>/dev/null
+            if ! touch "$dir/.perm_check"; then
+                echo "[ERROR] Cache directory $dir is still not writable after chmod."
+                tee -a "$LOG_FILE"
+                exit 1
+            else
+                echo "[INFO] Permissions for $dir updated to 0777."
+            fi
+        fi
     required_models=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
     for m in "${required_models[@]}"; do
         [ -f "$model_dir/$m" ] || echo "[$(date '+%Y-%m-%d %H:%M:%S')] Warning: missing model file $model_dir/$m" >&2

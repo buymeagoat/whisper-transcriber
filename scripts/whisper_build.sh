@@ -110,6 +110,8 @@ populate_apt_cache() {
         echo "[ERROR] apt cache population failed. Check apt logs for details." | tee -a "$LOG_FILE"
         exit 1
     fi
+    mkdir -p "$ROOT_DIR/cache/apt"
+    rsync -a "$apt_cache/" "$ROOT_DIR/cache/apt/"
     echo "[INFO] apt cache populated."
 }
 
@@ -138,6 +140,9 @@ populate_npm_cache() {
             exit 1
         fi
     fi
+    mkdir -p "$ROOT_DIR/cache/npm"
+    rsync -a "$npm_cache/" "$ROOT_DIR/cache/npm/"
+    npm ls --prefix "$frontend_dir" --all --silent > "$ROOT_DIR/cache/npm/npm_versions.txt" 2>/dev/null || true
 }
 
 cache_docker_images() {
@@ -184,6 +189,35 @@ validate_pip_manifest() {
         echo "[ERROR] Unable to retrieve required wheels listed in $manifest" | tee -a "$LOG_FILE"
         exit 1
     fi
+}
+
+validate_cache_step() {
+    local type="$1"
+    python3 "$SCRIPT_DIR/update_manifest.py" >> "$LOG_FILE" 2>&1
+    bash "$SCRIPT_DIR/validate_manifest.sh" --summary >> "$LOG_FILE" 2>&1 || {
+        echo "[ERROR] Manifest validation failed after populating $type cache" | tee -a "$LOG_FILE" >&2
+        exit 1
+    }
+    case "$type" in
+        pip)
+            if ! ls "$CACHE_DIR/pip"/*.whl >/dev/null 2>&1 || ! ls "$ROOT_DIR/cache/pip"/*.whl >/dev/null 2>&1; then
+                echo "[ERROR] pip cache files missing in expected locations" | tee -a "$LOG_FILE" >&2
+                exit 1
+            fi
+            ;;
+        apt)
+            if ! ls "$CACHE_DIR/apt"/*.deb >/dev/null 2>&1 || ! ls "$ROOT_DIR/cache/apt"/*.deb >/dev/null 2>&1; then
+                echo "[ERROR] apt cache files missing in expected locations" | tee -a "$LOG_FILE" >&2
+                exit 1
+            fi
+            ;;
+        npm)
+            if [ -z "$(ls -A "$CACHE_DIR/npm" 2>/dev/null)" ] || [ -z "$(ls -A "$ROOT_DIR/cache/npm" 2>/dev/null)" ]; then
+                echo "[ERROR] npm cache files missing in expected locations" | tee -a "$LOG_FILE" >&2
+                exit 1
+            fi
+            ;;
+    esac
 }
 
 verify_cache_integrity() {
@@ -385,6 +419,13 @@ download_dependencies() {
         echo "[$(date \"%Y-%m-%d %H:%M:%S\")] ERROR: Failed to stage build dependencies. Check cache directories and network." >&2
             exit 1
         fi
+
+    populate_pip_cache
+    validate_cache_step pip
+    populate_apt_cache
+    validate_cache_step apt
+    populate_npm_cache
+    validate_cache_step npm
 }
 
 # Codex: build helper for frontend-only mode
@@ -556,9 +597,6 @@ case "$MODE" in
         log_step "STAGING"
         echo "Performing full rebuild using Docker cache. All images will be rebuilt." >&2
         download_dependencies
-        populate_pip_cache
-        populate_apt_cache
-        populate_npm_cache
         docker_build
         ;;
     offline)
@@ -566,6 +604,7 @@ case "$MODE" in
         echo "Performing full rebuild using only cached assets." >&2
         verify_cache_integrity  # Codex: offline mode validates cached assets
         populate_npm_cache
+        validate_cache_step npm
         docker_build
         ;;
     update) # Codex: update workflow
@@ -575,6 +614,7 @@ case "$MODE" in
         log_step "FRONTEND ONLY"
         install_node18
         populate_npm_cache
+        validate_cache_step npm
         docker_build_frontend
         ;;
     validate_only) # Codex: validate-only workflow

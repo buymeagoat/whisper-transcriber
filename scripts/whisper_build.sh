@@ -1,116 +1,3 @@
-
-populate_pip_cache() {
-    local pip_cache="$CACHE_DIR/pip"
-    echo "[INFO] Populating pip cache for offline build..." | tee -a "$LOG_FILE"
-    pip download -d "$pip_cache" -r "$ROOT_DIR/requirements.txt"
-    if [ $? -ne 0 ]; then
-        echo "[ERROR] pip cache population failed. Check pip logs for details." | tee -a "$LOG_FILE"
-        exit 1
-    fi
-    echo "[INFO] pip cache populated."
-}
-
-populate_apt_cache() {
-    local apt_cache="$CACHE_DIR/apt"
-    local apt_list="$apt_cache/deb_list.txt"
-    echo "[INFO] Populating apt cache for offline build..." | tee -a "$LOG_FILE"
-    sudo apt-get clean
-    sudo apt-get update
-    # Replace with your actual package list file if different
-    sudo apt-get install --download-only -o Dir::Cache::archives="$apt_cache" $(grep -vE '^\s*#' "$ROOT_DIR/scripts/apt-packages.txt")
-    if [ $? -ne 0 ]; then
-        echo "[ERROR] apt cache population failed. Check apt logs for details." | tee -a "$LOG_FILE"
-        exit 1
-    fi
-    echo "[INFO] apt cache populated."
-}
-
-populate_npm_cache() {
-    local npm_cache="$CACHE_DIR/npm"
-    local frontend_dir="$ROOT_DIR/frontend"
-    echo "[INFO] Populating npm cache for offline build..." | tee -a "$LOG_FILE"
-    npm install --prefix "$frontend_dir" --cache "$npm_cache"
-    if [ $? -ne 0 ]; then
-        echo "[ERROR] npm install failed. Check npm logs for details." | tee -a "$LOG_FILE"
-        exit 1
-    fi
-    echo "[INFO] npm cache populated. Running offline install..." | tee -a "$LOG_FILE"
-    npm ci --offline --prefix "$frontend_dir" --cache "$npm_cache"
-    if [ $? -ne 0 ]; then
-        echo "[WARN] npm offline install failed. Retrying online to populate missing cache." | tee -a "$LOG_FILE"
-        npm ci --prefix "$frontend_dir" --cache "$npm_cache"
-        if [ $? -ne 0 ]; then
-            echo "[ERROR] npm online install failed after offline failure. Check npm logs for details." | tee -a "$LOG_FILE"
-            exit 1
-        fi
-        echo "[INFO] Retrying offline install after cache update..." | tee -a "$LOG_FILE"
-        npm ci --offline --prefix "$frontend_dir" --cache "$npm_cache"
-        if [ $? -ne 0 ]; then
-            echo "[ERROR] npm offline install failed again. Some dependencies may still be missing from cache." | tee -a "$LOG_FILE"
-            exit 1
-        fi
-    fi
-}
-# Preflight checks: ensure required directories and files exist
-preflight_checks() {
-    # Check for required executables
-    for exe in python3 pip node npm docker ffmpeg; do
-        if ! command -v "$exe" >/dev/null 2>&1; then
-            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Required executable '$exe' not found in PATH." >&2
-            exit 1
-        fi
-    done
-    # Check for docker compose (v2)
-    if ! docker compose version >/dev/null 2>&1; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: 'docker compose' command not available. Install Docker Compose v2." >&2
-        exit 1
-    fi
-    # Check for sudo/root access
-    if [[ $EUID -ne 0 ]]; then
-        if ! command -v sudo >/dev/null 2>&1; then
-            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Sudo required for some operations, but 'sudo' not found." >&2
-            exit 1
-        fi
-    fi
-    # Check Node.js version
-    node_version=$(node --version | sed 's/^v//')
-    node_major=${node_version%%.*}
-    if [ "$node_major" -lt 18 ]; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Node.js 18 or newer is required. Found $node_version" >&2
-        exit 1
-    fi
-    # Check internet connectivity
-    if ! curl -sSf https://pypi.org >/dev/null 2>&1; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: No internet connectivity to pypi.org." >&2
-        exit 1
-    fi
-    if ! curl -sSf https://registry.npmjs.org >/dev/null 2>&1; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: No internet connectivity to registry.npmjs.org." >&2
-        exit 1
-    fi
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running preflight checks..."
-    # Use default_cache_dir logic from shared_checks.sh
-    CACHE_DIR=""
-    if grep -qi microsoft /proc/version; then
-        CACHE_DIR="/mnt/wsl/shared/docker_cache"
-    else
-        CACHE_DIR="/tmp/docker_cache"
-    fi
-    base="$CACHE_DIR"
-    dirs=("$base/images" "$base/pip" "$base/npm" "$base/apt")
-    for d in "${dirs[@]}"; do
-        [ -d "$d" ] || mkdir -p "$d"
-    done
-    [ -f "$base/apt/deb_list.txt" ] || touch "$base/apt/deb_list.txt"
-    [ -f "$ROOT_DIR/.env" ] || echo "SECRET_KEY=CHANGE_ME" > "$ROOT_DIR/.env"
-    # Whisper model files check
-    model_dir="$ROOT_DIR/models"
-    required_models=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
-    for m in "${required_models[@]}"; do
-        [ -f "$model_dir/$m" ] || echo "[$(date '+%Y-%m-%d %H:%M:%S')] Warning: missing model file $model_dir/$m" >&2
-    done
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Preflight checks complete."
-}
 #!/usr/bin/env bash
 set -euo pipefail
 set -x
@@ -270,6 +157,7 @@ check_download_sources() {
 verify_cache_integrity() {
     check_cache_dirs
     verify_offline_assets
+    cache_docker_images
 }
 
 download_dependencies() {
@@ -282,23 +170,23 @@ download_dependencies() {
         node_status=${PIPESTATUS[0]}
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] install_node18 exit code: $node_status" | tee -a "$LOG_FILE"
         if [ "$node_status" -ne 0 ]; then
-            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Node.js installation failed." >&2
+            echo "[$(date '+%Y-%m-%d %H:%M:%S")] ERROR: Node.js installation failed." >&2
             exit 1
         fi
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Checking if Docker is running..." | tee -a "$LOG_FILE"
+        echo "[$(date '+%Y-%m-%d %H:%M:%S")] Checking if Docker is running..." | tee -a "$LOG_FILE"
         check_docker_running 2>&1 | tee -a "$LOG_FILE"
         docker_status=${PIPESTATUS[0]}
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] check_docker_running exit code: $docker_status" | tee -a "$LOG_FILE"
+        echo "[$(date '+%Y-%m-%d %H:%M:%S")] check_docker_running exit code: $docker_status" | tee -a "$LOG_FILE"
         if [ "$docker_status" -ne 0 ]; then
-            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Docker daemon is not running. Start Docker and retry." >&2
+            echo "[$(date '+%Y-%m-%d %H:%M:%S")] ERROR: Docker daemon is not running. Start Docker and retry." >&2
             exit 1
         fi
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Staging build dependencies..." | tee -a "$LOG_FILE"
+        echo "[$(date '+%Y-%m-%d %H:%M:%S")] Staging build dependencies..." | tee -a "$LOG_FILE"
         stage_build_dependencies 2>&1 | tee -a "$LOG_FILE"
         stage_status=${PIPESTATUS[0]}
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] stage_build_dependencies exit code: $stage_status" | tee -a "$LOG_FILE"
+        echo "[$(date '+%Y-%m-%d %H:%M:%S")] stage_build_dependencies exit code: $stage_status" | tee -a "$LOG_FILE"
         if [ "$stage_status" -ne 0 ]; then
-            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to stage build dependencies. Check cache directories and network." >&2
+            echo "[$(date '+%Y-%m-%d %H:%M:%S")] ERROR: Failed to stage build dependencies. Check cache directories and network." >&2
             exit 1
         fi
 }
@@ -457,6 +345,55 @@ Available test scripts:
   scripts/run_tests.sh         - runs backend tests plus frontend unit and Cypress end-to-end tests. Recommended after a full build.
   scripts/run_backend_tests.sh - executes only the backend tests and verifies the /health and /version endpoints.
 EOM
+}
+
+populate_pip_cache() {
+    local pip_cache="$CACHE_DIR/pip"
+    echo "[INFO] Populating pip cache for offline build..." | tee -a "$LOG_FILE"
+    pip download -d "$pip_cache" -r "$ROOT_DIR/requirements.txt"
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] pip cache population failed. Check pip logs for details." | tee -a "$LOG_FILE"
+        exit 1
+    fi
+    echo "[INFO] pip cache populated."
+}
+
+populate_apt_cache() {
+    local apt_cache="$CACHE_DIR/apt"
+    local apt_list="$apt_cache/deb_list.txt"
+    echo "[INFO] Populating apt cache for offline build..." | tee -a "$LOG_FILE"
+    sudo apt-get clean
+    sudo apt-get update
+    # Download required debs if missing
+    if ! ls "$apt_cache/nodejs_*" >/dev/null 2>&1; then
+        echo "[INFO] Downloading nodejs deb package..." | tee -a "$LOG_FILE"
+        sudo apt download nodejs -o Dir::Cache::archives="$apt_cache"
+    fi
+    if ! ls "$apt_cache/docker-compose-plugin_*" >/dev/null 2>&1; then
+        echo "[INFO] Downloading docker-compose-plugin deb package..." | tee -a "$LOG_FILE"
+        sudo apt download docker-compose-plugin -o Dir::Cache::archives="$apt_cache"
+    fi
+    # Replace with your actual package list file if different
+    sudo apt-get install --download-only -o Dir::Cache::archives="$apt_cache" $(grep -vE '^\s*#' "$ROOT_DIR/scripts/apt-packages.txt")
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] apt cache population failed. Check apt logs for details." | tee -a "$LOG_FILE"
+        exit 1
+    fi
+    echo "[INFO] apt cache populated."
+}
+
+cache_docker_images() {
+    local image_cache="$CACHE_DIR/images"
+    local images=("python:3.11-bookworm" "postgres:15-alpine" "rabbitmq:3-management")
+    mkdir -p "$image_cache"
+    for img in "${images[@]}"; do
+        local tar="$image_cache/$(echo $img | sed 's#[/:]#_#g').tar"
+        if [ ! -f "$tar" ]; then
+            echo "[INFO] Saving Docker image $img to $tar..." | tee -a "$LOG_FILE"
+            docker pull "$img"
+            docker save "$img" -o "$tar"
+        fi
+    done
 }
 
 if $VERIFY_SOURCES; then

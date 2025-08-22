@@ -486,6 +486,8 @@ Available test scripts:
 EOM
 }
 
+# Ensure function closure before case statement
+
 if $VERIFY_SOURCES; then
     log_step "VERIFY SOURCES"
     check_download_sources  # Codex: network connectivity test for package mirrors

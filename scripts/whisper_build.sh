@@ -1,3 +1,19 @@
+populate_npm_cache() {
+    local npm_cache="$CACHE_DIR/npm"
+    local frontend_dir="$ROOT_DIR/frontend"
+    echo "[INFO] Populating npm cache for offline build..." | tee -a "$LOG_FILE"
+    npm ci --prefix "$frontend_dir" --cache "$npm_cache"
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] npm cache population failed. Check npm logs for details." | tee -a "$LOG_FILE"
+        exit 1
+    fi
+    echo "[INFO] npm cache populated. Running offline install..." | tee -a "$LOG_FILE"
+    npm ci --offline --prefix "$frontend_dir" --cache "$npm_cache"
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] npm offline install failed. Some dependencies may be missing from cache." | tee -a "$LOG_FILE"
+        exit 1
+    fi
+}
 # Preflight checks: ensure required directories and files exist
 preflight_checks() {
     # Check for required executables
@@ -416,12 +432,14 @@ case "$MODE" in
         log_step "STAGING"
         echo "Performing full rebuild using Docker cache. All images will be rebuilt." >&2
         download_dependencies
+        populate_npm_cache
         docker_build
         ;;
     offline)
         log_step "OFFLINE VERIFY"
         echo "Performing full rebuild using only cached assets." >&2
         verify_cache_integrity  # Codex: offline mode validates cached assets
+        populate_npm_cache
         docker_build
         ;;
     update) # Codex: update workflow
@@ -430,7 +448,7 @@ case "$MODE" in
     frontend_only) # Codex: frontend-only workflow
         log_step "FRONTEND ONLY"
         install_node18
-        (cd "$ROOT_DIR/frontend" && npm install)
+        populate_npm_cache
         docker_build_frontend
         ;;
     validate_only) # Codex: validate-only workflow

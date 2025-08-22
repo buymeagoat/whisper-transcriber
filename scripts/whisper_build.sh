@@ -225,21 +225,30 @@ download_dependencies() {
         echo "Purging cache at $CACHE_DIR" >&2
         rm -rf "$CACHE_DIR"
     fi
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Installing Node.js 18..."
-    if ! install_node18; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Node.js installation failed." >&2
-        exit 1
-    fi
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Checking if Docker is running..."
-    if ! check_docker_running; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Docker daemon is not running. Start Docker and retry." >&2
-        exit 1
-    fi
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Staging build dependencies..."
-    if ! stage_build_dependencies; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to stage build dependencies. Check cache directories and network." >&2
-        exit 1
-    fi
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Installing Node.js 18..." | tee -a "$LOG_FILE"
+        install_node18 2>&1 | tee -a "$LOG_FILE"
+        node_status=${PIPESTATUS[0]}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] install_node18 exit code: $node_status" | tee -a "$LOG_FILE"
+        if [ "$node_status" -ne 0 ]; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Node.js installation failed." >&2
+            exit 1
+        fi
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Checking if Docker is running..." | tee -a "$LOG_FILE"
+        check_docker_running 2>&1 | tee -a "$LOG_FILE"
+        docker_status=${PIPESTATUS[0]}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] check_docker_running exit code: $docker_status" | tee -a "$LOG_FILE"
+        if [ "$docker_status" -ne 0 ]; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Docker daemon is not running. Start Docker and retry." >&2
+            exit 1
+        fi
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Staging build dependencies..." | tee -a "$LOG_FILE"
+        stage_build_dependencies 2>&1 | tee -a "$LOG_FILE"
+        stage_status=${PIPESTATUS[0]}
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] stage_build_dependencies exit code: $stage_status" | tee -a "$LOG_FILE"
+        if [ "$stage_status" -ne 0 ]; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to stage build dependencies. Check cache directories and network." >&2
+            exit 1
+        fi
 }
 
 # Codex: build helper for frontend-only mode

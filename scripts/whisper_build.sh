@@ -56,6 +56,21 @@ echo "========== NEW BUILD ATTEMPT: $(date '+%Y-%m-%d %H:%M:%S') ==========" >> 
 
 
 # Function definitions (move to top)
+
+ensure_cache_permissions() {
+    local dirs=("$CACHE_DIR" "$ROOT_DIR/cache")
+    for dir in "${dirs[@]}"; do
+        mkdir -p "$dir" || {
+            echo "[ERROR] Unable to create $dir" | tee -a "$LOG_FILE" >&2
+            exit 1
+        }
+        if ! (touch "$dir/.perm_check" 2>/dev/null && rm -f "$dir/.perm_check"); then
+            echo "[ERROR] Cache directory $dir is not writable." | tee -a "$LOG_FILE" >&2
+            exit 1
+        fi
+    done
+}
+
 populate_pip_cache() {
     local cache_dir="$(default_cache_dir)"
     local pip_cache="$cache_dir/pip"
@@ -179,6 +194,7 @@ verify_cache_integrity() {
 }
 
 preflight_checks() {
+    ensure_cache_permissions
     # Check for required executables
     for exe in python3 pip node npm docker ffmpeg; do
         if ! command -v "$exe" >/dev/null 2>&1; then

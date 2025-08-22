@@ -62,17 +62,37 @@ echo "========== NEW BUILD ATTEMPT: $(date '+%Y-%m-%d %H:%M:%S') ==========" >> 
 # Function definitions (move to top)
 
 ensure_cache_permissions() {
-    local dirs=("$CACHE_DIR" "$ROOT_DIR/cache")
-    for dir in "${dirs[@]}"; do
-        mkdir -p "$dir" || {
-            echo "[ERROR] Unable to create $dir" | tee -a "$LOG_FILE" >&2
-            exit 1
-        }
-        if ! (touch "$dir/.perm_check" 2>/dev/null && rm -f "$dir/.perm_check"); then
-            echo "[ERROR] Cache directory $dir is not writable." | tee -a "$LOG_FILE" >&2
-            exit 1
+    local candidates=("$CACHE_DIR")
+    if [ "$CACHE_DIR" != "/tmp/docker_cache" ]; then
+        candidates+=("/tmp/docker_cache")
+    fi
+
+    local chosen=""
+    for dir in "${candidates[@]}"; do
+        if mkdir -p "$dir" 2>/dev/null && touch "$dir/.perm_check" 2>/dev/null; then
+            rm -f "$dir/.perm_check"
+            chosen="$dir"
+            break
+        else
+            echo "[WARN] Cache directory $dir is not writable; trying next." | tee -a "$LOG_FILE" >&2
         fi
     done
+
+    if [ -z "$chosen" ]; then
+        echo "[ERROR] No writable cache directory found." | tee -a "$LOG_FILE" >&2
+        exit 1
+    fi
+
+    CACHE_DIR="$chosen"
+    mkdir -p "$ROOT_DIR/cache" || {
+        echo "[ERROR] Unable to create $ROOT_DIR/cache" | tee -a "$LOG_FILE" >&2
+        exit 1
+    }
+    if ! (touch "$ROOT_DIR/cache/.perm_check" 2>/dev/null && rm -f "$ROOT_DIR/cache/.perm_check"); then
+        echo "[ERROR] Cache directory $ROOT_DIR/cache is not writable." | tee -a "$LOG_FILE" >&2
+        exit 1
+    fi
+    export CACHE_DIR
 }
 
 populate_pip_cache() {
@@ -304,6 +324,7 @@ preflight_checks() {
                 echo "[INFO] Permissions for $dir updated to 0777."
             fi
         fi
+    done
     required_models=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
     for m in "${required_models[@]}"; do
         [ -f "$model_dir/$m" ] || echo "[$(date '+%Y-%m-%d %H:%M:%S')] Warning: missing model file $model_dir/$m" >&2

@@ -1,4 +1,29 @@
 populate_npm_cache() {
+populate_pip_cache() {
+    local pip_cache="$CACHE_DIR/pip"
+    echo "[INFO] Populating pip cache for offline build..." | tee -a "$LOG_FILE"
+    pip download -d "$pip_cache" -r "$ROOT_DIR/requirements.txt"
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] pip cache population failed. Check pip logs for details." | tee -a "$LOG_FILE"
+        exit 1
+    fi
+    echo "[INFO] pip cache populated."
+}
+
+populate_apt_cache() {
+    local apt_cache="$CACHE_DIR/apt"
+    local apt_list="$apt_cache/deb_list.txt"
+    echo "[INFO] Populating apt cache for offline build..." | tee -a "$LOG_FILE"
+    sudo apt-get clean
+    sudo apt-get update
+    # Replace with your actual package list file if different
+    sudo apt-get install --download-only -o Dir::Cache::archives="$apt_cache" $(grep -vE '^\s*#' "$ROOT_DIR/scripts/apt-packages.txt")
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] apt cache population failed. Check apt logs for details." | tee -a "$LOG_FILE"
+        exit 1
+    fi
+    echo "[INFO] apt cache populated."
+}
     local npm_cache="$CACHE_DIR/npm"
     local frontend_dir="$ROOT_DIR/frontend"
     echo "[INFO] Populating npm cache for offline build..." | tee -a "$LOG_FILE"
@@ -432,6 +457,8 @@ case "$MODE" in
         log_step "STAGING"
         echo "Performing full rebuild using Docker cache. All images will be rebuilt." >&2
         download_dependencies
+        populate_pip_cache
+        populate_apt_cache
         populate_npm_cache
         docker_build
         ;;

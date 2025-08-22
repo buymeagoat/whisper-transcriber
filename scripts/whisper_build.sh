@@ -54,6 +54,89 @@ echo "========== NEW BUILD ATTEMPT: $(date '+%Y-%m-%d %H:%M:%S') ==========" >> 
 
 
 
+# Function definitions (move to top)
+populate_pip_cache() {
+    local pip_cache="$CACHE_DIR/pip"
+    echo "[INFO] Populating pip cache for offline build..." | tee -a "$LOG_FILE"
+    pip download -d "$pip_cache" -r "$ROOT_DIR/requirements.txt"
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] pip cache population failed. Check pip logs for details." | tee -a "$LOG_FILE"
+        exit 1
+    fi
+    echo "[INFO] pip cache populated."
+}
+
+populate_apt_cache() {
+    local apt_cache="$CACHE_DIR/apt"
+    local apt_list="$apt_cache/deb_list.txt"
+    echo "[INFO] Populating apt cache for offline build..." | tee -a "$LOG_FILE"
+    sudo apt-get clean
+    sudo apt-get update
+    # Download required debs if missing
+    if ! ls "$apt_cache/nodejs_*" >/dev/null 2>&1; then
+        echo "[INFO] Downloading nodejs deb package..." | tee -a "$LOG_FILE"
+        sudo apt download nodejs -o Dir::Cache::archives="$apt_cache"
+    fi
+    if ! ls "$apt_cache/docker-compose-plugin_*" >/dev/null 2>&1; then
+        echo "[INFO] Downloading docker-compose-plugin deb package..." | tee -a "$LOG_FILE"
+        sudo apt download docker-compose-plugin -o Dir::Cache::archives="$apt_cache"
+    fi
+    # Replace with your actual package list file if different
+    sudo apt-get install --download-only -o Dir::Cache::archives="$apt_cache" $(grep -vE '^\s*#' "$ROOT_DIR/scripts/apt-packages.txt")
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] apt cache population failed. Check apt logs for details." | tee -a "$LOG_FILE"
+        exit 1
+    fi
+    echo "[INFO] apt cache populated."
+}
+
+populate_npm_cache() {
+    local npm_cache="$CACHE_DIR/npm"
+    local frontend_dir="$ROOT_DIR/frontend"
+    echo "[INFO] Populating npm cache for offline build..." | tee -a "$LOG_FILE"
+    npm install --prefix "$frontend_dir" --cache "$npm_cache"
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] npm install failed. Check npm logs for details." | tee -a "$LOG_FILE"
+        exit 1
+    fi
+    echo "[INFO] npm cache populated. Running offline install..." | tee -a "$LOG_FILE"
+    npm ci --offline --prefix "$frontend_dir" --cache "$npm_cache"
+    if [ $? -ne 0 ]; then
+        echo "[WARN] npm offline install failed. Retrying online to populate missing cache." | tee -a "$LOG_FILE"
+        npm ci --prefix "$frontend_dir" --cache "$npm_cache"
+        if [ $? -ne 0 ]; then
+            echo "[ERROR] npm online install failed after offline failure. Check npm logs for details." | tee -a "$LOG_FILE"
+            exit 1
+        fi
+        echo "[INFO] Retrying offline install after cache update..." | tee -a "$LOG_FILE"
+        npm ci --offline --prefix "$frontend_dir" --cache "$npm_cache"
+        if [ $? -ne 0 ]; then
+            echo "[ERROR] npm offline install failed again. Some dependencies may still be missing from cache." | tee -a "$LOG_FILE"
+            exit 1
+        fi
+    fi
+}
+
+cache_docker_images() {
+    local image_cache="$CACHE_DIR/images"
+    local images=("python:3.11-bookworm" "postgres:15-alpine" "rabbitmq:3-management")
+    mkdir -p "$image_cache"
+    for img in "${images[@]}"; do
+        local tar="$image_cache/$(echo $img | sed 's#[/:]#_#g').tar"
+        if [ ! -f "$tar" ]; then
+            echo "[INFO] Saving Docker image $img to $tar..." | tee -a "$LOG_FILE"
+            docker pull "$img"
+            docker save "$img" -o "$tar"
+        fi
+    done
+}
+
+verify_cache_integrity() {
+    check_cache_dirs
+    verify_offline_assets
+    cache_docker_images
+}
+
 # Run preflight checks before anything else
 preflight_checks
 
@@ -154,12 +237,6 @@ log_step() { echo "===== $1 ====="; }
 
 check_download_sources() {
     check_internet && check_docker_registry && check_apt_sources
-}
-
-verify_cache_integrity() {
-    check_cache_dirs
-    verify_offline_assets
-    cache_docker_images
 }
 
 download_dependencies() {
@@ -347,55 +424,6 @@ Available test scripts:
   scripts/run_tests.sh         - runs backend tests plus frontend unit and Cypress end-to-end tests. Recommended after a full build.
   scripts/run_backend_tests.sh - executes only the backend tests and verifies the /health and /version endpoints.
 EOM
-}
-
-populate_pip_cache() {
-    local pip_cache="$CACHE_DIR/pip"
-    echo "[INFO] Populating pip cache for offline build..." | tee -a "$LOG_FILE"
-    pip download -d "$pip_cache" -r "$ROOT_DIR/requirements.txt"
-    if [ $? -ne 0 ]; then
-        echo "[ERROR] pip cache population failed. Check pip logs for details." | tee -a "$LOG_FILE"
-        exit 1
-    fi
-    echo "[INFO] pip cache populated."
-}
-
-populate_apt_cache() {
-    local apt_cache="$CACHE_DIR/apt"
-    local apt_list="$apt_cache/deb_list.txt"
-    echo "[INFO] Populating apt cache for offline build..." | tee -a "$LOG_FILE"
-    sudo apt-get clean
-    sudo apt-get update
-    # Download required debs if missing
-    if ! ls "$apt_cache/nodejs_*" >/dev/null 2>&1; then
-        echo "[INFO] Downloading nodejs deb package..." | tee -a "$LOG_FILE"
-        sudo apt download nodejs -o Dir::Cache::archives="$apt_cache"
-    fi
-    if ! ls "$apt_cache/docker-compose-plugin_*" >/dev/null 2>&1; then
-        echo "[INFO] Downloading docker-compose-plugin deb package..." | tee -a "$LOG_FILE"
-        sudo apt download docker-compose-plugin -o Dir::Cache::archives="$apt_cache"
-    fi
-    # Replace with your actual package list file if different
-    sudo apt-get install --download-only -o Dir::Cache::archives="$apt_cache" $(grep -vE '^\s*#' "$ROOT_DIR/scripts/apt-packages.txt")
-    if [ $? -ne 0 ]; then
-        echo "[ERROR] apt cache population failed. Check apt logs for details." | tee -a "$LOG_FILE"
-        exit 1
-    fi
-    echo "[INFO] apt cache populated."
-}
-
-cache_docker_images() {
-    local image_cache="$CACHE_DIR/images"
-    local images=("python:3.11-bookworm" "postgres:15-alpine" "rabbitmq:3-management")
-    mkdir -p "$image_cache"
-    for img in "${images[@]}"; do
-        local tar="$image_cache/$(echo $img | sed 's#[/:]#_#g').tar"
-        if [ ! -f "$tar" ]; then
-            echo "[INFO] Saving Docker image $img to $tar..." | tee -a "$LOG_FILE"
-            docker pull "$img"
-            docker save "$img" -o "$tar"
-        fi
-    done
 }
 
 if $VERIFY_SOURCES; then

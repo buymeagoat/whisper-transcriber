@@ -5,7 +5,7 @@
 
 Self-hosted transcription service with a FastAPI backend and a React frontend. It wraps the OpenAI Whisper CLI so you can upload audio, monitor progress and retrieve transcripts.
 
-All Docker builds now use `scripts/whisper_build.sh`. Previous helper scripts were removed.<!-- # Codex: build entrypoint clarified -->
+All Docker builds now use `scripts/whisper_build.sh`. Previous helper scripts were removed.
 
 For a step-by-step setup guide, see [docs/help.md](docs/help.md).
 
@@ -452,10 +452,6 @@ docker compose restart
 
 If startup fails, rerun with `LOG_LEVEL=DEBUG` and `LOG_TO_STDOUT=true` to see
 the container logs in the console.
-
-## Codex Analyst GPT Workflow
-
-Repository introspection and patch creation are handled entirely by **Codex Analyst GPT (CAG)**. When contributors request changes, CAG retrieves file lists and contents through prompt-driven commands and returns the necessary diffs inside the conversation. Approved patches are applied automatically and the full diff is saved under `docs/patch_logs/` for reference. Manual ZIP uploads are no longer required—patch logs accumulate in that directory and serve as the canonical history.
 
 ## Contributing
 

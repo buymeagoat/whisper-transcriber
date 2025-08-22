@@ -325,6 +325,7 @@ preflight_checks() {
         fi
     done
     required_models=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
+    model_dir="${MODEL_DIR:-$ROOT_DIR/models}"
     for m in "${required_models[@]}"; do
         [ -f "$model_dir/$m" ] || echo "[$(date '+%Y-%m-%d %H:%M:%S')] Warning: missing model file $model_dir/$m" >&2
     done

@@ -139,8 +139,41 @@ cache_docker_images() {
     done
 }
 
+validate_pip_manifest() {
+    local manifest="$ROOT_DIR/cache/pip/pip_versions.txt"
+    local cache_base="$(default_cache_dir)"
+    local pip_cache="$cache_base/pip"
+    local target="$ROOT_DIR/cache/pip"
+    mkdir -p "$pip_cache" "$target"
+    if [ ! -f "$manifest" ]; then
+        echo "[ERROR] pip manifest $manifest missing. Run update_manifest.py." | tee -a "$LOG_FILE"
+        exit 1
+    fi
+    local missing=0
+    while IFS== read -r pkg ver; do
+        pkg=$(echo "$pkg" | xargs)
+        ver=$(echo "$ver" | xargs)
+        [[ -z "$pkg" || "$pkg" =~ ^# ]] && continue
+        local wheel_pkg="${pkg//-/_}"
+        if ! ls "$target/$wheel_pkg-$ver"*.whl >/dev/null 2>&1; then
+            echo "[INFO] Fetching wheel for $pkg==$ver" | tee -a "$LOG_FILE"
+            if ! pip download --prefer-binary --only-binary=:all: -d "$pip_cache" "$pkg==$ver" >> "$LOG_FILE" 2>&1; then
+                echo "[ERROR] Failed to download $pkg==$ver" | tee -a "$LOG_FILE"
+                missing=1
+            else
+                rsync -a "$pip_cache/" "$target/" >> "$LOG_FILE" 2>&1
+            fi
+        fi
+    done < "$manifest"
+    if [ $missing -ne 0 ]; then
+        echo "[ERROR] Unable to retrieve required wheels listed in $manifest" | tee -a "$LOG_FILE"
+        exit 1
+    fi
+}
+
 verify_cache_integrity() {
     check_cache_dirs
+    validate_pip_manifest
     verify_offline_assets
     cache_docker_images
 }

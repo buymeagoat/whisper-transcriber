@@ -78,9 +78,22 @@ def main():
         base_digest = ''
     # TIMESTAMP
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    # pip_versions
+
+    # Generate pip_versions.txt for later cache validation
     pip_versions = ''
-    pip_versions_path = 'cache/pip/pip_versions.txt'
+    pip_versions_path = os.path.join('cache', 'pip', 'pip_versions.txt')
+    try:
+        os.makedirs(os.path.dirname(pip_versions_path), exist_ok=True)
+        result = subprocess.run(
+            ['pip', 'list', '--format=freeze'],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        with open(pip_versions_path, 'w') as pf:
+            pf.write(result.stdout)
+    except Exception:
+        pass
     if os.path.exists(pip_versions_path):
         try:
             import hashlib

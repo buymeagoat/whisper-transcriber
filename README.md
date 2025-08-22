@@ -61,7 +61,9 @@ invoking `npm run build`.
   RabbitMQ to respond before exiting (defaults to `60`).
 - `API_HEALTH_TIMEOUT` – how many seconds to wait for the API container to
   become healthy (defaults to `300`).
-- `AUTH_USERNAME` and `AUTH_PASSWORD` – *(deprecated)* previous static credentials.
+- `AUTH_USERNAME` and `AUTH_PASSWORD` – credentials for the initial admin
+  account. Both variables must be set; the application creates this user on
+  startup if it does not already exist.
 - `ALLOW_REGISTRATION` – enable the `/register` endpoint (defaults to `true`).
  - `SECRET_KEY` – **required** secret used to sign JWT tokens. The application
    exits on startup when this variable is missing.
@@ -166,10 +168,11 @@ creates regular users. Set `ALLOW_REGISTRATION=false` in production to disable
 this endpoint. Obtain a token from `/token` using the same credentials. JWT
 payloads now include the user role so clients can inspect their privileges.
 
-The application ships with a built-in `admin` account using the password
-`admin`. Logging in with these credentials returns a token with
-`must_change_password=true`. Call `/change-password` with the new password and
-the token to update it before continuing.
+On first startup, the application creates an admin account using the
+`AUTH_USERNAME` and `AUTH_PASSWORD` environment variables. Logging in with
+these credentials returns a token with `must_change_password=true`. Call
+`/change-password` with the new password and the token to update it before
+continuing.
 
 ### User Management
 

@@ -260,7 +260,10 @@ while [[ $# -gt 0 ]]; do
                 echo "Conflicting switches detected. Only one build mode can be used at a time." >&2
                 exit 1
             fi
-            MODE="frontend_only"
+                if ! pip install --no-index --find-links "$pip_cache" -r "$ROOT_DIR/requirements.txt"; then
+                    echo "[WARNING] Cached pip install failed. Retrying with online PyPI for missing packages..."
+                    pip install -r "$ROOT_DIR/requirements.txt"
+                fi
             MODE_SET=true
             ;;
         --validate-only)

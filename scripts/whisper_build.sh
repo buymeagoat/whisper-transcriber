@@ -1,4 +1,4 @@
-populate_npm_cache() {
+
 populate_pip_cache() {
     local pip_cache="$CACHE_DIR/pip"
     echo "[INFO] Populating pip cache for offline build..." | tee -a "$LOG_FILE"
@@ -24,6 +24,8 @@ populate_apt_cache() {
     fi
     echo "[INFO] apt cache populated."
 }
+
+populate_npm_cache() {
     local npm_cache="$CACHE_DIR/npm"
     local frontend_dir="$ROOT_DIR/frontend"
     echo "[INFO] Populating npm cache for offline build..." | tee -a "$LOG_FILE"

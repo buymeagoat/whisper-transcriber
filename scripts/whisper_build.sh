@@ -100,8 +100,7 @@ populate_pip_cache() {
     local pip_cache="$cache_dir/pip"
     local retry_file="$LOG_DIR/pip_retry_count"
     echo "[INFO] Populating pip cache for offline build..." | tee -a "$LOG_FILE"
-    pip download -d "$pip_cache" -r "$ROOT_DIR/requirements.txt"
-    if [ $? -ne 0 ]; then
+    if ! pip download -d "$pip_cache" -r "$ROOT_DIR/requirements.txt"; then
         echo "[ERROR] pip cache population failed. Check pip logs for details." | tee -a "$LOG_FILE"
         local count=0
         if [ -f "$retry_file" ]; then
@@ -142,8 +141,7 @@ populate_apt_cache() {
         sudo apt download docker-compose-plugin -o Dir::Cache::archives="$apt_cache"
     fi
     # Replace with your actual package list file if different
-    sudo apt-get install --download-only -o Dir::Cache::archives="$apt_cache" $(grep -vE '^\s*#' "$ROOT_DIR/scripts/apt-packages.txt")
-    if [ $? -ne 0 ]; then
+    if ! sudo apt-get install --download-only -o Dir::Cache::archives="$apt_cache" $(grep -vE '^\s*#' "$ROOT_DIR/scripts/apt-packages.txt"); then
         echo "[ERROR] apt cache population failed. Check apt logs for details." | tee -a "$LOG_FILE"
         exit 1
     fi
@@ -156,23 +154,19 @@ populate_npm_cache() {
     local npm_cache="$CACHE_DIR/npm"
     local frontend_dir="$ROOT_DIR/frontend"
     echo "[INFO] Populating npm cache for offline build..." | tee -a "$LOG_FILE"
-    npm install --prefix "$frontend_dir" --cache "$npm_cache"
-    if [ $? -ne 0 ]; then
+    if ! npm install --prefix "$frontend_dir" --cache "$npm_cache"; then
         echo "[ERROR] npm install failed. Check npm logs for details." | tee -a "$LOG_FILE"
         exit 1
     fi
     echo "[INFO] npm cache populated. Running offline install..." | tee -a "$LOG_FILE"
-    npm ci --offline --prefix "$frontend_dir" --cache "$npm_cache"
-    if [ $? -ne 0 ]; then
+    if ! npm ci --offline --prefix "$frontend_dir" --cache "$npm_cache"; then
         echo "[WARN] npm offline install failed. Retrying online to populate missing cache." | tee -a "$LOG_FILE"
-        npm ci --prefix "$frontend_dir" --cache "$npm_cache"
-        if [ $? -ne 0 ]; then
+        if ! npm ci --prefix "$frontend_dir" --cache "$npm_cache"; then
             echo "[ERROR] npm online install failed after offline failure. Check npm logs for details." | tee -a "$LOG_FILE"
             exit 1
         fi
         echo "[INFO] Retrying offline install after cache update..." | tee -a "$LOG_FILE"
-        npm ci --offline --prefix "$frontend_dir" --cache "$npm_cache"
-        if [ $? -ne 0 ]; then
+        if ! npm ci --offline --prefix "$frontend_dir" --cache "$npm_cache"; then
             echo "[ERROR] npm offline install failed again. Some dependencies may still be missing from cache." | tee -a "$LOG_FILE"
             exit 1
         fi

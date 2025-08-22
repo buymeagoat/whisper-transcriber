@@ -1,0 +1,54 @@
+patch_20250822_192953_patch_uploader_message.log
+=====TASK=====
+Remove legacy references from patch uploader and documentation.
+
+=====OBJECTIVE=====
+Clarify patch log process and ensure messaging matches current workflow.
+
+=====CONSTRAINTS=====
+- Keep instructions accurate for the current Copilot-based workflow.
+
+=====SCOPE=====
+- frontend/src/components/PatchUploader.js
+- CHANGELOG.md
+
+=====DIFFSUMMARY=====
+- Reword patch uploader message to reference Copilot prompts.
+- Update changelog to note removal of outdated workflow references.
+
+=====TIMESTAMP=====
+20250822_192953 UTC
+
+=====BUILDER_DATE_TIME (UTC)=====
+20250822 192953
+
+=====PROMPTID=====
+N/A
+
+=====AGENTVERSION=====
+N/A
+
+=====AGENTHASH=====
+N/A
+
+=====PROMPTHASH=====
+N/A
+
+=====COMMITHASH=====
+5e5db3475c64ed3842a67f2089f0588d6f1901cd
+
+=====SPEC_HASHES=====
+N/A
+
+=====SNAPSHOT=====
+N/A
+
+=====TESTRESULTS=====
+frontend npm test: ReferenceError: expect is not defined
+pytest: ModuleNotFoundError: No module named 'api'
+
+=====DIAGNOSTICMETA=====
+{}
+
+=====DECISIONS=====
+- Removed obsolete workflow reference to keep documentation current.

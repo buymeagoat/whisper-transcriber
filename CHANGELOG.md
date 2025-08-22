@@ -7,7 +7,7 @@
 
 ### Changed
 - Build process is more robust for offline and online builds.
-- Removed Codex Analyst GPT workflow references from documentation.
+- Removed outdated workflow references from documentation and UI.
 
 ### Fixed
 - Ensures all cache directories are updated before Docker build starts.

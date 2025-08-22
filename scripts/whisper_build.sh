@@ -452,9 +452,9 @@ download_dependencies() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Staging build dependencies..." | tee -a "$LOG_FILE"
         stage_build_dependencies 2>&1 | tee -a "$LOG_FILE"
         stage_status=${PIPESTATUS[0]}
-    echo "[$(date \"%Y-%m-%d %H:%M:%S\")] stage_build_dependencies exit code: $stage_status" | tee -a "$LOG_FILE"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] stage_build_dependencies exit code: $stage_status" | tee -a "$LOG_FILE"
         if [ "$stage_status" -ne 0 ]; then
-        echo "[$(date \"%Y-%m-%d %H:%M:%S\")] ERROR: Failed to stage build dependencies. Check cache directories and network." >&2
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to stage build dependencies. Check cache directories and network." >&2
             exit 1
         fi
 

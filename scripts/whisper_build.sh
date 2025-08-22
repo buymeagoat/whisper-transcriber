@@ -142,6 +142,8 @@ VERIFY_SOURCES=false
 DOCKER_CLEANUP=false
 # Codex: removed legacy usage() helper
 
+
+# Improved argument parsing: only shift once per loop, handle zero args
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --full)
@@ -151,7 +153,6 @@ while [[ $# -gt 0 ]]; do
             fi
             MODE="full"
             MODE_SET=true
-            shift
             ;;
         --offline)
             if $MODE_SET; then
@@ -160,46 +161,39 @@ while [[ $# -gt 0 ]]; do
             fi
             MODE="offline"
             MODE_SET=true
-            shift
             ;;
-        --update)  # Codex: update switch
+        --update)
             if $MODE_SET; then
                 echo "Conflicting switches detected. Only one build mode can be used at a time." >&2
                 exit 1
             fi
             MODE="update"
             MODE_SET=true
-            shift
             ;;
-        --frontend-only)  # Codex: frontend-only switch
+        --frontend-only)
             if $MODE_SET; then
                 echo "Conflicting switches detected. Only one build mode can be used at a time." >&2
                 exit 1
             fi
             MODE="frontend_only"
             MODE_SET=true
-            shift
             ;;
-        --validate-only)  # Codex: validate-only switch
+        --validate-only)
             if $MODE_SET; then
                 echo "Conflicting switches detected. Only one build mode can be used at a time." >&2
                 exit 1
             fi
             MODE="validate_only"
             MODE_SET=true
-            shift
             ;;
-        --docker-cleanup)  # Codex: docker-cleanup switch
+        --docker-cleanup)
             DOCKER_CLEANUP=true
-            shift
             ;;
         --purge-cache)
             PURGE_CACHE=true
-            shift
             ;;
         --verify-sources)
             VERIFY_SOURCES=true
-            shift
             ;;
         -h|--help)
             print_help

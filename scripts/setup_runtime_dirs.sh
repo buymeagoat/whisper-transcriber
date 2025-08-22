@@ -20,7 +20,7 @@
 #   - Appends rules to .gitignore to ignore all contents except .gitkeep in each directory
 #
 # Outcome:
-#   Ensures Codex Analyst GPT (CPG) and project contributors always have a complete structural baseline
+#   Ensures project contributors always have a complete structural baseline
 #   without committing volatile files or large outputs.
 #
 # Usage:
@@ -28,7 +28,7 @@
 #       bash scripts/setup_runtime_dirs.sh
 #
 # Maintainer:
-#   Codex Process Governance
+#   Project governance
 
 
 # Absolute project root

@@ -322,6 +322,10 @@ preflight_checks() {
             fi
         fi
     done
+    [ -f "$base/apt/deb_list.txt" ] || touch "$base/apt/deb_list.txt"
+    [ -f "$ROOT_DIR/.env" ] || echo "SECRET_KEY=CHANGE_ME" > "$ROOT_DIR/.env"
+    # Whisper model files check
+    model_dir="$ROOT_DIR/models"
     required_models=(base.pt small.pt medium.pt large-v3.pt tiny.pt)
     model_dir="${MODEL_DIR:-$ROOT_DIR/models}"
     for m in "${required_models[@]}"; do

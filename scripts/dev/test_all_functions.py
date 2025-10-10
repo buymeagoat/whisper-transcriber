@@ -79,7 +79,7 @@ class InfrastructureTests:
     def test_file_structure():
         """Test that all required files and directories exist."""
         required_paths = [
-            "api/main.py", "api/models.py", "api/settings.py", "worker.py",
+            "api/main.py", "api/models.py", "api/settings.py", "api/worker.py",
             "docker-compose.yml", "Dockerfile", "requirements.txt",
             "frontend/dist/index.html", "models/", "api/migrations/",
             "api/static/", "scripts/", "tests/"
@@ -235,7 +235,7 @@ class WorkerTests:
     def test_celery_app_creation():
         """Test that Celery app can be created."""
         try:
-            from worker import celery_app
+            from api.worker import celery_app
             log_test("Worker", "Celery App Creation", "PASS", f"Celery app created: {celery_app.main}")
             
             # Test task discovery

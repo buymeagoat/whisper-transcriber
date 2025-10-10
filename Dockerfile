@@ -41,7 +41,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 COPY api         ./api
 COPY models      ./models
-COPY worker.py   ./worker.py
+COPY api/worker.py   ./api/worker.py
 # Validate models with environment variables
 RUN SECRET_KEY=build-time-secret AUTH_USERNAME=build-user AUTH_PASSWORD=build-pass \
     python -c "from api.utils.model_validation import validate_models_dir; validate_models_dir()"

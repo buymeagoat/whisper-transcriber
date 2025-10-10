@@ -43,13 +43,13 @@ for svc in $services; do
     docker compose -f "$COMPOSE_FILE" logs --tail "$LOG_LINES" "$svc" || true
 
     if [ "$svc" = "worker" ] && [ "$status" != "running" ]; then
-        echo "Checking worker image for /app/worker.py..."
-        if docker compose -f "$COMPOSE_FILE" run --rm --no-deps --entrypoint "" worker test -f /app/worker.py >/dev/null; then
-            echo "worker.py present in worker image"
+        echo "Checking worker image for /app/api/worker.py..."
+        if docker compose -f "$COMPOSE_FILE" run --rm --no-deps --entrypoint "" worker test -f /app/api/worker.py >/dev/null; then
+            echo "api/worker.py present in worker image"
         else
-            echo "worker.py missing in worker image"
-            if ! docker compose -f "$COMPOSE_FILE" run --rm --no-deps --entrypoint "" worker test -f /app/worker.py >/dev/null; then
-                echo "ERROR: /app/worker.py not found in worker image" >&2
+            echo "api/worker.py missing in worker image"
+            if ! docker compose -f "$COMPOSE_FILE" run --rm --no-deps --entrypoint "" worker test -f /app/api/worker.py >/dev/null; then
+                echo "ERROR: /app/api/worker.py not found in worker image" >&2
                 exit 1
             fi
         fi

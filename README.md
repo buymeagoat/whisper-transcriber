@@ -133,7 +133,7 @@ When `JOB_QUEUE_BACKEND` is set to `broker` a Celery worker must also be
 started:
 
 ```bash
-python worker.py
+python api/worker.py
 ```
 
 ## Example Usage

@@ -18,8 +18,8 @@ env | sort >&2
 
 # If this container is running a worker, wait for the broker to be ready
 if [ "${SERVICE_TYPE:-api}" = "worker" ]; then
-    if [ ! -f /app/worker.py ]; then
-        echo "ERROR: /app/worker.py not found" >&2
+    if [ ! -f /app/api/worker.py ]; then
+        echo "ERROR: /app/api/worker.py not found" >&2
         exit 1
     fi
     broker_host="${CELERY_BROKER_HOST:-broker}"

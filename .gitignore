@@ -108,6 +108,21 @@ uploads/logs/
 uploads/uploads/
 uploads/transcripts/
 
+# === Generated Reports and Test Results ===
+reports/*.json
+reports/*.html
+*.test-results
+full_stack_test_results.json
+test_results.json
+comprehensive_test_report.json
+function_dependency_graph.json
+
+# === Build/Development Artifacts ===
+all_files.txt
+local_only_files.txt
+tracked_files.txt
+frontend/frontend-filelist.txt
+
 # Ignore contents of key runtime directories, but keep the folders themselves
 cache/*
 !cache/.gitkeep

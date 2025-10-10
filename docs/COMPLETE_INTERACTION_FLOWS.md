@@ -117,7 +117,7 @@ This document maps every user interaction through the complete technology stack,
     - Background worker picks up job
     ↓
 🤖 WHISPER PROCESSING:
-    - worker.py launches Celery worker
+    - api/worker.py launches Celery worker
     - api/services/celery_app.py::run_callable()
     - Whisper AI model processes audio
     - Transcript saved to transcripts/ directory

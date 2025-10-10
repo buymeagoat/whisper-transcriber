@@ -134,3 +134,16 @@ transcripts/*
 !transcripts/.gitkeep
 uploads/*
 !uploads/.gitkeep
+
+# === Generated Reports (keep structure) ===
+reports/*.json
+reports/*.log
+!reports/.gitkeep
+
+# === Development Artifacts ===
+*_filelist.txt
+all_files.txt
+local_only_files.txt
+tracked_files.txt
+test_results_*.json
+function_dependency_*.json

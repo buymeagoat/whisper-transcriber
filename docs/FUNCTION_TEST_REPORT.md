@@ -56,7 +56,7 @@
 - **Status**: Test expectation was wrong, not the application
 
 #### 3. Celery Worker Import Path
-- **Issue**: Test expected `celery_app` in `api/worker.py`
+- **Issue**: Test expected `celery_app` in `worker.py`
 - **Reality**: Celery app is in `api.services.celery_app` (proper organization)
 - **Impact**: None - Celery properly configured and accessible
 - **Status**: Test expectation was wrong, not the application

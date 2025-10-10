@@ -48,6 +48,15 @@ def main():
     # Gather required metadata
     # BASE_CODENAME from Dockerfile base image
     base_image = None
+    # Record apt packages
+    apt_packages = []
+    apt_path = os.path.join('scripts', 'apt-packages.txt')
+    if os.path.exists(apt_path):
+        with open(apt_path) as f:
+            apt_packages = [line.strip() for line in f if line.strip() and not line.startswith('#')]
+    # Write apt packages to manifest
+    with open(MANIFEST_PATH, 'a') as mf:
+        mf.write('\napt_packages=' + ','.join(apt_packages) + '\n')
     base_codename = None
     base_digest = None
     dockerfile_path = 'Dockerfile'

@@ -35,6 +35,7 @@ from api.schemas import (
     AnalysisOut,
 )
 from api.services.analysis import analyze_text, detect_language, analyze_sentiment
+from api.services.file_validation import file_validator, FileValidationError
 
 router = APIRouter()
 
@@ -45,13 +46,31 @@ router = APIRouter()
 async def submit_job(
     file: UploadFile = File(...), model: str = Form("base")
 ) -> JobCreatedOut:
+    # Validate model
     if model not in available_models():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid model"
         )
+    
+    # Comprehensive file validation
+    try:
+        safe_filename, detected_mime = await file_validator.validate_upload(file)
+        backend_log.info(f"File validation passed: {safe_filename} ({detected_mime})")
+    except FileValidationError as e:
+        backend_log.warning(f"File validation failed for {file.filename}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=f"File validation failed: {str(e)}"
+        )
+    except Exception as e:
+        backend_log.error(f"Unexpected error during file validation: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="File validation error. Please try again."
+        )
+    
     job_id = uuid.uuid4().hex
-    safe_name = Path(file.filename).name
-    saved = f"{job_id}_{safe_name}"
+    saved = f"{job_id}_{safe_filename}"
     try:
         upload_path = storage.save_upload(file.file, saved)
     except HTTPException:
@@ -62,7 +81,7 @@ async def submit_job(
     job_dir = storage.get_transcript_dir(job_id)
 
     ts = datetime.now(LOCAL_TZ)
-    create_job(job_id, file.filename, saved, model, ts)
+    create_job(job_id, safe_filename, saved, model, ts)
 
     job_queue.enqueue(
         partial(handle_whisper, job_id, upload_path, job_dir, model, start_thread=False)

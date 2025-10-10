@@ -18,6 +18,12 @@ from jose import JWTError, jwt
 
 from api.settings import settings
 from api.schemas import TokenOut, TokenLoginOut, PasswordChangeIn
+from api.services.audit_logging import (
+    log_authentication_event, 
+    log_security_event,
+    AuditEventType, 
+    AuditSeverity
+)
 from api.models import User
 from api.services.users import (
     create_user,
@@ -55,14 +61,37 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
 
 @router.post("/token", response_model=TokenLoginOut)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenLoginOut:
+async def login(
+    request: Request,
+    form_data: OAuth2PasswordRequestForm = Depends()
+) -> TokenLoginOut:
     user = get_user_by_username(form_data.username)
+    
     if not user or not verify_password(form_data.password, user.hashed_password):
+        # Log failed login attempt
+        await log_authentication_event(
+            event_type=AuditEventType.LOGIN_FAILED,
+            request=request,
+            username=form_data.username,
+            success=False,
+            details={"reason": "invalid_credentials"}
+        )
+        
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+    # Log successful login
+    await log_authentication_event(
+        event_type=AuditEventType.LOGIN_SUCCESS,
+        request=request,
+        username=user.username,
+        success=True,
+        details={"user_id": user.id}
+    )
+    
     token = create_access_token({"sub": user.username, "role": user.role})
     return TokenLoginOut(
         access_token=token,
@@ -72,16 +101,43 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenLoginO
 
 
 @router.post("/register", response_model=TokenOut, status_code=status.HTTP_201_CREATED)
-async def register(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenOut:
+async def register(
+    request: Request,
+    form_data: OAuth2PasswordRequestForm = Depends()
+) -> TokenOut:
     if not settings.allow_registration:
+        await log_security_event(
+            event_type=AuditEventType.ACCESS_DENIED,
+            request=request,
+            severity=AuditSeverity.MEDIUM,
+            details={"reason": "registration_disabled", "attempted_username": form_data.username}
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Registration disabled"
         )
+    
     if get_user_by_username(form_data.username):
+        await log_security_event(
+            event_type=AuditEventType.SUSPICIOUS_ACTIVITY,
+            request=request,
+            severity=AuditSeverity.MEDIUM,
+            details={"reason": "duplicate_registration_attempt", "username": form_data.username}
+        )
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="User already exists"
         )
+    
     user = create_user(form_data.username, form_data.password)
+    
+    # Log successful registration
+    await log_authentication_event(
+        event_type=AuditEventType.ACCOUNT_REGISTRATION,
+        request=request,
+        username=user.username,
+        success=True,
+        details={"user_id": user.id}
+    )
+    
     token = create_access_token({"sub": user.username, "role": user.role})
     return TokenOut(access_token=token, token_type="bearer")
 
@@ -117,7 +173,19 @@ def require_admin(user: User = Depends(get_current_user)) -> User:
 
 @router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT)
 async def change_password(
-    payload: PasswordChangeIn, user: User = Depends(get_current_user)
+    request: Request,
+    payload: PasswordChangeIn, 
+    user: User = Depends(get_current_user)
 ) -> Response:
     update_user_password(user.id, payload.password)
+    
+    # Log password change
+    await log_authentication_event(
+        event_type=AuditEventType.PASSWORD_CHANGE,
+        request=request,
+        username=user.username,
+        success=True,
+        details={"user_id": user.id}
+    )
+    
     return Response(status_code=status.HTTP_204_NO_CONTENT)

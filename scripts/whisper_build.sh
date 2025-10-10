@@ -100,28 +100,44 @@ populate_pip_cache() {
     local pip_cache="$cache_dir/pip"
     local retry_file="$LOG_DIR/pip_retry_count"
     echo "[INFO] Populating pip cache for offline build..." | tee -a "$LOG_FILE"
-    if ! pip download -d "$pip_cache" -r "$ROOT_DIR/requirements.txt"; then
-        echo "[ERROR] pip cache population failed. Check pip logs for details." | tee -a "$LOG_FILE"
-        local count=0
-        if [ -f "$retry_file" ]; then
-            count=$(cat "$retry_file")
+    mkdir -p "$pip_cache"
+    # Download all requirements and their dependencies as wheels
+    pip download --only-binary=:all: --requirement "$ROOT_DIR/requirements.txt" --dest "$pip_cache" || true
+    # Ensure every package in requirements.txt is present in cache
+    while IFS= read -r line; do
+        pkg=$(echo "$line" | cut -d'[' -f1 | cut -d'=' -f1 | xargs)
+        ver=$(echo "$line" | grep -oP '(?<=>=)[^ ]*')
+        [[ -z "$pkg" || "$pkg" =~ ^# ]] && continue
+        wheel_pkg="${pkg//-/_}"
+        # Check if wheel exists
+        if ! ls "$pip_cache/$wheel_pkg-"*".whl" >/dev/null 2>&1 && ! ls "$ROOT_DIR/cache/pip/$wheel_pkg-"*".whl" >/dev/null 2>&1; then
+            echo "[INFO] Missing wheel for $pkg, attempting download..." | tee -a "$LOG_FILE"
+            if ! pip download --prefer-binary --only-binary=:all: -d "$pip_cache" "$pkg"; then
+                echo "[WARN] Wheel not found for $pkg, trying source dist..." | tee -a "$LOG_FILE"
+                if ! pip download --no-binary=:all: -d "$pip_cache" "$pkg"; then
+                    echo "[ERROR] Could not download $pkg from PyPI." | tee -a "$LOG_FILE"
+                    if [ "${STRICT_OFFLINE:-false}" = "true" ]; then
+                        echo "[ERROR] Strict offline mode: cannot proceed without $pkg in cache." | tee -a "$LOG_FILE"
+                        exit 1
+                    fi
+                fi
+            fi
         fi
-        count=$((count+1))
-        echo "$count" > "$retry_file"
-        if [ "$count" -ge "$MAX_RETRIES" ]; then
-            echo "[ERROR] pip cache population failed $count times; exceeding max retries ($MAX_RETRIES)." | tee -a "$LOG_FILE"
-            echo "[ERROR] Exiting with code $PIP_RETRY_EXIT_CODE" | tee -a "$LOG_FILE"
-            exit $PIP_RETRY_EXIT_CODE
-        fi
-        exit 1
-    fi
-    rm -f "$retry_file"
+    done < "$ROOT_DIR/requirements.txt"
+    # Sync cache
     mkdir -p "$ROOT_DIR/cache/pip"
     rsync -a "$pip_cache/" "$ROOT_DIR/cache/pip/"
-    if ! ls "$ROOT_DIR/cache/pip"/*.whl >/dev/null 2>&1; then
-        echo "[ERROR] No wheel files found in $ROOT_DIR/cache/pip" | tee -a "$LOG_FILE"
-        exit 1
-    fi
+    # Final check for missing wheels
+    for line in $(grep -vE '^#|^$' "$ROOT_DIR/requirements.txt"); do
+        pkg=$(echo "$line" | cut -d'[' -f1 | cut -d'=' -f1 | xargs)
+        wheel_pkg="${pkg//-/_}"
+        if ! ls "$ROOT_DIR/cache/pip/$wheel_pkg-"*".whl" >/dev/null 2>&1; then
+            echo "[ERROR] No wheel found for $pkg in $ROOT_DIR/cache/pip" | tee -a "$LOG_FILE"
+            if [ "${STRICT_OFFLINE:-false}" = "true" ]; then
+                exit 1
+            fi
+        fi
+    done
     echo "[INFO] pip cache populated."
 }
 
@@ -210,6 +226,35 @@ validate_pip_manifest() {
         ver=$(echo "$ver" | xargs)
         [[ -z "$pkg" || "$pkg" =~ ^# ]] && continue
         local wheel_pkg="${pkg//-/_}"
+        # If version is a minimum (>=), find highest compatible version
+        min_ver=""
+        if [[ "$ver" =~ ^'>=' ]]; then
+            min_ver="${ver#'>='}"
+            # Get all available versions, filter for >= min_ver, pick highest
+            compatible_ver=$(pip index versions "$pkg" 2>/dev/null | grep -Eo '[0-9]+\.[0-9]+(\.[0-9]+)?' | awk -v min="$min_ver" 'function vercmp(a,b){split(a,x,".");split(b,y,".");for(i=1;i<=3;i++){if(x[i]+0>y[i]+0)return 1;if(x[i]+0<y[i]+0)return -1}return 0} {if(vercmp($1,min)>=0)print $1}' | sort -V | tail -1)
+            if [ -n "$compatible_ver" ] && pip install --dry-run "$pkg==$compatible_ver" >/dev/null 2>&1; then
+                echo "[INFO] Using $pkg==$compatible_ver for this platform." | tee -a "$LOG_FILE"
+                ver="$compatible_ver"
+            else
+                echo "[ERROR] No compatible version found for $pkg with minimum $min_ver on this platform." | tee -a "$LOG_FILE"
+                missing=1
+                continue
+            fi
+        else
+            # Try exact version
+            if ! pip install --dry-run "$pkg==$ver" >/dev/null 2>&1; then
+                echo "[WARN] $pkg==$ver not available for this platform. Attempting to find compatible version..." | tee -a "$LOG_FILE"
+                compatible_ver=$(pip index versions "$pkg" 2>/dev/null | grep -Eo '[0-9]+\.[0-9]+(\.[0-9]+)?' | sort -V | tail -1)
+                if [ -n "$compatible_ver" ] && pip install --dry-run "$pkg==$compatible_ver" >/dev/null 2>&1; then
+                    echo "[INFO] Using $pkg==$compatible_ver for this platform." | tee -a "$LOG_FILE"
+                    ver="$compatible_ver"
+                else
+                    echo "[ERROR] No compatible version found for $pkg on this platform." | tee -a "$LOG_FILE"
+                    missing=1
+                    continue
+                fi
+            fi
+        fi
         if ! ls "$target/$wheel_pkg-$ver"*.whl >/dev/null 2>&1; then
             echo "[INFO] Fetching wheel for $pkg==$ver" | tee -a "$LOG_FILE"
             if ! pip download --prefer-binary --only-binary=:all: -d "$pip_cache" "$pkg==$ver" >> "$LOG_FILE" 2>&1; then
@@ -219,6 +264,9 @@ validate_pip_manifest() {
                 rsync -a "$pip_cache/" "$target/" >> "$LOG_FILE" 2>&1
             fi
         fi
+        # Update manifest with actual version used
+        sed -i "/^$pkg==/d" "$manifest"
+        echo "$pkg==$ver" >> "$manifest"
     done < "$manifest"
     if [ $missing -ne 0 ]; then
         echo "[ERROR] Unable to retrieve required wheels listed in $manifest" | tee -a "$LOG_FILE"
@@ -236,19 +284,19 @@ validate_cache_step() {
     case "$type" in
         pip)
             if ! ls "$CACHE_DIR/pip"/*.whl >/dev/null 2>&1 || ! ls "$ROOT_DIR/cache/pip"/*.whl >/dev/null 2>&1; then
-                echo "[ERROR] pip cache files missing in expected locations" | tee -a "$LOG_FILE" >&2
+                echo "[ERROR] pip cache files missing in expected locations. Build cannot continue." | tee -a "$LOG_FILE" >&2
                 exit 1
             fi
             ;;
         apt)
             if ! ls "$CACHE_DIR/apt"/*.deb >/dev/null 2>&1 || ! ls "$ROOT_DIR/cache/apt"/*.deb >/dev/null 2>&1; then
-                echo "[ERROR] apt cache files missing in expected locations" | tee -a "$LOG_FILE" >&2
+                echo "[ERROR] apt cache files missing in expected locations. Build cannot continue." | tee -a "$LOG_FILE" >&2
                 exit 1
             fi
             ;;
         npm)
             if [ -z "$(ls -A "$CACHE_DIR/npm" 2>/dev/null)" ] || [ -z "$(ls -A "$ROOT_DIR/cache/npm" 2>/dev/null)" ]; then
-                echo "[ERROR] npm cache files missing in expected locations" | tee -a "$LOG_FILE" >&2
+                echo "[ERROR] npm cache files missing in expected locations. Build cannot continue." | tee -a "$LOG_FILE" >&2
                 exit 1
             fi
             ;;
@@ -331,11 +379,22 @@ preflight_checks() {
     for m in "${required_models[@]}"; do
         [ -f "$model_dir/$m" ] || echo "[$(date '+%Y-%m-%d %H:%M:%S')] Warning: missing model file $model_dir/$m" >&2
     done
+    # Explicitly check apt packages
+    echo "Checking required APT packages from scripts/apt-packages.txt..."
+    while IFS= read -r pkg; do
+        [[ -z "$pkg" || "$pkg" =~ ^# ]] && continue
+        if ! dpkg -s "${pkg%% *}" >/dev/null 2>&1; then
+            echo "[WARNING] Required APT package '$pkg' is not installed." >&2
+        fi
+    done < "$ROOT_DIR/scripts/apt-packages.txt"
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Preflight checks complete."
 }
 
 # Run preflight checks before anything else
 preflight_checks
+
+ # Enforce dependency audit and cache validation before build
+ "$(dirname "$0")/audit_dependencies.sh"
 
 python3 "$SCRIPT_DIR/update_manifest.py"
 
@@ -463,6 +522,28 @@ download_dependencies() {
         fi
 
     populate_pip_cache
+    # Adaptive pip install: try wheels, then source dists, then online if allowed
+    PIP_FLAGS="--no-index --find-links $CACHE_DIR/pip --find-links $ROOT_DIR/cache/pip"
+    if ! pip install $PIP_FLAGS --requirement "$ROOT_DIR/requirements.txt"; then
+        echo "[WARN] pip install from cache failed. Attempting source dist fallback..." | tee -a "$LOG_FILE"
+        if ! pip install --no-index --find-links "$CACHE_DIR/pip" --find-links "$ROOT_DIR/cache/pip" --no-binary=:all: --requirement "$ROOT_DIR/requirements.txt"; then
+            echo "[WARN] pip install from source dists in cache failed." | tee -a "$LOG_FILE"
+            if [ "${STRICT_OFFLINE:-false}" = "true" ]; then
+                echo "[ERROR] Strict offline mode enabled. Build cannot continue without required packages in cache." | tee -a "$LOG_FILE"
+                exit 1
+            fi
+            echo "[INFO] Attempting online pip install for missing packages..." | tee -a "$LOG_FILE"
+            if ! pip install --requirement "$ROOT_DIR/requirements.txt"; then
+                echo "[ERROR] Online pip install failed. Check pip logs for details." | tee -a "$LOG_FILE"
+                exit 1
+            fi
+            echo "[INFO] Online pip install succeeded. Consider updating cache for future offline builds." | tee -a "$LOG_FILE"
+        else
+            echo "[INFO] Source dist install from cache succeeded." | tee -a "$LOG_FILE"
+        fi
+    else
+        echo "[INFO] Pip install from cache succeeded." | tee -a "$LOG_FILE"
+    fi
     validate_cache_step pip
     populate_apt_cache
     validate_cache_step apt

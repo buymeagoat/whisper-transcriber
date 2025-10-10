@@ -1,0 +1,446 @@
+{
+  "timestamp": "2025-10-09T16:48:48.721236",
+  "total_chains": 28,
+  "successful_chains": 6,
+  "failed_chains": 22,
+  "chain_results": [
+    {
+      "ui_action": "User enters credentials and clicks Login",
+      "api_endpoint": "POST /token",
+      "success": false,
+      "message": "Login failed: 401 - {\"detail\":\"Incorrect username or password\"}",
+      "duration": 0.3188211917877197,
+      "dependencies": [
+        "api.services.users.verify_password",
+        "api.settings.settings"
+      ],
+      "database_operations": [
+        "SELECT users WHERE username=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.041947"
+    },
+    {
+      "ui_action": "User changes password",
+      "api_endpoint": "POST /change-password",
+      "success": false,
+      "message": "No auth token available",
+      "duration": 3.218650817871094e-05,
+      "dependencies": [
+        "api.services.users.update_user_password",
+        "api.services.users.hash_password"
+      ],
+      "database_operations": [
+        "UPDATE users SET password_hash=? WHERE id=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.042027"
+    },
+    {
+      "ui_action": "User selects audio file and uploads",
+      "api_endpoint": "POST /jobs",
+      "success": true,
+      "message": "File upload endpoint accessible (skipped actual upload)",
+      "duration": 2.4557113647460938e-05,
+      "dependencies": [
+        "api.services.storage.save_upload",
+        "api.services.job_queue.enqueue",
+        "api.models.Job"
+      ],
+      "database_operations": [
+        "INSERT INTO jobs",
+        "INSERT INTO transcript_metadata"
+      ],
+      "timestamp": "2025-10-09T16:48:49.042063"
+    },
+    {
+      "ui_action": "User downloads completed transcript",
+      "api_endpoint": "GET /jobs/{job_id}/download",
+      "success": false,
+      "message": "404: {\"detail\":{\"code\":40401,\"message\":\"Job no longer exists.\"}}",
+      "duration": 0.00955653190612793,
+      "dependencies": [
+        "api.services.storage.get_transcript_file",
+        "api.exporters.txt_exporter"
+      ],
+      "database_operations": [
+        "SELECT jobs WHERE id=?",
+        "SELECT transcript_metadata WHERE job_id=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.051656"
+    },
+    {
+      "ui_action": "Admin views system statistics",
+      "api_endpoint": "GET /admin/stats",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.010990142822265625,
+      "dependencies": [
+        "api.services.storage.get_storage_info",
+        "api.models.Job",
+        "api.models.User"
+      ],
+      "database_operations": [
+        "SELECT COUNT(*) FROM jobs",
+        "SELECT COUNT(*) FROM users",
+        "File system queries"
+      ],
+      "timestamp": "2025-10-09T16:48:49.062738"
+    },
+    {
+      "ui_action": "Admin resets all data",
+      "api_endpoint": "POST /admin/reset",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.004265785217285156,
+      "dependencies": [
+        "api.services.storage.cleanup_files",
+        "api.orm_bootstrap.SessionLocal"
+      ],
+      "database_operations": [
+        "DELETE FROM jobs",
+        "DELETE FROM transcript_metadata",
+        "File system cleanup"
+      ],
+      "timestamp": "2025-10-09T16:48:49.067081"
+    },
+    {
+      "ui_action": "User views active jobs",
+      "api_endpoint": "GET /jobs?status=queued|processing",
+      "success": true,
+      "message": "200: []",
+      "duration": 0.014736413955688477,
+      "dependencies": [
+        "api.models.Job",
+        "api.orm_bootstrap.SessionLocal"
+      ],
+      "database_operations": [
+        "SELECT jobs WHERE status IN ('queued', 'processing', 'enriching')"
+      ],
+      "timestamp": "2025-10-09T16:48:49.081905"
+    },
+    {
+      "ui_action": "User deletes completed job",
+      "api_endpoint": "DELETE /jobs/{job_id}",
+      "success": false,
+      "message": "404: {\"detail\":{\"code\":40401,\"message\":\"Job no longer exists.\"}}",
+      "duration": 0.014104366302490234,
+      "dependencies": [
+        "api.services.storage.delete_job_files",
+        "api.models.Job"
+      ],
+      "database_operations": [
+        "DELETE FROM jobs WHERE id=?",
+        "DELETE FROM transcript_metadata WHERE job_id=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.096131"
+    },
+    {
+      "ui_action": "User monitors job progress via WebSocket",
+      "api_endpoint": "WS /ws/progress/{job_id}",
+      "success": true,
+      "message": "WebSocket endpoint structure verified (full test requires running server)",
+      "duration": 2.9087066650390625e-05,
+      "dependencies": [
+        "api.services.job_queue.get_job_status",
+        "api.models.Job"
+      ],
+      "database_operations": [
+        "SELECT jobs WHERE id=? (periodic polling)"
+      ],
+      "timestamp": "2025-10-09T16:48:49.096263"
+    },
+    {
+      "ui_action": "User generates TTS audio from transcript",
+      "api_endpoint": "POST /tts/{job_id}",
+      "success": false,
+      "message": "404: {\"detail\":{\"code\":40401,\"message\":\"Job no longer exists.\"}}",
+      "duration": 0.008545875549316406,
+      "dependencies": [
+        "api.services.tts_service",
+        "api.services.storage.save_tts_file"
+      ],
+      "database_operations": [
+        "SELECT transcript_metadata WHERE job_id=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.104826"
+    },
+    {
+      "ui_action": "Admin changes user role",
+      "api_endpoint": "PUT /users/{user_id}",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.004086971282958984,
+      "dependencies": [
+        "api.models.User",
+        "api.services.users.update_user"
+      ],
+      "database_operations": [
+        "UPDATE users SET role=? WHERE id=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.109001"
+    },
+    {
+      "ui_action": "User updates default model preference",
+      "api_endpoint": "POST /user/settings",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.004522085189819336,
+      "dependencies": [
+        "api.models.UserSetting",
+        "api.services.users.get_current_user"
+      ],
+      "database_operations": [
+        "INSERT/UPDATE user_settings WHERE user_id=? AND key='default_model'"
+      ],
+      "timestamp": "2025-10-09T16:48:49.113593"
+    },
+    {
+      "ui_action": "Admin browses file system",
+      "api_endpoint": "GET /admin/browse",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.0051555633544921875,
+      "dependencies": [
+        "api.services.storage.list_files",
+        "api.paths.UPLOAD_DIR"
+      ],
+      "database_operations": [
+        "File system operations only"
+      ],
+      "timestamp": "2025-10-09T16:48:49.118795"
+    },
+    {
+      "ui_action": "Admin deletes file from browser",
+      "api_endpoint": "DELETE /admin/files",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.006807804107666016,
+      "dependencies": [
+        "api.services.storage.delete_file",
+        "pathlib.Path"
+      ],
+      "database_operations": [
+        "File system operations only"
+      ],
+      "timestamp": "2025-10-09T16:48:49.125685"
+    },
+    {
+      "ui_action": "User enters credentials and clicks Login",
+      "api_endpoint": "POST /token",
+      "success": false,
+      "message": "Login failed: 401 - {\"detail\":\"Incorrect username or password\"}",
+      "duration": 0.38220691680908203,
+      "dependencies": [
+        "api.services.users.verify_password",
+        "api.settings.settings"
+      ],
+      "database_operations": [
+        "SELECT users WHERE username=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.508001"
+    },
+    {
+      "ui_action": "User changes password",
+      "api_endpoint": "POST /change-password",
+      "success": false,
+      "message": "No auth token available",
+      "duration": 2.7179718017578125e-05,
+      "dependencies": [
+        "api.services.users.update_user_password",
+        "api.services.users.hash_password"
+      ],
+      "database_operations": [
+        "UPDATE users SET password_hash=? WHERE id=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.508101"
+    },
+    {
+      "ui_action": "User selects audio file and uploads",
+      "api_endpoint": "POST /jobs",
+      "success": true,
+      "message": "File upload endpoint accessible (skipped actual upload)",
+      "duration": 3.4332275390625e-05,
+      "dependencies": [
+        "api.services.storage.save_upload",
+        "api.services.job_queue.enqueue",
+        "api.models.Job"
+      ],
+      "database_operations": [
+        "INSERT INTO jobs",
+        "INSERT INTO transcript_metadata"
+      ],
+      "timestamp": "2025-10-09T16:48:49.508148"
+    },
+    {
+      "ui_action": "User downloads completed transcript",
+      "api_endpoint": "GET /jobs/{job_id}/download",
+      "success": false,
+      "message": "404: {\"detail\":{\"code\":40401,\"message\":\"Job no longer exists.\"}}",
+      "duration": 0.005916118621826172,
+      "dependencies": [
+        "api.services.storage.get_transcript_file",
+        "api.exporters.txt_exporter"
+      ],
+      "database_operations": [
+        "SELECT jobs WHERE id=?",
+        "SELECT transcript_metadata WHERE job_id=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.514078"
+    },
+    {
+      "ui_action": "Admin views system statistics",
+      "api_endpoint": "GET /admin/stats",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.0035130977630615234,
+      "dependencies": [
+        "api.services.storage.get_storage_info",
+        "api.models.Job",
+        "api.models.User"
+      ],
+      "database_operations": [
+        "SELECT COUNT(*) FROM jobs",
+        "SELECT COUNT(*) FROM users",
+        "File system queries"
+      ],
+      "timestamp": "2025-10-09T16:48:49.517686"
+    },
+    {
+      "ui_action": "Admin resets all data",
+      "api_endpoint": "POST /admin/reset",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.0037605762481689453,
+      "dependencies": [
+        "api.services.storage.cleanup_files",
+        "api.orm_bootstrap.SessionLocal"
+      ],
+      "database_operations": [
+        "DELETE FROM jobs",
+        "DELETE FROM transcript_metadata",
+        "File system cleanup"
+      ],
+      "timestamp": "2025-10-09T16:48:49.521517"
+    },
+    {
+      "ui_action": "User views active jobs",
+      "api_endpoint": "GET /jobs?status=queued|processing",
+      "success": true,
+      "message": "200: []",
+      "duration": 0.010068416595458984,
+      "dependencies": [
+        "api.models.Job",
+        "api.orm_bootstrap.SessionLocal"
+      ],
+      "database_operations": [
+        "SELECT jobs WHERE status IN ('queued', 'processing', 'enriching')"
+      ],
+      "timestamp": "2025-10-09T16:48:49.531668"
+    },
+    {
+      "ui_action": "User deletes completed job",
+      "api_endpoint": "DELETE /jobs/{job_id}",
+      "success": false,
+      "message": "404: {\"detail\":{\"code\":40401,\"message\":\"Job no longer exists.\"}}",
+      "duration": 0.013436079025268555,
+      "dependencies": [
+        "api.services.storage.delete_job_files",
+        "api.models.Job"
+      ],
+      "database_operations": [
+        "DELETE FROM jobs WHERE id=?",
+        "DELETE FROM transcript_metadata WHERE job_id=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.545374"
+    },
+    {
+      "ui_action": "User monitors job progress via WebSocket",
+      "api_endpoint": "WS /ws/progress/{job_id}",
+      "success": true,
+      "message": "WebSocket endpoint structure verified (full test requires running server)",
+      "duration": 7.557868957519531e-05,
+      "dependencies": [
+        "api.services.job_queue.get_job_status",
+        "api.models.Job"
+      ],
+      "database_operations": [
+        "SELECT jobs WHERE id=? (periodic polling)"
+      ],
+      "timestamp": "2025-10-09T16:48:49.545504"
+    },
+    {
+      "ui_action": "User generates TTS audio from transcript",
+      "api_endpoint": "POST /tts/{job_id}",
+      "success": false,
+      "message": "404: {\"detail\":{\"code\":40401,\"message\":\"Job no longer exists.\"}}",
+      "duration": 0.006092548370361328,
+      "dependencies": [
+        "api.services.tts_service",
+        "api.services.storage.save_tts_file"
+      ],
+      "database_operations": [
+        "SELECT transcript_metadata WHERE job_id=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.551639"
+    },
+    {
+      "ui_action": "Admin changes user role",
+      "api_endpoint": "PUT /users/{user_id}",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.0037822723388671875,
+      "dependencies": [
+        "api.models.User",
+        "api.services.users.update_user"
+      ],
+      "database_operations": [
+        "UPDATE users SET role=? WHERE id=?"
+      ],
+      "timestamp": "2025-10-09T16:48:49.555490"
+    },
+    {
+      "ui_action": "User updates default model preference",
+      "api_endpoint": "POST /user/settings",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.0037500858306884766,
+      "dependencies": [
+        "api.models.UserSetting",
+        "api.services.users.get_current_user"
+      ],
+      "database_operations": [
+        "INSERT/UPDATE user_settings WHERE user_id=? AND key='default_model'"
+      ],
+      "timestamp": "2025-10-09T16:48:49.559303"
+    },
+    {
+      "ui_action": "Admin browses file system",
+      "api_endpoint": "GET /admin/browse",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.005033969879150391,
+      "dependencies": [
+        "api.services.storage.list_files",
+        "api.paths.UPLOAD_DIR"
+      ],
+      "database_operations": [
+        "File system operations only"
+      ],
+      "timestamp": "2025-10-09T16:48:49.564426"
+    },
+    {
+      "ui_action": "Admin deletes file from browser",
+      "api_endpoint": "DELETE /admin/files",
+      "success": false,
+      "message": "401: {\"detail\":\"Not authenticated\"}",
+      "duration": 0.0036308765411376953,
+      "dependencies": [
+        "api.services.storage.delete_file",
+        "pathlib.Path"
+      ],
+      "database_operations": [
+        "File system operations only"
+      ],
+      "timestamp": "2025-10-09T16:48:49.568119"
+    }
+  ]
+}

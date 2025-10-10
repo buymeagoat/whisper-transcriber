@@ -26,6 +26,9 @@ try:
         check_celery_connection,
     )
     from api.services.job_queue import ThreadJobQueue
+    from api.middlewares.security_headers import SecurityHeadersMiddleware
+    from api.middlewares.rate_limit import RateLimitMiddleware, RateLimitConfig
+    from api.middlewares.api_cache import ApiCacheMiddleware, CacheConfig
 
     validate_config()
 except (ConfigurationError, InitError) as exc:  # pragma: no cover - startup fail
@@ -104,6 +107,23 @@ system_log.info("FastAPI app initialization starting.")
 app = FastAPI(lifespan=lifespan)
 
 # ─── Middleware ───
+# API Response Caching (5 minute default TTL, 1000 entry limit)
+cache_config = CacheConfig(
+    default_ttl=300,       # 5 minutes
+    max_cache_size=1000,   # Maximum 1000 cached responses
+    enable_caching=True
+)
+app.add_middleware(ApiCacheMiddleware, config=cache_config)
+
+# Rate limiting for authentication endpoints (5 requests per 5 minutes)
+rate_limit_config = RateLimitConfig(
+    max_requests=5,
+    window_seconds=300,    # 5 minutes
+    block_duration_seconds=900  # 15 minutes block after rate limit hit
+)
+app.add_middleware(RateLimitMiddleware, config=rate_limit_config)
+
+app.add_middleware(SecurityHeadersMiddleware, enable_hsts=False)  # HSTS disabled for development
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins.split(","),
@@ -131,12 +151,19 @@ def health_check():
 @app.get("/version")
 def version() -> dict:
     """Return the application version from pyproject.toml."""
-    pyproject = ROOT.parent / "pyproject.toml"
-    import tomllib
-
-    data = tomllib.loads(pyproject.read_text())
-    version = data.get("project", {}).get("version", "unknown")
-    return {"version": version}
+    try:
+        pyproject = ROOT.parent / "pyproject.toml"
+        try:
+            import tomllib
+        except ImportError:
+            # Fallback for Python < 3.11
+            import tomli as tomllib
+        
+        data = tomllib.loads(pyproject.read_text())
+        version = data.get("project", {}).get("version", "unknown")
+        return {"version": version}
+    except Exception as e:
+        return {"version": "error", "details": str(e)}
 
 
 def rehydrate_incomplete_jobs():

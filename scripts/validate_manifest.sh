@@ -44,6 +44,14 @@ timestamp=$(grep '^TIMESTAMP=' "$MANIFEST" | cut -d= -f2-)
 manifest_pip_lock=$(grep '^pip_versions=' "$MANIFEST" | cut -d= -f2-)
 manifest_npm_lock=$(grep '^npm_versions=' "$MANIFEST" | cut -d= -f2-)
 
+manifest_apt_packages=$(grep '^apt_packages=' "$MANIFEST" | cut -d= -f2-)
+
+if [ -z "$manifest_apt_packages" ]; then
+    echo "Warning: manifest missing apt_packages field" >&2
+else
+    echo "APT packages listed in manifest: $manifest_apt_packages"
+fi
+
 image_digest=""
 image_codename=""
 if docker image inspect "$BASE_IMAGE" >/dev/null 2>&1; then

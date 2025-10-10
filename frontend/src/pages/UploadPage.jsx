@@ -2,43 +2,84 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../routes";
 import { useApi } from "../api";
+import { useErrorHandler } from "../services/errorHandler";
+import ProgressBar from "../components/ProgressBar";
+import DragDropUpload from "../components/DragDropUpload";
 const MAX_FILES = 10;
 const MAX_SIZE_MB = 2048;
-const ALLOWED_TYPES = ["audio/wav", "audio/mpeg", "audio/mp3", "audio/x-m4a", "audio/mp4", "audio/x-wav"];
+const ALLOWED_TYPES = [
+  "audio/wav", "audio/wave", "audio/x-wav",
+  "audio/mpeg", "audio/mp3", "audio/x-mp3",
+  "audio/mp4", "audio/m4a", "audio/x-m4a",
+  "audio/flac", "audio/x-flac",
+  "audio/ogg", "audio/vorbis",
+  "audio/webm",
+  "audio/aac",
+  "video/mp4",
+  "video/quicktime",
+  "video/x-msvideo"
+];
+
+const ALLOWED_EXTENSIONS = [
+  ".wav", ".mp3", ".mp4", ".m4a", ".flac", ".ogg", ".webm", ".aac", ".mov", ".avi"
+];
 
 export default function UploadPage() {
   const api = useApi();
+  const { handleError, withErrorHandling } = useErrorHandler();
   const [files, setFiles] = useState([]);
   const [model, setModel] = useState("tiny");
   const [status, setStatus] = useState(null);
   const [jobId, setJobId] = useState(null);
   const [showNewJobBtn, setShowNewJobBtn] = useState(false);
   const [submittedJobs, setSubmittedJobs] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState({}); // Track progress per file
   const inputRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const load = async () => {
-      try {
+    withErrorHandling(
+      async () => {
         const data = await api.get("/user/settings");
         if (data.default_model) {
           setModel(data.default_model);
         }
-      } catch {
-        // ignore errors
-      }
-    };
-    load();
+      },
+      "Loading user settings",
+      { showToast: false } // Don't show toast for this non-critical operation
+    );
   }, []);
 
   const validateFile = (file) => {
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return `❌ Unsupported format: ${file.name}`;
-    }
+    // Check file size
     if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-      return `❌ File too large: ${file.name}`;
+      return `❌ File too large: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)}MB > ${MAX_SIZE_MB}MB)`;
     }
-    return null;
+    
+    if (file.size === 0) {
+      return `❌ Empty file: ${file.name}`;
+    }
+    
+    // Check file extension
+    const fileName = file.name.toLowerCase();
+    const hasValidExtension = ALLOWED_EXTENSIONS.some(ext => fileName.endsWith(ext));
+    
+    if (!hasValidExtension) {
+      return `❌ Unsupported file extension: ${file.name}. Allowed: ${ALLOWED_EXTENSIONS.join(", ")}`;
+    }
+    
+    // Check MIME type (if available)
+    if (file.type && !ALLOWED_TYPES.includes(file.type)) {
+      return `❌ Unsupported file type: ${file.name} (${file.type})`;
+    }
+    
+    // Check for dangerous characters in filename
+    const dangerousChars = /[<>:"|?*\\\/]/;
+    if (dangerousChars.test(file.name)) {
+      return `❌ Invalid characters in filename: ${file.name}`;
+    }
+    
+    return null; // Valid file
   };
 
   const handleFileChange = (e) => {
@@ -60,15 +101,25 @@ export default function UploadPage() {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  useEffect(() => {
-    const save = async () => {
-      try {
-        await api.post("/user/settings", { default_model: model });
-      } catch {
-        // ignore errors
+  const handleDragDropFiles = (droppedFiles) => {
+    const newFiles = [...files];
+
+    droppedFiles.forEach((file) => {
+      if (newFiles.length < MAX_FILES) {
+        const error = validateFile(file);
+        newFiles.push({ file, error });
       }
-    };
-    save();
+    });
+
+    setFiles(newFiles.slice(0, MAX_FILES));
+  };
+
+  useEffect(() => {
+    withErrorHandling(
+      () => api.post("/user/settings", { default_model: model }),
+      "Saving model preference",
+      { showToast: false } // Don't show toast for this background operation
+    );
   }, [model]);
 // ── NEW handler (component scope) ─────────────────────────
 const handleNewJob = () => {
@@ -77,6 +128,7 @@ const handleNewJob = () => {
   setStatus(null);
   setShowNewJobBtn(false);
   setSubmittedJobs([]);
+  setUploadProgress({});
   inputRef.current.value = "";
 };
 // ──────────────────────────────────────────────────────────
@@ -90,12 +142,17 @@ const handleNewJob = () => {
 
       let entryIndex;
       setSubmittedJobs((prev) => {
-        const newJobs = [...prev, { fileName: file.name, jobId: null, status: "Uploading..." }];
+        const newJobs = [...prev, { 
+          fileName: file.name, 
+          jobId: null, 
+          status: "Preparing upload...",
+          progress: 0 
+        }];
         entryIndex = newJobs.length - 1;
         return newJobs;
       });
 
-      setStatus(`Uploading: ${file.name}`);
+      setStatus(`Preparing: ${file.name}`);
       setJobId(null);
 
       const updateJob = (updates) =>
@@ -105,21 +162,68 @@ const handleNewJob = () => {
           return copy;
         });
 
+      // Progress callback
+      const onProgress = (percentComplete, loaded, total) => {
+        const progressInfo = {
+          percent: percentComplete,
+          loaded,
+          total,
+          status: percentComplete < 100 ? 'Uploading...' : 'Processing...'
+        };
+        
+        setUploadProgress(prev => ({
+          ...prev,
+          [file.name]: progressInfo
+        }));
+        
+        updateJob({ 
+          progress: percentComplete,
+          status: progressInfo.status
+        });
+        
+        if (percentComplete < 100) {
+          setStatus(`Uploading: ${file.name} (${percentComplete.toFixed(1)}%)`);
+        } else {
+          setStatus(`Processing: ${file.name}`);
+        }
+      };
+
       try {
-        const data = await api.post("/jobs", formData);
+        updateJob({ status: "Starting upload..." });
+        const data = await api.postWithProgress("/jobs", formData, onProgress);
         if (data.job_id) {
           setStatus(`✅ Job started: ${file.name}`);
           setJobId(data.job_id);
           setShowNewJobBtn(true);
-          updateJob({ jobId: data.job_id, status: "✅ Started" });
+          updateJob({ 
+            jobId: data.job_id, 
+            status: "✅ Started",
+            progress: 100 
+          });
+          
+          // Clear progress for this file
+          setUploadProgress(prev => {
+            const newProgress = { ...prev };
+            delete newProgress[file.name];
+            return newProgress;
+          });
         } else {
           const msg = `❌ ${file.name}: ${data.error || "Unknown error"}`;
           setStatus(msg);
           updateJob({ status: msg });
         }
-      } catch {
-        setStatus(`❌ Network error for ${file.name}`);
-        updateJob({ status: "❌ Network error" });
+      } catch (error) {
+        const errorInfo = handleError(error, `Upload failed for ${file.name}`, false);
+        const errorMsg = `❌ ${file.name}: ${errorInfo.userMessage}`;
+        setStatus(errorMsg);
+        updateJob({ status: errorMsg, progress: 0 });
+        
+        // Clear progress for this file
+        setUploadProgress(prev => {
+          const newProgress = { ...prev };
+          delete newProgress[file.name];
+          return newProgress;
+        });
       }
     }
   };
@@ -128,14 +232,39 @@ const handleNewJob = () => {
     <div className="page-content">
       <h2 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>Upload Audio Files</h2>
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept=".wav,.mp3,.m4a"
-        multiple
-        onChange={handleFileChange}
-        style={{ display: "block", marginTop: "1rem", marginBottom: "1rem" }}
-      />
+      {/* Drag and Drop Upload Area */}
+      <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+        <DragDropUpload
+          onFileDrop={handleDragDropFiles}
+          accept="audio/*,video/*"
+          maxFileSize={MAX_SIZE_MB * 1024 * 1024}
+          multiple={true}
+        />
+      </div>
+
+      {/* Fallback file input for manual selection */}
+      <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+        <label style={{ 
+          display: "inline-block", 
+          padding: "0.5rem 1rem",
+          backgroundColor: "#f3f4f6",
+          border: "1px solid #d1d5db",
+          borderRadius: "0.375rem",
+          cursor: "pointer",
+          fontSize: "0.9rem",
+          color: "#374151"
+        }}>
+          Or click here to browse files
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".wav,.mp3,.m4a,.mp4,.flac,.ogg,.webm,.aac,.mov,.avi"
+            multiple
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+          />
+        </label>
+      </div>
 
       <div
         style={{
@@ -180,6 +309,38 @@ const handleNewJob = () => {
           </div>
         ))}
       </div>
+
+      {/* Upload Progress Display */}
+      {Object.keys(uploadProgress).length > 0 && (
+        <div style={{ marginTop: "1.5rem" }}>
+          <h3 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Upload Progress</h3>
+          {Object.entries(uploadProgress).map(([fileName, progress]) => (
+            <div key={fileName} style={{ marginBottom: "1rem" }}>
+              <div style={{ 
+                fontSize: "0.9rem", 
+                marginBottom: "0.5rem",
+                display: "flex",
+                justifyContent: "space-between"
+              }}>
+                <span>{fileName}</span>
+                <span>{(progress.loaded / (1024 * 1024)).toFixed(1)}MB / {(progress.total / (1024 * 1024)).toFixed(1)}MB</span>
+              </div>
+              <ProgressBar 
+                progress={progress.percent}
+                showPercentage={false}
+                height="12px"
+              />
+              <div style={{ 
+                fontSize: "0.8rem", 
+                color: "#a1a1aa",
+                marginTop: "0.25rem"
+              }}>
+                {progress.status}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={{ marginTop: "1.5rem" }}>
         <label style={{ display: "block", marginBottom: "0.5rem" }}>Select Model</label>

@@ -1,0 +1,455 @@
+{
+  "timestamp": "2025-10-09 12:02:10",
+  "categories": {
+    "Infrastructure": [
+      {
+        "test": "File/Dir api/main.py",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/api/main.py",
+        "error": ""
+      },
+      {
+        "test": "File/Dir api/models.py",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/api/models.py",
+        "error": ""
+      },
+      {
+        "test": "File/Dir api/settings.py",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/api/settings.py",
+        "error": ""
+      },
+      {
+        "test": "File/Dir worker.py",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/worker.py",
+        "error": ""
+      },
+      {
+        "test": "File/Dir docker-compose.yml",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/docker-compose.yml",
+        "error": ""
+      },
+      {
+        "test": "File/Dir Dockerfile",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/Dockerfile",
+        "error": ""
+      },
+      {
+        "test": "File/Dir requirements.txt",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/requirements.txt",
+        "error": ""
+      },
+      {
+        "test": "File/Dir frontend/dist/index.html",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/frontend/dist/index.html",
+        "error": ""
+      },
+      {
+        "test": "File/Dir models/",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/models",
+        "error": ""
+      },
+      {
+        "test": "File/Dir api/migrations/",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/api/migrations",
+        "error": ""
+      },
+      {
+        "test": "File/Dir api/static/",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/api/static",
+        "error": ""
+      },
+      {
+        "test": "File/Dir scripts/",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/scripts",
+        "error": ""
+      },
+      {
+        "test": "File/Dir tests/",
+        "status": "PASS",
+        "details": "Path exists: /home/buymeagoat/dev/whisper-transcriber/tests",
+        "error": ""
+      },
+      {
+        "test": "Model base.pt",
+        "status": "PASS",
+        "details": "Model exists (138.5 MB)",
+        "error": ""
+      },
+      {
+        "test": "Model tiny.pt",
+        "status": "PASS",
+        "details": "Model exists (72.1 MB)",
+        "error": ""
+      },
+      {
+        "test": "Model small.pt",
+        "status": "PASS",
+        "details": "Model exists (461.2 MB)",
+        "error": ""
+      },
+      {
+        "test": "Model medium.pt",
+        "status": "PASS",
+        "details": "Model exists (1457.2 MB)",
+        "error": ""
+      },
+      {
+        "test": "Model large-v3.pt",
+        "status": "PASS",
+        "details": "Model exists (2944.3 MB)",
+        "error": ""
+      },
+      {
+        "test": "Import fastapi",
+        "status": "PASS",
+        "details": "Module fastapi available",
+        "error": ""
+      },
+      {
+        "test": "Import uvicorn",
+        "status": "PASS",
+        "details": "Module uvicorn available",
+        "error": ""
+      },
+      {
+        "test": "Import sqlalchemy",
+        "status": "PASS",
+        "details": "Module sqlalchemy available",
+        "error": ""
+      },
+      {
+        "test": "Import alembic",
+        "status": "PASS",
+        "details": "Module alembic available",
+        "error": ""
+      },
+      {
+        "test": "Import celery",
+        "status": "PASS",
+        "details": "Module celery available",
+        "error": ""
+      },
+      {
+        "test": "Import pydantic",
+        "status": "PASS",
+        "details": "Module pydantic available",
+        "error": ""
+      },
+      {
+        "test": "Import pydantic_settings",
+        "status": "PASS",
+        "details": "Module pydantic_settings available",
+        "error": ""
+      },
+      {
+        "test": "Import psycopg2",
+        "status": "PASS",
+        "details": "Module psycopg2 available",
+        "error": ""
+      },
+      {
+        "test": "Import redis",
+        "status": "PASS",
+        "details": "Module redis available",
+        "error": ""
+      },
+      {
+        "test": "Import whisper",
+        "status": "PASS",
+        "details": "Module whisper available",
+        "error": ""
+      },
+      {
+        "test": "Import torch",
+        "status": "PASS",
+        "details": "Module torch available",
+        "error": ""
+      },
+      {
+        "test": "Import numpy",
+        "status": "PASS",
+        "details": "Module numpy available",
+        "error": ""
+      },
+      {
+        "test": "Import pathlib",
+        "status": "PASS",
+        "details": "Module pathlib available",
+        "error": ""
+      },
+      {
+        "test": "Import subprocess",
+        "status": "PASS",
+        "details": "Module subprocess available",
+        "error": ""
+      }
+    ],
+    "Configuration": [
+      {
+        "test": "Env Var DATABASE_URL",
+        "status": "SKIP",
+        "details": "Not set (using defaults)",
+        "error": ""
+      },
+      {
+        "test": "Env Var SECRET_KEY",
+        "status": "SKIP",
+        "details": "Not set (using defaults)",
+        "error": ""
+      },
+      {
+        "test": "Env Var AUTH_USERNAME",
+        "status": "SKIP",
+        "details": "Not set (using defaults)",
+        "error": ""
+      },
+      {
+        "test": "Env Var AUTH_PASSWORD",
+        "status": "SKIP",
+        "details": "Not set (using defaults)",
+        "error": ""
+      },
+      {
+        "test": "Env Var OPENAI_API_KEY",
+        "status": "SKIP",
+        "details": "Not set (using defaults)",
+        "error": ""
+      },
+      {
+        "test": "Env Var CELERY_BROKER_URL",
+        "status": "SKIP",
+        "details": "Not set (using defaults)",
+        "error": ""
+      },
+      {
+        "test": "Settings Load",
+        "status": "PASS",
+        "details": "Settings loaded with DB URL: postgresql+psycopg2://whisper:whisper@db:5432/whis...",
+        "error": ""
+      },
+      {
+        "test": "Setting db_url",
+        "status": "PASS",
+        "details": "Value: postgresql+psycopg2://whisper:whisper@db:5432/whisper",
+        "error": ""
+      },
+      {
+        "test": "Setting log_level",
+        "status": "PASS",
+        "details": "Value: INFO",
+        "error": ""
+      },
+      {
+        "test": "Setting max_upload_size",
+        "status": "PASS",
+        "details": "Value: 2147483648",
+        "error": ""
+      },
+      {
+        "test": "Setting auth_username",
+        "status": "PASS",
+        "details": "Value: admin",
+        "error": ""
+      },
+      {
+        "test": "Setting secret_key",
+        "status": "PASS",
+        "details": "Value: fa218a99d5...",
+        "error": ""
+      }
+    ],
+    "Database": [
+      {
+        "test": "Model User",
+        "status": "PASS",
+        "details": "Model class defined with 6 columns",
+        "error": ""
+      },
+      {
+        "test": "Model Job",
+        "status": "PASS",
+        "details": "Model class defined with 11 columns",
+        "error": ""
+      },
+      {
+        "test": "Model TranscriptMetadata",
+        "status": "PASS",
+        "details": "Model class defined with 12 columns",
+        "error": ""
+      },
+      {
+        "test": "Model ConfigEntry",
+        "status": "PASS",
+        "details": "Model class defined with 2 columns",
+        "error": ""
+      },
+      {
+        "test": "Model UserSetting",
+        "status": "PASS",
+        "details": "Model class defined with 3 columns",
+        "error": ""
+      },
+      {
+        "test": "SQLAlchemy Metadata",
+        "status": "PASS",
+        "details": "Base metadata has 5 tables",
+        "error": ""
+      },
+      {
+        "test": "Migration Files",
+        "status": "PASS",
+        "details": "Found 9 migration files",
+        "error": ""
+      },
+      {
+        "test": "Migration e9a7d25a7408_check_status_enum_completeness.py",
+        "status": "PASS",
+        "details": "Has upgrade/downgrade functions",
+        "error": ""
+      },
+      {
+        "test": "Migration 600b2cda9baf_add_started_and_finished_at.py",
+        "status": "PASS",
+        "details": "Has upgrade/downgrade functions",
+        "error": ""
+      },
+      {
+        "test": "Migration d99ff9e35597_baseline.py",
+        "status": "PASS",
+        "details": "Has upgrade/downgrade functions",
+        "error": ""
+      }
+    ],
+    "API": [
+      {
+        "test": "Route Module auth",
+        "status": "PASS",
+        "details": "Module imported: api.routes.auth",
+        "error": ""
+      },
+      {
+        "test": "Route Module audio",
+        "status": "PASS",
+        "details": "Module imported: api.routes.audio",
+        "error": ""
+      },
+      {
+        "test": "Route Module health",
+        "status": "FAIL",
+        "details": "Failed to import api.routes.health",
+        "error": "No module named 'api.routes.health'"
+      },
+      {
+        "test": "Route Module admin",
+        "status": "PASS",
+        "details": "Module imported: api.routes.admin",
+        "error": ""
+      },
+      {
+        "test": "Route Module logs",
+        "status": "PASS",
+        "details": "Module imported: api.routes.logs",
+        "error": ""
+      },
+      {
+        "test": "Route Module jobs",
+        "status": "PASS",
+        "details": "Module imported: api.routes.jobs",
+        "error": ""
+      },
+      {
+        "test": "FastAPI App Creation",
+        "status": "PASS",
+        "details": "App created with 50 routes",
+        "error": ""
+      },
+      {
+        "test": "Route /health",
+        "status": "PASS",
+        "details": "Route defined in app",
+        "error": ""
+      },
+      {
+        "test": "Route /docs",
+        "status": "PASS",
+        "details": "Route defined in app",
+        "error": ""
+      },
+      {
+        "test": "Route /auth/login",
+        "status": "FAIL",
+        "details": "Route not found in app",
+        "error": ""
+      },
+      {
+        "test": "Route /auth/register",
+        "status": "FAIL",
+        "details": "Route not found in app",
+        "error": ""
+      }
+    ],
+    "Worker": [
+      {
+        "test": "Celery App Creation",
+        "status": "FAIL",
+        "details": "Failed to create Celery app",
+        "error": "cannot import name 'celery_app' from 'worker' (/home/buymeagoat/dev/whisper-transcriber/worker.py)"
+      },
+      {
+        "test": "Whisper Model Access",
+        "status": "PASS",
+        "details": "Tiny model file accessible: /home/buymeagoat/dev/whisper-transcriber/models/tiny.pt",
+        "error": ""
+      },
+      {
+        "test": "Whisper Library",
+        "status": "PASS",
+        "details": "Whisper library version: 20240930",
+        "error": ""
+      }
+    ],
+    "Utilities": [
+      {
+        "test": "System Logger",
+        "status": "PASS",
+        "details": "Logger created: system",
+        "error": ""
+      },
+      {
+        "test": "Path MODEL_DIR",
+        "status": "PASS",
+        "details": "Path exists: models",
+        "error": ""
+      },
+      {
+        "test": "Path UPLOAD_DIR",
+        "status": "PASS",
+        "details": "Path exists: uploads/uploads",
+        "error": ""
+      },
+      {
+        "test": "Path TRANSCRIPTS_DIR",
+        "status": "PASS",
+        "details": "Path exists: uploads/transcripts",
+        "error": ""
+      }
+    ]
+  },
+  "summary": {
+    "total": 72,
+    "pass": 62,
+    "fail": 4,
+    "skip": 6
+  }
+}

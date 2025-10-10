@@ -12,6 +12,9 @@ RUN apt-get update || (cat /etc/resolv.conf && ping -c 3 deb.debian.org && exit 
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Install gosu for dropping privileges in entrypoint
+RUN apt-get update && apt-get install -y gosu && rm -rf /var/lib/apt/lists/*
+
 # Create a non-root user to run Celery workers
 RUN groupadd -g 1000 appuser && \
     useradd -m -u 1000 -g appuser appuser
@@ -39,10 +42,9 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 COPY api         ./api
 COPY models      ./models
 COPY worker.py   ./worker.py
-# Use BuildKit secrets when available, otherwise rely on the build argument
-RUN --mount=type=secret,id=secret_key \
-    bash -c 'if [ -f /run/secrets/secret_key ]; then export SECRET_KEY="$(cat /run/secrets/secret_key)"; fi; \ 
-    python -c "from api.utils.model_validation import validate_models_dir; validate_models_dir()"'
+# Validate models with environment variables
+RUN SECRET_KEY=build-time-secret AUTH_USERNAME=build-user AUTH_PASSWORD=build-pass \
+    python -c "from api.utils.model_validation import validate_models_dir; validate_models_dir()"
 RUN mkdir -p uploads transcripts logs \
     && chown -R appuser:appuser /app
 COPY frontend/dist ./api/static

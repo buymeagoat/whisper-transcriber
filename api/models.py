@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum as PyEnum
 from typing import Optional
 
-from sqlalchemy import DateTime, Enum, Integer, String, Text, Float, Boolean
+from sqlalchemy import DateTime, Enum, Integer, String, Text, Float, Boolean, Index
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import ForeignKey
 
@@ -121,3 +121,37 @@ class UserSetting(Base):
 
     def __repr__(self) -> str:  # pragma: no cover - trivial
         return f"<UserSetting {self.user_id}:{self.key}={self.value}>"
+
+
+# ─── Audit Logs Table ─────────────────────────────────────────────────────────
+class AuditLog(Base):
+    """Audit log database model for tracking security events and user actions"""
+    
+    __tablename__ = "audit_logs"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
+    event_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    severity: Mapped[str] = mapped_column(String(20), nullable=False, default="medium")
+    user_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, index=True)
+    username: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
+    client_ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True, index=True)  # Support IPv6
+    user_agent: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    endpoint: Mapped[Optional[str]] = mapped_column(String(200), nullable=True, index=True)
+    method: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    status_code: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    resource_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
+    resource_type: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    details: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON string for additional data
+    session_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
+    
+    # Add composite indexes for common queries
+    __table_args__ = (
+        Index('idx_audit_time_type', 'timestamp', 'event_type'),
+        Index('idx_audit_user_time', 'user_id', 'timestamp'),
+        Index('idx_audit_ip_time', 'client_ip', 'timestamp'),
+        Index('idx_audit_severity_time', 'severity', 'timestamp'),
+    )
+
+    def __repr__(self) -> str:  # pragma: no cover - trivial
+        return f"<AuditLog {self.id}:{self.event_type}@{self.timestamp}>"

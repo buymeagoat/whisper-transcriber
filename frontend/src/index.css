@@ -13,6 +13,16 @@ body {
   color: #fff;
 }
 
+/* Loading spinner animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .page-content {
   padding: 1rem;
 }

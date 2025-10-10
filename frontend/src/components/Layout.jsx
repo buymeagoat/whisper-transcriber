@@ -50,7 +50,7 @@ export default function Layout({ children }) {
             </Link>
           )}
           {isAuthenticated ? (
-            <button onClick={handleLogout} style={linkStyle}>
+            <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
           ) : (

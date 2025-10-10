@@ -77,10 +77,19 @@ desktop.ini
 *.swp
 *.swo
 
+# === Package Files (should never be committed) ===
+*.deb
+*.rpm
+*.tar.gz
+*.zip
+*.pkg
+
 # === Project-specific ===
 logs/
 *.db
 *.sqlite3
+*.sqlite
+whisper_dev.db
 .env
 .env.*
 *.env
@@ -90,6 +99,14 @@ logs/
 models/
 tests/assets/
 scripts/test_cache_access.sh
+
+# === Runtime Files ===
+uploads/*.wav
+uploads/*.mp3
+uploads/*.mp4
+uploads/logs/
+uploads/uploads/
+uploads/transcripts/
 
 # Ignore contents of key runtime directories, but keep the folders themselves
 cache/*

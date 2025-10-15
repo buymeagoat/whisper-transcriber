@@ -33,8 +33,12 @@ passlib[bcrypt]>=1.7.4
 python-dotenv>=1.1.0
 pydantic>=2.6.0
 
+# --- Monitoring & Performance ---
+python-json-logger>=2.0.0
+psutil>=5.9.0
+
 # ================================================
-# Total: 12 core packages (down from 19)
+# Total: 14 core packages (added monitoring support)
 # Removed: TTS, sentiment analysis, language detection, 
 #          AWS, PostgreSQL, Prometheus, advanced auth
 # ================================================

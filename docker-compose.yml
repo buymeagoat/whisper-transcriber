@@ -1,102 +1,271 @@
+version: '3.8'
+
 services:
-  api:
-    build:
-      context: .
-    restart: on-failure
-    ports:
-      - "8000:8000"
-    environment:
-      - SERVICE_TYPE=api
-      - PORT=8000 # change to run the API on a different port
-      - VITE_API_HOST=http://localhost:8000
-      - JOB_QUEUE_BACKEND=broker
-      - CELERY_BROKER_URL=amqp://guest:guest@broker:5672//
-      - CELERY_BACKEND_URL=rpc://
-      - DB_URL=postgresql+psycopg2://whisper:whisper@db:5432/whisper
-      - SECRET_KEY=fa218a99d59b539d6a89fc70cee35a8ac9ca4591c34e4e0dde0ca8b4ee3204da
-      - AUTH_USERNAME=admin
-      - AUTH_PASSWORD='0sb%dfDHCuEi%!$$Z'
+  # Redis for Celery task queue with security hardening
+  redis:
+    image: redis:7-alpine@sha256:de13e74e14b98eb96bdf886791ae47686c3c5d29f9d5f85ea55206843e3fce26
+    container_name: whisper-redis
+    restart: unless-stopped
+    # Security: Limit port exposure - only expose to app network
+    expose:
+      - "6379"
     volumes:
-      - ./uploads:/app/uploads
-      - ./transcripts:/app/transcripts
-      - ./logs:/app/logs
-      - ./models:/app/models:ro
-      - ./api/static:/app/api/static
-    depends_on:
-      db:
-        condition: service_healthy
-      broker:
-        condition: service_healthy
-      worker:
-        condition: service_healthy
+      - redis_data:/data
+    command: >
+      redis-server 
+      --appendonly yes 
+      --requirepass ${REDIS_PASSWORD:-securepassword123}
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    # Security: Configure security context
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+    user: "999:999"  # Redis user
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
     healthcheck:
-      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD:-securepassword123}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # Security: Backend network only
+    networks:
+      - backend
+
+  # Main application (FastAPI + React) with security hardening
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: whisper-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"  # Security: Bind to localhost only
+    environment:
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-securepassword123}@redis:6379/0
+      - DATABASE_URL=sqlite:///app/data/app.db
+      - WHISPER_MODEL_DIR=/app/models
+      - LOG_LEVEL=INFO
+      - LOG_FORMAT=json
+      - ENVIRONMENT=production
+      # Security: Additional environment security
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Security: Use named volumes instead of bind mounts
+      - app_storage:/app/storage
+      - app_models:/app/models:ro  # Read-only models
+      - app_data:/app/data
+      - app_logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+    # Security: Comprehensive security context
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:unconfined  # May need adjustment based on app requirements
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE  # Needed for file operations
+    user: "1000:1000"  # appuser
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=200m
+      - /var/tmp:noexec,nosuid,size=50m
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 30s
+    # Security: Network isolation
+    networks:
+      - frontend
+      - backend
 
-  db:
-    image: postgres:15-alpine
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: whisper
-      POSTGRES_PASSWORD: whisper
-      POSTGRES_DB: whisper
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "whisper"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  broker:
-    image: rabbitmq:3-management
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-    environment:
-      - RABBITMQ_NODENAME=rabbit@broker
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
+  # Celery worker for background transcription with security hardening
   worker:
-    build:
+    build: 
       context: .
-    command: celery -A api.services.celery_app worker --loglevel=info
-    restart: on-failure
+      dockerfile: Dockerfile
+    container_name: whisper-worker
+    restart: unless-stopped
     environment:
       - SERVICE_TYPE=worker
-      - VITE_API_HOST=http://localhost:8000
-      - JOB_QUEUE_BACKEND=broker
-      - CELERY_BROKER_URL=amqp://guest:guest@broker:5672//
-      - CELERY_BACKEND_URL=rpc://
-      - DB_URL=postgresql+psycopg2://whisper:whisper@db:5432/whisper
-      - SECRET_KEY=fa218a99d59b539d6a89fc70cee35a8ac9ca4591c34e4e0dde0ca8b4ee3204da
-      - AUTH_USERNAME=admin
-      - AUTH_PASSWORD='0sb%dfDHCuEi%!$$Z'
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-securepassword123}@redis:6379/0
+      - DATABASE_URL=sqlite:///app/data/app.db
+      - WHISPER_MODEL_DIR=/app/models
+      - LOG_LEVEL=INFO
+      - LOG_FORMAT=json
+      - WORKER_CONCURRENCY=1
+      - ENVIRONMENT=production
+      # Security: Additional environment security
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
     volumes:
-      - ./uploads:/app/uploads
-      - ./transcripts:/app/transcripts
-      - ./logs:/app/logs
+      # Security: Use named volumes with appropriate permissions
+      - app_storage:/app/storage
+      - app_models:/app/models:ro  # Read-only models
+      - app_data:/app/data
+      - app_logs:/app/logs
     depends_on:
-      db:
+      redis:
         condition: service_healthy
-      broker:
+      app:
         condition: service_healthy
+    # Security: Comprehensive security context
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:unconfined  # May need for ML model operations
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
+      - SYS_NICE  # For CPU scheduling in ML workloads
+    user: "1000:1000"  # appuser
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=1g  # Larger temp space for ML operations
+      - /var/tmp:noexec,nosuid,size=200m
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'     # Heavy CPU usage for transcription
+          memory: 8G      # Large memory for model loading
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    command: celery -A app.worker worker --loglevel=info --concurrency=1
     healthcheck:
-      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
-      interval: 10s
+      test: ["CMD", "celery", "-A", "app.worker", "inspect", "ping"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
+    # Security: Backend network only (worker doesn't need frontend access)
+    networks:
+      - backend
+    networks:
+      - backend
+
+  # Nginx reverse proxy with security hardening (optional, for production)
+  nginx:
+    image: nginx:1.25-alpine@sha256:a5127daff3d6f4606be3100a252419bfa84fd6ee5cd74d0feaca1a5068f97dcf
+    container_name: whisper-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Security: Read-only configuration mounts
+      - nginx_config:/etc/nginx/conf.d:ro
+      - nginx_ssl:/etc/nginx/ssl:ro
+      # Security: Read-only nginx.conf
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    # Security: Comprehensive security context
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - NET_BIND_SERVICE  # Needed for port 80/443
+    user: "nginx:nginx"
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:noexec,nosuid,size=50m
+      - /var/run:noexec,nosuid,size=10m
+      - /tmp:noexec,nosuid,size=10m
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 10s
+    # Security: Network isolation
+    networks:
+      - frontend
+    profiles:
+      - production
 
+# Security: Named volumes with proper configuration
 volumes:
-  db_data:
-  rabbitmq_data:
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /var/lib/docker/volumes/whisper_redis_data
+  app_data:
+    driver: local
+  app_storage:
+    driver: local
+  app_models:
+    driver: local
+  app_logs:
+    driver: local
+  nginx_config:
+    driver: local
+  nginx_ssl:
+    driver: local
+
+# Security: Network isolation and segmentation
+networks:
+  frontend:
+    name: whisper-frontend
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/24
+  backend:
+    name: whisper-backend
+    driver: bridge
+    internal: true  # Security: Backend network is internal only
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.21.0.0/24

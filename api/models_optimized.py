@@ -1,3 +1,8 @@
+"""
+Database Performance Optimization Enhancement
+Adds additional indexes and optimizations to improve query performance
+"""
+
 from datetime import datetime
 from enum import Enum as PyEnum
 from typing import Optional
@@ -7,12 +12,13 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import ForeignKey
 
 
-# ─── Base Class ─────────────────────────────────────────────────────────
+# ─── Enhanced Base Class with Performance Features ─────────────────────────────
 class Base(DeclarativeBase):
+    """Enhanced base class with performance tracking capabilities"""
     pass
 
 
-# ─── Users Table ─────────────────────────────────────────────────────────
+# ─── Enhanced Users Table with Optimized Indexes ─────────────────────────────────
 class User(Base):
     __tablename__ = "users"
 
@@ -26,16 +32,25 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
     )
+    last_login: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    # Add database indexes for performance
+    # Enhanced database indexes for performance optimization
     __table_args__ = (
+        # Existing indexes
         Index('idx_users_username', 'username'),
         Index('idx_users_role', 'role'),
+        
+        # New performance indexes
+        Index('idx_users_active', 'is_active'),
+        Index('idx_users_created_at', 'created_at'),
+        Index('idx_users_last_login', 'last_login'),
+        Index('idx_users_role_active', 'role', 'is_active'),  # Composite for admin queries
+        Index('idx_users_active_created', 'is_active', 'created_at'),  # For user listings
     )
 
 
-# ─── Enum Class ─────────────────────────────────────────────────────────
-# These values are used in logs, API responses, and DB — use machine-safe slugs
+# ─── Job Status Enum (unchanged) ─────────────────────────────────────────────────
 class JobStatusEnum(str, PyEnum):
     QUEUED = "queued"
     PROCESSING = "processing"
@@ -49,7 +64,7 @@ class JobStatusEnum(str, PyEnum):
     FAILED_UNKNOWN = "failed_unknown"
 
 
-# ─── Jobs Table ─────────────────────────────────────────────────────────
+# ─── Enhanced Jobs Table with Performance Optimizations ─────────────────────────
 class Job(Base):
     __tablename__ = "jobs"
 
@@ -62,10 +77,14 @@ class Job(Base):
         nullable=False,
         default=JobStatusEnum.QUEUED,
     )
-    # Filled after processing: should not be empty if status is COMPLETED
+    # User association for multi-user support
+    user_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("users.id"), nullable=True)
+    
+    # Filled after processing
     transcript_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    # Path to job log file, created during whisper run or on failure
     log_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    
+    # Enhanced timestamp fields
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
     )
@@ -74,20 +93,44 @@ class Job(Base):
     )
     started_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    # Performance tracking fields
+    processing_time_seconds: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    file_size_bytes: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    duration_seconds: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
-    # Add database indexes for performance
+    # Comprehensive database indexes for optimal performance
     __table_args__ = (
+        # Existing indexes
         Index('idx_jobs_status', 'status'),
         Index('idx_jobs_created_at', 'created_at'),
         Index('idx_jobs_status_created', 'status', 'created_at'),
         Index('idx_jobs_model', 'model'),
+        
+        # Enhanced performance indexes
+        Index('idx_jobs_user_id', 'user_id'),
+        Index('idx_jobs_user_status', 'user_id', 'status'),
+        Index('idx_jobs_user_created', 'user_id', 'created_at'),
+        Index('idx_jobs_status_updated', 'status', 'updated_at'),
+        Index('idx_jobs_finished_at', 'finished_at'),
+        Index('idx_jobs_started_at', 'started_at'),
+        
+        # Composite indexes for common query patterns
+        Index('idx_jobs_user_status_created', 'user_id', 'status', 'created_at'),  # User job listings
+        Index('idx_jobs_status_model_created', 'status', 'model', 'created_at'),   # Model performance analysis
+        Index('idx_jobs_created_status_model', 'created_at', 'status', 'model'),   # Time-based analysis
+        
+        # Performance analysis indexes
+        Index('idx_jobs_processing_time', 'processing_time_seconds'),
+        Index('idx_jobs_file_size', 'file_size_bytes'),
+        Index('idx_jobs_duration', 'duration_seconds'),
     )
 
     def __repr__(self):
-        return f"<Job id={self.id} status={self.status.value}>"
+        return f"<Job id={self.id} status={self.status.value} user_id={self.user_id}>"
 
 
-# ─── MVP Metadata Table ─────────────────────────────────────────────────
+# ─── Enhanced Transcript Metadata with Performance Indexes ─────────────────────
 class TranscriptMetadata(Base):
     __tablename__ = "metadata"
 
@@ -105,29 +148,50 @@ class TranscriptMetadata(Base):
         DateTime, default=datetime.utcnow, nullable=False
     )
 
-    # Add database indexes for performance
+    # Enhanced indexes for metadata queries
     __table_args__ = (
+        # Existing indexes
         Index('idx_metadata_job_id', 'job_id'),
+        
+        # New performance indexes
+        Index('idx_metadata_language', 'language'),
+        Index('idx_metadata_generated_at', 'generated_at'),
+        Index('idx_metadata_duration', 'duration'),
+        Index('idx_metadata_tokens', 'tokens'),
+        Index('idx_metadata_wpm', 'wpm'),
+        Index('idx_metadata_sentiment', 'sentiment'),
+        
+        # Composite indexes for analytics
+        Index('idx_metadata_lang_duration', 'language', 'duration'),
+        Index('idx_metadata_lang_tokens', 'language', 'tokens'),
+        Index('idx_metadata_generated_lang', 'generated_at', 'language'),
     )
 
     def __repr__(self):
-        return f"<Metadata job_id={self.job_id} tokens={self.tokens} duration={self.duration}>"
+        return f"<Metadata job_id={self.job_id} tokens={self.tokens} language={self.language}>"
 
 
-# ─── Simple Config Table ─────────────────────────────────────────────────────
+# ─── Config Table (unchanged but with index) ─────────────────────────────────────
 class ConfigEntry(Base):
     """Key/value storage for small configuration items."""
-
     __tablename__ = "config"
 
     key: Mapped[str] = mapped_column(String, primary_key=True)
     value: Mapped[str] = mapped_column(String, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
 
-    def __repr__(self) -> str:  # pragma: no cover - trivial
+    # Performance index for config lookups
+    __table_args__ = (
+        Index('idx_config_updated_at', 'updated_at'),
+    )
+
+    def __repr__(self) -> str:
         return f"<Config {self.key}={self.value}>"
 
 
-# ─── User Settings Table ─────────────────────────────────────────────────────
+# ─── Enhanced User Settings with Performance Indexes ─────────────────────────────
 class UserSetting(Base):
     __tablename__ = "user_settings"
 
@@ -136,14 +200,25 @@ class UserSetting(Base):
     )
     key: Mapped[str] = mapped_column(String, primary_key=True)
     value: Mapped[str] = mapped_column(String, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
 
-    def __repr__(self) -> str:  # pragma: no cover - trivial
+    # Performance indexes for user settings
+    __table_args__ = (
+        Index('idx_user_settings_user_id', 'user_id'),
+        Index('idx_user_settings_key', 'key'),
+        Index('idx_user_settings_updated', 'updated_at'),
+        Index('idx_user_settings_user_key', 'user_id', 'key'),  # Composite for lookups
+    )
+
+    def __repr__(self) -> str:
         return f"<UserSetting {self.user_id}:{self.key}={self.value}>"
 
 
-# ─── Audit Logs Table ─────────────────────────────────────────────────────────
+# ─── Enhanced Audit Logs with Performance Optimizations ─────────────────────────
 class AuditLog(Base):
-    """Audit log database model for tracking security events and user actions"""
+    """Enhanced audit log model with performance optimizations"""
     
     __tablename__ = "audit_logs"
     
@@ -153,26 +228,43 @@ class AuditLog(Base):
     severity: Mapped[str] = mapped_column(String(20), nullable=False, default="medium")
     user_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, index=True)
     username: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
-    client_ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True, index=True)  # Support IPv6
+    client_ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True, index=True)
     user_agent: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     endpoint: Mapped[Optional[str]] = mapped_column(String(200), nullable=True, index=True)
     method: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
     status_code: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     resource_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
     resource_type: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
-    details: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON string for additional data
+    details: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     session_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
     
-    # Add composite indexes for common queries
+    # Enhanced composite indexes for audit log analysis
     __table_args__ = (
+        # Existing indexes
         Index('idx_audit_time_type', 'timestamp', 'event_type'),
         Index('idx_audit_user_time', 'user_id', 'timestamp'),
         Index('idx_audit_ip_time', 'client_ip', 'timestamp'),
         Index('idx_audit_severity_time', 'severity', 'timestamp'),
+        
+        # New performance indexes
+        Index('idx_audit_endpoint_time', 'endpoint', 'timestamp'),
+        Index('idx_audit_status_time', 'status_code', 'timestamp'),
+        Index('idx_audit_method_time', 'method', 'timestamp'),
+        Index('idx_audit_resource_time', 'resource_type', 'timestamp'),
+        Index('idx_audit_session_time', 'session_id', 'timestamp'),
+        
+        # Composite indexes for security analysis
+        Index('idx_audit_ip_event_time', 'client_ip', 'event_type', 'timestamp'),
+        Index('idx_audit_user_event_time', 'user_id', 'event_type', 'timestamp'),
+        Index('idx_audit_severity_event_time', 'severity', 'event_type', 'timestamp'),
+        Index('idx_audit_endpoint_method_time', 'endpoint', 'method', 'timestamp'),
+        
+        # Performance analysis indexes
+        Index('idx_audit_time_status_endpoint', 'timestamp', 'status_code', 'endpoint'),
     )
 
-    def __repr__(self) -> str:  # pragma: no cover - trivial
-        return f"<AuditLog {self.id}:{self.event_type}@{self.timestamp}>"
+    def __repr__(self) -> str:
+        return f"<AuditLog {self.id}:{self.event_type}@{self.timestamp} user={self.user_id}>"
 
 
 # ─── Performance Metrics Table for Database Monitoring ─────────────────────────

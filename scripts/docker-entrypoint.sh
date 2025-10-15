@@ -1,15 +1,35 @@
 #!/usr/bin/env bash
+# Security: Enable strict error handling and security options
 set -euo pipefail
+IFS=$'\n\t'
 
+# Security: Define secure logging and directory creation
 LOG_FILE="/app/logs/entrypoint.log"
-# Create required directories and mirror all output to a log file
-mkdir -p /app/uploads /app/transcripts /app/logs
-exec > >(tee -a "$LOG_FILE") 2>&1
-chown -R 1000:1000 /app/uploads /app/transcripts /app/logs
 
-# Echo a marker for major milestones
+# Security: Create required directories with proper permissions (non-root safe)
+mkdir -p /app/storage/uploads /app/storage/transcripts /app/logs /app/data
+
+# Security: Only set ownership if running as root (for initialization)
+if [ "$(id -u)" -eq 0 ]; then
+    echo "WARNING: Running as root - this should only happen during initialization"
+    chown -R appuser:appuser /app/storage /app/logs /app/data
+    # Security: Drop privileges using gosu
+    exec gosu appuser "$0" "$@"
+fi
+
+# Security: Verify we're running as the correct user
+if [ "$(id -u)" -ne 1000 ] || [ "$(id -g)" -ne 1000 ]; then
+    echo "ERROR: Container must run as user appuser (uid=1000, gid=1000)" >&2
+    echo "Current: uid=$(id -u), gid=$(id -g), user=$(whoami)" >&2
+    exit 1
+fi
+
+# Security: Set up secure logging with log rotation consideration
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+# Logging function for security audit trail
 log_step() {
-    echo "===== $1 ====="
+    echo "$(date -u +"%Y-%m-%d %H:%M:%S UTC") [ENTRYPOINT] $1"
 }
 
 log_step "ENVIRONMENT"

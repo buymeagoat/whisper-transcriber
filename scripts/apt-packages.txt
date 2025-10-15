@@ -1,6 +1,8 @@
 # APT package requirements for whisper-transcriber
 # Ensure all required system packages are listed here for cache and build integrity
+# Essential packages that are imported and used by the application
 ffmpeg
+libmagic1
 nodejs (>=18)
 docker-compose-plugin
 python3

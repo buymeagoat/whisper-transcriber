@@ -1,0 +1,66 @@
+# ===== whisper-transcriber requirements.txt =====
+# Optimized for actual usage - only packages that are imported and used
+# Install with:  pip install -r requirements.txt
+# ------------------------------------------------
+
+# --- Core web stack ---
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+psutil>=5.9.8
+
+# --- Multipart uploads & files ---
+python-multipart>=0.0.6
+aiofiles>=23.2.1
+
+# --- File validation (REQUIRED - used in file_validation.py) ---
+python-magic>=0.4.27
+
+# --- Database & migrations ---
+sqlalchemy>=2.0.30
+alembic>=1.13.1
+psycopg2-binary>=2.9
+
+# --- Auth / security ---
+passlib[bcrypt]>=1.7.4
+bcrypt<4
+python-jose[cryptography]>=3.5.0
+
+# --- Speech-to-text (core functionality) ---
+openai-whisper==20240930
+torch>=2.2.2
+
+# --- Audio processing ---
+pydub>=0.25.1
+
+# --- Text-to-speech ---
+pyttsx3>=2.90
+
+# --- Background task queue ---
+celery>=5.3
+
+# --- Optional: Language detection and sentiment analysis ---
+# These have fallbacks in analysis.py if not installed
+langdetect>=1.0.9
+vaderSentiment>=3.3.2
+
+# --- Optional: OpenAI API integration ---
+# Only needed if OPENAI_API_KEY is set
+openai>=1.14.3
+
+# --- Configuration management ---
+python-dotenv>=1.1.0
+pydantic-settings>=2.2.1
+
+# --- Performance: JSON serialization (FastAPI auto-detects) ---
+orjson>=3.10.0
+
+# --- Monitoring & metrics ---
+prometheus-client>=0.20.0
+
+# --- Cloud storage (AWS S3 support) ---
+boto3>=1.34.0
+
+# ------------------------------------------------
+# System prerequisite (not pip, required at runtime):
+#   sudo apt-get install -y ffmpeg libmagic1
+# ------------------------------------------------

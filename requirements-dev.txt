@@ -1,10 +1,23 @@
-pytest
-httpx
-black
-wheel
-pytest-asyncio
-coverage
-pytest-postgresql
-pytest-xdist
+# ===== Development and Testing Dependencies =====
+# Additional packages needed for development, testing, and CI/CD
+# Install with: pip install -r requirements-dev.txt
+# ------------------------------------------------
 
-psycopg[binary]>=3.1
+# --- Testing framework ---
+pytest>=7.0.0,<9.0.0
+pytest-asyncio>=0.21.0
+pytest-xdist>=3.5.0
+httpx>=0.24.0
+
+# --- Test database support ---
+pytest-postgresql>=2.5.0
+
+# --- Code formatting and quality ---
+black>=24.0.0
+wheel>=0.42.0
+
+# --- Coverage reporting ---
+coverage>=7.0.0
+
+# Note: psycopg>=3.1.0 was removed as it's not used in the codebase
+# psycopg2-binary in main requirements.txt provides PostgreSQL support

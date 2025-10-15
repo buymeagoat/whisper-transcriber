@@ -101,6 +101,12 @@ tests/assets/
 scripts/test_cache_access.sh
 
 # === Runtime Files ===
+app.db
+*.db
+*.sqlite
+*.sqlite3
+server.log
+*.log
 uploads/*.wav
 uploads/*.mp3
 uploads/*.mp4

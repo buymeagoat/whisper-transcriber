@@ -33,8 +33,13 @@ from schemas import (
     UserRegistrationSchema, UserLoginSchema, PasswordChangeSchema,
     FileUploadSchema, JobQuerySchema, JobIdSchema,
     TokenResponseSchema, UserResponseSchema, JobResponseSchema,
+    PaginatedJobsResponseSchema,
     ErrorResponseSchema, HealthResponseSchema, MetricsResponseSchema,
     create_validation_error_response, validate_request_size
+)
+from pagination import (
+    PaginationRequest, JobQueryFilters, JobPaginator,
+    PaginatedResponse, PaginationMetadata
 )
 from rate_limiter import RateLimitMiddleware, RateLimitConfig, create_development_rate_limiter
 from security_middleware import SecurityMiddleware, create_development_security_middleware, security_logger
@@ -1111,36 +1116,70 @@ async def download_transcript(job_id: str, format: str = "txt", current_user: Us
         filename=filename
     )
 
-@app.get("/jobs", response_model=List[JobResponseSchema])
+@app.get("/jobs", response_model=PaginatedJobsResponseSchema)
 async def list_jobs(
     request: Request,
-    limit: Optional[int] = 20,
-    offset: Optional[int] = 0,
+    page_size: Optional[int] = 20,
+    cursor: Optional[str] = None,
+    sort_by: Optional[str] = "created_at",
+    sort_order: Optional[str] = "desc",
+    include_total: Optional[bool] = False,
+    # Filtering parameters
     status: Optional[str] = None,
-    current_user: User = Depends(get_current_user), 
+    model_used: Optional[str] = None,
+    created_after: Optional[datetime] = None,
+    created_before: Optional[datetime] = None,
+    completed_after: Optional[datetime] = None,
+    completed_before: Optional[datetime] = None,
+    min_file_size: Optional[int] = None,
+    max_file_size: Optional[int] = None,
+    min_duration: Optional[int] = None,
+    max_duration: Optional[int] = None,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """List jobs with secure pagination and filtering"""
+    """
+    List jobs with advanced pagination and filtering.
+    
+    Supports cursor-based pagination for efficient navigation through large datasets.
+    Includes comprehensive filtering options and optional total count.
+    """
     try:
-        # Validate query parameters using secure schema
-        query_params = JobQuerySchema(
-            limit=limit,
-            offset=offset,
-            status=status
+        # Validate pagination parameters
+        pagination = PaginationRequest(
+            page_size=page_size,
+            cursor=cursor,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            include_total=include_total
         )
         
-        # Build query with security context
-        query = db.query(Job).order_by(Job.created_at.desc())
+        # Validate filtering parameters
+        filters = JobQueryFilters(
+            status=status,
+            model_used=model_used,
+            created_after=created_after,
+            created_before=created_before,
+            completed_after=completed_after,
+            completed_before=completed_before,
+            min_file_size=min_file_size,
+            max_file_size=max_file_size,
+            min_duration=min_duration,
+            max_duration=max_duration
+        )
         
-        # Apply status filter if provided
-        if query_params.status:
-            query = query.filter(Job.status == query_params.status)
+        # Build base query
+        query = db.query(Job)
         
-        # Apply pagination with security limits
-        jobs = query.offset(query_params.offset).limit(query_params.limit).all()
+        # Apply filters
+        query = filters.apply_filters(query)
         
-        # Return sanitized job data
-        return [
+        # Apply pagination
+        paginator = JobPaginator(db)
+        result = paginator.paginate_jobs(query, pagination)
+        
+        # Convert jobs to response schema
+        job_responses = [
             JobResponseSchema(
                 id=job.id,
                 filename=job.original_filename,
@@ -1149,23 +1188,147 @@ async def list_jobs(
                 created_at=job.created_at,
                 completed_at=job.completed_at,
                 file_size=job.file_size,
+                duration=job.duration,
                 error_message=job.error_message
             )
-            for job in jobs
+            for job in result['items']
         ]
+        
+        # Return paginated response
+        return PaginatedJobsResponseSchema(
+            data=job_responses,
+            pagination=result['metadata'].dict()
+        )
         
     except ValidationError as e:
         client_ip = request.client.host if request.client else "unknown"
         security_logger.log_attack_attempt(
-            attack_type="job_query_validation_bypass",
+            attack_type="job_pagination_validation_bypass",
             client_ip=client_ip,
             user_agent=request.headers.get("user-agent", "unknown"),
-            payload=f"limit:{limit}, offset:{offset}, status:{status}",
+            payload=f"page_size:{page_size}, cursor:{cursor}, sort_by:{sort_by}",
             request_path="/jobs"
         )
         
         error_response = create_validation_error_response(e)
         raise HTTPException(status_code=400, detail=error_response)
+    
+    except ValueError as e:
+        # Handle cursor validation errors
+        raise HTTPException(
+            status_code=400, 
+            detail={
+                "error": "invalid_cursor",
+                "message": str(e)
+            }
+        )
+
+@app.get("/admin/jobs", response_model=PaginatedJobsResponseSchema)
+async def admin_list_jobs(
+    request: Request,
+    page_size: Optional[int] = 20,
+    cursor: Optional[str] = None,
+    sort_by: Optional[str] = "created_at",
+    sort_order: Optional[str] = "desc",
+    include_total: Optional[bool] = True,
+    # Filtering parameters
+    status: Optional[str] = None,
+    model_used: Optional[str] = None,
+    created_after: Optional[datetime] = None,
+    created_before: Optional[datetime] = None,
+    completed_after: Optional[datetime] = None,
+    completed_before: Optional[datetime] = None,
+    min_file_size: Optional[int] = None,
+    max_file_size: Optional[int] = None,
+    min_duration: Optional[int] = None,
+    max_duration: Optional[int] = None,
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """
+    Admin endpoint: List all jobs with advanced pagination and filtering.
+    
+    Provides comprehensive access to all jobs in the system with detailed
+    filtering and pagination capabilities for administrative purposes.
+    """
+    try:
+        # Validate pagination parameters
+        pagination = PaginationRequest(
+            page_size=page_size,
+            cursor=cursor,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            include_total=include_total
+        )
+        
+        # Validate filtering parameters
+        filters = JobQueryFilters(
+            status=status,
+            model_used=model_used,
+            created_after=created_after,
+            created_before=created_before,
+            completed_after=completed_after,
+            completed_before=completed_before,
+            min_file_size=min_file_size,
+            max_file_size=max_file_size,
+            min_duration=min_duration,
+            max_duration=max_duration
+        )
+        
+        # Build base query (admin sees all jobs)
+        query = db.query(Job)
+        
+        # Apply filters
+        query = filters.apply_filters(query)
+        
+        # Apply pagination
+        paginator = JobPaginator(db)
+        result = paginator.paginate_jobs(query, pagination)
+        
+        # Convert jobs to response schema
+        job_responses = [
+            JobResponseSchema(
+                id=job.id,
+                filename=job.original_filename,
+                status=job.status,
+                model_used=job.model_used,
+                created_at=job.created_at,
+                completed_at=job.completed_at,
+                file_size=job.file_size,
+                duration=job.duration,
+                error_message=job.error_message
+            )
+            for job in result['items']
+        ]
+        
+        # Return paginated response
+        return PaginatedJobsResponseSchema(
+            data=job_responses,
+            pagination=result['metadata'].dict()
+        )
+        
+    except ValidationError as e:
+        client_ip = request.client.host if request.client else "unknown"
+        security_logger.log_attack_attempt(
+            attack_type="admin_job_pagination_validation_bypass",
+            client_ip=client_ip,
+            user_agent=request.headers.get("user-agent", "unknown"),
+            payload=f"page_size:{page_size}, cursor:{cursor}, sort_by:{sort_by}",
+            request_path="/admin/jobs"
+        )
+        
+        error_response = create_validation_error_response(e)
+        raise HTTPException(status_code=400, detail=error_response)
+    
+    except ValueError as e:
+        # Handle cursor validation errors
+        raise HTTPException(
+            status_code=400, 
+            detail={
+                "error": "invalid_cursor",
+                "message": str(e)
+            }
+        )
 
 @app.delete("/jobs/{job_id}")
 async def delete_job(

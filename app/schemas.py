@@ -40,10 +40,11 @@ class ValidationConfig:
     
     # Dangerous patterns to reject
     DANGEROUS_PATTERNS = [
-        # SQL injection patterns
+        # SQL injection patterns - more specific
         r"('|(\\x27)|(\\x2D))",
-        r"(;|\s|^)(\s)*(select|insert|update|delete|drop|create|alter|exec|execute)",
-        r"(\s|^)(union|having|order\s+by)\s",
+        r"(;|\s)(\s)*(select|insert|update|delete|drop|create|alter|exec|execute)\s",
+        r"(\s)(union|having)\s+",
+        r"order\s+by\s+[^a-zA-Z_]",  # Allow legitimate ORDER BY field names
         
         # XSS patterns  
         r"<script[^>]*>.*?</script>",
@@ -55,7 +56,7 @@ class ValidationConfig:
         r"[\\/]etc[\\/]",
         r"[\\/]proc[\\/]",
         
-        # Command injection
+        # Command injection - exclude underscore from dangerous chars
         r"[;&|`$(){}[\]\\]",
     ]
 
@@ -399,6 +400,7 @@ class JobResponseSchema(BaseSchema):
     created_at: datetime = Field(..., description="Job creation date")
     completed_at: Optional[datetime] = Field(None, description="Job completion date")
     file_size: Optional[int] = Field(None, description="File size in bytes")
+    duration: Optional[int] = Field(None, description="Audio duration in seconds")
     error_message: Optional[str] = Field(None, description="Error message if failed")
     
     @field_validator('filename', 'error_message')
@@ -408,6 +410,42 @@ class JobResponseSchema(BaseSchema):
         if v is None:
             return v
         return sanitize_string(v)
+
+
+class PaginatedJobsResponseSchema(BaseSchema):
+    """Paginated job listing response."""
+    
+    data: List[JobResponseSchema] = Field(..., description="Job data")
+    pagination: dict = Field(..., description="Pagination metadata")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "data": [
+                    {
+                        "id": "123e4567-e89b-12d3-a456-426614174000",
+                        "filename": "audio.mp3",
+                        "status": "completed",
+                        "model_used": "small",
+                        "created_at": "2025-10-15T10:00:00Z",
+                        "completed_at": "2025-10-15T10:05:00Z",
+                        "file_size": 1024000,
+                        "duration": 300,
+                        "error_message": None
+                    }
+                ],
+                "pagination": {
+                    "page_size": 20,
+                    "total_count": 100,
+                    "has_next": True,
+                    "has_previous": False,
+                    "next_cursor": "eyJpZCI6IjEyMyIsInNvcnRfdmFsdWUiOiIyMDI1LTEwLTE1VDEwOjAwOjAwWiJ9",
+                    "previous_cursor": None,
+                    "sort_by": "created_at",
+                    "sort_order": "desc"
+                }
+            }
+        }
 
 
 class ErrorResponseSchema(BaseSchema):

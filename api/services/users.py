@@ -1,0 +1,64 @@
+"""
+User management services for the Whisper Transcriber API.
+"""
+
+from typing import Optional
+from sqlalchemy.orm import Session
+from api.orm_bootstrap import get_db
+from api.models import User
+from api.utils.logger import get_system_logger
+import hashlib
+
+logger = get_system_logger("users")
+
+def hash_password(password: str) -> str:
+    """Hash a password."""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def ensure_default_admin():
+    """Ensure a default admin user exists."""
+    try:
+        # Get a database session
+        db = next(get_db())
+        
+        # Check if admin user exists
+        admin_user = db.query(User).filter(User.username == "admin").first()
+        
+        if not admin_user:
+            # Create default admin user
+            admin_user = User(
+                username="admin",
+                hashed_password=hash_password("admin123"),  # Change in production
+                role="admin",
+                must_change_password=True
+            )
+            db.add(admin_user)
+            db.commit()
+            logger.info("Created default admin user (username: admin, password: admin123)")
+        else:
+            logger.info("Admin user already exists")
+        
+        db.close()
+        
+    except Exception as e:
+        logger.error(f"Failed to ensure default admin user: {e}")
+
+def get_user_by_username(db: Session, username: str) -> Optional[User]:
+    """Get user by username."""
+    return db.query(User).filter(User.username == username).first()
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a password against its hash."""
+    return hash_password(plain_password) == hashed_password
+
+def create_user(db: Session, username: str, password: str, role: str = "user") -> User:
+    """Create a new user."""
+    user = User(
+        username=username,
+        hashed_password=hash_password(password),
+        role=role
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user

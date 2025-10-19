@@ -27,6 +27,7 @@ def register_routes(app: FastAPI) -> None:
     app.include_router(progress.router)
     app.include_router(metrics.router)
     app.include_router(auth.router)
+    app.include_router(auth.root_router)  # Add root-level auth routes
     app.include_router(users.router)
     app.include_router(audit.router, prefix="/admin", tags=["audit"])
     app.include_router(cache.router, prefix="/admin", tags=["cache"])

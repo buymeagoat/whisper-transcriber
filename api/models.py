@@ -3,13 +3,9 @@ from enum import Enum as PyEnum
 from typing import Optional
 
 from sqlalchemy import DateTime, Enum, Integer, String, Text, Float, Boolean, Index
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
-
-
-# ─── Base Class ─────────────────────────────────────────────────────────
-class Base(DeclarativeBase):
-    pass
+from api.orm_bootstrap import Base
 
 
 # ─── Users Table ─────────────────────────────────────────────────────────
@@ -89,7 +85,7 @@ class Job(Base):
 
 # ─── MVP Metadata Table ─────────────────────────────────────────────────
 class TranscriptMetadata(Base):
-    __tablename__ = "metadata"
+    __tablename__ = "transcript_metadata"
 
     job_id: Mapped[str] = mapped_column(String, ForeignKey("jobs.id"), primary_key=True)
     tokens: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -118,7 +114,7 @@ class TranscriptMetadata(Base):
 class ConfigEntry(Base):
     """Key/value storage for small configuration items."""
 
-    __tablename__ = "config"
+    __tablename__ = "config_entries"
 
     key: Mapped[str] = mapped_column(String, primary_key=True)
     value: Mapped[str] = mapped_column(String, nullable=False)

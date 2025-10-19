@@ -87,7 +87,7 @@ class FileBackupEngine:
         
         # File tracking and deduplication
         self.file_index_file = self.backup_dir / "file_index.json"
-        self.content_hash_index = self.backup_dir / "content_hash_index.json"
+        self.content_hash_index_file = self.backup_dir / "content_hash_index.json"
         self.load_indexes()
         
         # Backup queue for real-time processing
@@ -115,8 +115,8 @@ class FileBackupEngine:
             self.file_index = {}
         
         # Content hash index: maps content hashes to backup locations
-        if self.content_hash_index.exists():
-            with open(self.content_hash_index, 'r') as f:
+        if self.content_hash_index_file.exists():
+            with open(self.content_hash_index_file, 'r') as f:
                 self.content_hash_index = json.load(f)
         else:
             self.content_hash_index = {}
@@ -126,7 +126,7 @@ class FileBackupEngine:
         with open(self.file_index_file, 'w') as f:
             json.dump(self.file_index, f, indent=2, default=str)
         
-        with open(self.content_hash_index, 'w') as f:
+        with open(self.content_hash_index_file, 'w') as f:
             json.dump(self.content_hash_index, f, indent=2)
     
     def start_monitoring(self):
@@ -300,6 +300,8 @@ class FileBackupEngine:
             
         except Exception as e:
             logger.error(f"Failed to backup file {file_path}: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return None
     
     def process_backup_queue(self, compression_engine=None) -> List[Dict]:

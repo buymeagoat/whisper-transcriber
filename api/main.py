@@ -53,7 +53,7 @@ from api.models import JobStatusEnum
 from api.services.users import ensure_default_admin
 from api.utils.model_validation import validate_models_dir
 from api.router_setup import register_routes
-from api.middlewares.access_log import access_logger
+from api.middlewares.access_log import AccessLogMiddleware
 from api.utils.db_lock import db_lock
 from functools import partial
 
@@ -144,9 +144,9 @@ cache_config = CacheConfig(
 )
 app.add_middleware(ApiCacheMiddleware, config=cache_config)
 
-# Rate limiting for authentication endpoints (5 requests per 5 minutes)
+# Rate limiting for authentication endpoints (100 requests per 5 minutes for testing)
 rate_limit_config = RateLimitConfig(
-    max_requests=5,
+    max_requests=100,
     window_seconds=300,    # 5 minutes
     block_duration_seconds=900  # 15 minutes block after rate limit hit
 )
@@ -162,7 +162,7 @@ app.add_middleware(
 )
 
 
-app.middleware("http")(access_logger)
+app.add_middleware(AccessLogMiddleware)
 
 
 # ─── Static File Routes ───

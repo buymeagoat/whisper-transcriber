@@ -101,6 +101,7 @@ class CompressionEngine:
             space_saved = original_size - compressed_size
             
             stats = {
+                "success": True,
                 "input_file": str(input_path),
                 "output_file": str(output_path),
                 "original_size": original_size,
@@ -121,7 +122,12 @@ class CompressionEngine:
             
         except Exception as e:
             logger.error(f"Compression failed: {e}")
-            raise
+            return {
+                "success": False,
+                "error": str(e),
+                "input_file": str(input_path),
+                "output_file": str(output_path) if output_path else None
+            }
     
     def decompress_file(self, input_path: Path, output_path: Optional[Path] = None) -> Dict:
         """

@@ -8,6 +8,9 @@ pytest>=7.0.0,<9.0.0
 pytest-asyncio>=0.21.0
 pytest-xdist>=3.5.0
 httpx>=0.24.0
+aiohttp>=3.8.0
+websockets>=12.0
+psutil>=5.9.0
 
 # --- Test database support ---
 pytest-postgresql>=2.5.0

@@ -1,0 +1,261 @@
+name: Architecture Documentation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run weekly on Sunday at 2 AM UTC
+    - cron: '0 2 * * 0'
+
+jobs:
+  inventory-scan:
+    name: Generate Architecture Inventory
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Run inventory scanner
+        run: |
+          python tools/repo_inventory.py
+          
+      - name: Validate inventory format
+        run: |
+          python -c "
+          import json
+          with open('docs/architecture/INVENTORY.json') as f:
+              data = json.load(f)
+              print(f'✅ Inventory valid: {data[\"statistics\"]}')
+          "
+          
+      - name: Check for significant changes
+        if: github.event_name == 'pull_request'
+        run: |
+          # Download main branch inventory for comparison
+          curl -s -f -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3.raw" \
+            "https://api.github.com/repos/${{ github.repository }}/contents/docs/architecture/INVENTORY.json?ref=main" \
+            -o main_inventory.json || echo "{}" > main_inventory.json
+            
+          # Compare inventories
+          python -c "
+          import json
+          import sys
+          
+          try:
+              with open('main_inventory.json') as f:
+                  main_data = json.load(f)
+              with open('docs/architecture/INVENTORY.json') as f:
+                  pr_data = json.load(f)
+                  
+              main_stats = main_data.get('statistics', {})
+              pr_stats = pr_data.get('statistics', {})
+              
+              changes = []
+              for key in ['total_modules', 'total_functions', 'total_api_endpoints']:
+                  main_val = main_stats.get(key, 0)
+                  pr_val = pr_stats.get(key, 0)
+                  if main_val != pr_val:
+                      changes.append(f'{key}: {main_val} → {pr_val}')
+              
+              if changes:
+                  print('📊 Architecture Changes Detected:')
+                  for change in changes:
+                      print(f'  - {change}')
+              else:
+                  print('✅ No significant architecture changes')
+                  
+          except Exception as e:
+              print(f'⚠️  Could not compare inventories: {e}')
+          "
+          
+      - name: Upload inventory artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: architecture-inventory-${{ github.sha }}
+          path: docs/architecture/INVENTORY.json
+          retention-days: 30
+          
+      - name: Commit updated inventory (main branch only)
+        if: github.ref == 'refs/heads/main' && github.event_name != 'schedule'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if git diff --quiet docs/architecture/INVENTORY.json; then
+            echo "📄 No inventory changes to commit"
+          else
+            git add docs/architecture/INVENTORY.json
+            git commit -m "chore(docs): update architecture inventory [skip ci]"
+            git push
+            echo "📄 Updated architecture inventory committed"
+          fi
+
+  documentation-validation:
+    name: Validate Architecture Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Validate Mermaid diagrams
+        uses: mermaid-js/mermaid-cli@v10.6.1
+        with:
+          args: --version
+          
+      - name: Check diagram syntax
+        run: |
+          # Extract and validate Mermaid diagrams from ARCHITECTURE.md
+          python -c "
+          import re
+          
+          with open('docs/architecture/ARCHITECTURE.md') as f:
+              content = f.read()
+              
+          # Find all mermaid code blocks
+          mermaid_blocks = re.findall(r'```mermaid\n(.*?)\n```', content, re.DOTALL)
+          
+          if not mermaid_blocks:
+              print('⚠️  No Mermaid diagrams found')
+              exit(0)
+              
+          print(f'📊 Found {len(mermaid_blocks)} Mermaid diagrams')
+          
+          for i, block in enumerate(mermaid_blocks, 1):
+              # Basic syntax validation
+              if not block.strip():
+                  print(f'❌ Diagram {i}: Empty diagram')
+                  exit(1)
+              elif not any(keyword in block for keyword in ['graph', 'flowchart', 'sequenceDiagram', 'stateDiagram']):
+                  print(f'⚠️  Diagram {i}: Unknown diagram type')
+              else:
+                  print(f'✅ Diagram {i}: Valid syntax')
+          "
+          
+      - name: Validate document links
+        run: |
+          # Check internal links in architecture documents
+          python -c "
+          import re
+          import os
+          from pathlib import Path
+          
+          docs_dir = Path('docs/architecture')
+          markdown_files = list(docs_dir.glob('*.md'))
+          
+          errors = []
+          
+          for md_file in markdown_files:
+              content = md_file.read_text()
+              
+              # Find markdown links
+              links = re.findall(r'\[([^\]]+)\]\(([^)]+)\)', content)
+              
+              for link_text, link_url in links:
+                  # Check internal file links
+                  if link_url.startswith('..') or (link_url.endswith('.md') and not link_url.startswith('http')):
+                      target_path = (md_file.parent / link_url).resolve()
+                      if not target_path.exists():
+                          errors.append(f'{md_file.name}: Broken link [{link_text}]({link_url})')
+          
+          if errors:
+              print('❌ Broken links found:')
+              for error in errors:
+                  print(f'  - {error}')
+              exit(1)
+          else:
+              print('✅ All internal links valid')
+          "
+          
+      - name: Check document freshness
+        if: github.event_name == 'schedule'
+        run: |
+          # Warn if documents haven't been updated recently
+          python -c "
+          from datetime import datetime, timedelta
+          from pathlib import Path
+          import os
+          
+          docs_dir = Path('docs/architecture')
+          week_ago = datetime.now() - timedelta(days=7)
+          
+          stale_docs = []
+          
+          for doc in docs_dir.glob('*.md'):
+              # Get last modified time
+              mtime = datetime.fromtimestamp(os.path.getmtime(doc))
+              if mtime < week_ago:
+                  days_old = (datetime.now() - mtime).days
+                  stale_docs.append(f'{doc.name} ({days_old} days old)')
+          
+          if stale_docs:
+              print('📅 Potentially stale documents:')
+              for doc in stale_docs:
+                  print(f'  - {doc}')
+              print('Consider reviewing for updates')
+          else:
+              print('✅ All documents recently updated')
+          "
+
+  api-contract-validation:
+    name: Validate API Contracts
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install jsonschema
+          
+      - name: Extract API contracts from ICD
+        run: |
+          # Simple validation that ICD.md contains valid TypeScript interfaces
+          python -c "
+          import re
+          
+          with open('docs/architecture/ICD.md') as f:
+              content = f.read()
+              
+          # Find TypeScript interface blocks
+          interfaces = re.findall(r'```typescript\n(.*?)\n```', content, re.DOTALL)
+          
+          print(f'📋 Found {len(interfaces)} API contract definitions')
+          
+          # Basic validation - check for required fields
+          for i, interface in enumerate(interfaces, 1):
+              if 'interface' in interface and '{' in interface and '}' in interface:
+                  print(f'✅ Contract {i}: Valid structure')
+              else:
+                  print(f'⚠️  Contract {i}: Potential syntax issues')
+          "
+          
+      - name: Check for breaking changes
+        run: |
+          # Compare current API endpoints with documented contracts
+          echo '🔍 Checking for API contract compliance...'
+          echo 'This would validate actual endpoints against ICD specifications'
+          echo 'Implementation depends on OpenAPI/Swagger integration'

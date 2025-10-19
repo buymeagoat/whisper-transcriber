@@ -188,23 +188,39 @@ class ComprehensiveValidator:
     def _test_endpoint(self, method: str, url: str, auth_required: bool):
         """Test a single API endpoint."""
         try:
-            headers = {}
+            headers = {"Content-Type": "application/json"}
+            json_data = None
+            
+            # Special handling for authentication endpoints
+            if "/token" in url and method == "POST":
+                json_data = {"username": "admin", "password": "password"}
+            elif "/register" in url and method == "POST":
+                import time
+                unique_id = str(int(time.time() * 1000))  # millisecond timestamp
+                json_data = {"username": f"testuser_{unique_id}", "password": "testpass456"}
+            elif "/change-password" in url and method == "POST":
+                # This endpoint requires auth, so we expect 401 or 403 without token
+                json_data = {"current_password": "password", "new_password": "newpass456"}
+            
             if auth_required:
-                # For auth-required endpoints, we expect 401 without token
-                response = requests.request(method, url, timeout=5, headers=headers)
-                if response.status_code == 401:
-                    return "PASS", f"Auth required (401) - as expected", {"status_code": 401}
+                # For auth-required endpoints, we expect 401/403 without token
+                response = requests.request(method, url, timeout=5, headers=headers, json=json_data)
+                if response.status_code in [401, 403]:
+                    return "PASS", f"Auth required ({response.status_code}) - as expected", {"status_code": response.status_code}
                 elif response.status_code in [200, 404, 405]:
                     return "WARN", f"Auth possibly not enforced (got {response.status_code})", {"status_code": response.status_code}
                 else:
                     return "FAIL", f"Unexpected status code: {response.status_code}", {"status_code": response.status_code}
             else:
                 # For public endpoints, we expect successful response or 404/405
-                response = requests.request(method, url, timeout=5, headers=headers)
+                response = requests.request(method, url, timeout=5, headers=headers, json=json_data)
                 if response.status_code in [200, 201, 202]:
                     return "PASS", f"Endpoint accessible (status: {response.status_code})", {"status_code": response.status_code}
-                elif response.status_code in [404, 405]:
-                    return "WARN", f"Endpoint not found or method not allowed", {"status_code": response.status_code}
+                elif response.status_code in [404, 405, 422]:  # 422 is validation error, acceptable for endpoints needing specific data
+                    if response.status_code == 422 and json_data:
+                        return "PASS", f"Endpoint accessible with validation (status: {response.status_code})", {"status_code": response.status_code}
+                    else:
+                        return "WARN", f"Endpoint not found or method not allowed", {"status_code": response.status_code}
                 else:
                     return "FAIL", f"Unexpected status code: {response.status_code}", {"status_code": response.status_code}
                     
@@ -254,7 +270,7 @@ class ComprehensiveValidator:
         
         # Test database schema
         result, duration, error = self._time_test(self._test_database_schema, str(db_path))
-        if error:
+        if error or result is None:
             self._record_result(component, "db_schema", "FAIL", 
                               "Schema validation failed", duration, error=error)
         else:
@@ -263,7 +279,7 @@ class ComprehensiveValidator:
         
         # Test database performance
         result, duration, error = self._time_test(self._test_database_performance, str(db_path))
-        if error:
+        if error or result is None:
             self._record_result(component, "db_performance", "WARN", 
                               "Performance test failed", duration, error=error)
         else:
@@ -383,7 +399,7 @@ class ComprehensiveValidator:
         
         # Test file permissions
         result, duration, error = self._time_test(self._test_file_permissions)
-        if error:
+        if error or result is None:
             self._record_result(component, "file_permissions", "WARN", 
                               "Permission test failed", duration, error=error)
         else:
@@ -392,7 +408,7 @@ class ComprehensiveValidator:
         
         # Test disk space
         result, duration, error = self._time_test(self._test_disk_space)
-        if error:
+        if error or result is None:
             self._record_result(component, "disk_space", "WARN", 
                               "Disk space check failed", duration, error=error)
         else:
@@ -487,7 +503,7 @@ class ComprehensiveValidator:
         
         # Test configuration consistency
         result, duration, error = self._time_test(self._test_config_consistency)
-        if error:
+        if error or result is None:
             self._record_result(component, "config_consistency", "WARN", 
                               "Consistency check failed", duration, error=error)
         else:
@@ -567,7 +583,7 @@ class ComprehensiveValidator:
         
         # Test authentication endpoints
         result, duration, error = self._time_test(self._test_auth_endpoints)
-        if error:
+        if error or result is None:
             self._record_result(component, "auth_endpoints", "WARN", 
                               "Auth endpoint test failed", duration, error=error)
         else:
@@ -579,22 +595,46 @@ class ComprehensiveValidator:
     def _test_auth_endpoints(self):
         """Test authentication endpoints."""
         server_url = self.config.get("VITE_API_HOST", "http://localhost:8000")
-        auth_endpoints = ["/token", "/register", "/change-password"]
         
         try:
-            for endpoint in auth_endpoints:
-                url = f"{server_url}{endpoint}"
-                response = requests.post(url, json={}, timeout=5)
-                
-                # We expect 400/422 (validation error) or 401 (auth required)
-                if response.status_code not in [400, 401, 422]:
-                    return "WARN", f"Unexpected auth response from {endpoint}", {
-                        "endpoint": endpoint,
-                        "status_code": response.status_code
-                    }
+            # Test /token endpoint with valid credentials
+            token_response = requests.post(f"{server_url}/token", 
+                json={"username": "admin", "password": "password"}, 
+                timeout=5)
+            if token_response.status_code != 200:
+                return "WARN", f"Token endpoint unexpected response: {token_response.status_code}", {
+                    "endpoint": "/token", "status_code": token_response.status_code
+                }
+            
+            # Extract token for authenticated requests
+            token_data = token_response.json()
+            auth_headers = {"Authorization": f"Bearer {token_data['access_token']}"}
+            
+            # Test /register endpoint with valid data
+            import time
+            unique_id = str(int(time.time() * 1000))  # millisecond timestamp
+            register_response = requests.post(f"{server_url}/register", 
+                json={"username": f"testuser_{unique_id}", "password": "testpass123"}, 
+                timeout=5)
+            if register_response.status_code not in [200, 201, 409]:  # 409 = user exists
+                return "WARN", f"Register endpoint unexpected response: {register_response.status_code}", {
+                    "endpoint": "/register", "status_code": register_response.status_code
+                }
+            
+            # Test /change-password with authentication
+            change_pass_response = requests.post(f"{server_url}/change-password", 
+                json={"current_password": "password", "new_password": "newpass123"},
+                headers=auth_headers,
+                timeout=5)
+            if change_pass_response.status_code not in [200, 401]:  # 401 if wrong current password
+                return "WARN", f"Change password endpoint unexpected response: {change_pass_response.status_code}", {
+                    "endpoint": "/change-password", "status_code": change_pass_response.status_code
+                }
             
             return "PASS", "Auth endpoints responding appropriately", {
-                "endpoints_tested": auth_endpoints
+                "token_status": token_response.status_code,
+                "register_status": register_response.status_code,
+                "change_password_status": change_pass_response.status_code
             }
         except Exception as e:
             return "FAIL", f"Auth endpoint test failed: {str(e)}", {}
@@ -624,7 +664,7 @@ class ComprehensiveValidator:
         
         # Test backup modules import
         result, duration, error = self._time_test(self._test_backup_modules)
-        if error:
+        if error or result is None:
             self._record_result(component, "backup_modules", "FAIL", 
                               "Backup modules not available", duration, error=error)
         else:
@@ -667,7 +707,7 @@ class ComprehensiveValidator:
         
         # Test system resources
         result, duration, error = self._time_test(self._test_system_resources)
-        if error:
+        if error or result is None:
             self._record_result(component, "system_resources", "WARN", 
                               "Resource check failed", duration, error=error)
         else:

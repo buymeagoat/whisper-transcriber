@@ -190,10 +190,13 @@ class ComprehensiveValidator:
         try:
             headers = {"Content-Type": "application/json"}
             json_data = None
+            form_data = None
             
             # Special handling for authentication endpoints
             if "/token" in url and method == "POST":
-                json_data = {"username": "admin", "password": "password"}
+                # OAuth2 token endpoint expects form data, not JSON
+                form_data = {"username": "admin", "password": "password"}
+                headers = {}  # Don't set Content-Type for form data
             elif "/register" in url and method == "POST":
                 import time
                 unique_id = str(int(time.time() * 1000))  # millisecond timestamp
@@ -204,7 +207,10 @@ class ComprehensiveValidator:
             
             if auth_required:
                 # For auth-required endpoints, we expect 401/403 without token
-                response = requests.request(method, url, timeout=5, headers=headers, json=json_data)
+                if form_data:
+                    response = requests.request(method, url, timeout=5, headers=headers, data=form_data)
+                else:
+                    response = requests.request(method, url, timeout=5, headers=headers, json=json_data)
                 if response.status_code in [401, 403]:
                     return "PASS", f"Auth required ({response.status_code}) - as expected", {"status_code": response.status_code}
                 elif response.status_code in [200, 404, 405]:
@@ -213,11 +219,14 @@ class ComprehensiveValidator:
                     return "FAIL", f"Unexpected status code: {response.status_code}", {"status_code": response.status_code}
             else:
                 # For public endpoints, we expect successful response or 404/405
-                response = requests.request(method, url, timeout=5, headers=headers, json=json_data)
+                if form_data:
+                    response = requests.request(method, url, timeout=5, headers=headers, data=form_data)
+                else:
+                    response = requests.request(method, url, timeout=5, headers=headers, json=json_data)
                 if response.status_code in [200, 201, 202]:
                     return "PASS", f"Endpoint accessible (status: {response.status_code})", {"status_code": response.status_code}
                 elif response.status_code in [404, 405, 422]:  # 422 is validation error, acceptable for endpoints needing specific data
-                    if response.status_code == 422 and json_data:
+                    if response.status_code == 422 and (json_data or form_data):
                         return "PASS", f"Endpoint accessible with validation (status: {response.status_code})", {"status_code": response.status_code}
                     else:
                         return "WARN", f"Endpoint not found or method not allowed", {"status_code": response.status_code}

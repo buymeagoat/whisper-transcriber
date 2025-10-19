@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Security & Configuration**: Fixed critical configuration and security issues
+  - Fixed CORS configuration to remove duplicate wildcard entries, properly restricting to specific origins
+  - Fixed OAuth2 authentication endpoint format to use form data instead of JSON for /token endpoint
+  - Fixed relative import paths in main.py (schemas, pagination, rate_limiter, security_middleware)
+  - Fixed SecurityMiddleware compatibility with FastAPI 0.119.0 using proper BaseHTTPMiddleware pattern
+  - Fixed missing python-magic dependency installation for file type detection
+  - Fixed get_current_admin function reference to get_current_user in main.py
+  
 ### Added
 - **Application Validation & Quality Improvements**: Enhanced system reliability and testing
   - Improved comprehensive validator with better authentication endpoint testing

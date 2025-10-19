@@ -374,12 +374,12 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             
             # Check request timeout
             if time.time() - start_time > SecurityConfig.MAX_REQUEST_TIMEOUT:
-                raise HTTPException(
+                return JSONResponse(
                     status_code=408,
-                    detail="Request timeout"
+                    content={"error": "request_timeout", "message": "Request timeout"}
                 )
             
-            # Process request
+            # Process request through the application
             response = await call_next(request)
             
             # Add security headers
@@ -394,9 +394,12 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             
             return response
             
-        except HTTPException:
-            # Re-raise HTTP exceptions (validation failures)
-            raise
+        except HTTPException as e:
+            # Handle validation failures
+            return JSONResponse(
+                status_code=e.status_code,
+                content={"error": "validation_error", "message": e.detail}
+            )
             
         except Exception as e:
             # Log unexpected errors
@@ -514,8 +517,8 @@ class SecurityEventLogger:
 def create_security_middleware(
     enable_strict_validation: bool = True,
     custom_config: Optional[Dict[str, Any]] = None
-) -> SecurityMiddleware:
-    """Create security middleware with configuration."""
+) -> type:
+    """Create security middleware class with configuration."""
     config = custom_config or {}
     
     if enable_strict_validation:
@@ -524,20 +527,11 @@ def create_security_middleware(
         config.setdefault("max_json_depth", 5)
         config.setdefault("max_array_length", 100)
     
-    return SecurityMiddleware(None, config)
-
-
-def create_development_security_middleware() -> SecurityMiddleware:
-    """Create lenient security middleware for development."""
-    config = {
-        "max_request_size": SecurityConfig.MAX_REQUEST_SIZE,
-        "max_json_depth": 20,  # More lenient for development
-        "max_array_length": 10000,
-        "enable_attack_detection": True,
-        "log_all_requests": True
-    }
+    class ConfiguredSecurityMiddleware(SecurityMiddleware):
+        def __init__(self, app):
+            super().__init__(app, config)
     
-    return SecurityMiddleware(None, config)
+    return ConfiguredSecurityMiddleware
 
 
 # Global security event logger instance

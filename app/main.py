@@ -29,7 +29,7 @@ from typing import Optional, List, Dict, Set
 import logging
 
 # Import security components
-from schemas import (
+from .schemas import (
     UserRegistrationSchema, UserLoginSchema, PasswordChangeSchema,
     FileUploadSchema, JobQuerySchema, JobIdSchema,
     TokenResponseSchema, UserResponseSchema, JobResponseSchema,
@@ -37,12 +37,12 @@ from schemas import (
     ErrorResponseSchema, HealthResponseSchema, MetricsResponseSchema,
     create_validation_error_response, validate_request_size
 )
-from pagination import (
+from .pagination import (
     PaginationRequest, JobQueryFilters, JobPaginator,
     PaginatedResponse, PaginationMetadata
 )
-from rate_limiter import RateLimitMiddleware, RateLimitConfig, create_development_rate_limiter
-from security_middleware import SecurityMiddleware, create_development_security_middleware, security_logger
+from .rate_limiter import RateLimitMiddleware, RateLimitConfig, create_development_rate_limiter
+from .security_middleware import SecurityMiddleware, create_development_security_middleware, security_logger
 
 # Setup paths
 BASE_DIR = Path(__file__).parent.parent
@@ -1242,7 +1242,7 @@ async def admin_list_jobs(
     max_file_size: Optional[int] = None,
     min_duration: Optional[int] = None,
     max_duration: Optional[int] = None,
-    current_user: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """

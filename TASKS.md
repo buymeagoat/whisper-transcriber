@@ -3,8 +3,52 @@
 > **📋 SINGLE SOURCE OF TRUTH for all issues, TODOs, and tasks**  
 > **Last Updated**: 2025-10-19  
 > **Status**: Active Development - 87.1% System Health  
+> **Quick Nav**: [🚨 Critical](#critical-issues-high-risk) | [📋 Current Tasks](#current-priorities) | [🔧 Testing](#enhanced-validator-requirements) | [📊 Status](#current-system-status)
 
 ## 🎯 **Current Priorities**
+
+### **🔥 IMMEDIATE (This Week)**
+- [ ] **T001**: Fix server startup reliability for consistent validator testing
+- [ ] **T002**: Create authentication UI foundation (LoginPage.jsx, RegisterPage.jsx)
+- [ ] **T003**: Implement frontend build process and development environment
+
+### **📅 SHORT-TERM (Next 2 Weeks)**
+- [ ] **T004**: Build user dashboard with statistics and job management  
+- [ ] **T005**: Add user settings page with password change functionality  
+- [ ] **T006**: Implement complete frontend-backend authentication flow integration
+
+---
+
+## 🗂️ **Quick Reference for GitHub Copilot**
+
+### **🎯 Most Urgent Issues**
+1. **Server Reliability** → T001 (Fix startup/shutdown in test environment)
+2. **No User Authentication UI** → T002 (90% of backend features inaccessible)  
+3. **Frontend Dev Environment** → T003 (Cannot develop frontend efficiently)
+
+### **📁 Key Files for Development**
+- **Frontend Auth**: `frontend/src/components/auth/` (needs creation)  
+- **Server Entry**: `scripts/server_entry.py` (startup reliability)  
+- **Validator**: `comprehensive_validator.py` (enhance for frontend testing)  
+- **Main API**: `api/main.py` (backend endpoints ready)  
+
+### **🔧 Development Commands**
+```bash
+# Start development server (currently unreliable)
+docker-compose up -d  
+
+# Run comprehensive validator 
+python comprehensive_validator.py  
+
+# Frontend development (needs setup)
+cd frontend && npm run dev  
+```
+
+### **📊 Current System Health**
+- **Backend**: 87.1% validator success (27/31 tests)
+- **Frontend**: ~20% user functionality available
+- **Integration**: ~5% (upload/download only)
+- **Target**: 100% comprehensive coverage
 
 ### **Phase 1: Critical User Access (URGENT)**
 - [ ] **T001**: Create authentication UI (LoginPage.jsx, RegisterPage.jsx)  
@@ -25,34 +69,88 @@
 
 ---
 
-## 🚨 **Critical Issues (HIGH RISK)**
+## 🚨 **Critical Issues (High Risk)**
+
+### **❌ SERVER RELIABILITY ISSUES**
+**Current State**: 4/31 validator tests fail due to server connectivity  
+**Impact**: Cannot reliably test system functionality  
+**Root Cause**: FastAPI server startup/shutdown not stable in test environment
 
 ### **Backend Functions Missing Frontend Access**
 - **Issue**: Users cannot access 75% of backend functionality
 - **Impact**: Application appears limited despite extensive backend capabilities
 - **Root Cause**: No frontend UI for authentication, admin, or system management
 
-#### **T001: Authentication UI - BLOCKING ALL USER ACCESS**
-- **Status**: 🔴 CRITICAL - Users cannot log in
-- **Description**: Backend has full auth system, but no login interface
-- **Requirements**:
-  - LoginPage.jsx with form validation
-  - RegisterPage.jsx for new users
-  - Password change interface
-  - Session management
-- **Files Needed**: 
-  - `web/src/pages/LoginPage.jsx`
-  - `web/src/pages/RegisterPage.jsx` 
-  - `web/src/pages/SettingsPage.jsx`
-- **Backend APIs**: `/token`, `/register`, `/change-password` (all working)
-- **Acceptance Criteria**:
-  - [ ] Users can register new accounts
-  - [ ] Users can log in with credentials
-  - [ ] Users can change passwords
-  - [ ] JWT tokens properly managed
-  - [ ] Error handling for auth failures
+### **T001: Fix Server Startup Reliability**  
+**Priority**: Critical (Blocks testing workflow)  
+**Risk**: High (Cannot validate system health)  
+**Estimated Time**: 1 day  
 
-#### **T002: User Dashboard - NO USER MANAGEMENT**
+**Current State**: FastAPI server fails to start consistently in test environment  
+**Error Context**: 4/31 validator tests fail due to connection refused on localhost:8000  
+**Dependencies**: None (foundational issue)  
+
+**Specific Tasks**:
+- [ ] Fix docker-compose service dependencies and health checks  
+- [ ] Ensure proper server shutdown handling in scripts/server_entry.py  
+- [ ] Add retry logic and proper error handling to comprehensive_validator.py  
+- [ ] Test server startup in both development and production modes  
+
+**Acceptance Criteria**:
+- [ ] Comprehensive validator achieves 100% success rate (31/31 tests)  
+- [ ] Server starts reliably within 5 seconds  
+- [ ] Server can be stopped and restarted without issues  
+- [ ] All API endpoints respond correctly after startup  
+
+---
+
+### **T003: Frontend Development Environment Setup**  
+**Priority**: Critical (Blocks frontend development)  
+**Risk**: High (Cannot develop frontend features)  
+**Estimated Time**: 1 day  
+**Dependencies**: None (parallel with T001-T002)  
+
+**Current State**: Basic React setup exists but needs proper build process and dev tools  
+**Missing Components**: Hot reload, proper routing, state management, dev server integration  
+
+**Specific Tasks**:
+- [ ] Configure Vite dev server with proper proxy to backend API  
+- [ ] Set up React Router for SPA navigation  
+- [ ] Configure environment variables for development/production  
+- [ ] Set up ESLint and Prettier for code quality  
+- [ ] Add proper build scripts for production deployment  
+
+**Acceptance Criteria**:
+- [ ] `npm run dev` starts development server with hot reload  
+- [ ] `npm run build` creates optimized production build  
+- [ ] API calls properly routed to backend during development  
+- [ ] Environment-specific configuration works correctly  
+
+---
+
+### **T004: User Dashboard Creation**  
+**Priority**: High (Core user experience)  
+**Risk**: Medium (Users can't see system status/jobs)  
+**Estimated Time**: 2-3 days  
+**Dependencies**: T002 (authentication), T003 (dev environment)  
+
+**Current State**: Frontend only shows upload/download, backend has full job management API  
+**Components Needed**: Dashboard.jsx, JobList.jsx, StatisticsCard.jsx  
+**Backend Ready**: `/api/jobs/`, `/api/admin/stats`, `/api/user/settings` endpoints  
+
+**Specific Tasks**:
+- [ ] Create Dashboard.jsx with job overview and user statistics  
+- [ ] Build JobList.jsx component with filtering and pagination  
+- [ ] Add StatisticsCard.jsx for displaying user metrics  
+- [ ] Implement real-time job status updates using WebSocket or polling  
+- [ ] Add job actions (delete, re-download, view details)  
+
+**Acceptance Criteria**:
+- [ ] Dashboard shows user's transcription jobs and status  
+- [ ] Users can view job progress and download completed results  
+- [ ] Basic user statistics displayed (total jobs, success rate, etc.)  
+- [ ] Integration with job management API endpoints  
+- [ ] Real-time updates for job status changes#### **T002: User Dashboard - NO USER MANAGEMENT**
 - **Status**: 🔴 HIGH - Users have no access to their data
 - **Description**: Users cannot view stats, manage jobs, or access account info
 - **Requirements**:
@@ -135,6 +233,17 @@
 ---
 
 ## 🔧 **Enhanced Validator Requirements**
+
+### **❌ CURRENT VALIDATOR LIMITATIONS**
+**Status**: 87.1% success rate (27/31 tests passing)  
+**Missing Coverage**: Frontend functionality, user workflows, integration scenarios  
+**Critical Gap**: Tests connectivity but not actual user experience  
+
+**Server-Dependent Failures**:
+- api_endpoints test - connection refused localhost:8000
+- security authentication test - server unavailable  
+- performance endpoints test - timing out
+- Overall health check - inconsistent results
 
 ### **T009: Frontend Integration Testing**
 - **Status**: 🟡 MEDIUM - Validator missing frontend coverage
@@ -247,7 +356,48 @@
 
 ---
 
-## 📝 **Change Log - Completed Items**
+## � **Production & Deployment (Future Phases)**
+
+### **T024: Production Environment Setup**  
+**Priority**: Future (Phase 4)  
+**Risk**: Medium (Production deployment concerns)  
+**Dependencies**: All Phase 1-3 tasks complete  
+
+**Missing Infrastructure**:
+- [ ] Production Docker configuration and optimization  
+- [ ] Environment variable management for production  
+- [ ] SSL/TLS certificate setup and renewal  
+- [ ] Load balancer configuration  
+- [ ] Database backup and disaster recovery procedures  
+- [ ] Monitoring and alerting setup (Prometheus/Grafana)  
+- [ ] CI/CD pipeline for automated deployments  
+
+### **T025: Performance Optimization**  
+**Priority**: Future (Phase 4)  
+**Risk**: Low (Performance under load unknown)  
+
+**Optimization Areas**:
+- [ ] Frontend bundle size optimization  
+- [ ] API response caching strategies  
+- [ ] Database query optimization for high load  
+- [ ] Websocket connection scaling  
+- [ ] File upload optimization for large files  
+
+### **T026: Security Hardening**  
+**Priority**: Future (Phase 4)  
+**Risk**: High (Production security requirements)  
+
+**Security Enhancements**:
+- [ ] Rate limiting implementation  
+- [ ] Input validation hardening  
+- [ ] CSRF protection enhancement  
+- [ ] API key management system  
+- [ ] Audit logging for all user actions  
+- [ ] Security headers and content security policy  
+
+---
+
+## �📝 **Change Log - Completed Items**
 
 ### **2025-10-19: Configuration & Security Fixes**
 - ✅ Fixed CORS configuration security issues

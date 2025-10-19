@@ -413,7 +413,8 @@ class BackupService:
         """Handle shutdown signals gracefully."""
         logger.info(f"Received signal {signum}, shutting down gracefully...")
         self.stop()
-        sys.exit(0)
+        # Removed sys.exit(0) to prevent FastAPI server crashes
+        # Let the main process handle the shutdown gracefully
 
 
 # Global backup service instance

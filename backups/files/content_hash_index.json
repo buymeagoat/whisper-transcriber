@@ -28,5 +28,60 @@
     "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_151541_api.log.gz",
     "first_seen": "2025-10-19T15:15:41.624993",
     "reference_count": 1
+  },
+  "957fcfc0dce492f06a4cfedbfdacaeb1d5f653c19c4c0ef423d0ae9478266cf3": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_165757_api.log.zst",
+    "first_seen": "2025-10-19T16:57:57.547460",
+    "reference_count": 1
+  },
+  "0e8ba84caa865bde8e363f3e410b31f08b1bc14a63f689112b97278a73a27e1b": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_165757_server.log.zst",
+    "first_seen": "2025-10-19T16:57:57.575373",
+    "reference_count": 1
+  },
+  "a9660ee1a8d7339111257a17900f20ffe2b1fa15d82565aead3cee0fbb5965d3": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_165757_validation_report_20251019_164250.json.zst",
+    "first_seen": "2025-10-19T16:57:57.590741",
+    "reference_count": 1
+  },
+  "6c9b751e3c88ec45c27cbda4e45d701e950dde8d5e8a45d0c79888f4aedd15fa": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_171310_api.log.zst",
+    "first_seen": "2025-10-19T17:13:10.309286",
+    "reference_count": 1
+  },
+  "bb9e35faca0d21e6ab9c9cc9da17152c58700638f4ea23f1e93b3d716c8b0971": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_171310_server.log.zst",
+    "first_seen": "2025-10-19T17:13:10.331506",
+    "reference_count": 1
+  },
+  "7116e4420e1c1a2f8d7c57763506e4c78afcac9b6cb39dd6d033ea0afb9a256a": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_174336_api.log.zst",
+    "first_seen": "2025-10-19T17:43:36.395350",
+    "reference_count": 1
+  },
+  "a0d0975737a36bd7eb13743765a1c00d4ae06e683f62a408d2a69cfb7835e73b": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_174336_server.log.zst",
+    "first_seen": "2025-10-19T17:43:36.400983",
+    "reference_count": 1
+  },
+  "e7a754e5f0857787282df6b138d50d2bb3911ea212bfd2f4f28cf91df5b58743": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_184426_api.log.zst",
+    "first_seen": "2025-10-19T18:44:26.667922",
+    "reference_count": 1
+  },
+  "35b9e6dc1df16949c1ec9860d46fcd30f8f006edba052dc6a060594ac117565e": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_184426_server.log.zst",
+    "first_seen": "2025-10-19T18:44:26.677784",
+    "reference_count": 1
+  },
+  "bbadce30b6d11709128a861daf3e4db2aeed4f5de604e071a9fe512bd0ee61f4": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_193003_api.log.zst",
+    "first_seen": "2025-10-19T19:30:03.246223",
+    "reference_count": 1
+  },
+  "5619c670f86f9427eb5e5f6d73b9a5639c0bb623eed121b93a460a3f85bea6a4": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251019_193003_server.log.zst",
+    "first_seen": "2025-10-19T19:30:03.251479",
+    "reference_count": 1
   }
 }

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test</title>
+</head>
+<body>
+    <h1>Simple Test Page</h1>
+    <script>
+        fetch('/api/health')
+            .then(r => r.json())
+            .then(data => console.log('Backend health:', data))
+            .catch(e => console.log('Backend error:', e));
+    </script>
+</body>
+</html>

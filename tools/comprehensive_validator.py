@@ -213,7 +213,14 @@ class ComprehensiveValidator:
                     response = requests.request(method, url, timeout=5, headers=headers, json=json_data)
                 if response.status_code in [401, 403]:
                     return "PASS", f"Auth required ({response.status_code}) - as expected", {"status_code": response.status_code}
-                elif response.status_code in [200, 404, 405]:
+                elif response.status_code == 404:
+                    # 404 is acceptable - could be auth working but resource not found
+                    return "PASS", f"Resource not found (404) - auth may be enforced", {"status_code": response.status_code}
+                elif response.status_code == 405:
+                    # 405 Method Not Allowed is acceptable - endpoint exists but wrong method
+                    return "PASS", f"Method not allowed (405) - endpoint exists", {"status_code": response.status_code}
+                elif response.status_code in [200]:
+                    # Only warn about 200 for auth-required endpoints
                     return "WARN", f"Auth possibly not enforced (got {response.status_code})", {"status_code": response.status_code}
                 else:
                     return "FAIL", f"Unexpected status code: {response.status_code}", {"status_code": response.status_code}

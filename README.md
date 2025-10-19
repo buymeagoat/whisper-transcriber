@@ -54,11 +54,19 @@ The application uses **SQLite** for data storage and **Redis** for task queue ma
 
 ## Documentation
 
-- **[Setup Guide](docs/streamlined/SETUP_GUIDE.md)** - Complete installation instructions
-- **[Transformation Summary](docs/streamlined/TRANSFORMATION_SUMMARY.md)** - What changed
-- **[Architecture Overview](docs/streamlined/RESTRUCTURE_PLAN.md)** - Technical details
+- **[Setup Guide](docs/SETUP_GUIDE.md)** - Complete installation instructions
+- **[Task Tracking](TASKS.md)** - **📋 Master list of all issues, TODOs, and development tasks**
+- **[Architecture Overview](docs/architecture/)** - Technical details and system design
 
 ## Contributing
+
+**📌 Before contributing, check [TASKS.md](TASKS.md) for current priorities and issues.**
+
+This repository follows modern development practices:
+- **Mobile-first design** with React PWA  
+- **Single source of truth** for task tracking in `TASKS.md`
+- **Docker-first deployment** with health checks
+- **SQLite for simplicity** (no complex DB setup)
 
 This repository follows modern development practices:
 - **Mobile-first design** with React PWA

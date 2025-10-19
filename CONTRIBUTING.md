@@ -4,12 +4,14 @@ Thank you for your interest in contributing! This document provides guidelines f
 
 ## Quick Start
 
-1. **Fork the repository** on GitHub
-2. **Clone your fork** locally
-3. **Create a feature branch** for your changes
-4. **Make your changes** following our guidelines
-5. **Test your changes** thoroughly
-6. **Submit a pull request**
+1. **Check [TASKS.md](TASKS.md)** for current priorities and available tasks
+2. **Fork the repository** on GitHub  
+3. **Clone your fork** locally
+4. **Create a feature branch** for your changes
+5. **Make your changes** following our guidelines
+6. **Test your changes** thoroughly
+7. **Update [TASKS.md](TASKS.md)** if completing tracked tasks
+8. **Submit a pull request**
 
 ## Development Setup
 
@@ -19,15 +21,18 @@ See the [Developer Guide](docs/developer-guide/contributing.md) for detailed set
 
 ### Reporting Issues
 
+**⚠️ IMPORTANT: Check [TASKS.md](TASKS.md) first - it contains all known issues and current work.**
+
 **Before creating an issue:**
-- Search existing issues to avoid duplicates
+- Review [TASKS.md](TASKS.md) to see if already tracked
+- Search existing GitHub issues to avoid duplicates  
 - Check the [troubleshooting guide](docs/user-guide/troubleshooting.md)
 - Test with the latest version
 
-**When reporting bugs, include:**
-- Clear description of the problem
-- Steps to reproduce the issue
-- Expected vs actual behavior
+**For new issues not in TASKS.md:**
+- Add to [TASKS.md](TASKS.md) with appropriate priority and phase
+- Create GitHub issue referencing the TASKS.md entry
+- Include clear description, reproduction steps, and expected behavior
 - System information (OS, Docker version, etc.)
 - Relevant log messages
 

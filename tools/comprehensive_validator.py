@@ -1025,6 +1025,13 @@ async def main():
     for rec in report['recommendations']:
         print(f"  • {rec}")
     
+    # Reference master task tracking
+    if report['overall_system_status'] in ["CRITICAL", "WARNING"]:
+        print(f"\n📌 For detailed issue tracking and resolution plans:")
+        print(f"  • See TASKS.md - Master task and issue tracking document")
+        print(f"  • Current priority tasks are listed by phase and risk level")
+        print(f"  • All known issues and TODOs consolidated in single source of truth")
+    
     # Exit with appropriate code
     if report['overall_system_status'] == "CRITICAL":
         sys.exit(1)

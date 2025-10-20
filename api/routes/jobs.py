@@ -1,5 +1,6 @@
 """
 Job management routes for the Whisper Transcriber API.
+Enhanced with cache invalidation for T025 Phase 2.
 """
 
 from typing import Dict, Any, Optional
@@ -10,6 +11,7 @@ from api.models import Job, JobStatusEnum
 from api.services.job_queue import job_queue
 from api.settings import settings
 from api.utils.logger import get_system_logger
+from api.services.cache_hooks import job_cache_manager, cache_invalidator
 import uuid
 from datetime import datetime
 
@@ -70,6 +72,13 @@ async def create_job(
             language=language,
             job_id=file_id
         )
+        
+        # Invalidate cache for job lists since a new job was created
+        await job_cache_manager.job_created(file_id, {
+            "status": job.status.value,
+            "filename": file.filename,
+            "model": model
+        })
         
         logger.info(f"Created transcription job {file_id} for file {file.filename}")
         
@@ -142,6 +151,15 @@ async def delete_job(job_id: str, db: Session = Depends(get_db)):
     job_queue.cancel_job(job_id)
     
     # Delete from database
+    db.delete(job)
+    db.commit()
+    
+    # Invalidate related caches
+    await job_cache_manager.job_deleted(job_id)
+    
+    logger.info(f"Deleted job {job_id}")
+    
+    return {"message": "Job deleted successfully"}
     db.delete(job)
     db.commit()
     

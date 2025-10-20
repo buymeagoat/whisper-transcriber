@@ -29,6 +29,14 @@ try:
     from api.middlewares.security_headers import SecurityHeadersMiddleware
     from api.middlewares.rate_limit import RateLimitMiddleware, RateLimitConfig
     from api.middlewares.api_cache import ApiCacheMiddleware, CacheConfig
+    
+    # Enhanced caching system for T025 Phase 2
+    from api.services.redis_cache import (
+        initialize_cache_service, 
+        cleanup_cache_service, 
+        CacheConfiguration
+    )
+    from api.middlewares.enhanced_cache import EnhancedApiCacheMiddleware
 
     # Import backup service management if available
     try:
@@ -92,6 +100,22 @@ async def lifespan(app: FastAPI):
     # Model validation
     validate_models_dir()
 
+    # Initialize enhanced cache service for T025 Phase 2
+    try:
+        cache_config = CacheConfiguration(
+            redis_url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
+            default_ttl=int(os.getenv("CACHE_DEFAULT_TTL", "300")),
+            max_memory_mb=int(os.getenv("CACHE_MAX_MEMORY_MB", "100")),
+            enable_smart_invalidation=True,
+            cache_warming=True,
+            track_hit_ratio=True,
+            log_cache_operations=settings.log_level == "DEBUG"
+        )
+        await initialize_cache_service(cache_config)
+        system_log.info("Enhanced Redis cache service initialized successfully")
+    except Exception as e:
+        system_log.warning(f"Failed to initialize cache service: {e}")
+
     # Start background threads
     start_cleanup_thread()
     
@@ -117,6 +141,13 @@ async def lifespan(app: FastAPI):
 
     system_log.info("Shutting down app...")
     
+    # Cleanup enhanced cache service
+    try:
+        await cleanup_cache_service()
+        system_log.info("Cache service shutdown completed")
+    except Exception as e:
+        system_log.error(f"Error shutting down cache service: {e}")
+    
     # Shutdown backup service gracefully
     if BACKUP_SERVICE_AVAILABLE:
         try:
@@ -136,13 +167,22 @@ system_log.info("FastAPI app initialization starting.")
 app = FastAPI(lifespan=lifespan)
 
 # ─── Middleware ───
-# API Response Caching (5 minute default TTL, 1000 entry limit)
-cache_config = CacheConfig(
-    default_ttl=300,       # 5 minutes
-    max_cache_size=1000,   # Maximum 1000 cached responses
-    enable_caching=True
+# Enhanced API Response Caching with Redis (T025 Phase 2)
+enhanced_cache_config = CacheConfiguration(
+    redis_url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
+    default_ttl=300,  # 5 minutes
+    job_status_ttl=60,  # 1 minute for frequently changing job status
+    job_list_ttl=120,  # 2 minutes for job lists
+    user_data_ttl=600,  # 10 minutes for user data
+    static_data_ttl=3600,  # 1 hour for health/version endpoints
+    max_memory_mb=100,
+    compression_threshold=1024,
+    enable_smart_invalidation=True,
+    cache_warming=True,
+    track_hit_ratio=True,
+    log_cache_operations=settings.log_level == "DEBUG"
 )
-app.add_middleware(ApiCacheMiddleware, config=cache_config)
+app.add_middleware(EnhancedApiCacheMiddleware, config=enhanced_cache_config)
 
 # Rate limiting for authentication endpoints (100 requests per 5 minutes for testing)
 rate_limit_config = RateLimitConfig(

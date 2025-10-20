@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from api.routes import jobs, admin, logs, metrics, auth, users, audit, cache
-from api.routes import progress, audio, tts, user_settings
+from api.routes import progress, audio, tts, user_settings, enhanced_cache
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.app_state import backend_log
 
@@ -31,6 +31,9 @@ def register_routes(app: FastAPI) -> None:
     app.include_router(users.router)
     app.include_router(audit.router, prefix="/admin", tags=["audit"])
     app.include_router(cache.router, prefix="/admin", tags=["cache"])
+    
+    # Enhanced cache management routes for T025 Phase 2
+    app.include_router(enhanced_cache.router, tags=["enhanced_cache", "admin"])
     
     # Include backup management API if available
     if BACKUP_API_AVAILABLE:

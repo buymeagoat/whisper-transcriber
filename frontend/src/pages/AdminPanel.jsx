@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import SystemHealth from '../components/SystemHealth';
 import BackupManagement from '../components/BackupManagement';
+import UserManagement from '../components/UserManagement';
+import JobAdministration from '../components/JobAdministration';
 
 /**
  * AdminPanel - Main administrative interface for system management
@@ -80,34 +82,7 @@ const AdminPanel = () => {
   );
 };
 
-// Placeholder components for future implementation
-const UserManagement = () => (
-  <div className="p-6">
-    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-      User Management
-    </h2>
-    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
-      <p className="text-yellow-800 dark:text-yellow-200">
-        🚧 User management interface coming soon (T008)
-      </p>
-    </div>
-  </div>
-);
-
-const JobAdministration = () => (
-  <div className="p-6">
-    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-      Job Administration
-    </h2>
-    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
-      <p className="text-yellow-800 dark:text-yellow-200">
-        🚧 Job administration interface coming soon (T006 Phase 2)
-      </p>
-    </div>
-  </div>
-);
-
-// BackupManagement component is now imported and used directly
+// All admin components are now imported and used directly
 
 const MaintenanceTools = () => (
   <div className="p-6">

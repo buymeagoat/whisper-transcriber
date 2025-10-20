@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import SystemHealth from '../components/SystemHealth';
+import BackupManagement from '../components/BackupManagement';
 
 /**
  * AdminPanel - Main administrative interface for system management
@@ -106,18 +107,7 @@ const JobAdministration = () => (
   </div>
 );
 
-const BackupManagement = () => (
-  <div className="p-6">
-    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-      Backup Management
-    </h2>
-    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
-      <p className="text-yellow-800 dark:text-yellow-200">
-        🚧 Backup management interface coming soon (T008)
-      </p>
-    </div>
-  </div>
-);
+// BackupManagement component is now imported and used directly
 
 const MaintenanceTools = () => (
   <div className="p-6">

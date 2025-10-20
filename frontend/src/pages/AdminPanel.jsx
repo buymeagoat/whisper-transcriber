@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SystemHealth from '../components/SystemHealth';
 import BackupManagement from '../components/BackupManagement';
 import UserManagement from '../components/UserManagement';
-import JobAdministration from '../components/JobAdministration';
+import AdminJobManagement from '../components/admin/AdminJobManagement';
 
 /**
  * AdminPanel - Main administrative interface for system management
@@ -26,7 +26,7 @@ const AdminPanel = () => {
       case 'users':
         return <UserManagement />;
       case 'jobs':
-        return <JobAdministration />;
+        return <AdminJobManagement />;
       case 'backups':
         return <BackupManagement />;
       case 'maintenance':

@@ -33,6 +33,9 @@ passlib[bcrypt]>=1.7.4
 python-dotenv>=1.1.0
 pydantic[dotenv]>=2.6.0
 
+# --- System Monitoring ---
+psutil>=5.9.0
+
 # --- Backup & Recovery System ---
 # High-performance compression
 zstandard>=0.22.0

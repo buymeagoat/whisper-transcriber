@@ -872,6 +872,9 @@ class ComprehensiveValidator:
         # Test authentication flow through frontend
         self._test_frontend_authentication()
         
+        # Test admin interface functionality
+        self._test_admin_interface()
+        
         # Test CORS and cross-origin functionality
         self._test_cors_functionality()
         
@@ -1231,6 +1234,75 @@ class ComprehensiveValidator:
         except Exception as e:
             self._record_result("frontend", "auth_test", "FAIL", 
                            f"Authentication test failed: {str(e)}", 0)
+
+    def _test_admin_interface(self):
+        """Test admin interface components and functionality."""
+        try:
+            frontend_dir = Path("frontend") / "src"
+            
+            # Check for admin components
+            admin_components = []
+            
+            # Look for admin pages
+            admin_page_paths = [
+                "pages/AdminPanel.jsx", "pages/admin/AdminDashboard.jsx",
+                "pages/admin/SystemMonitoring.jsx", "pages/admin/UserManagement.jsx"
+            ]
+            
+            for path in admin_page_paths:
+                if (frontend_dir / path).exists():
+                    admin_components.append(f"Admin page ({path})")
+                    
+            # Look for admin components
+            admin_component_paths = [
+                "components/admin/SystemHealthDashboard.tsx",
+                "components/admin/AdminJobManagement.tsx",
+                "components/admin/SystemMetrics.tsx",
+                "components/admin/ServiceStatus.tsx"
+            ]
+            
+            for path in admin_component_paths:
+                if (frontend_dir / path).exists():
+                    admin_components.append(f"Admin component ({path})")
+                    
+            if len(admin_components) >= 4:
+                self._record_result("frontend", "admin_interface", "PASS", 
+                               f"Comprehensive admin interface found: {len(admin_components)} components", 0)
+            elif len(admin_components) >= 2:
+                self._record_result("frontend", "admin_interface", "WARN", 
+                               f"Partial admin interface found: {len(admin_components)} components", 0)
+            else:
+                self._record_result("frontend", "admin_interface", "FAIL", 
+                               "No admin interface components found", 0)
+            
+            # Test admin API integration
+            server_url = self.config.get("VITE_API_HOST", "http://localhost:8000")
+            
+            # Test admin endpoints accessibility
+            admin_endpoints = [
+                "/admin/stats", "/admin/health", "/admin/jobs",
+                "/admin/health/system", "/admin/health/services"
+            ]
+            
+            accessible_endpoints = 0
+            for endpoint in admin_endpoints:
+                try:
+                    response = requests.get(f"{server_url}{endpoint}", timeout=5)
+                    if response.status_code in [200, 401, 403]:  # 401/403 means auth required (good)
+                        accessible_endpoints += 1
+                except:
+                    pass
+            
+            if accessible_endpoints >= 4:
+                self._record_result("frontend", "admin_api_integration", "PASS", 
+                               f"Admin API endpoints accessible: {accessible_endpoints}/{len(admin_endpoints)}", 0)
+            else:
+                self._record_result("frontend", "admin_api_integration", "WARN", 
+                               f"Limited admin API access: {accessible_endpoints}/{len(admin_endpoints)}", 0)
+                
+        except Exception as e:
+            self._record_result("frontend", "admin_interface_test", "FAIL", 
+                           f"Admin interface test failed: {str(e)}", 0)
 
     def _test_cors_functionality(self):
         """Test CORS configuration for frontend-backend communication."""

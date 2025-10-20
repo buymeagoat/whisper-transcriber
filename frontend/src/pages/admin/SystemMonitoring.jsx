@@ -1,20 +1,10 @@
 import React from 'react'
-import { Activity } from 'lucide-react'
+import SystemHealthDashboard from '../../components/admin/SystemHealthDashboard'
 
 const SystemMonitoring = () => {
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          System Monitoring
-        </h1>
-        <div className="text-center py-12">
-          <Activity className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400">
-            System monitoring interface coming soon...
-          </p>
-        </div>
-      </div>
+      <SystemHealthDashboard />
     </div>
   )
 }

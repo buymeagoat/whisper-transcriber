@@ -19,11 +19,9 @@ import JobsPage from './pages/user/JobsPage'
 import SettingsPage from './pages/user/SettingsPage'
 
 // Admin pages
+import AdminLayout from './components/admin/AdminLayout'
+import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminPanel from './pages/AdminPanel'
-// TODO: These components will be implemented in future tasks
-// import UserManagement from './pages/admin/UserManagement'
-// import SystemMonitoring from './pages/admin/SystemMonitoring'
-// import AuditLogs from './pages/admin/AuditLogs'
 
 // The ProtectedRoute component is now imported from ./components/ProtectedRoute
 
@@ -76,40 +74,28 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* Admin routes */}
-          <Route path="/admin" element={
+          {/* Admin routes with dedicated layout */}
+          <Route path="/admin/*" element={
+            <ProtectedRoute adminRequired>
+              <AdminLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<AdminDashboard />} />
+            <Route path="health" element={<div className="p-4 text-center text-gray-500">System Health - Coming Soon</div>} />
+            <Route path="jobs" element={<div className="p-4 text-center text-gray-500">Job Management - Coming Soon</div>} />
+            <Route path="users" element={<div className="p-4 text-center text-gray-500">User Management - Coming Soon</div>} />
+            <Route path="backups" element={<div className="p-4 text-center text-gray-500">Backup Management - Coming Soon</div>} />
+            <Route path="monitoring" element={<div className="p-4 text-center text-gray-500">System Monitoring - Coming Soon</div>} />
+          </Route>
+          
+          {/* Legacy admin route for backward compatibility */}
+          <Route path="/admin-legacy" element={
             <ProtectedRoute adminRequired>
               <Layout>
                 <AdminPanel />
               </Layout>
             </ProtectedRoute>
           } />
-          
-          {/* TODO: Implement individual admin pages in future tasks
-          <Route path="/admin/users" element={
-            <ProtectedRoute adminRequired>
-              <Layout>
-                <UserManagement />
-              </Layout>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/admin/monitoring" element={
-            <ProtectedRoute adminRequired>
-              <Layout>
-                <SystemMonitoring />
-              </Layout>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/admin/audit" element={
-            <ProtectedRoute adminRequired>
-              <Layout>
-                <AuditLogs />
-              </Layout>
-            </ProtectedRoute>
-          } />
-          */}
           
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />

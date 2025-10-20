@@ -468,5 +468,40 @@
     "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/changes/20251020_032013_change_20251020_031750.md.zst",
     "first_seen": "2025-10-20T03:20:13.811383",
     "reference_count": 1
+  },
+  "72ea2347dae6affe476f8c6c183d76ac0fc3d0ca8dfa9319351a69c835faf38a": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251020_033521_server.log.zst",
+    "first_seen": "2025-10-20T03:35:21.030511",
+    "reference_count": 1
+  },
+  "d722aa72e7b5c61167cffd0339cceb992ddad8fdfc5f52daf0a2fcac71bc3646": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251020_033521_validation_report_20251020_032306.json.zst",
+    "first_seen": "2025-10-20T03:35:21.037864",
+    "reference_count": 1
+  },
+  "d39348018b0d8178789dbd08af59e46e4f1f1890447093df2fabdbcc071461bf": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/changes/20251020_033521_change_20251020_033422.md.zst",
+    "first_seen": "2025-10-20T03:35:21.044665",
+    "reference_count": 1
+  },
+  "7cdd967ce6d9ed88bbb5dd07cd5eae0513085045d2b7b9e16f34d30304910335": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251020_033521_api.log.zst",
+    "first_seen": "2025-10-20T03:35:21.050589",
+    "reference_count": 1
+  },
+  "69a462537dae043fd715de25d32dd7d3988b31d8f8f015f6a9bf6cd9244cb6bb": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251020_033521_validation_report_20251020_032445.json.zst",
+    "first_seen": "2025-10-20T03:35:21.060161",
+    "reference_count": 1
+  },
+  "7deb093682461ace2746f62ef50d5b6d2f22f2321e40c12bdebeede4248d7959": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/builds/20251020_033521_build_20251020_033422.md.zst",
+    "first_seen": "2025-10-20T03:35:21.068098",
+    "reference_count": 1
+  },
+  "e87784096abc89782c763c43230bb6df6bf0c134e90cad4f694530f1b1fa432f": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251020_033521_validation_report_20251020_033249.json.zst",
+    "first_seen": "2025-10-20T03:35:21.073883",
+    "reference_count": 1
   }
 }

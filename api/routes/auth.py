@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List
 import jwt
 import hashlib
 import secrets
@@ -33,6 +33,8 @@ class UserInfo(BaseModel):
     id: str
     username: str
     is_active: bool
+    is_admin: bool = False
+    roles: List[str] = []
 
 # Dummy user store (in production, this would be a database)
 USERS_DB = {
@@ -40,7 +42,9 @@ USERS_DB = {
         "id": "1",
         "username": "admin",
         "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",  # "password"
-        "is_active": True
+        "is_active": True,
+        "is_admin": True,
+        "roles": ["admin", "user"]
     }
 }
 
@@ -129,7 +133,9 @@ async def get_current_user(current_user: dict = Depends(verify_token)):
     return UserInfo(
         id=user["id"],
         username=user["username"],
-        is_active=user["is_active"]
+        is_active=user["is_active"],
+        is_admin=user.get("is_admin", False),
+        roles=user.get("roles", [])
     )
 
 @router.post("/logout")

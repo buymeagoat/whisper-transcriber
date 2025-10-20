@@ -613,44 +613,69 @@ class ComprehensiveValidator:
         server_url = self.config.get("VITE_API_HOST", "http://localhost:8000")
         
         try:
-            # Test /token endpoint with valid credentials
-            token_response = requests.post(f"{server_url}/token", 
+            # Test /auth/login endpoint with valid credentials
+            login_response = requests.post(f"{server_url}/auth/login", 
                 json={"username": "admin", "password": "password"}, 
                 timeout=5)
-            if token_response.status_code != 200:
-                return "WARN", f"Token endpoint unexpected response: {token_response.status_code}", {
-                    "endpoint": "/token", "status_code": token_response.status_code
+            if login_response.status_code != 200:
+                return "WARN", f"Login endpoint unexpected response: {login_response.status_code}", {
+                    "endpoint": "/auth/login", "status_code": login_response.status_code
                 }
             
             # Extract token for authenticated requests
-            token_data = token_response.json()
+            token_data = login_response.json()
             auth_headers = {"Authorization": f"Bearer {token_data['access_token']}"}
             
-            # Test /register endpoint with valid data
-            import time
-            unique_id = str(int(time.time() * 1000))  # millisecond timestamp
-            register_response = requests.post(f"{server_url}/register", 
-                json={"username": f"testuser_{unique_id}", "password": "testpass123"}, 
-                timeout=5)
-            if register_response.status_code not in [200, 201, 409]:  # 409 = user exists
-                return "WARN", f"Register endpoint unexpected response: {register_response.status_code}", {
-                    "endpoint": "/register", "status_code": register_response.status_code
-                }
-            
-            # Test /change-password with authentication
-            change_pass_response = requests.post(f"{server_url}/change-password", 
-                json={"current_password": "password", "new_password": "newpass123"},
+            # Test /auth/me endpoint with authentication
+            me_response = requests.get(f"{server_url}/auth/me", 
                 headers=auth_headers,
                 timeout=5)
-            if change_pass_response.status_code not in [200, 401]:  # 401 if wrong current password
-                return "WARN", f"Change password endpoint unexpected response: {change_pass_response.status_code}", {
-                    "endpoint": "/change-password", "status_code": change_pass_response.status_code
+            if me_response.status_code != 200:
+                return "WARN", f"User info endpoint unexpected response: {me_response.status_code}", {
+                    "endpoint": "/auth/me", "status_code": me_response.status_code
                 }
             
-            return "PASS", "Auth endpoints responding appropriately", {
-                "token_status": token_response.status_code,
-                "register_status": register_response.status_code,
-                "change_password_status": change_pass_response.status_code
+            # Test /auth/refresh endpoint
+            refresh_response = requests.post(f"{server_url}/auth/refresh",
+                headers=auth_headers,
+                timeout=5)
+            if refresh_response.status_code != 200:
+                return "WARN", f"Token refresh endpoint unexpected response: {refresh_response.status_code}", {
+                    "endpoint": "/auth/refresh", "status_code": refresh_response.status_code
+                }
+            
+            # Test /auth/logout endpoint
+            logout_response = requests.post(f"{server_url}/auth/logout",
+                headers=auth_headers,
+                timeout=5)
+            if logout_response.status_code != 200:
+                return "WARN", f"Logout endpoint unexpected response: {logout_response.status_code}", {
+                    "endpoint": "/auth/logout", "status_code": logout_response.status_code
+                }
+            
+            # Test authentication security - invalid credentials
+            invalid_login = requests.post(f"{server_url}/auth/login", 
+                json={"username": "admin", "password": "wrong_password"}, 
+                timeout=5)
+            if invalid_login.status_code != 401:
+                return "WARN", f"Invalid credentials should return 401, got {invalid_login.status_code}", {
+                    "security_test": "invalid_credentials", "status_code": invalid_login.status_code
+                }
+                
+            # Test authentication required - no token
+            no_token_response = requests.get(f"{server_url}/auth/me", timeout=5)
+            if no_token_response.status_code not in [401, 403]:
+                return "WARN", f"Protected endpoint should require auth, got {no_token_response.status_code}", {
+                    "security_test": "no_token", "status_code": no_token_response.status_code
+                }
+            
+            return "PASS", "All auth endpoints functioning correctly with security", {
+                "login_status": login_response.status_code,
+                "me_status": me_response.status_code,
+                "refresh_status": refresh_response.status_code,
+                "logout_status": logout_response.status_code,
+                "invalid_creds_status": invalid_login.status_code,
+                "no_token_status": no_token_response.status_code
             }
         except Exception as e:
             return "FAIL", f"Auth endpoint test failed: {str(e)}", {}
@@ -855,6 +880,167 @@ class ComprehensiveValidator:
         
         duration = time.time() - start_time
         return self._get_component_status("frontend", duration)
+    
+    def validate_e2e_testing(self) -> ComponentStatus:
+        """Test End-to-End testing framework and test coverage."""
+        logger.info("🎭 Validating E2E testing framework...")
+        
+        start_time = time.time()
+        
+        # Check if E2E testing framework exists
+        e2e_dir = Path("tests/e2e")
+        if not e2e_dir.exists():
+            self._record_result("e2e_testing", "framework_exists", "FAIL", 
+                           "E2E testing directory not found", 0)
+            duration = time.time() - start_time
+            return self._get_component_status("e2e_testing", duration)
+        
+        self._record_result("e2e_testing", "framework_exists", "PASS", 
+                       "E2E testing directory found", 0)
+        
+        # Check Playwright configuration
+        playwright_config = e2e_dir / "playwright.config.ts"
+        if playwright_config.exists():
+            self._record_result("e2e_testing", "playwright_config", "PASS", 
+                           "Playwright configuration found", 0)
+        else:
+            self._record_result("e2e_testing", "playwright_config", "FAIL", 
+                           "Playwright configuration not found", 0)
+        
+        # Check for test files
+        test_files = list(e2e_dir.glob("*.spec.ts")) + list(e2e_dir.glob("*.test.ts"))
+        if test_files:
+            self._record_result("e2e_testing", "test_files", "PASS", 
+                           f"Found {len(test_files)} E2E test files", 0)
+            
+            # Check for comprehensive test coverage
+            test_categories = {
+                "auth": False, "authentication": False, "login": False,
+                "transcription": False, "upload": False, "workflow": False,
+                "admin": False, "management": False,
+                "cross-browser": False, "browser": False, "mobile": False
+            }
+            
+            for test_file in test_files:
+                file_content = test_file.name.lower()
+                for category in test_categories:
+                    if category in file_content:
+                        test_categories[category] = True
+            
+            covered_categories = [cat for cat, covered in test_categories.items() if covered]
+            if len(covered_categories) >= 6:  # Good coverage
+                self._record_result("e2e_testing", "test_coverage", "PASS", 
+                               f"Comprehensive test coverage: {', '.join(covered_categories)}", 0)
+            elif len(covered_categories) >= 3:  # Basic coverage
+                self._record_result("e2e_testing", "test_coverage", "WARN", 
+                               f"Basic test coverage: {', '.join(covered_categories)}", 0)
+            else:  # Poor coverage
+                self._record_result("e2e_testing", "test_coverage", "FAIL", 
+                               f"Limited test coverage: {', '.join(covered_categories)}", 0)
+        else:
+            self._record_result("e2e_testing", "test_files", "FAIL", 
+                           "No E2E test files found", 0)
+        
+        # Check package.json for E2E dependencies
+        package_json = e2e_dir / "package.json"
+        if package_json.exists():
+            try:
+                with open(package_json, 'r') as f:
+                    package_data = json.load(f)
+                
+                # Check for Playwright dependency
+                dependencies = package_data.get("dependencies", {})
+                dev_dependencies = package_data.get("devDependencies", {})
+                all_deps = {**dependencies, **dev_dependencies}
+                
+                if "@playwright/test" in all_deps:
+                    self._record_result("e2e_testing", "playwright_dependency", "PASS", 
+                                   f"Playwright version: {all_deps['@playwright/test']}", 0)
+                else:
+                    self._record_result("e2e_testing", "playwright_dependency", "FAIL", 
+                                   "Playwright dependency not found", 0)
+                
+                # Check for test scripts
+                scripts = package_data.get("scripts", {})
+                test_scripts = [script for script in scripts.keys() if "test" in script]
+                if test_scripts:
+                    self._record_result("e2e_testing", "test_scripts", "PASS", 
+                                   f"Test scripts found: {', '.join(test_scripts)}", 0)
+                else:
+                    self._record_result("e2e_testing", "test_scripts", "WARN", 
+                                   "No test scripts found in package.json", 0)
+                    
+            except (json.JSONDecodeError, FileNotFoundError) as e:
+                self._record_result("e2e_testing", "package_json", "FAIL", 
+                               f"Error reading package.json: {str(e)}", 0)
+        else:
+            self._record_result("e2e_testing", "package_json", "WARN", 
+                           "No package.json found in E2E directory", 0)
+        
+        # Test if Playwright can run (basic validation)
+        try:
+            start_test_time = time.time()
+            result = subprocess.run(
+                ["npm", "run", "test", "--", "--list"],
+                cwd=e2e_dir,
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            test_duration = (time.time() - start_test_time) * 1000
+            
+            if result.returncode == 0:
+                # Count tests from output
+                test_count = result.stdout.count("›")  # Playwright test listing format
+                self._record_result("e2e_testing", "framework_functional", "PASS", 
+                               f"Playwright framework functional, {test_count} tests detected", test_duration)
+            else:
+                self._record_result("e2e_testing", "framework_functional", "WARN", 
+                               f"Playwright test listing failed: {result.stderr[:100]}", test_duration)
+                
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError) as e:
+            self._record_result("e2e_testing", "framework_functional", "WARN", 
+                           f"Playwright framework test failed: {str(e)[:100]}", 0)
+        
+        # Check for global setup/teardown
+        global_setup = e2e_dir / "global-setup.ts"
+        global_teardown = e2e_dir / "global-teardown.ts"
+        
+        if global_setup.exists() and global_teardown.exists():
+            self._record_result("e2e_testing", "global_hooks", "PASS", 
+                           "Global setup and teardown files found", 0)
+        elif global_setup.exists() or global_teardown.exists():
+            self._record_result("e2e_testing", "global_hooks", "WARN", 
+                           "Partial global hooks configuration", 0)
+        else:
+            self._record_result("e2e_testing", "global_hooks", "WARN", 
+                           "No global setup/teardown found", 0)
+        
+        # Check browser configuration
+        if playwright_config.exists():
+            try:
+                with open(playwright_config, 'r') as f:
+                    config_content = f.read()
+                
+                browsers = ["chromium", "firefox", "webkit"]
+                configured_browsers = [browser for browser in browsers if browser in config_content]
+                
+                if len(configured_browsers) >= 3:
+                    self._record_result("e2e_testing", "browser_coverage", "PASS", 
+                                   f"Multi-browser testing configured: {', '.join(configured_browsers)}", 0)
+                elif len(configured_browsers) >= 2:
+                    self._record_result("e2e_testing", "browser_coverage", "WARN", 
+                                   f"Limited browser coverage: {', '.join(configured_browsers)}", 0)
+                else:
+                    self._record_result("e2e_testing", "browser_coverage", "FAIL", 
+                                   "Insufficient browser coverage", 0)
+                    
+            except FileNotFoundError:
+                self._record_result("e2e_testing", "browser_coverage", "SKIP", 
+                               "Cannot read Playwright configuration", 0)
+        
+        duration = time.time() - start_time
+        return self._get_component_status("e2e_testing", duration)
 
     def _test_frontend_build(self):
         """Test that React frontend builds successfully."""
@@ -1251,7 +1437,7 @@ class ComprehensiveValidator:
         
         if components is None:
             components = ["api_endpoints", "database", "file_system", "configuration", 
-                         "security", "backup_system", "performance", "frontend"]
+                         "security", "backup_system", "performance", "frontend", "e2e_testing"]
         
         component_statuses = []
         overall_start = time.time()
@@ -1275,6 +1461,8 @@ class ComprehensiveValidator:
                     status = self.validate_performance()
                 elif component == "frontend":
                     status = self.validate_frontend()
+                elif component == "e2e_testing":
+                    status = self.validate_e2e_testing()
                 else:
                     logger.warning(f"Unknown component: {component}")
                     continue
@@ -1393,7 +1581,7 @@ async def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="Comprehensive Application State Validator")
-    parser.add_argument("--component", choices=["all", "api", "database", "files", "config", "security", "backup", "performance", "frontend"],
+    parser.add_argument("--component", choices=["all", "api", "database", "files", "config", "security", "backup", "performance", "frontend", "e2e_testing"],
                        default="all", help="Component to validate")
     parser.add_argument("--output", help="Output file for report")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
@@ -1413,7 +1601,8 @@ async def main():
         "security": ["security"],
         "backup": ["backup_system"],
         "performance": ["performance"],
-        "frontend": ["frontend"]
+        "frontend": ["frontend"],
+        "e2e_testing": ["e2e_testing"]
     }
     
     components = component_map.get(args.component)

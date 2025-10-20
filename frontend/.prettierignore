@@ -1,0 +1,23 @@
+# Prettier ignore file
+node_modules/
+dist/
+build/
+*.min.js
+*.min.css
+.vite/
+coverage/
+.nyc_output/
+
+# Generated files
+*.generated.*
+*.bundle.*
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files
+.env
+.env.local
+.env.*.local

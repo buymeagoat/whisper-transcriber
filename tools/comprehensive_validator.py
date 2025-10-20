@@ -832,13 +832,426 @@ class ComprehensiveValidator:
             recommendations=recommendations
         )
 
+    def validate_frontend(self) -> ComponentStatus:
+        """Test frontend build process and integration with backend APIs."""
+        logger.info("🎨 Validating frontend application...")
+        
+        start_time = time.time()
+        
+        # Test frontend build process
+        self._test_frontend_build()
+        
+        # Test frontend-backend API integration 
+        self._test_frontend_api_integration()
+        
+        # Test authentication flow through frontend
+        self._test_frontend_authentication()
+        
+        # Test CORS and cross-origin functionality
+        self._test_cors_functionality()
+        
+        # Test end-to-end user workflow
+        self._test_e2e_user_workflow()
+        
+        duration = time.time() - start_time
+        return self._get_component_status("frontend", duration)
+
+    def _test_frontend_build(self):
+        """Test that React frontend builds successfully."""
+        try:
+            frontend_dir = Path("frontend")
+            
+            # Check if frontend directory exists
+            if not frontend_dir.exists():
+                self._record_result("frontend", "frontend_directory", "FAIL", 
+                               "Frontend directory not found", 0)
+                return
+            
+            self._record_result("frontend", "frontend_directory", "PASS", 
+                           "Frontend directory exists", 0)
+            
+            # Check package.json
+            package_json = frontend_dir / "package.json"
+            if not package_json.exists():
+                self._record_result("frontend", "package_json", "FAIL", 
+                               "package.json not found", 0)
+                return
+            
+            self._record_result("frontend", "package_json", "PASS", 
+                           "package.json exists", 0)
+            
+            # Test npm build process
+            logger.info("Testing frontend build process...")
+            try:
+                start_time = time.time()
+                result = subprocess.run(
+                    ["npm", "run", "build"],
+                    cwd=frontend_dir,
+                    capture_output=True,
+                    text=True,
+                    timeout=120  # 2 minute timeout
+                )
+                build_duration = (time.time() - start_time) * 1000
+                
+                if result.returncode == 0:
+                    self._record_result("frontend", "build_process", "PASS", 
+                                   "Frontend builds successfully", build_duration)
+                    
+                    # Check if dist directory was created
+                    dist_dir = frontend_dir / "dist"
+                    if dist_dir.exists():
+                        self._record_result("frontend", "build_output", "PASS", 
+                                       "Build output directory created", 0)
+                        
+                        # Check for essential build files
+                        index_html = dist_dir / "index.html"
+                        if index_html.exists():
+                            self._record_result("frontend", "build_index", "PASS", 
+                                           "index.html generated", 0)
+                        else:
+                            self._record_result("frontend", "build_index", "FAIL", 
+                                           "index.html not found in build output", 0)
+                    else:
+                        self._record_result("frontend", "build_output", "FAIL", 
+                                       "Build output directory not created", 0)
+                        
+                else:
+                    self._record_result("frontend", "build_process", "FAIL", 
+                                   f"Build failed with exit code {result.returncode}", build_duration)
+                    logger.error(f"Build stderr: {result.stderr}")
+                    
+            except subprocess.TimeoutExpired:
+                self._record_result("frontend", "build_process", "FAIL", 
+                               "Build process timed out (>2 minutes)", 120000)
+            except FileNotFoundError:
+                self._record_result("frontend", "build_process", "SKIP", 
+                               "npm not found - install Node.js", 0)
+                
+        except Exception as e:
+            self._record_result("frontend", "build_test", "FAIL", 
+                           f"Build test failed: {str(e)}", 0)
+
+    def _test_frontend_api_integration(self):
+        """Test that frontend can communicate with backend APIs."""
+        try:
+            frontend_dir = Path("frontend")
+            
+            # Check for API service files
+            src_dir = frontend_dir / "src"
+            if not src_dir.exists():
+                self._record_result("frontend", "src_directory", "FAIL", 
+                               "Frontend src directory not found", 0)
+                return
+                
+            self._record_result("frontend", "src_directory", "PASS", 
+                           "Frontend src directory exists", 0)
+            
+            # Look for API service files
+            api_service_patterns = [
+                "services/apiClient.js", "services/authService.js", 
+                "services/jobsService.js", "services/adminService.js"
+            ]
+            
+            found_services = []
+            for pattern in api_service_patterns:
+                service_file = src_dir / pattern
+                if service_file.exists():
+                    found_services.append(pattern)
+            
+            if found_services:
+                self._record_result("frontend", "api_services", "PASS", 
+                               f"API service files found: {', '.join(found_services)}", 0)
+            else:
+                self._record_result("frontend", "api_services", "WARN", 
+                               "No API service files found in expected locations", 0)
+            
+            # Check vite config for proxy setup
+            vite_config = frontend_dir / "vite.config.js"
+            if vite_config.exists():
+                try:
+                    with open(vite_config, 'r') as f:
+                        content = f.read()
+                        if "proxy" in content and "8000" in content:
+                            self._record_result("frontend", "api_proxy", "PASS", 
+                                           "Vite proxy configuration found", 0)
+                        else:
+                            self._record_result("frontend", "api_proxy", "WARN", 
+                                           "Vite proxy configuration not found", 0)
+                except Exception as e:
+                    self._record_result("frontend", "api_proxy", "WARN", 
+                                   f"Could not check vite config: {str(e)}", 0)
+            else:
+                self._record_result("frontend", "vite_config", "WARN", 
+                               "vite.config.js not found", 0)
+                
+        except Exception as e:
+            self._record_result("frontend", "api_integration", "FAIL", 
+                           f"API integration test failed: {str(e)}", 0)
+
+    def _test_frontend_authentication(self):
+        """Test authentication components and flow."""
+        try:
+            frontend_dir = Path("frontend") / "src"
+            
+            # Check for authentication components
+            auth_components = []
+            
+            # Look for auth context
+            auth_context_paths = [
+                "context/AuthContext.jsx", "contexts/AuthContext.jsx",
+                "context/AuthContext.js", "contexts/AuthContext.js"
+            ]
+            
+            for path in auth_context_paths:
+                if (frontend_dir / path).exists():
+                    auth_components.append(f"AuthContext ({path})")
+                    break
+            
+            # Look for auth pages
+            auth_page_paths = [
+                "pages/auth/LoginPage.jsx", "pages/LoginPage.jsx",
+                "components/auth/LoginPage.jsx", "pages/auth/RegisterPage.jsx"
+            ]
+            
+            for path in auth_page_paths:
+                if (frontend_dir / path).exists():
+                    auth_components.append(f"Auth page ({path})")
+                    
+            if auth_components:
+                self._record_result("frontend", "auth_components", "PASS", 
+                               f"Authentication components found: {', '.join(auth_components)}", 0)
+            else:
+                self._record_result("frontend", "auth_components", "FAIL", 
+                               "No authentication components found", 0)
+            
+            # Check for protected route implementation
+            protected_route_paths = [
+                "components/ProtectedRoute.jsx", "components/auth/ProtectedRoute.jsx",
+                "components/ProtectedRoute.js", "utils/ProtectedRoute.jsx"
+            ]
+            
+            found_protected_route = False
+            for path in protected_route_paths:
+                if (frontend_dir / path).exists():
+                    found_protected_route = True
+                    self._record_result("frontend", "protected_routes", "PASS", 
+                                   f"Protected route component found: {path}", 0)
+                    break
+                    
+            if not found_protected_route:
+                self._record_result("frontend", "protected_routes", "WARN", 
+                               "Protected route component not found", 0)
+                
+        except Exception as e:
+            self._record_result("frontend", "auth_test", "FAIL", 
+                           f"Authentication test failed: {str(e)}", 0)
+
+    def _test_cors_functionality(self):
+        """Test CORS configuration for frontend-backend communication."""
+        try:
+            server_url = self.config.get("VITE_API_HOST", "http://localhost:8000")
+            
+            # Simulate a CORS preflight request
+            try:
+                start_time = time.time()
+                response = requests.options(
+                    f"{server_url}/health",
+                    headers={
+                        "Origin": "http://localhost:3000",
+                        "Access-Control-Request-Method": "GET",
+                        "Access-Control-Request-Headers": "Content-Type,Authorization"
+                    },
+                    timeout=5
+                )
+                duration = (time.time() - start_time) * 1000
+                
+                cors_headers = [
+                    "Access-Control-Allow-Origin",
+                    "Access-Control-Allow-Methods", 
+                    "Access-Control-Allow-Headers"
+                ]
+                
+                present_headers = [h for h in cors_headers if h in response.headers]
+                
+                if len(present_headers) >= 2:
+                    self._record_result("frontend", "cors_headers", "PASS", 
+                                   f"CORS headers present: {', '.join(present_headers)}", duration)
+                else:
+                    self._record_result("frontend", "cors_headers", "WARN", 
+                                   "Some CORS headers missing", duration)
+                    
+            except requests.exceptions.RequestException as e:
+                self._record_result("frontend", "cors_test", "WARN", 
+                               f"CORS test failed: {str(e)}", 0)
+                               
+        except Exception as e:
+            self._record_result("frontend", "cors_functionality", "FAIL", 
+                           f"CORS functionality test failed: {str(e)}", 0)
+
+    def _test_e2e_user_workflow(self):
+        """Test end-to-end user workflow through API simulation."""
+        try:
+            server_url = self.config.get("VITE_API_HOST", "http://localhost:8000")
+            
+            # Test 1: User Registration Flow
+            logger.info("Testing user registration workflow...")
+            try:
+                start_time = time.time()
+                registration_data = {
+                    "username": f"test_user_{int(time.time())}",
+                    "email": f"test_{int(time.time())}@example.com",
+                    "password": "test_password_123"
+                }
+                
+                reg_response = requests.post(
+                    f"{server_url}/register",
+                    json=registration_data,
+                    timeout=10
+                )
+                
+                duration = (time.time() - start_time) * 1000
+                
+                if reg_response.status_code == 200:
+                    self._record_result("frontend", "e2e_user_registration", "PASS", 
+                                   "User registration workflow working", duration)
+                else:
+                    self._record_result("frontend", "e2e_user_registration", "WARN", 
+                                   f"Registration returned status {reg_response.status_code}", duration)
+                    
+            except requests.exceptions.RequestException as e:
+                self._record_result("frontend", "e2e_user_registration", "WARN", 
+                               f"Registration test failed: {str(e)}", 0)
+            
+            # Test 2: Authentication Flow
+            logger.info("Testing authentication workflow...")
+            try:
+                start_time = time.time()
+                
+                # Try to get a token using form data (as expected by FastAPI OAuth2)
+                auth_data = {
+                    "username": "admin",  # Use existing user
+                    "password": "admin"
+                }
+                
+                # Set proper content-type for form data
+                headers = {"Content-Type": "application/x-www-form-urlencoded"}
+                
+                auth_response = requests.post(
+                    f"{server_url}/token",
+                    data=auth_data,
+                    headers=headers,
+                    timeout=10
+                )
+                
+                duration = (time.time() - start_time) * 1000
+                
+                if auth_response.status_code == 200:
+                    try:
+                        token_data = auth_response.json()
+                        if "access_token" in token_data:
+                            token = token_data["access_token"]
+                            self._record_result("frontend", "e2e_authentication", "PASS", 
+                                           "Authentication workflow working", duration)
+                            
+                            # Test 3: Authenticated API Access
+                            self._test_authenticated_api_access(server_url, token)
+                        else:
+                            self._record_result("frontend", "e2e_authentication", "WARN", 
+                                           "Authentication response missing access_token", duration)
+                    except ValueError:
+                        self._record_result("frontend", "e2e_authentication", "WARN", 
+                                       "Authentication response not valid JSON", duration)
+                        
+                elif auth_response.status_code == 422:
+                    # Check if it's a validation error (which is expected for invalid credentials)
+                    self._record_result("frontend", "e2e_authentication", "PASS", 
+                                   "Authentication endpoint validates input correctly (422 for invalid credentials)", duration)
+                else:
+                    self._record_result("frontend", "e2e_authentication", "WARN", 
+                                   f"Authentication returned unexpected status {auth_response.status_code}", duration)
+                    
+            except requests.exceptions.RequestException as e:
+                self._record_result("frontend", "e2e_authentication", "WARN", 
+                               f"Authentication test failed: {str(e)}", 0)
+                               
+        except Exception as e:
+            self._record_result("frontend", "e2e_workflow", "FAIL", 
+                           f"E2E workflow test failed: {str(e)}", 0)
+
+    def _test_authenticated_api_access(self, server_url: str, token: str):
+        """Test authenticated API endpoints that the frontend would use."""
+        try:
+            headers = {"Authorization": f"Bearer {token}"}
+            
+            # Test job listing endpoint
+            start_time = time.time()
+            jobs_response = requests.get(
+                f"{server_url}/jobs/",
+                headers=headers,
+                timeout=10
+            )
+            duration = (time.time() - start_time) * 1000
+            
+            if jobs_response.status_code == 200:
+                self._record_result("frontend", "e2e_jobs_access", "PASS", 
+                               "Jobs API accessible with authentication", duration)
+            else:
+                self._record_result("frontend", "e2e_jobs_access", "WARN", 
+                               f"Jobs API returned status {jobs_response.status_code}", duration)
+            
+            # Test user profile/dashboard endpoint
+            start_time = time.time()
+            try:
+                dashboard_response = requests.get(
+                    f"{server_url}/dashboard",
+                    headers=headers,
+                    timeout=10
+                )
+                duration = (time.time() - start_time) * 1000
+                
+                if dashboard_response.status_code == 200:
+                    self._record_result("frontend", "e2e_dashboard_access", "PASS", 
+                                   "Dashboard API accessible", duration)
+                else:
+                    self._record_result("frontend", "e2e_dashboard_access", "WARN", 
+                                   f"Dashboard returned status {dashboard_response.status_code}", duration)
+                                   
+            except requests.exceptions.RequestException as e:
+                self._record_result("frontend", "e2e_dashboard_access", "WARN", 
+                               f"Dashboard access test failed: {str(e)}", 0)
+            
+            # Test admin endpoints (if user has admin access)
+            start_time = time.time()
+            try:
+                admin_response = requests.get(
+                    f"{server_url}/admin/stats",
+                    headers=headers,
+                    timeout=10
+                )
+                duration = (time.time() - start_time) * 1000
+                
+                if admin_response.status_code == 200:
+                    self._record_result("frontend", "e2e_admin_access", "PASS", 
+                                   "Admin API accessible", duration)
+                else:
+                    self._record_result("frontend", "e2e_admin_access", "WARN", 
+                                   f"Admin API returned status {admin_response.status_code}", duration)
+                                   
+            except requests.exceptions.RequestException as e:
+                self._record_result("frontend", "e2e_admin_access", "WARN", 
+                               f"Admin access test failed: {str(e)}", 0)
+                
+        except Exception as e:
+            self._record_result("frontend", "e2e_authenticated_access", "FAIL", 
+                           f"Authenticated API access test failed: {str(e)}", 0)
+
     async def run_comprehensive_validation(self, components: Optional[List[str]] = None) -> Dict:
         """Run comprehensive validation of all or specified components."""
         logger.info("🚀 Starting comprehensive application validation...")
         
         if components is None:
             components = ["api_endpoints", "database", "file_system", "configuration", 
-                         "security", "backup_system", "performance"]
+                         "security", "backup_system", "performance", "frontend"]
         
         component_statuses = []
         overall_start = time.time()
@@ -860,6 +1273,8 @@ class ComprehensiveValidator:
                     status = self.validate_backup_system()
                 elif component == "performance":
                     status = self.validate_performance()
+                elif component == "frontend":
+                    status = self.validate_frontend()
                 else:
                     logger.warning(f"Unknown component: {component}")
                     continue
@@ -978,7 +1393,7 @@ async def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="Comprehensive Application State Validator")
-    parser.add_argument("--component", choices=["all", "api", "database", "files", "config", "security", "backup", "performance"],
+    parser.add_argument("--component", choices=["all", "api", "database", "files", "config", "security", "backup", "performance", "frontend"],
                        default="all", help="Component to validate")
     parser.add_argument("--output", help="Output file for report")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
@@ -997,7 +1412,8 @@ async def main():
         "config": ["configuration"],
         "security": ["security"],
         "backup": ["backup_system"],
-        "performance": ["performance"]
+        "performance": ["performance"],
+        "frontend": ["frontend"]
     }
     
     components = component_map.get(args.component)

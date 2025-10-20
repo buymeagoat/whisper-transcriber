@@ -37,6 +37,30 @@ try:
         CacheConfiguration
     )
     from api.middlewares.enhanced_cache import EnhancedApiCacheMiddleware
+    
+    # Enhanced database optimization for T025 Phase 3
+    from api.services.database_optimization_integration import (
+        get_optimization_service,
+        cleanup_optimization_service,
+        database_optimization_lifespan
+    )
+    
+    # Enhanced WebSocket service for T025 Phase 4
+    from api.services.enhanced_websocket_service import (
+        get_websocket_service,
+        cleanup_websocket_service,
+        websocket_service_lifespan
+    )
+    from api.services.websocket_job_integration import (
+        get_job_notifier,
+        setup_job_event_listeners
+    )
+    
+    # Chunked upload service for T025 Phase 5
+    from api.services.chunked_upload_service import (
+        chunked_upload_service,
+        ChunkedUploadService
+    )
 
     # Import backup service management if available
     try:
@@ -116,6 +140,30 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         system_log.warning(f"Failed to initialize cache service: {e}")
 
+    # Initialize enhanced database optimization for T025 Phase 3
+    try:
+        optimization_service = await get_optimization_service()
+        system_log.info("Enhanced database optimization service initialized successfully")
+    except Exception as e:
+        system_log.warning(f"Failed to initialize database optimization service: {e}")
+
+    # Initialize enhanced WebSocket service for T025 Phase 4
+    try:
+        websocket_service = await get_websocket_service()
+        job_notifier = await get_job_notifier()
+        setup_job_event_listeners()
+        system_log.info("Enhanced WebSocket service initialized successfully")
+    except Exception as e:
+        system_log.warning(f"Failed to initialize WebSocket service: {e}")
+
+    # Initialize chunked upload service for T025 Phase 5
+    try:
+        # Initialize chunked upload service with WebSocket integration
+        chunked_upload_service.progress_tracker.websocket_service = websocket_service
+        system_log.info("Chunked upload service initialized successfully")
+    except Exception as e:
+        system_log.warning(f"Failed to initialize chunked upload service: {e}")
+
     # Start background threads
     start_cleanup_thread()
     
@@ -147,6 +195,27 @@ async def lifespan(app: FastAPI):
         system_log.info("Cache service shutdown completed")
     except Exception as e:
         system_log.error(f"Error shutting down cache service: {e}")
+    
+    # Cleanup enhanced database optimization service
+    try:
+        await cleanup_optimization_service()
+        system_log.info("Database optimization service shutdown completed")
+    except Exception as e:
+        system_log.error(f"Error shutting down database optimization service: {e}")
+    
+    # Cleanup enhanced WebSocket service
+    try:
+        await cleanup_websocket_service()
+        system_log.info("WebSocket service shutdown completed")
+    except Exception as e:
+        system_log.error(f"Error shutting down WebSocket service: {e}")
+    
+    # Cleanup chunked upload service
+    try:
+        chunked_upload_service.cleanup()
+        system_log.info("Chunked upload service shutdown completed")
+    except Exception as e:
+        system_log.error(f"Error shutting down chunked upload service: {e}")
     
     # Shutdown backup service gracefully
     if BACKUP_SERVICE_AVAILABLE:

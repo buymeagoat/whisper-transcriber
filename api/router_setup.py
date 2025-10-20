@@ -7,6 +7,8 @@ from fastapi.staticfiles import StaticFiles
 
 from api.routes import jobs, admin, logs, metrics, auth, users, audit, cache
 from api.routes import progress, audio, tts, user_settings, enhanced_cache
+from api.routes import websockets, admin_websocket, admin_database_optimization
+from api.routes import chunked_uploads, upload_websockets, admin_chunked_uploads
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.app_state import backend_log
 
@@ -34,6 +36,16 @@ def register_routes(app: FastAPI) -> None:
     
     # Enhanced cache management routes for T025 Phase 2
     app.include_router(enhanced_cache.router, tags=["enhanced_cache", "admin"])
+    
+    # Enhanced WebSocket routes for T025 Phase 4
+    app.include_router(websockets.router, tags=["websockets", "real-time"])
+    app.include_router(admin_websocket.router, tags=["admin", "websockets"])
+    app.include_router(admin_database_optimization.router, tags=["admin", "database"])
+    
+    # Chunked upload routes for T025 Phase 5
+    app.include_router(chunked_uploads.router, tags=["chunked-uploads", "file-upload"])
+    app.include_router(upload_websockets.router, tags=["upload-websockets", "real-time"])
+    app.include_router(admin_chunked_uploads.router, tags=["admin", "chunked-uploads"])
     
     # Include backup management API if available
     if BACKUP_API_AVAILABLE:

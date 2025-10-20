@@ -50,10 +50,11 @@ const Layout = ({ children }) => {
   ]
 
   const adminNavigation = [
-    { name: 'Admin Dashboard', href: '/admin', icon: Shield },
-    { name: 'User Management', href: '/admin/users', icon: Users },
-    { name: 'System Monitoring', href: '/admin/monitoring', icon: Activity },
-    { name: 'Audit Logs', href: '/admin/audit', icon: FileText },
+    { name: 'Admin Panel', href: '/admin', icon: Shield },
+    // TODO: Add individual admin pages in future tasks
+    // { name: 'User Management', href: '/admin/users', icon: Users },
+    // { name: 'System Monitoring', href: '/admin/monitoring', icon: Activity },
+    // { name: 'Audit Logs', href: '/admin/audit', icon: FileText },
   ]
 
   const isActiveRoute = (href) => {

@@ -1,4 +1,4 @@
-import React, { useState } from 're              Are you sure you want to logout? You&apos;ll need to sign in again to access your account.ct'
+import React, { useState } from 'react'
 import { LogOut, X, AlertTriangle } from 'lucide-react'
 
 const LogoutConfirmation = ({ isOpen, onConfirm, onCancel }) => {

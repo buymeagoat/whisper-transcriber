@@ -19,10 +19,11 @@ import JobsPage from './pages/user/JobsPage'
 import SettingsPage from './pages/user/SettingsPage'
 
 // Admin pages
-import AdminDashboard from './pages/admin/AdminDashboard'
-import UserManagement from './pages/admin/UserManagement'
-import SystemMonitoring from './pages/admin/SystemMonitoring'
-import AuditLogs from './pages/admin/AuditLogs'
+import AdminPanel from './pages/AdminPanel'
+// TODO: These components will be implemented in future tasks
+// import UserManagement from './pages/admin/UserManagement'
+// import SystemMonitoring from './pages/admin/SystemMonitoring'
+// import AuditLogs from './pages/admin/AuditLogs'
 
 // The ProtectedRoute component is now imported from ./components/ProtectedRoute
 
@@ -79,11 +80,12 @@ function App() {
           <Route path="/admin" element={
             <ProtectedRoute adminRequired>
               <Layout>
-                <AdminDashboard />
+                <AdminPanel />
               </Layout>
             </ProtectedRoute>
           } />
           
+          {/* TODO: Implement individual admin pages in future tasks
           <Route path="/admin/users" element={
             <ProtectedRoute adminRequired>
               <Layout>
@@ -107,6 +109,7 @@ function App() {
               </Layout>
             </ProtectedRoute>
           } />
+          */}
           
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />

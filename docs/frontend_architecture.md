@@ -18,10 +18,15 @@ Modern React application with TypeScript, Vite build system, and TailwindCSS sty
 - `src/components/ProgressBar.jsx` - Progress tracking
 
 ### Admin Interface
-- `src/pages/admin/AdminDashboard.jsx` - System overview
-- `src/pages/admin/UserManagement.jsx` - User administration
-- `src/pages/admin/SystemMonitoring.jsx` - System health monitoring
-- `src/pages/admin/AuditLogs.jsx` - Security audit trail
+- `src/pages/AdminPanel.jsx` - Main administrative interface with tabbed navigation
+- `src/components/SystemHealth.jsx` - Real-time system health monitoring component
+- **Features Implemented (T007)**:
+  - System health dashboard with server status, database connectivity, queue monitoring
+  - Live statistics display (job counts, app version, configuration details)
+  - Real-time updates with 30-second auto-refresh
+  - Admin-only access protection via ProtectedRoute component
+  - Responsive design with dark mode support
+  - Integration with backend `/admin/health` and `/admin/stats` endpoints
 
 ### Services
 - `src/services/jobsService.js` - Transcription job API integration

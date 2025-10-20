@@ -1,6 +1,15 @@
 import apiClient from './apiClient'
 
 export const adminService = {
+  async getHealth() {
+    try {
+      const response = await apiClient.get('/admin/health')
+      return response.data
+    } catch (error) {
+      throw new Error(error.response?.data?.detail || 'Failed to fetch health status')
+    }
+  },
+
   async getStats() {
     try {
       const response = await apiClient.get('/admin/stats')

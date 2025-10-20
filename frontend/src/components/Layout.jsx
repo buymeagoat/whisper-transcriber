@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import LogoutConfirmation from './LogoutConfirmation'
+import SessionStatus from './SessionStatus'
 import { 
   Menu, 
   X, 
@@ -17,6 +19,7 @@ import {
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const { user, logout, isAdmin } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
@@ -24,6 +27,19 @@ const Layout = ({ children }) => {
   const handleLogout = async () => {
     await logout()
     navigate('/login')
+  }
+
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true)
+  }
+
+  const handleLogoutConfirm = async () => {
+    setShowLogoutConfirm(false)
+    await handleLogout()
+  }
+
+  const handleLogoutCancel = () => {
+    setShowLogoutConfirm(false)
   }
 
   const navigation = [
@@ -150,7 +166,7 @@ const Layout = ({ children }) => {
                 </p>
               </div>
               <button
-                onClick={handleLogout}
+                onClick={handleLogoutClick}
                 className="ml-3 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                 title="Logout"
               >
@@ -187,7 +203,19 @@ const Layout = ({ children }) => {
             </div>
           </div>
         </main>
+
+        {/* Session Status - bottom right corner */}
+        <div className="fixed bottom-4 right-4 z-10">
+          <SessionStatus />
+        </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmation
+        isOpen={showLogoutConfirm}
+        onConfirm={handleLogoutConfirm}
+        onCancel={handleLogoutCancel}
+      />
     </div>
   )
 }

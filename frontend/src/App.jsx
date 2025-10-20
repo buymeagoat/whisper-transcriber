@@ -5,6 +5,7 @@ import Layout from './components/Layout'
 import LoadingSpinner from './components/LoadingSpinner'
 import ErrorBoundary from './components/ErrorBoundary'
 import DevTools from './components/DevTools'
+import ProtectedRoute from './components/ProtectedRoute'
 
 // Public pages
 import LoginPage from './pages/auth/LoginPage'
@@ -23,24 +24,7 @@ import UserManagement from './pages/admin/UserManagement'
 import SystemMonitoring from './pages/admin/SystemMonitoring'
 import AuditLogs from './pages/admin/AuditLogs'
 
-// Route protection component
-const ProtectedRoute = ({ children, adminRequired = false }) => {
-  const { user, loading } = useAuth()
-  
-  if (loading) {
-    return <LoadingSpinner />
-  }
-  
-  if (!user) {
-    return <Navigate to="/login" replace />
-  }
-  
-  if (adminRequired && !user.is_admin) {
-    return <Navigate to="/dashboard" replace />
-  }
-  
-  return children
-}
+// The ProtectedRoute component is now imported from ./components/ProtectedRoute
 
 function App() {
   const { user, loading } = useAuth()

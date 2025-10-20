@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { Mic, Eye, EyeOff, AlertCircle } from 'lucide-react'
@@ -7,15 +7,33 @@ const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    rememberMe: false,
   })
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { login, error, clearError } = useAuth()
   const navigate = useNavigate()
 
+  // Load remembered email on mount
+  useEffect(() => {
+    const rememberMe = localStorage.getItem('remember_me')
+    const rememberedEmail = localStorage.getItem('remembered_email')
+    
+    if (rememberMe === 'true' && rememberedEmail) {
+      setFormData(prev => ({
+        ...prev,
+        email: rememberedEmail,
+        rememberMe: true
+      }))
+    }
+  }, [])
+
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    const { name, value, type, checked } = e.target
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? checked : value 
+    }))
     if (error) clearError()
   }
 
@@ -26,6 +44,16 @@ const LoginPage = () => {
     setIsSubmitting(true)
     try {
       await login(formData.email, formData.password)
+      
+      // Handle remember me functionality
+      if (formData.rememberMe) {
+        localStorage.setItem('remember_me', 'true')
+        localStorage.setItem('remembered_email', formData.email)
+      } else {
+        localStorage.removeItem('remember_me')
+        localStorage.removeItem('remembered_email')
+      }
+      
       navigate('/dashboard')
     } catch (error) {
       // Error is handled by AuthContext
@@ -110,6 +138,31 @@ const LoginPage = () => {
                     <Eye className="h-5 w-5 text-gray-400" />
                   )}
                 </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="rememberMe"
+                  name="rememberMe"
+                  type="checkbox"
+                  checked={formData.rememberMe}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                  Remember me
+                </label>
+              </div>
+
+              <div className="text-sm">
+                <Link
+                  to="/forgot-password"
+                  className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  Forgot your password?
+                </Link>
               </div>
             </div>
 

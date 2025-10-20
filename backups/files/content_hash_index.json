@@ -263,5 +263,45 @@
     "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/builds/20251020_011905_build_20251020_011240.md.zst",
     "first_seen": "2025-10-20T01:19:05.975965",
     "reference_count": 1
+  },
+  "a206bea54bccd5e33f0e21579ddb4523c5eef7830cc1af7439d9fc424049413c": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251020_013414_server.log.zst",
+    "first_seen": "2025-10-20T01:34:14.380807",
+    "reference_count": 1
+  },
+  "4661752e0d47541c2b7eab88ce7756d76ecd57a27815bb8d4b6d7d88c0f0fe07": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251020_013414_api.log.zst",
+    "first_seen": "2025-10-20T01:34:14.400055",
+    "reference_count": 1
+  },
+  "32cc5b1d20ddbdaf106b0d9971bcfd275c54dc029161ace03d8808d88068fd13": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/builds/20251020_013414_build_20251020_013138.md.zst",
+    "first_seen": "2025-10-20T01:34:14.417779",
+    "reference_count": 1
+  },
+  "f3a830d1d082cf46a7caccac5906c98d0150a944978b18e8de8cd3a97cd781f7": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/builds/20251020_013414_build_20251020_013129.md.zst",
+    "first_seen": "2025-10-20T01:34:14.426011",
+    "reference_count": 1
+  },
+  "8ddd7aa6c70307d8a4e7d2148374dc570b19194bf495793b9c14d61af6efa7bb": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/changes/20251020_013414_change_20251020_013138.md.zst",
+    "first_seen": "2025-10-20T01:34:14.430859",
+    "reference_count": 1
+  },
+  "ecfb8701dab47d2a2daedc4d5c76db3b87f9ce210b987c05b5529d38d0a7738c": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/changes/20251020_013414_change_20251020_012210.md.zst",
+    "first_seen": "2025-10-20T01:34:14.436574",
+    "reference_count": 1
+  },
+  "dc5f0cac7f271e6dac2e7ba0f5fd84403d624ef0d8caa57f5d19d126a83e6eb0": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/builds/20251020_013414_build_20251020_012210.md.zst",
+    "first_seen": "2025-10-20T01:34:14.441920",
+    "reference_count": 1
+  },
+  "64701dabee008e136ac89230657a87989b949ac1adb83411fd9d93431cbc81b6": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/changes/20251020_013414_change_20251020_013129.md.zst",
+    "first_seen": "2025-10-20T01:34:14.446903",
+    "reference_count": 1
   }
 }

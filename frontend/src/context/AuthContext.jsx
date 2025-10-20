@@ -22,19 +22,46 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('auth_token')
         if (token) {
-          // Verify token and get user info
-          const userData = await authService.getCurrentUser()
-          setUser(userData)
+          // Check if token is expired
+          if (authService.isTokenExpired()) {
+            // Try to refresh token
+            try {
+              await authService.refreshToken()
+              const userData = await authService.getCurrentUser()
+              setUser(userData)
+            } catch (refreshError) {
+              // Refresh failed, clear tokens
+              localStorage.removeItem('auth_token')
+              localStorage.removeItem('token_expires_at')
+              setError('Your session has expired. Please login again.')
+            }
+          } else {
+            // Token is still valid, get user info
+            const userData = await authService.getCurrentUser()
+            setUser(userData)
+          }
         }
       } catch (error) {
         console.error('Auth initialization error:', error)
         localStorage.removeItem('auth_token')
+        localStorage.removeItem('token_expires_at')
       } finally {
         setLoading(false)
       }
     }
 
+    // Listen for auth expiration events from API client
+    const handleAuthExpired = (event) => {
+      setUser(null)
+      setError(event.detail.message)
+    }
+
+    window.addEventListener('auth:expired', handleAuthExpired)
     initializeAuth()
+
+    return () => {
+      window.removeEventListener('auth:expired', handleAuthExpired)
+    }
   }, [])
 
   const login = async (email, password) => {
@@ -44,7 +71,7 @@ export const AuthProvider = ({ children }) => {
       
       const { user: userData, token } = await authService.login(email, password)
       
-      // Store token
+      // Store token (expiration time is already stored by authService)
       localStorage.setItem('auth_token', token)
       
       // Set user data
@@ -87,8 +114,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error)
     } finally {
-      // Always clear local state
-      localStorage.removeItem('auth_token')
+      // Always clear local state (authService.logout() clears tokens too)
       setUser(null)
       setError(null)
     }

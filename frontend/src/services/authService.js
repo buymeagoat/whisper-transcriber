@@ -15,6 +15,9 @@ export const authService = {
         throw new Error('No access token received')
       }
       
+      // Store token expiration time
+      localStorage.setItem('token_expires_at', Date.now() + (expires_in * 1000))
+      
       // Get user info with the token
       const userResponse = await apiClient.get('/auth/me', {
         headers: {
@@ -62,9 +65,32 @@ export const authService = {
   },
 
   async logout() {
-    // For now, just clear local storage
-    // Backend doesn't seem to have explicit logout endpoint
-    localStorage.removeItem('auth_token')
+    try {
+      await apiClient.post('/auth/logout')
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('token_expires_at')
+    }
+  },
+
+  async refreshToken() {
+    try {
+      const response = await apiClient.post('/auth/refresh')
+      const { access_token, expires_in } = response.data
+      
+      if (access_token) {
+        localStorage.setItem('auth_token', access_token)
+        localStorage.setItem('token_expires_at', Date.now() + (expires_in * 1000))
+        return access_token
+      }
+    } catch (error) {
+      // If refresh fails, clear tokens and force logout
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('token_expires_at')
+      throw new Error('Session expired. Please login again.')
+    }
   },
 
   async changePassword(currentPassword, newPassword) {
@@ -89,5 +115,36 @@ export const authService = {
     } catch (error) {
       throw new Error(error.response?.data?.detail || 'Profile update failed')
     }
+  },
+
+  isTokenExpired() {
+    const expiresAt = localStorage.getItem('token_expires_at')
+    if (!expiresAt) return true
+    
+    // Add 5 minute buffer before expiration
+    const fiveMinutes = 5 * 60 * 1000
+    return Date.now() >= (parseInt(expiresAt) - fiveMinutes)
+  },
+
+  hasValidToken() {
+    const token = localStorage.getItem('auth_token')
+    return token && !this.isTokenExpired()
+  },
+
+  async ensureValidToken() {
+    if (!this.hasValidToken()) {
+      const token = localStorage.getItem('auth_token')
+      if (token) {
+        // Try to refresh the token
+        try {
+          await this.refreshToken()
+          return true
+        } catch (error) {
+          return false
+        }
+      }
+      return false
+    }
+    return true
   },
 }

@@ -1,6 +1,6 @@
 """Authentication routes for user login and token management."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from datetime import datetime, timedelta
@@ -9,6 +9,18 @@ import jwt
 import hashlib
 import secrets
 from ..settings import settings
+
+# T026 Security Hardening - Audit logging integration
+from api.audit.integration import (
+    audit_login_attempt,
+    audit_administrative_action,
+    extract_request_context
+)
+from api.audit.security_audit_logger import (
+    AuditEventType,
+    AuditSeverity,
+    AuditOutcome
+)
 
 # Create router instance for /auth prefixed routes
 router = APIRouter(prefix="/auth", tags=["authentication"])
@@ -105,10 +117,19 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) 
         )
 
 @router.post("/login", response_model=Token)
-async def login(login_data: LoginRequest):
+async def login(login_data: LoginRequest, request: Request):
     """Authenticate user and return access token."""
     user = USERS_DB.get(login_data.username)
+    
     if not user or not verify_password(login_data.password, user["password_hash"]):
+        # Audit failed login attempt
+        audit_login_attempt(
+            user_id=login_data.username,
+            success=False,
+            request=request,
+            reason="Invalid credentials"
+        )
+        
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -116,10 +137,25 @@ async def login(login_data: LoginRequest):
         )
     
     if not user["is_active"]:
+        # Audit failed login attempt for inactive user
+        audit_login_attempt(
+            user_id=login_data.username,
+            success=False,
+            request=request,
+            reason="Inactive user account"
+        )
+        
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Inactive user"
         )
+    
+    # Audit successful login
+    audit_login_attempt(
+        user_id=login_data.username,
+        success=True,
+        request=request
+    )
     
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(

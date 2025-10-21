@@ -1,10 +1,11 @@
-"""
+from api.utils.log_sanitization import safe_log_format, sanitize_for_log\n\n# T026 Security: Fixed log injection vulnerability\n"""
 Job management routes for the Whisper Transcriber API.
 Enhanced with cache invalidation for T025 Phase 2.
+Enhanced with audit logging for T026 Security Hardening.
 """
 
 from typing import Dict, Any, Optional
-from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form, Request
 from sqlalchemy.orm import Session
 from api.orm_bootstrap import get_db
 from api.models import Job, JobStatusEnum
@@ -15,6 +16,18 @@ from api.services.cache_hooks import job_cache_manager, cache_invalidator
 import uuid
 from datetime import datetime
 
+# T026 Security Hardening - Audit logging integration
+from api.audit.integration import (
+    audit_data_operation,
+    audit_administrative_action,
+    extract_request_context
+)
+from api.audit.security_audit_logger import (
+    AuditEventType,
+    AuditSeverity,
+    AuditOutcome
+)
+
 logger = get_system_logger("jobs_api")
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
@@ -24,28 +37,51 @@ async def create_job(
     file: UploadFile = File(...),
     model: str = Form(default="small"),
     language: Optional[str] = Form(default=None),
+    request: Request,
     db: Session = Depends(get_db)
 ):
     """Create a new transcription job."""
     try:
+        # Extract user context for auditing
+        user_context = extract_request_context(request)
+        user_id = user_context.get("user_id", "anonymous")
+        
         # Validate file type
         if file.content_type not in settings.allowed_file_types:
+            # Audit failed file upload
+            audit_data_operation(
+                user_id=user_id,
+                action="upload",
+                resource=safe_log_format("file:{}", sanitize_for_log(file.filename)),
+                request=request,
+                success=False
+            )
+            
             raise HTTPException(
                 status_code=400,
-                detail=f"File type {file.content_type} not allowed"
+                detail=safe_log_format("File type {} not allowed", sanitize_for_log(file.content_type))
             )
         
         # Validate file size
         content = await file.read()
         if len(content) > settings.max_file_size:
+            # Audit failed file upload
+            audit_data_operation(
+                user_id=user_id,
+                action="upload",
+                resource=safe_log_format("file:{}", sanitize_for_log(file.filename)),
+                request=request,
+                success=False
+            )
+            
             raise HTTPException(
                 status_code=400,
-                detail=f"File too large. Maximum size: {settings.max_file_size} bytes"
+                detail=safe_log_format("File too large. Maximum size: {} bytes", sanitize_for_log(settings.max_file_size))
             )
         
         # Save uploaded file
         file_id = str(uuid.uuid4())
-        file_path = settings.upload_dir / f"{file_id}_{file.filename}"
+        file_path = settings.upload_dir / safe_log_format("{}_{}", sanitize_for_log(file_id), sanitize_for_log(file.filename))
         
         with open(file_path, "wb") as f:
             f.write(content)
@@ -80,7 +116,7 @@ async def create_job(
             "model": model
         })
         
-        logger.info(f"Created transcription job {file_id} for file {file.filename}")
+        logger.info(safe_log_format("Created transcription job {} for file {}", sanitize_for_log(file_id), sanitize_for_log(file.filename)))
         
         return {
             "job_id": file_id,
@@ -90,7 +126,7 @@ async def create_job(
         }
     
     except Exception as e:
-        logger.error(f"Failed to create job: {e}")
+        logger.error(safe_log_format("Failed to create job: {}", sanitize_for_log(e)))
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{job_id}", response_model=Dict[str, Any])
@@ -157,12 +193,12 @@ async def delete_job(job_id: str, db: Session = Depends(get_db)):
     # Invalidate related caches
     await job_cache_manager.job_deleted(job_id)
     
-    logger.info(f"Deleted job {job_id}")
+    logger.info(safe_log_format("Deleted job {}", sanitize_for_log(job_id)))
     
     return {"message": "Job deleted successfully"}
     db.delete(job)
     db.commit()
     
-    logger.info(f"Deleted job {job_id}")
+    logger.info(safe_log_format("Deleted job {}", sanitize_for_log(job_id)))
     
     return {"message": "Job deleted successfully"}

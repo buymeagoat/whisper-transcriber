@@ -32,6 +32,7 @@ try:
 )
     from api.middlewares.rate_limit import RateLimitMiddleware, RateLimitConfig
     from api.middlewares.api_cache import ApiCacheMiddleware, CacheConfig
+    from api.middlewares.audit_middleware import AuditMiddleware
     
     # Enhanced caching system for T025 Phase 2
     from api.services.redis_cache import (
@@ -40,6 +41,12 @@ try:
         CacheConfiguration
     )
     from api.middlewares.enhanced_cache import EnhancedApiCacheMiddleware
+    
+    # Audit logging system for T026 Security Hardening
+    from api.audit.security_audit_logger import initialize_audit_logging
+    
+    # T026 Security Hardening - Secure logging utilities
+    from api.utils.log_sanitization import safe_log_format, sanitize_for_log
     
     # Enhanced database optimization for T025 Phase 3
     from api.services.database_optimization_integration import (
@@ -95,13 +102,14 @@ from functools import partial
 
 def log_startup_settings() -> None:
     """Log key configuration settings."""
-    system_log.info(
-        "db_url=%s, job_queue_backend=%s, storage_backend=%s, log_level=%s",
-        settings.db_url,
-        settings.job_queue_backend,
-        settings.storage_backend,
-        settings.log_level,
-    )
+    # T026 Security: Fixed log injection vulnerability - use safe formatting
+    system_log.info(safe_log_format(
+        "db_url={}, job_queue_backend={}, storage_backend={}, log_level={}",
+        sanitize_for_log(settings.db_url),
+        sanitize_for_log(settings.job_queue_backend),
+        sanitize_for_log(settings.storage_backend),
+        sanitize_for_log(settings.log_level)
+    ))
 
 
 # ─── Paths ───
@@ -119,6 +127,13 @@ if "VITE_API_HOST" not in os.environ:
 async def lifespan(app: FastAPI):
     """App lifespan events."""
     system_log.info("Starting app initialization...")
+    
+    # Initialize audit logging system for T026 Security Hardening
+    try:
+        audit_logger = initialize_audit_logging(enable_integrity=True)
+        system_log.info("Security audit logging system initialized successfully")
+    except Exception as e:
+        system_log.warning(f"Failed to initialize audit logging: {e}")
     
     # Database initialization
     validate_or_initialize_database()
@@ -282,6 +297,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# T026 Security Hardening - Audit Middleware for comprehensive security logging
+app.add_middleware(
+    AuditMiddleware,
+    audit_all_requests=False,  # Only audit sensitive endpoints
+    audit_sensitive_endpoints=True,
+    audit_failures=True,
+    exclude_paths=['/health', '/version', '/docs', '/redoc', '/openapi.json']
+)
 
 app.add_middleware(AccessLogMiddleware)
 

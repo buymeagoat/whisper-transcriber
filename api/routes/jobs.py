@@ -1,8 +1,11 @@
-from api.utils.log_sanitization import safe_log_format, sanitize_for_log\n\n# T026 Security: Fixed log injection vulnerability\n"""
+"""
 Job management routes for the Whisper Transcriber API.
 Enhanced with cache invalidation for T025 Phase 2.
 Enhanced with audit logging for T026 Security Hardening.
 """
+
+# T026 Security: Fixed log injection vulnerability
+from api.utils.log_sanitization import safe_log_format, sanitize_for_log
 
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form, Request
@@ -34,10 +37,10 @@ router = APIRouter(prefix="/jobs", tags=["jobs"])
 
 @router.post("/", response_model=Dict[str, Any])
 async def create_job(
+    request: Request,
     file: UploadFile = File(...),
     model: str = Form(default="small"),
     language: Optional[str] = Form(default=None),
-    request: Request,
     db: Session = Depends(get_db)
 ):
     """Create a new transcription job."""
@@ -50,7 +53,7 @@ async def create_job(
         if file.content_type not in settings.allowed_file_types:
             # Audit failed file upload
             audit_data_operation(
-                user_id=user_id,
+                user_id=user_id or "anonymous",
                 action="upload",
                 resource=safe_log_format("file:{}", sanitize_for_log(file.filename)),
                 request=request,
@@ -67,7 +70,7 @@ async def create_job(
         if len(content) > settings.max_file_size:
             # Audit failed file upload
             audit_data_operation(
-                user_id=user_id,
+                user_id=user_id or "anonymous",
                 action="upload",
                 resource=safe_log_format("file:{}", sanitize_for_log(file.filename)),
                 request=request,

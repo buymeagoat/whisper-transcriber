@@ -247,7 +247,8 @@ class RedisCacheService:
             # Store tag mappings for invalidation
             for tag in tags:
                 tag_key = f"{self._tags_prefix}{tag}"
-                await self.redis_pool.sadd(tag_key, cache_key)
+                # Note: sadd behavior varies by Redis version  
+                await self.redis_pool.sadd(tag_key, cache_key)  # type: ignore
                 await self.redis_pool.expire(tag_key, ttl + 60)  # Keep tags slightly longer
             
             self.metrics.sets += 1
@@ -269,13 +270,17 @@ class RedisCacheService:
         
         try:
             tag_key = f"{self._tags_prefix}{tag}"
-            cache_keys = await self.redis_pool.smembers(tag_key)
+            # Note: smembers behavior varies by Redis version
+            cache_keys = await self.redis_pool.smembers(tag_key)  # type: ignore
             
             if cache_keys:
-                # Delete cache entries
-                deleted = await self.redis_pool.delete(*cache_keys)
-                # Delete tag set
-                await self.redis_pool.delete(tag_key)
+                # Convert to list to handle different return types
+                cache_keys_list = list(cache_keys) if hasattr(cache_keys, '__iter__') else []
+                if cache_keys_list:
+                    # Delete cache entries
+                    deleted = await self.redis_pool.delete(*cache_keys_list)
+                    # Delete tag set
+                    await self.redis_pool.delete(tag_key)
                 
                 self.metrics.invalidations += deleted
                 

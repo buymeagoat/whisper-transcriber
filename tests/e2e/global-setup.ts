@@ -1,4 +1,4 @@
-import { chromium, FullConfig } from '@playwright/test';
+import { chromium, FullConfig, Page } from '@playwright/test';
 
 /**
  * Global setup for Playwright tests
@@ -34,7 +34,7 @@ async function globalSetup(config: FullConfig) {
 /**
  * Set up test users for E2E testing
  */
-async function setupTestUsers(page) {
+async function setupTestUsers(page: Page) {
   const testUsers = [
     {
       username: 'e2e_test_user',

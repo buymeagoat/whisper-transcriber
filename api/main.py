@@ -26,7 +26,10 @@ try:
         check_celery_connection,
     )
     from api.services.job_queue import ThreadJobQueue
-    from api.middlewares.security_headers import SecurityHeadersMiddleware
+    from api.middlewares.enhanced_security_headers import (
+    EnhancedSecurityHeadersMiddleware,
+    create_security_headers_middleware
+)
     from api.middlewares.rate_limit import RateLimitMiddleware, RateLimitConfig
     from api.middlewares.api_cache import ApiCacheMiddleware, CacheConfig
     
@@ -261,7 +264,16 @@ rate_limit_config = RateLimitConfig(
 )
 app.add_middleware(RateLimitMiddleware, config=rate_limit_config)
 
-app.add_middleware(SecurityHeadersMiddleware, enable_hsts=False)  # HSTS disabled for development
+# Enhanced Security Headers with environment-specific configuration
+environment = os.getenv("ENVIRONMENT", "production")
+security_headers_middleware = create_security_headers_middleware(
+    environment=environment,
+    enable_hsts=(environment == "production"),
+    excluded_paths=["/docs", "/redoc", "/openapi.json", "/health", "/version"]
+)
+app.add_middleware(EnhancedSecurityHeadersMiddleware, 
+                  environment=environment,
+                  excluded_paths=["/docs", "/redoc", "/openapi.json"])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins.split(","),
@@ -340,12 +352,3 @@ def rehydrate_incomplete_jobs():
 
 # ─── Register Routers ─────────────────────────────────────
 register_routes(app)
-\n
-# Detect environment for rate limiting
-import os
-environment = os.getenv("ENVIRONMENT", "production")
-if environment not in ["production", "development", "test"]:
-    environment = "production"  # Default to production for security
-
-# Add enhanced rate limiting
-add_rate_limiting(app, environment)

@@ -79,20 +79,20 @@ class DatabaseBackupEngine:
                 
                 # Optimize WAL settings for backup
                 conn.execute("PRAGMA wal_autocheckpoint=1000")  # Checkpoint every 1000 pages
-                # Set SQLite PRAGMA settings for performance optimization
+            # Set SQLite PRAGMA settings for performance optimization
             # These are system commands, not user input, so they're safe
             conn.execute("PRAGMA synchronous=NORMAL")      # Balance safety and performance
-                
-                # Verify WAL mode is active
-                result = conn.execute("PRAGMA journal_mode").fetchone()
-                is_wal = result[0].upper() == 'WAL'
-                
-                if is_wal:
-                    logger.info(f"WAL mode enabled for database: {self.database_path}")
-                else:
-                    logger.error(f"Failed to enable WAL mode for: {self.database_path}")
-                
-                return is_wal
+            
+            # Verify WAL mode is active
+            result = conn.execute("PRAGMA journal_mode").fetchone()
+            is_wal = result[0].upper() == 'WAL'
+            
+            if is_wal:
+                logger.info(f"WAL mode enabled for database: {self.database_path}")
+            else:
+                logger.error(f"Failed to enable WAL mode for: {self.database_path}")
+            
+            return is_wal
                 
         except Exception as e:
             logger.error(f"Error enabling WAL mode: {e}")

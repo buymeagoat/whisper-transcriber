@@ -48,6 +48,9 @@ try:
     # T026 Security Hardening - Secure logging utilities
     from api.utils.log_sanitization import safe_log_format, sanitize_for_log
     
+    # T026 Security Hardening - Comprehensive security middleware
+    from api.security.middleware import create_security_middleware_stack
+    
     # Enhanced database optimization for T025 Phase 3
     from api.services.database_optimization_integration import (
         get_optimization_service,
@@ -252,6 +255,11 @@ system_log.info("FastAPI app initialization starting.")
 
 # ─── App Setup ───
 app = FastAPI(lifespan=lifespan)
+
+# ─── Security Hardening Middleware Stack (T026) ───
+# Apply comprehensive security middleware stack
+security_middleware_stack = create_security_middleware_stack()
+app = security_middleware_stack(app)
 
 # ─── Middleware ───
 # Enhanced API Response Caching with Redis (T025 Phase 2)

@@ -9,6 +9,7 @@ from api.routes import jobs, admin, logs, metrics, auth, users, audit, cache
 from api.routes import progress, audio, tts, user_settings, enhanced_cache
 from api.routes import websockets, admin_websocket, admin_database_optimization
 from api.routes import chunked_uploads, upload_websockets, admin_chunked_uploads
+from api.routes import admin_security  # T026 Security Hardening admin routes
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.app_state import backend_log
 
@@ -46,6 +47,9 @@ def register_routes(app: FastAPI) -> None:
     app.include_router(chunked_uploads.router, tags=["chunked-uploads", "file-upload"])
     app.include_router(upload_websockets.router, tags=["upload-websockets", "real-time"])
     app.include_router(admin_chunked_uploads.router, tags=["admin", "chunked-uploads"])
+    
+    # T026 Security Hardening admin routes
+    app.include_router(admin_security.router, prefix="/admin", tags=["admin", "security"])
     
     # Include backup management API if available
     if BACKUP_API_AVAILABLE:

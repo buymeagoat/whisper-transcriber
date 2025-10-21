@@ -38,7 +38,7 @@ def ensure_default_admin():
             # Create default admin user
             admin_user = User(
                 username="admin",
-                hashed_password=hash_password("admin123"),  # Change in production
+                hashed_password=hash_password("0AYw^lpZa!TM*iw0oIKX"),  # Strong generated password
                 role="admin",
                 must_change_password=True
             )

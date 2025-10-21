@@ -9,6 +9,12 @@ uvicorn[standard]>=0.29.0
 # --- Database (SQLite for simplicity) ---
 sqlalchemy>=2.0.30
 
+# --- Security & Configuration ---
+cryptography>=41.0.0
+python-magic>=0.4.27
+filetype>=1.2.0
+bcrypt>=4.0.1
+
 # --- File Handling ---
 python-multipart>=0.0.6
 aiofiles>=23.2.1

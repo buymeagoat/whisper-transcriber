@@ -31,7 +31,7 @@ class Settings(BaseModel):
     vite_api_host: str = Field(default="localhost:8000")
     
     # Security settings
-    secret_key: str = Field(default="dev-secret-key-change-in-production")
+    secret_key: str = Field(default="")
     allowed_hosts: List[str] = Field(default=["*"])
     cors_origins: str = Field(default="*")  # Changed to string for split() compatibility
     

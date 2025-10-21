@@ -51,6 +51,9 @@ try:
     # T026 Security Hardening - Comprehensive security middleware
     from api.security.middleware import create_security_middleware_stack
     
+    # T027 API Key Management - API key authentication middleware
+    from api.middlewares.api_key_auth import APIKeyAuthenticationMiddleware
+    
     # Enhanced database optimization for T025 Phase 3
     from api.services.database_optimization_integration import (
         get_optimization_service,
@@ -256,10 +259,13 @@ system_log.info("FastAPI app initialization starting.")
 # ─── App Setup ───
 app = FastAPI(lifespan=lifespan)
 
-# ─── Security Hardening Middleware Stack (T026) ───
+# ─── Security Hardening Middleware Stack (T027) ───
 # Apply comprehensive security middleware stack
 security_middleware_stack = create_security_middleware_stack()
 app = security_middleware_stack(app)
+
+# ─── API Key Authentication Middleware (T027) ───
+app.add_middleware(APIKeyAuthenticationMiddleware)
 
 # ─── Middleware ───
 # Enhanced API Response Caching with Redis (T025 Phase 2)

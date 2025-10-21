@@ -10,6 +10,9 @@ from api.routes import progress, audio, tts, user_settings, enhanced_cache
 from api.routes import websockets, admin_websocket, admin_database_optimization
 from api.routes import chunked_uploads, upload_websockets, admin_chunked_uploads
 from api.routes import admin_security  # T026 Security Hardening admin routes
+from api.routes import api_keys, admin_api_keys  # T027 API Key Management routes
+from api.routes import batch  # T027 Batch Processing routes
+from api.routes import pwa  # T027 PWA Enhancement routes
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.app_state import backend_log
 
@@ -51,6 +54,16 @@ def register_routes(app: FastAPI) -> None:
     # T026 Security Hardening admin routes
     app.include_router(admin_security.router, prefix="/admin", tags=["admin", "security"])
     
+    # T027 API Key Management routes
+    app.include_router(api_keys.router, tags=["api-keys"])
+    app.include_router(admin_api_keys.router, tags=["admin", "api-keys"])
+    
+    # T027 Batch Processing routes
+    app.include_router(batch.router, tags=["batch"])
+    
+    # T027 PWA Enhancement routes
+    app.include_router(pwa.router, tags=["pwa"])
+    
     # Include backup management API if available
     if BACKUP_API_AVAILABLE:
         app.include_router(backup_router, tags=["backup"])
@@ -60,7 +73,7 @@ def register_routes(app: FastAPI) -> None:
     
     # Find and set cache middleware for admin operations
     for middleware in app.user_middleware:
-        if hasattr(middleware, 'cls') and middleware.cls.__name__ == 'ApiCacheMiddleware':
+        if hasattr(middleware, 'cls') and hasattr(middleware.cls, '__name__') and middleware.cls.__name__ == 'ApiCacheMiddleware':
             # Set the cache middleware instance for admin routes
             cache.set_cache_middleware(middleware)
             break

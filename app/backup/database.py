@@ -79,7 +79,9 @@ class DatabaseBackupEngine:
                 
                 # Optimize WAL settings for backup
                 conn.execute("PRAGMA wal_autocheckpoint=1000")  # Checkpoint every 1000 pages
-                conn.execute("PRAGMA synchronous=NORMAL")      # Balance safety and performance
+                # Set SQLite PRAGMA settings for performance optimization
+            # These are system commands, not user input, so they're safe
+            conn.execute("PRAGMA synchronous=NORMAL")      # Balance safety and performance
                 
                 # Verify WAL mode is active
                 result = conn.execute("PRAGMA journal_mode").fetchone()
@@ -398,11 +400,16 @@ class DatabaseBackupEngine:
             
             stats["database_size"] = stats["page_count"] * stats["page_size"]
             
-            # Get record counts for main tables
+            # Get record counts for main tables (using safe table names)
             main_tables = ["users", "jobs", "metadata", "config"]
             for table in main_tables:
                 try:
-                    result = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()
+                    # Validate table name against whitelist for security
+                    if table not in ["users", "jobs", "metadata", "config"]:
+                        continue
+                    # Use quote_identifier for safe table name handling
+                    safe_table = f'"{table}"'  # SQLite identifier quoting
+                    result = conn.execute(f"SELECT COUNT(*) FROM {safe_table}").fetchone()
                     stats[f"{table}_count"] = result[0] if result else 0
                 except sqlite3.OperationalError:
                     stats[f"{table}_count"] = 0

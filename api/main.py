@@ -340,3 +340,12 @@ def rehydrate_incomplete_jobs():
 
 # ─── Register Routers ─────────────────────────────────────
 register_routes(app)
+\n
+# Detect environment for rate limiting
+import os
+environment = os.getenv("ENVIRONMENT", "production")
+if environment not in ["production", "development", "test"]:
+    environment = "production"  # Default to production for security
+
+# Add enhanced rate limiting
+add_rate_limiting(app, environment)

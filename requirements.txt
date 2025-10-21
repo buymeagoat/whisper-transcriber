@@ -61,3 +61,4 @@ paramiko>=3.4.0
 
 # System requirements (install separately):
 # sudo apt-get install -y ffmpeg libmagic1
+\nfiletype>=1.2.0

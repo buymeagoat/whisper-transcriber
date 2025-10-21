@@ -459,7 +459,8 @@ class TestIntegrationScenarios:
         async def perform_queries(session_num):
             async with test_optimizer.get_optimized_session() as session:
                 for i in range(5):
-                    session.execute(text(f"SELECT {session_num * 5 + i}"))
+                    # Use parameterized query to prevent SQL injection
+                    session.execute(text("SELECT :value"), {"value": session_num * 5 + i})
         
         # Run concurrent operations
         tasks = [perform_queries(i) for i in range(3)]

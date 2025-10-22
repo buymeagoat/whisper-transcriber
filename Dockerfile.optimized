@@ -1,0 +1,249 @@
+# syntax=docker/dockerfile:1.7
+# Multi-stage production-optimized Dockerfile for Whisper Transcriber
+# T031: Production Deployment and Monitoring - Enhanced Docker Configuration
+
+# ===============================================================================
+# Stage 1: Base Python environment with security hardening
+# ===============================================================================
+FROM python:3.11-slim-bookworm@sha256:a96504e4e5a0e6cacf4fe789411497efb870c29ccd5b6c8082dcaaa9e2a34145 AS python-base
+
+# Build arguments for optimization
+ARG INSTALL_DEV=false
+ARG ENABLE_HEALTH_CHECKS=true
+ARG OPTIMIZE_SIZE=true
+
+# Security: Create non-root user with specific UID/GID
+RUN groupadd -r -g 1000 appuser && \
+    useradd -r -u 1000 -g appuser -m -d /home/appuser -s /sbin/nologin appuser
+
+# System packages with security focus
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        # Essential runtime packages
+        curl \
+        ca-certificates \
+        gosu \
+        # Build tools (removed in final stage)
+        gcc \
+        g++ \
+        make \
+        pkg-config \
+        # Audio processing dependencies
+        ffmpeg \
+        libsndfile1 \
+        # Security packages
+        gnupg2 \
+        && \
+    # Security: Clean package cache
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
+
+# Environment variables for Python optimization
+ENV PYTHONPATH=/app \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONOPTIMIZE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_ROOT_USER_ACTION=ignore
+
+# ===============================================================================
+# Stage 2: Frontend build stage for production assets
+# ===============================================================================
+FROM node:18-alpine@sha256:8e72de328fe7cf3e19e4b29e60c294a1f0e7abe1b4d5b5b3a4b2a4b2a4b2a4b2 AS frontend-build
+
+WORKDIR /frontend
+
+# Copy package files for dependency resolution
+COPY frontend/package*.json ./
+COPY frontend/.npmrc ./
+
+# Install dependencies with optimization
+RUN npm ci --only=production --no-audit --no-fund && \
+    npm cache clean --force
+
+# Copy frontend source and build
+COPY frontend/ ./
+RUN npm run build && \
+    # Optimize build output
+    find dist -name "*.map" -delete && \
+    find dist -name "*.txt" -delete
+
+# ===============================================================================
+# Stage 3: Python dependencies and models preparation
+# ===============================================================================
+FROM python-base AS deps-build
+
+WORKDIR /app
+
+# Copy dependency files
+COPY requirements.txt requirements-dev.txt alembic.ini ./
+COPY cache/pip ./wheels/
+
+# Install Python dependencies with optimization
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    # Install production dependencies
+    pip install --no-cache-dir --find-links ./wheels -r requirements.txt && \
+    # Conditionally install development dependencies
+    if [ "$INSTALL_DEV" = "true" ]; then \
+        pip install --no-cache-dir --find-links ./wheels -r requirements-dev.txt; \
+    fi && \
+    # Optimize Python bytecode
+    python -m compileall -f /usr/local/lib/python3.11/site-packages && \
+    # Clean up installation artifacts
+    rm -rf ./wheels ~/.cache /root/.cache /tmp/* /var/tmp/*
+
+# Download and prepare Whisper models
+COPY models/ ./models/
+RUN python -c "
+import whisper
+import os
+# Ensure models directory exists
+os.makedirs('/app/models', exist_ok=True)
+# Pre-download commonly used models for faster startup
+models = ['tiny', 'base', 'small', 'medium']
+for model in models:
+    try:
+        whisper.load_model(model, download_root='/app/models')
+        print(f'✓ Downloaded {model} model')
+    except Exception as e:
+        print(f'⚠ Failed to download {model}: {e}')
+"
+
+# ===============================================================================
+# Stage 4: Production runtime image
+# ===============================================================================
+FROM python-base AS production
+
+# Production configuration
+ENV APP_ENV=production \
+    DEBUG=false \
+    LOG_LEVEL=INFO \
+    PROMETHEUS_ENABLED=true \
+    WORKER_PROCESSES=4 \
+    WORKER_CONNECTIONS=1000
+
+# Create secure application directory structure
+RUN mkdir -p /app /app/data /app/storage /app/storage/uploads /app/storage/transcripts \
+             /app/logs /app/temp /app/backups /app/cache && \
+    chown -R appuser:appuser /app && \
+    chmod -R 750 /app
+
+WORKDIR /app
+
+# Copy Python dependencies from build stage
+COPY --from=deps-build /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
+COPY --from=deps-build /usr/local/bin/ /usr/local/bin/
+
+# Copy pre-downloaded models
+COPY --from=deps-build --chown=appuser:appuser /app/models/ ./models/
+
+# Copy application code
+COPY --chown=appuser:appuser api/ ./api/
+COPY --chown=appuser:appuser worker.py alembic.ini ./
+
+# Copy frontend assets from build stage
+COPY --from=frontend-build --chown=appuser:appuser /frontend/dist/ ./api/static/
+
+# Copy configuration and scripts
+COPY --chown=root:root scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
+COPY --chown=root:root scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY --chown=appuser:appuser .env.prod.example ./.env.example
+
+# Set script permissions
+RUN chmod 755 /usr/local/bin/healthcheck.sh /usr/local/bin/docker-entrypoint.sh
+
+# Final security and optimization steps
+RUN if [ "$OPTIMIZE_SIZE" = "true" ]; then \
+        # Remove development packages to reduce image size
+        apt-get remove -y gcc g++ make pkg-config && \
+        apt-get autoremove -y && \
+        # Clean Python bytecode cache
+        find /usr/local/lib/python3.11 -name "*.pyc" -delete && \
+        find /usr/local/lib/python3.11 -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true; \
+    fi && \
+    # Set final ownership and permissions
+    chown -R appuser:appuser /app && \
+    find /app -type d -exec chmod 750 {} \; && \
+    find /app -type f -exec chmod 640 {} \;
+
+# Create volume mount points
+VOLUME ["/app/storage", "/app/logs", "/app/models", "/app/backups"]
+
+# Expose application port
+EXPOSE 8000
+
+# Switch to non-root user
+USER appuser
+
+# Health check configuration
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD if [ "$ENABLE_HEALTH_CHECKS" = "true" ]; then /usr/local/bin/healthcheck.sh; else exit 0; fi
+
+# Set entrypoint and default command
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+
+# Security and metadata labels
+LABEL maintainer="whisper-transcriber" \
+      description="Production-optimized Whisper Transcriber with multi-stage build" \
+      version="3.0.0" \
+      security.scan="enabled" \
+      build.optimization="multi-stage" \
+      build.stage="production" \
+      org.opencontainers.image.source="https://github.com/buymeagoat/whisper-transcriber" \
+      org.opencontainers.image.title="Whisper Transcriber - Production" \
+      org.opencontainers.image.description="Secure, optimized containerized audio transcription service"
+
+# ===============================================================================
+# Stage 5: Development image (optional)
+# ===============================================================================
+FROM deps-build AS development
+
+ENV APP_ENV=development \
+    DEBUG=true \
+    LOG_LEVEL=DEBUG \
+    INSTALL_DEV=true
+
+# Install development tools
+RUN pip install --no-cache-dir \
+        pytest \
+        pytest-asyncio \
+        pytest-cov \
+        black \
+        flake8 \
+        mypy
+
+# Copy application code for development
+COPY --chown=appuser:appuser . .
+
+# Install pre-commit hooks and development dependencies
+RUN if [ -f .pre-commit-config.yaml ]; then \
+        pip install pre-commit && \
+        pre-commit install; \
+    fi
+
+# Development command with hot reload
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"]
+
+# ===============================================================================
+# Stage 6: Testing image for CI/CD
+# ===============================================================================
+FROM development AS testing
+
+# Install additional testing dependencies
+RUN pip install --no-cache-dir \
+        pytest-xdist \
+        pytest-benchmark \
+        locust \
+        safety
+
+# Copy test files
+COPY --chown=appuser:appuser tests/ ./tests/
+COPY --chown=appuser:appuser tools/ ./tools/
+
+# Create test data directory
+RUN mkdir -p /app/test_data && \
+    chown appuser:appuser /app/test_data
+
+# Test command
+CMD ["pytest", "tests/", "-v", "--cov=api", "--cov-report=html", "--cov-report=term"]

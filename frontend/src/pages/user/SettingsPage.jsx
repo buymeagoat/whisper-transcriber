@@ -2,6 +2,7 @@ import React from 'react'
 import { Settings } from 'lucide-react'
 import UserProfile from '../../components/UserProfile'
 import PasswordChangeForm from '../../components/PasswordChangeForm'
+import PWASettings from '../../components/PWASettings'
 
 const SettingsPage = () => {
   return (
@@ -22,6 +23,9 @@ const SettingsPage = () => {
         <UserProfile />
         <PasswordChangeForm />
       </div>
+
+      {/* PWA Settings */}
+      <PWASettings />
 
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">

@@ -14,7 +14,10 @@ import {
   Users, 
   Activity,
   LogOut,
-  User
+  User,
+  Key,
+  Package,
+  Smartphone
 } from 'lucide-react'
 
 const Layout = ({ children }) => {
@@ -45,7 +48,9 @@ const Layout = ({ children }) => {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Transcribe', href: '/transcribe', icon: Mic },
+    { name: 'Batch Upload', href: '/batch-upload', icon: Package },
     { name: 'My Jobs', href: '/jobs', icon: FileText },
+    { name: 'API Keys', href: '/api-keys', icon: Key },
     { name: 'Settings', href: '/settings', icon: Settings },
   ]
 

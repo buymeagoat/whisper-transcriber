@@ -1,0 +1,456 @@
+/**
+ * T030 Mobile Settings Interface CSS
+ * Mobile-specific styles and optimizations for settings interface
+ */
+
+/* Base mobile settings container */
+.mobile-settings {
+  --mobile-header-height: 60px;
+  --mobile-safe-area-top: env(safe-area-inset-top, 0px);
+  --mobile-safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --mobile-safe-area-left: env(safe-area-inset-left, 0px);
+  --mobile-safe-area-right: env(safe-area-inset-right, 0px);
+  --touch-target-size: 44px;
+  --swipe-threshold: 50px;
+}
+
+/* Mobile-specific layout adjustments */
+.mobile-settings .fixed {
+  padding-top: var(--mobile-safe-area-top);
+  padding-bottom: var(--mobile-safe-area-bottom);
+  padding-left: var(--mobile-safe-area-left);
+  padding-right: var(--mobile-safe-area-right);
+}
+
+/* Touch target optimization */
+.mobile-settings button,
+.mobile-settings [role="button"],
+.mobile-settings a,
+.mobile-settings input,
+.mobile-settings select {
+  min-height: var(--touch-target-size);
+  min-width: var(--touch-target-size);
+}
+
+/* Swipe gesture feedback */
+.mobile-settings .swipe-back-indicator {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60px;
+  background: linear-gradient(to right, transparent, rgba(59, 130, 246, 0.5));
+  border-radius: 0 4px 4px 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+.mobile-settings .swipe-back-indicator.active {
+  opacity: 1;
+}
+
+/* Pull to refresh indicator */
+.pull-refresh-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pull-refresh-indicator::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  opacity: 0;
+}
+
+.pull-refresh-indicator.refreshing::before {
+  opacity: 1;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile category cards */
+.mobile-settings .category-card {
+  transition: transform 0.1s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-settings .category-card:active {
+  transform: scale(0.98);
+}
+
+.mobile-settings .category-card-compact {
+  padding: 12px 16px;
+}
+
+.mobile-settings .category-card-compact .icon {
+  width: 40px;
+  height: 40px;
+}
+
+/* Search interface */
+.mobile-settings .search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 60;
+}
+
+.mobile-settings .search-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: var(--mobile-safe-area-top) 16px 16px;
+  z-index: 61;
+}
+
+.mobile-settings.dark .search-container {
+  background: #1f2937;
+  border-bottom-color: #374151;
+}
+
+/* Gesture-based navigation */
+.mobile-settings .gesture-nav {
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-settings .gesture-nav-content {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.mobile-settings .gesture-nav-content.swiping {
+  transition: none;
+}
+
+/* Virtual keyboard handling */
+.mobile-settings.keyboard-open {
+  height: calc(100vh - var(--keyboard-height, 0px));
+}
+
+.mobile-settings.keyboard-open .fixed.bottom-0 {
+  bottom: var(--keyboard-height, 0px);
+}
+
+/* Haptic feedback visual cues */
+.mobile-settings .haptic-feedback {
+  position: relative;
+}
+
+.mobile-settings .haptic-feedback::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+}
+
+.mobile-settings .haptic-feedback.active::after {
+  opacity: 1;
+}
+
+/* Long press visual feedback */
+.mobile-settings .long-press-target {
+  position: relative;
+}
+
+.mobile-settings .long-press-target::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(59, 130, 246, 0.1);
+  transform: scale(0.9);
+  opacity: 0;
+  transition: all 0.5s ease;
+}
+
+.mobile-settings .long-press-target.long-pressing::before {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Favorite button animations */
+.mobile-settings .favorite-btn {
+  transition: all 0.2s ease;
+}
+
+.mobile-settings .favorite-btn:active {
+  transform: scale(1.2);
+}
+
+.mobile-settings .favorite-btn.favorited {
+  color: #fbbf24;
+  animation: favorite-pulse 0.4s ease;
+}
+
+@keyframes favorite-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* Recent usage indicator */
+.mobile-settings .recent-indicator {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 8px;
+  height: 8px;
+  background: #3b82f6;
+  border-radius: 50%;
+  animation: pulse-blue 2s infinite;
+}
+
+@keyframes pulse-blue {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Quick actions grid */
+.mobile-settings .quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.mobile-settings .quick-action-btn {
+  padding: 16px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.mobile-settings .quick-action-btn:active {
+  transform: scale(0.95);
+}
+
+/* Collapsible sections */
+.mobile-settings .collapsible-section {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.mobile-settings .collapsible-header {
+  padding: 16px;
+  background: #f9fafb;
+  border: none;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mobile-settings.dark .collapsible-header {
+  background: #374151;
+}
+
+.mobile-settings .collapsible-header:active {
+  background: #f3f4f6;
+}
+
+.mobile-settings.dark .collapsible-header:active {
+  background: #4b5563;
+}
+
+.mobile-settings .collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.mobile-settings .collapsible-content.expanded {
+  max-height: 2000px;
+}
+
+/* View mode toggles */
+.mobile-settings .view-mode-toggle {
+  display: flex;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.mobile-settings.dark .view-mode-toggle {
+  background: #374151;
+}
+
+.mobile-settings .view-mode-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.mobile-settings .view-mode-btn.active {
+  background: white;
+  color: #1f2937;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-settings.dark .view-mode-btn.active {
+  background: #1f2937;
+  color: white;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 640px) {
+  .mobile-settings {
+    --touch-target-size: 48px;
+  }
+  
+  .mobile-settings .category-card {
+    padding: 12px;
+  }
+  
+  .mobile-settings .quick-actions {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .mobile-settings .quick-action-btn {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-settings {
+    --touch-target-size: 52px;
+  }
+  
+  .mobile-settings .category-card-compact {
+    padding: 8px 12px;
+  }
+  
+  .mobile-settings .collapsible-header {
+    padding: 12px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+  .mobile-settings .quick-actions {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+  
+  .mobile-settings .category-card {
+    padding: 8px 12px;
+  }
+  
+  .mobile-settings .quick-action-btn {
+    padding: 8px;
+    font-size: 12px;
+  }
+}
+
+/* Dark mode specific adjustments */
+.mobile-settings.dark .category-card {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.mobile-settings.dark .category-card:hover {
+  border-color: #4b5563;
+}
+
+.mobile-settings.dark .recent-indicator {
+  background: #60a5fa;
+}
+
+/* Accessibility enhancements */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-settings * {
+    animation-duration: 0.01s !important;
+    transition-duration: 0.01s !important;
+  }
+}
+
+.mobile-settings.high-contrast {
+  --ring-color: #000;
+}
+
+.mobile-settings.high-contrast .category-card {
+  border-width: 2px;
+  border-color: #000;
+}
+
+.mobile-settings.high-contrast .category-card:focus {
+  outline: 3px solid #000;
+  outline-offset: 2px;
+}
+
+/* Performance optimizations */
+.mobile-settings .gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.mobile-settings .category-card,
+.mobile-settings .quick-action-btn {
+  contain: layout style paint;
+}
+
+/* iOS specific adjustments */
+.mobile-settings.ios {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.mobile-settings.ios .category-card {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Android specific adjustments */
+.mobile-settings.android .quick-action-btn {
+  outline: none;
+}
+
+.mobile-settings.android .category-card:active {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.mobile-settings.android.dark .category-card:active {
+  background: rgba(255, 255, 255, 0.05);
+}

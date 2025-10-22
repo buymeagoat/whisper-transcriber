@@ -12,7 +12,14 @@
     "format:check": "prettier --check src/**/*.{js,jsx,ts,tsx,json,css,md}",
     "type-check": "tsc --noEmit",
     "dev:clean": "rm -rf node_modules/.vite && npm run dev",
-    "analyze": "vite build --mode analyze"
+    "analyze": "vite build --mode analyze",
+    "migrate": "node ../scripts/settings-migration-cli.js",
+    "migrate:status": "node ../scripts/settings-migration-cli.js status",
+    "migrate:backup": "node ../scripts/settings-migration-cli.js backup",
+    "migrate:restore": "node ../scripts/settings-migration-cli.js restore",
+    "migrate:validate": "node ../scripts/settings-migration-cli.js validate",
+    "migrate:clean": "node ../scripts/settings-migration-cli.js clean",
+    "migrate:init": "node ../scripts/settings-migration-cli.js init"
   },
   "dependencies": {
     "axios": "^1.5.0",

@@ -1,0 +1,338 @@
+# T031: Production Deployment and Monitoring - Alerting Rules
+# Comprehensive alerting rules for Whisper Transcriber production monitoring
+
+groups:
+  # Application Health Alerts
+  - name: 'application_health'
+    rules:
+      - alert: 'ApplicationDown'
+        expr: 'up{job="whisper-app"} == 0'
+        for: 30s
+        labels:
+          severity: 'critical'
+          component: 'application'
+        annotations:
+          summary: 'Whisper Transcriber application is down'
+          description: 'The main application has been down for more than 30 seconds'
+          runbook_url: 'https://docs.whisper-transcriber.com/runbooks/application-down'
+
+      - alert: 'HighErrorRate'
+        expr: 'whisper:error_rate_5m > 0.05'
+        for: 2m
+        labels:
+          severity: 'warning'
+          component: 'application'
+        annotations:
+          summary: 'High error rate detected'
+          description: 'Error rate is {{ $value | humanizePercentage }} for the last 5 minutes'
+
+      - alert: 'CriticalErrorRate'
+        expr: 'whisper:error_rate_5m > 0.10'
+        for: 1m
+        labels:
+          severity: 'critical'
+          component: 'application'
+        annotations:
+          summary: 'Critical error rate detected'
+          description: 'Error rate is {{ $value | humanizePercentage }} for the last 5 minutes'
+
+      - alert: 'SlowResponseTime'
+        expr: 'whisper:response_time_p95 > 2'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'application'
+        annotations:
+          summary: 'Slow response times detected'
+          description: '95th percentile response time is {{ $value }}s'
+
+  # System Resource Alerts
+  - name: 'system_resources'
+    rules:
+      - alert: 'HighCPUUsage'
+        expr: 'whisper:cpu_usage > 80'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'system'
+        annotations:
+          summary: 'High CPU usage detected'
+          description: 'CPU usage is {{ $value }}% for the last 5 minutes'
+
+      - alert: 'CriticalCPUUsage'
+        expr: 'whisper:cpu_usage > 95'
+        for: 2m
+        labels:
+          severity: 'critical'
+          component: 'system'
+        annotations:
+          summary: 'Critical CPU usage detected'
+          description: 'CPU usage is {{ $value }}% for the last 2 minutes'
+
+      - alert: 'HighMemoryUsage'
+        expr: 'whisper:memory_usage_percent > 85'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'system'
+        annotations:
+          summary: 'High memory usage detected'
+          description: 'Memory usage is {{ $value }}% for the last 5 minutes'
+
+      - alert: 'CriticalMemoryUsage'
+        expr: 'whisper:memory_usage_percent > 95'
+        for: 2m
+        labels:
+          severity: 'critical'
+          component: 'system'
+        annotations:
+          summary: 'Critical memory usage detected'
+          description: 'Memory usage is {{ $value }}% for the last 2 minutes'
+
+      - alert: 'HighDiskUsage'
+        expr: 'whisper:disk_usage_percent > 80'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'system'
+        annotations:
+          summary: 'High disk usage detected'
+          description: 'Disk usage is {{ $value }}% for the last 5 minutes'
+
+      - alert: 'CriticalDiskUsage'
+        expr: 'whisper:disk_usage_percent > 95'
+        for: 1m
+        labels:
+          severity: 'critical'
+          component: 'system'
+        annotations:
+          summary: 'Critical disk usage detected'
+          description: 'Disk usage is {{ $value }}% for the last minute'
+
+  # Database Alerts
+  - name: 'database_health'
+    rules:
+      - alert: 'PostgreSQLDown'
+        expr: 'up{job="postgres"} == 0'
+        for: 30s
+        labels:
+          severity: 'critical'
+          component: 'database'
+        annotations:
+          summary: 'PostgreSQL database is down'
+          description: 'PostgreSQL has been down for more than 30 seconds'
+
+      - alert: 'DatabaseConnectionsHigh'
+        expr: 'pg_stat_database_numbackends / pg_settings_max_connections > 0.8'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'database'
+        annotations:
+          summary: 'High database connection usage'
+          description: 'Database connections are at {{ $value | humanizePercentage }} of maximum'
+
+      - alert: 'DatabaseSlowQueries'
+        expr: 'pg_stat_activity_max_tx_duration > 300'
+        for: 2m
+        labels:
+          severity: 'warning'
+          component: 'database'
+        annotations:
+          summary: 'Slow database queries detected'
+          description: 'Longest transaction duration is {{ $value }}s'
+
+      - alert: 'DatabaseDeadlocks'
+        expr: 'increase(pg_stat_database_deadlocks[5m]) > 0'
+        for: 0s
+        labels:
+          severity: 'warning'
+          component: 'database'
+        annotations:
+          summary: 'Database deadlocks detected'
+          description: '{{ $value }} deadlocks in the last 5 minutes'
+
+  # Redis Alerts
+  - name: 'redis_health'
+    rules:
+      - alert: 'RedisDown'
+        expr: 'up{job="redis"} == 0'
+        for: 30s
+        labels:
+          severity: 'critical'
+          component: 'cache'
+        annotations:
+          summary: 'Redis cache is down'
+          description: 'Redis has been down for more than 30 seconds'
+
+      - alert: 'RedisMemoryHigh'
+        expr: 'redis_memory_used_bytes / redis_memory_max_bytes > 0.9'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'cache'
+        annotations:
+          summary: 'Redis memory usage high'
+          description: 'Redis memory usage is {{ $value | humanizePercentage }}'
+
+      - alert: 'RedisConnectionsHigh'
+        expr: 'redis_connected_clients > 100'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'cache'
+        annotations:
+          summary: 'High Redis connection count'
+          description: 'Redis has {{ $value }} connected clients'
+
+  # Job Processing Alerts
+  - name: 'job_processing'
+    rules:
+      - alert: 'JobQueueBacklog'
+        expr: 'celery_queue_length{queue="default"} > 50'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'workers'
+        annotations:
+          summary: 'Job queue backlog detected'
+          description: 'Default queue has {{ $value }} pending jobs'
+
+      - alert: 'CriticalJobQueueBacklog'
+        expr: 'celery_queue_length{queue="default"} > 100'
+        for: 2m
+        labels:
+          severity: 'critical'
+          component: 'workers'
+        annotations:
+          summary: 'Critical job queue backlog'
+          description: 'Default queue has {{ $value }} pending jobs'
+
+      - alert: 'WorkerDown'
+        expr: 'celery_workers_active == 0'
+        for: 1m
+        labels:
+          severity: 'critical'
+          component: 'workers'
+        annotations:
+          summary: 'No active Celery workers'
+          description: 'All Celery workers are down'
+
+      - alert: 'HighJobFailureRate'
+        expr: 'whisper:job_error_rate_5m > 0.1'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'jobs'
+        annotations:
+          summary: 'High job failure rate'
+          description: 'Job failure rate is {{ $value | humanizePercentage }} over the last 5 minutes'
+
+  # Container Health Alerts
+  - name: 'container_health'
+    rules:
+      - alert: 'ContainerDown'
+        expr: 'up{job="cadvisor"} == 0'
+        for: 30s
+        labels:
+          severity: 'warning'
+          component: 'containers'
+        annotations:
+          summary: 'Container monitoring down'
+          description: 'cAdvisor container monitoring is not available'
+
+      - alert: 'ContainerHighCPU'
+        expr: 'rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100 > 80'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'containers'
+        annotations:
+          summary: 'Container high CPU usage'
+          description: 'Container {{ $labels.name }} CPU usage is {{ $value }}%'
+
+      - alert: 'ContainerHighMemory'
+        expr: 'container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes > 0.9'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'containers'
+        annotations:
+          summary: 'Container high memory usage'
+          description: 'Container {{ $labels.name }} memory usage is {{ $value | humanizePercentage }}'
+
+      - alert: 'ContainerRestarting'
+        expr: 'increase(container_start_time_seconds{name!=""}[5m]) > 0'
+        for: 0s
+        labels:
+          severity: 'warning'
+          component: 'containers'
+        annotations:
+          summary: 'Container restarting'
+          description: 'Container {{ $labels.name }} has restarted'
+
+  # Network and Load Balancer Alerts
+  - name: 'network_health'
+    rules:
+      - alert: 'NginxDown'
+        expr: 'up{job="nginx"} == 0'
+        for: 30s
+        labels:
+          severity: 'critical'
+          component: 'loadbalancer'
+        annotations:
+          summary: 'Nginx load balancer is down'
+          description: 'Nginx has been down for more than 30 seconds'
+
+      - alert: 'HighRequestRate'
+        expr: 'rate(nginx_http_requests_total[5m]) > 1000'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'loadbalancer'
+        annotations:
+          summary: 'High request rate detected'
+          description: 'Request rate is {{ $value }} requests/second over the last 5 minutes'
+
+      - alert: 'SSL CertificateExpiringSoon'
+        expr: '(probe_ssl_earliest_cert_expiry - time()) / 86400 < 7'
+        for: 1h
+        labels:
+          severity: 'warning'
+          component: 'ssl'
+        annotations:
+          summary: 'SSL certificate expiring soon'
+          description: 'SSL certificate expires in {{ $value }} days'
+
+  # Monitoring System Health
+  - name: 'monitoring_health'
+    rules:
+      - alert: 'PrometheusConfigReloadFailed'
+        expr: 'prometheus_config_last_reload_successful == 0'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'monitoring'
+        annotations:
+          summary: 'Prometheus configuration reload failed'
+          description: 'Prometheus configuration reload has been failing'
+
+      - alert: 'PrometheusTargetDown'
+        expr: 'up == 0'
+        for: 5m
+        labels:
+          severity: 'warning'
+          component: 'monitoring'
+        annotations:
+          summary: 'Prometheus target down'
+          description: 'Target {{ $labels.instance }} of job {{ $labels.job }} is down'
+
+      - alert: 'GrafanaDown'
+        expr: 'up{job="grafana"} == 0'
+        for: 1m
+        labels:
+          severity: 'warning'
+          component: 'monitoring'
+        annotations:
+          summary: 'Grafana dashboard is down'
+          description: 'Grafana has been down for more than 1 minute'

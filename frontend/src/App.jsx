@@ -22,6 +22,10 @@ const TranscribePage = React.lazy(() => import('./pages/user/TranscribePage'))
 const JobsPage = React.lazy(() => import('./pages/user/JobsPage'))
 const SettingsPage = React.lazy(() => import('./pages/user/SettingsPage'))
 
+// T028 Frontend Implementation - New components (lazy-loaded)
+const ApiKeyManagement = React.lazy(() => import('./components/ApiKeyManagement'))
+const BatchUpload = React.lazy(() => import('./components/BatchUpload'))
+
 // Admin components (lazy-loaded since they're less frequently accessed)
 const AdminLayout = React.lazy(() => import('./components/admin/AdminLayout'))
 const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard'))
@@ -109,6 +113,26 @@ function App() {
               <Layout>
                 <SuspenseWrapper>
                   <JobsPage />
+                </SuspenseWrapper>
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/api-keys" element={
+            <ProtectedRoute>
+              <Layout>
+                <SuspenseWrapper>
+                  <ApiKeyManagement />
+                </SuspenseWrapper>
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/batch-upload" element={
+            <ProtectedRoute>
+              <Layout>
+                <SuspenseWrapper>
+                  <BatchUpload />
                 </SuspenseWrapper>
               </Layout>
             </ProtectedRoute>

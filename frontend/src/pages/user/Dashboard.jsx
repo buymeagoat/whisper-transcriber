@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { BarChart3, FileText, Clock, TrendingUp } from 'lucide-react'
+import { BarChart3, FileText, Clock, TrendingUp, Upload, FolderOpen } from 'lucide-react'
+import { Tabs, Tab, Box, Button, Chip } from '@mui/material'
 import StatisticsCard from '../../components/StatisticsCard'
 import JobList from '../../components/JobList'
+import { BatchList, BatchUploadDialog } from '../../components/batch'
 import { jobService } from '../../services/jobService'
 import { statsService } from '../../services/statsService'
+import batchUploadService from '../../services/batchUploadService'
 
 const Dashboard = () => {
   const { user } = useAuth()
@@ -17,20 +20,35 @@ const Dashboard = () => {
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [activeTab, setActiveTab] = useState(0)
+  const [showBatchDialog, setShowBatchDialog] = useState(false)
+  const [batchStats, setBatchStats] = useState({
+    totalBatches: 0,
+    activeBatches: 0
+  })
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
       setError(null)
       
-      // Fetch jobs and stats
-      const [jobsData, userStats] = await Promise.all([
+      // Fetch jobs, stats, and batch data
+      const [jobsData, userStats, batches] = await Promise.all([
         jobService.getJobs(0, 20), // Get first 20 jobs for recent activity
-        statsService.getUserStats()
+        statsService.getUserStats(),
+        batchUploadService.listBatchUploads().catch(() => []) // Don't fail if batch service unavailable
       ])
       
       setJobs(jobsData.jobs || [])
       setStats(userStats)
+      
+      // Calculate batch stats
+      setBatchStats({
+        totalBatches: batches.length,
+        activeBatches: batches.filter(b => 
+          b.status === 'processing' || b.status === 'pending'
+        ).length
+      })
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error)
       setError(error.message)
@@ -62,6 +80,21 @@ const Dashboard = () => {
     }
   }
 
+  const handleBatchComplete = (batchData) => {
+    // Refresh dashboard data when batch completes
+    fetchDashboardData()
+  }
+
+  const handleBatchError = (error) => {
+    console.error('Batch error:', error)
+    // Refresh data to get current state
+    fetchDashboardData()
+  }
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue)
+  }
+
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
@@ -82,7 +115,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
         <StatisticsCard
           title="Total Jobs"
           value={stats.totalJobs}
@@ -114,13 +147,90 @@ const Dashboard = () => {
           color="purple"
           loading={loading}
         />
+
+        <StatisticsCard
+          title="Total Batches"
+          value={batchStats.totalBatches}
+          icon={FolderOpen}
+          color="indigo"
+          loading={loading}
+        />
+
+        <StatisticsCard
+          title="Active Batches"
+          value={batchStats.activeBatches}
+          icon={Upload}
+          color="orange"
+          loading={loading}
+        />
       </div>
 
-      {/* Recent Activity */}
-      <JobList
-        jobs={jobs}
-        loading={loading}
-        onJobAction={handleJobAction}
+      {/* Main Content Tabs */}
+      <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3, pt: 2 }}>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Tabs value={activeTab} onChange={handleTabChange}>
+              <Tab 
+                label={
+                  <Box display="flex" alignItems="center" gap={1}>
+                    Recent Jobs
+                    {stats.processingJobs > 0 && (
+                      <Chip size="small" label={stats.processingJobs} color="warning" />
+                    )}
+                  </Box>
+                } 
+              />
+              <Tab 
+                label={
+                  <Box display="flex" alignItems="center" gap={1}>
+                    Batch Uploads
+                    {batchStats.activeBatches > 0 && (
+                      <Chip size="small" label={batchStats.activeBatches} color="primary" />
+                    )}
+                  </Box>
+                } 
+              />
+            </Tabs>
+
+            <Button
+              variant="contained"
+              startIcon={<Upload />}
+              onClick={() => setShowBatchDialog(true)}
+              size="small"
+            >
+              New Batch Upload
+            </Button>
+          </Box>
+        </Box>
+
+        <Box sx={{ p: 3 }}>
+          {activeTab === 0 && (
+            <JobList
+              jobs={jobs}
+              loading={loading}
+              onJobAction={handleJobAction}
+            />
+          )}
+
+          {activeTab === 1 && (
+            <BatchList
+              onBatchComplete={handleBatchComplete}
+              onBatchError={handleBatchError}
+              maxDisplayBatches={10}
+            />
+          )}
+        </Box>
+      </div>
+
+      {/* Batch Upload Dialog */}
+      <BatchUploadDialog
+        open={showBatchDialog}
+        onClose={() => setShowBatchDialog(false)}
+        onBatchCreated={() => {
+          setShowBatchDialog(false)
+          fetchDashboardData()
+          setActiveTab(1) // Switch to batch tab
+        }}
       />
     </div>
   )

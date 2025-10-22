@@ -12,8 +12,8 @@ aiohttp>=3.8.0
 websockets>=12.0
 psutil>=5.9.0
 
-# --- Test database support ---
-pytest-postgresql>=2.5.0
+# --- Test database support (removed problematic pytest-postgresql) ---
+# pytest-postgresql>=2.5.0  # Causes import issues with psycopg
 
 # --- Code formatting and quality ---
 black>=24.0.0
@@ -21,6 +21,11 @@ wheel>=0.42.0
 
 # --- Coverage reporting ---
 coverage>=7.0.0
+
+# --- Optional export format dependencies ---
+# These are optional for enhanced export formats (DOCX, PDF)
+python-docx>=1.1.0  # For DOCX export support
+reportlab>=4.0.0    # For PDF export support
 
 # Note: psycopg>=3.1.0 was removed as it's not used in the codebase
 # psycopg2-binary in main requirements.txt provides PostgreSQL support

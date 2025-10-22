@@ -599,9 +599,31 @@ python tools/comprehensive_validator.py
 - [ ] **T019**: Add mobile PWA enhancements
 
 ### **Advanced Features**
-- [ ] **T020**: Add batch upload capabilities
-- [ ] **T021**: Implement transcript search functionality
-- [ ] **T022**: Add export format options (SRT, VTT, etc.)
+- [x] **T020**: Add batch upload capabilities ✅ **COMPLETED**
+  - Comprehensive batch upload service with file validation, progress tracking, and simplified queue management
+  - FastAPI backend endpoints for create, start, progress monitoring, cancel, and delete batch operations
+  - SQLite database integration with existing Job model for seamless batch processing workflow
+  - Material-UI React components: BatchUploadDialog (drag-and-drop interface), BatchProgressTracker (real-time monitoring), BatchList (management interface)
+  - Enhanced batchUploadService.js with T020 API integration while maintaining T028 compatibility
+  - Dashboard integration with batch statistics, tabbed interface, and new batch upload controls
+  - Complete frontend component architecture with file validation, progress tracking, and user experience optimization
+- [x] **T021**: Implement transcript search functionality ✅ **COMPLETED**
+  - Comprehensive search service with full-text, metadata, and combined search types
+  - SQLite FTS integration with relevance scoring and caching system
+  - Advanced filtering by language, model, duration, date, sentiment, and content features
+  - RESTful API endpoints for search, suggestions, quick search, and statistics
+  - Material-UI React components with autocomplete, advanced filters, and result highlighting
+  - Complete backend service (600+ lines) with SearchType enums and SearchFilters dataclass
+  - Frontend search interface with pagination, URL persistence, and responsive design
+- [x] **T022**: Multi-Format Export System ✅ **COMPLETED**
+  - Comprehensive transcript export system with 6 formats: SRT, VTT, DOCX, PDF, JSON, TXT
+  - Backend service with template system and customizable export options
+  - RESTful API endpoints for single/batch export, download, preview, and statistics
+  - React frontend components: ExportDialog, BatchExportDialog, ExportButton with Material-UI
+  - Template system with metadata inclusion, timestamp formatting, and format-specific options
+  - Batch export support with ZIP archives for up to 50 transcripts
+  - Comprehensive test suite with 400+ lines covering all formats and error scenarios
+  - Optional dependency management for DOCX (python-docx) and PDF (reportlab) generation
 - [ ] **T023**: Create API key management for developers
 
 ---

@@ -17,6 +17,9 @@ from api.routes import admin_system_performance  # T032 System Performance Dashb
 from api.routes import transcript_management  # T033 Advanced Transcript Management routes
 from api.routes import export_system  # T034 Multi-Format Export System routes
 from api.routes import audio_processing  # T035 Audio Processing Pipeline routes
+from api.routes import search  # T021 Transcript Search functionality
+from api.routes import export  # T022 Multi-Format Export System
+from api.routes import batch_upload  # T020 Batch Upload capabilities
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.app_state import backend_log
 
@@ -79,6 +82,15 @@ def register_routes(app: FastAPI) -> None:
     
     # T035 Audio Processing Pipeline routes
     app.include_router(audio_processing.router, tags=["audio-processing", "enhancement"])
+    
+    # T021 Transcript Search functionality routes  
+    app.include_router(search.router, tags=["search", "transcripts"])
+    
+    # T022 Multi-Format Export routes
+    app.include_router(export.router, tags=["export", "formats"])
+    
+    # T020 Batch Upload capabilities routes
+    app.include_router(batch_upload.router, tags=["batch-upload", "uploads"])
     
     # Include backup management API if available
     if BACKUP_API_AVAILABLE:

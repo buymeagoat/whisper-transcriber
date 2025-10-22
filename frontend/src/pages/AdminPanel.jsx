@@ -4,6 +4,9 @@ import BackupManagement from '../components/BackupManagement';
 import UserManagement from '../components/UserManagement';
 import AdminJobManagement from '../components/admin/AdminJobManagement';
 import SystemPerformanceDashboard from '../components/SystemPerformanceDashboard';
+import AdvancedTranscriptManagement from '../components/AdvancedTranscriptManagement';
+import MultiFormatExportSystem from '../components/MultiFormatExportSystem';
+import AudioProcessingSystem from '../components/AudioProcessingSystem';
 
 /**
  * AdminPanel - Main administrative interface for system management
@@ -15,6 +18,9 @@ const AdminPanel = () => {
   const tabs = [
     { id: 'health', name: 'System Health', icon: '🏥' },
     { id: 'performance', name: 'Performance Dashboard', icon: '📊' },
+    { id: 'transcripts', name: 'Transcript Management', icon: '📝' },
+    { id: 'exports', name: 'Export System', icon: '📤' },
+    { id: 'audio', name: 'Audio Processing', icon: '🎵' },
     { id: 'users', name: 'User Management', icon: '👥' },
     { id: 'jobs', name: 'Job Management', icon: '📋' },
     { id: 'backups', name: 'Backups', icon: '💾' },
@@ -27,6 +33,12 @@ const AdminPanel = () => {
         return <SystemHealth />;
       case 'performance':
         return <SystemPerformanceDashboard />;
+      case 'transcripts':
+        return <AdvancedTranscriptManagement />;
+      case 'exports':
+        return <MultiFormatExportSystem />;
+      case 'audio':
+        return <AudioProcessingSystem />;
       case 'users':
         return <UserManagement />;
       case 'jobs':

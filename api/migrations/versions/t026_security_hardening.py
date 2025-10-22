@@ -13,7 +13,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers
 revision = 't026_security_hardening'
-down_revision = None  # This will need to be updated to the latest revision
+down_revision = 'perf_001'
 branch_labels = None
 depends_on = None
 

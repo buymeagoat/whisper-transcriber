@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic
 revision: str = "schema_cleanup_006"
-down_revision: Union[str, None] = "b8b3752f3e16"
+down_revision: Union[str, None] = "t034_export_system"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

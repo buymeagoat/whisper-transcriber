@@ -1,0 +1,278 @@
+/* T036: Real-time Collaboration Features - Collaborative Editor Styles */
+
+.collaborative-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f8fafc;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.editor-title h3 {
+  margin: 0 0 4px 0;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  transition: background-color 0.2s;
+}
+
+.status-indicator.connected {
+  background: #10b981;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.editor-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.comment-toggle,
+.save-button {
+  padding: 8px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  color: #374151;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.comment-toggle:hover,
+.save-button:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.save-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.editor-container {
+  display: flex;
+  flex: 1;
+  gap: 16px;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.editor-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.text-editor-container {
+  position: relative;
+  flex: 1;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.text-editor {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  border: none;
+  outline: none;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  background: white;
+  color: #111827;
+}
+
+.text-editor:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+.remote-cursor {
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  background: #3b82f6;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.cursor-label {
+  position: absolute;
+  top: -24px;
+  left: -4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.selection-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: #f3f4f6;
+  border-top: 1px solid #e5e7eb;
+}
+
+.add-comment-button,
+.highlight-button {
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: white;
+  color: #374151;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-comment-button:hover,
+.highlight-button:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.editor-sidebar {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .editor-container {
+    flex-direction: column;
+  }
+  
+  .editor-sidebar {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .editor-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .editor-title {
+    text-align: center;
+  }
+  
+  .editor-actions {
+    justify-content: center;
+  }
+  
+  .editor-container {
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  .text-editor {
+    padding: 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .collaborative-editor {
+    background: #111827;
+  }
+  
+  .editor-header {
+    background: #1f2937;
+    border-bottom-color: #374151;
+  }
+  
+  .editor-title h3 {
+    color: #f9fafb;
+  }
+  
+  .connection-status {
+    color: #d1d5db;
+  }
+  
+  .comment-toggle,
+  .save-button {
+    background: #374151;
+    border-color: #6b7280;
+    color: #f9fafb;
+  }
+  
+  .comment-toggle:hover,
+  .save-button:hover {
+    background: #4b5563;
+  }
+  
+  .text-editor-container {
+    background: #1f2937;
+  }
+  
+  .text-editor {
+    background: #1f2937;
+    color: #f9fafb;
+  }
+  
+  .selection-actions {
+    background: #374151;
+    border-top-color: #6b7280;
+  }
+  
+  .add-comment-button,
+  .highlight-button {
+    background: #4b5563;
+    border-color: #6b7280;
+    color: #f9fafb;
+  }
+  
+  .add-comment-button:hover,
+  .highlight-button:hover {
+    background: #6b7280;
+  }
+}

@@ -1,0 +1,240 @@
+/* T036: Real-time Collaboration Features - User Presence Styles */
+
+.user-presence {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  min-width: 280px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.presence-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  transition: background-color 0.2s;
+}
+
+.status-indicator.connected {
+  background: #10b981;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.status-text {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.active-count {
+  font-size: 12px;
+  color: #9ca3af;
+  background: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.user-item:hover {
+  background: #f9fafb;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-initials {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-status {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.active-document {
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.presence-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d1d5db;
+}
+
+.presence-indicator.online {
+  background: #10b981;
+  box-shadow: 0 0 0 2px white, 0 0 0 4px #10b981;
+}
+
+.no-users {
+  text-align: center;
+  padding: 24px 16px;
+  color: #6b7280;
+}
+
+.no-users p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+}
+
+.invite-hint {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .user-presence {
+    min-width: 240px;
+    padding: 12px;
+  }
+  
+  .presence-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+  
+  .user-item {
+    padding: 6px;
+    gap: 10px;
+  }
+  
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .avatar-initials {
+    font-size: 12px;
+  }
+  
+  .username {
+    font-size: 13px;
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .user-presence {
+    background: #1f2937;
+    color: #f9fafb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .presence-header {
+    border-bottom-color: #374151;
+  }
+  
+  .status-text {
+    color: #d1d5db;
+  }
+  
+  .active-count {
+    background: #374151;
+    color: #d1d5db;
+  }
+  
+  .user-item:hover {
+    background: #374151;
+  }
+  
+  .username {
+    color: #f9fafb;
+  }
+  
+  .user-status {
+    color: #d1d5db;
+  }
+  
+  .active-document {
+    background: #1e40af;
+    color: #93c5fd;
+  }
+  
+  .no-users {
+    color: #d1d5db;
+  }
+  
+  .invite-hint {
+    color: #9ca3af;
+  }
+}

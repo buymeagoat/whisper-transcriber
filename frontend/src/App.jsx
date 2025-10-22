@@ -29,6 +29,7 @@ const BatchUpload = React.lazy(() => import('./components/BatchUpload'))
 // Admin components (lazy-loaded since they're less frequently accessed)
 const AdminLayout = React.lazy(() => import('./components/admin/AdminLayout'))
 const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard'))
+const RealTimePerformanceMonitor = React.lazy(() => import('./components/admin/RealTimePerformanceMonitor'))
 const AdminPanel = React.lazy(() => import('./pages/AdminPanel'))
 
 // Loading fallback component
@@ -165,7 +166,11 @@ function App() {
             <Route path="jobs" element={<div className="p-4 text-center text-gray-500">Job Management - Coming Soon</div>} />
             <Route path="users" element={<div className="p-4 text-center text-gray-500">User Management - Coming Soon</div>} />
             <Route path="backups" element={<div className="p-4 text-center text-gray-500">Backup Management - Coming Soon</div>} />
-            <Route path="monitoring" element={<div className="p-4 text-center text-gray-500">System Monitoring - Coming Soon</div>} />
+            <Route path="monitoring" element={
+              <SuspenseWrapper>
+                <RealTimePerformanceMonitor />
+              </SuspenseWrapper>
+            } />
           </Route>
           
           {/* Legacy admin route for backward compatibility */}

@@ -3,6 +3,7 @@ import SystemHealth from '../components/SystemHealth';
 import BackupManagement from '../components/BackupManagement';
 import UserManagement from '../components/UserManagement';
 import AdminJobManagement from '../components/admin/AdminJobManagement';
+import SystemPerformanceDashboard from '../components/SystemPerformanceDashboard';
 
 /**
  * AdminPanel - Main administrative interface for system management
@@ -13,6 +14,7 @@ const AdminPanel = () => {
 
   const tabs = [
     { id: 'health', name: 'System Health', icon: '🏥' },
+    { id: 'performance', name: 'Performance Dashboard', icon: '📊' },
     { id: 'users', name: 'User Management', icon: '👥' },
     { id: 'jobs', name: 'Job Management', icon: '📋' },
     { id: 'backups', name: 'Backups', icon: '💾' },
@@ -23,6 +25,8 @@ const AdminPanel = () => {
     switch (activeTab) {
       case 'health':
         return <SystemHealth />;
+      case 'performance':
+        return <SystemPerformanceDashboard />;
       case 'users':
         return <UserManagement />;
       case 'jobs':

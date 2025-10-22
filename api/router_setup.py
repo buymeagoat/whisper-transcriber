@@ -13,6 +13,7 @@ from api.routes import admin_security  # T026 Security Hardening admin routes
 from api.routes import api_keys, admin_api_keys  # T027 API Key Management routes
 from api.routes import batch  # T027 Batch Processing routes
 from api.routes import pwa  # T027 PWA Enhancement routes
+from api.routes import admin_system_performance  # T032 System Performance Dashboard routes
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.app_state import backend_log
 
@@ -63,6 +64,9 @@ def register_routes(app: FastAPI) -> None:
     
     # T027 PWA Enhancement routes
     app.include_router(pwa.router, tags=["pwa"])
+    
+    # T032 System Performance Dashboard routes
+    app.include_router(admin_system_performance.router, tags=["admin", "system-performance"])
     
     # Include backup management API if available
     if BACKUP_API_AVAILABLE:

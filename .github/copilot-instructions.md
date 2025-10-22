@@ -9,7 +9,42 @@ After completing ANY development task, Copilot MUST run:
 ./scripts/ai_task_complete.sh
 ```
 
-This enforces all requirements below automatically. DO NOT SKIP THIS STEP.
+This enforces all requirements below automatically and includes MANDATORY validation. DO NOT SKIP THIS STEP.
+
+## MANDATORY: TASKS.md Updates
+
+**EVERY task completion MUST update TASKS.md:**
+1. Change task status from `- [ ]` to `- [x]`
+2. Add completion marker: `✅ **COMPLETED**`
+3. Include detailed description of what was implemented
+4. Format example:
+```markdown
+- [x] **T036**: Real-time Collaboration Features ✅ **COMPLETED**
+  - WebSocket infrastructure for real-time communication with session management
+  - Operational transform algorithm for conflict-free collaborative editing
+  - Shared project workspaces with user permissions and project management
+  - Real-time comments & annotations with threading and notification system
+  - Complete React UI components for collaborative editing experience
+```
+
+## MANDATORY: Comprehensive Testing
+
+**EVERY task completion MUST include comprehensive testing:**
+1. **Add/Update Tests**: Create or modify test files for new functionality
+   - Follow naming: `tests/test_<feature>.py`
+   - Include unit tests, integration tests, and edge cases
+   - Test both success and failure scenarios
+2. **Run Test Suite**: Execute full test suite before completion
+   - Backend: `pytest tests/ --cov=api`
+   - Frontend: `npm test` 
+   - Document test results
+3. **Test Coverage**: Maintain or improve test coverage
+   - Generate coverage reports
+   - Address any gaps in critical functionality
+4. **Test Documentation**: Document testing in change logs
+   - What tests were added/updated
+   - Test results and coverage metrics
+   - Any known testing limitations
 
 ## Detailed Requirements
 
@@ -66,12 +101,30 @@ This enforces all requirements below automatically. DO NOT SKIP THIS STEP.
 
 ## Enforcement
 
+The enhanced enforcement system ensures compliance through multiple layers:
+
+### 1. Pre-Task Validation
+- `./scripts/validate_task_completion.sh` - Comprehensive pre-completion validation
+- Checks TASKS.md updates, testing requirements, and documentation
+- MUST pass before ai_task_complete.sh will proceed
+
+### 2. Pre-Commit Hook Enforcement  
 The pre-commit hook will REJECT commits that:
 - Have temporary files in repository root
 - Make code changes without documentation updates
 - Don't follow the established file organization
+- Update TASKS.md without proper completion markers (✅ **COMPLETED**)
+- Complete tasks without corresponding test updates
+- Submit test files without actual test functions
+
+### 3. Automated Validation
+- TASKS.md format validation (completion markers, descriptions)
+- Test file quality checks (presence of test functions)
+- Documentation update requirements
+- Repository hygiene enforcement
 
 **Copilot must ALWAYS run `./scripts/ai_task_complete.sh` at the end of every task.**
+**The script will automatically validate all requirements before proceeding.**
 
 Conventions:
 - Use UTC timestamps formatted as `YYYYMMDD_HHMMSS`.

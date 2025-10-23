@@ -503,5 +503,15 @@
     "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251020_033521_validation_report_20251020_033249.json.zst",
     "first_seen": "2025-10-20T03:35:21.073883",
     "reference_count": 1
+  },
+  "e0372bb1e6a000723b3be311c9c9f18499d7c5b084e2e95efcfb0f0aca928e96": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251023_213208_api.log.zst",
+    "first_seen": "2025-10-23T21:32:08.533513",
+    "reference_count": 1
+  },
+  "ee4dccf01fd910ba00676683d738ad0fac486657d58b1687f6a2dd66053a66dd": {
+    "backup_path": "/home/buymeagoat/dev/whisper-transcriber/backups/files/logs/20251023_213208_security_audit.log.zst",
+    "first_seen": "2025-10-23T21:32:08.577872",
+    "reference_count": 1
   }
 }

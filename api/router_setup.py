@@ -26,7 +26,7 @@ from api.app_state import backend_log
 
 # Import backup API router
 try:
-    from app.backup_api import backup_router
+    from api.routes.backup import backup_router
     BACKUP_API_AVAILABLE = True
 except ImportError as e:
     backend_log.warning(f"Backup API not available: {e}")

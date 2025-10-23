@@ -18,7 +18,7 @@ from sqlalchemy import and_, or_, desc, func
 from fastapi import HTTPException, status
 from pydantic import BaseModel, Field
 
-from api.models.api_keys import APIKey, APIKeyUsageLog, APIKeyQuotaUsage, APIKeyStatus, APIKeyPermission
+from api.extended_models.api_keys import APIKey, APIKeyUsageLog, APIKeyQuotaUsage, APIKeyStatus, APIKeyPermission
 from api.utils.logger import get_system_logger
 
 logger = get_system_logger("api_key_service")

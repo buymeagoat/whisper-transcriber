@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 
 from api.orm_bootstrap import get_db
 from api.utils.logger import get_system_logger
-from api.services.auth_service import get_current_user
+from api.services.users import get_current_user
 from api.services.pwa_service import (
     pwa_service,
     PWANotification,

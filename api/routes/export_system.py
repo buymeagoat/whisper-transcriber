@@ -14,9 +14,10 @@ from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field, validator
 
-from ..database import get_db
-from ..auth import get_current_user, require_admin
-from ..models.export_system import (
+from api.orm_bootstrap import get_db
+from api.routes.auth import get_current_user
+from api.utils.admin_required import check_admin_required as require_admin
+from ..extended_models.export_system import (
     ExportTemplate, ExportJob, BatchExport, ExportHistory, ExportFormatConfig,
     ExportFormat, ExportStatus, BatchExportStatus, TemplateType
 )

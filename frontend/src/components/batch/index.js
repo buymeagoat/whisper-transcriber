@@ -12,4 +12,4 @@ export {
   BATCH_STATUS, 
   JOB_STATUS,
   default as batchUploadService 
-} from '../services/batchUploadService';
+} from '../../services/batchUploadService';

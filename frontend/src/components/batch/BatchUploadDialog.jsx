@@ -35,7 +35,7 @@ import {
   Cancel as CancelIcon
 } from '@mui/icons-material';
 
-import batchUploadService, { BatchUploadConfig, BATCH_STATUS } from '../services/batchUploadService';
+import batchUploadService, { BatchUploadConfig, BATCH_STATUS } from '../../services/batchUploadService';
 
 const BatchUploadDialog = ({ 
   open, 

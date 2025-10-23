@@ -12,8 +12,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from api.database import get_db
-from api.auth import get_current_user
+from api.orm_bootstrap import get_db
+from api.routes.auth import get_current_user
 from api.models import User
 from api.utils.admin_required import admin_required
 

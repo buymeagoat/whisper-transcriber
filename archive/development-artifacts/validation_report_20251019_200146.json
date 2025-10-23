@@ -1,0 +1,692 @@
+{
+  "validation_metadata": {
+    "timestamp": "2025-10-19T20:01:46.121779",
+    "duration_ms": 1189.7430419921875,
+    "validator_version": "1.0.0",
+    "components_tested": 7,
+    "inventory_stats": {
+      "total_api_endpoints": 21,
+      "total_config_vars": 38,
+      "total_data_stores": 1,
+      "total_functions": 1032,
+      "total_modules": 49
+    }
+  },
+  "overall_system_status": "WARNING",
+  "summary": {
+    "tests_run": 52,
+    "tests_passed": 47,
+    "tests_failed": 0,
+    "tests_warned": 5,
+    "tests_skipped": 0,
+    "success_rate": 90.38461538461539
+  },
+  "component_statuses": [
+    {
+      "name": "api_endpoints",
+      "overall_status": "WARNING",
+      "tests_run": 22,
+      "tests_passed": 18,
+      "tests_failed": 0,
+      "tests_warned": 4,
+      "tests_skipped": 0,
+      "duration_ms": 151.52931213378906,
+      "critical_issues": [],
+      "warnings": [
+        "Auth possibly not enforced (got 200)",
+        "Auth possibly not enforced (got 200)",
+        "Auth possibly not enforced (got 200)",
+        "Auth possibly not enforced (got 200)"
+      ],
+      "recommendations": [
+        "Review warnings for potential issues"
+      ]
+    },
+    {
+      "name": "database",
+      "overall_status": "HEALTHY",
+      "tests_run": 4,
+      "tests_passed": 4,
+      "tests_failed": 0,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 2.3474693298339844,
+      "critical_issues": [],
+      "warnings": [],
+      "recommendations": []
+    },
+    {
+      "name": "file_system",
+      "overall_status": "HEALTHY",
+      "tests_run": 10,
+      "tests_passed": 10,
+      "tests_failed": 0,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 1.8076896667480469,
+      "critical_issues": [],
+      "warnings": [],
+      "recommendations": []
+    },
+    {
+      "name": "configuration",
+      "overall_status": "HEALTHY",
+      "tests_run": 6,
+      "tests_passed": 6,
+      "tests_failed": 0,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 0.4634857177734375,
+      "critical_issues": [],
+      "warnings": [],
+      "recommendations": []
+    },
+    {
+      "name": "security",
+      "overall_status": "WARNING",
+      "tests_run": 3,
+      "tests_passed": 2,
+      "tests_failed": 0,
+      "tests_warned": 1,
+      "tests_skipped": 0,
+      "duration_ms": 8.109092712402344,
+      "critical_issues": [],
+      "warnings": [
+        "Token endpoint unexpected response: 401"
+      ],
+      "recommendations": [
+        "Review warnings for potential issues"
+      ]
+    },
+    {
+      "name": "backup_system",
+      "overall_status": "HEALTHY",
+      "tests_run": 4,
+      "tests_passed": 4,
+      "tests_failed": 0,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 0.8358955383300781,
+      "critical_issues": [],
+      "warnings": [],
+      "recommendations": []
+    },
+    {
+      "name": "performance",
+      "overall_status": "HEALTHY",
+      "tests_run": 3,
+      "tests_passed": 3,
+      "tests_failed": 0,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 1023.857593536377,
+      "critical_issues": [],
+      "warnings": [],
+      "recommendations": []
+    }
+  ],
+  "critical_components": [],
+  "warning_components": [
+    "api_endpoints",
+    "security"
+  ],
+  "healthy_components": [
+    "database",
+    "file_system",
+    "configuration",
+    "backup_system",
+    "performance"
+  ],
+  "detailed_results": [
+    {
+      "component": "api_endpoints",
+      "test_name": "server_availability",
+      "status": "PASS",
+      "message": "Server responding at http://localhost:8000",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 6.474971771240234,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_POST_/token",
+      "status": "PASS",
+      "message": "Endpoint accessible with validation (status: 422)",
+      "duration_ms": 7.267951965332031,
+      "details": {
+        "status_code": 422
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_POST_/register",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 5.098104476928711,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_POST_/change-password",
+      "status": "PASS",
+      "message": "Auth required (403) - as expected",
+      "duration_ms": 4.801273345947266,
+      "details": {
+        "status_code": 403
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/health",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 4.958629608154297,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/metrics",
+      "status": "WARN",
+      "message": "Auth possibly not enforced (got 200)",
+      "duration_ms": 8.414268493652344,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/stats",
+      "status": "WARN",
+      "message": "Auth possibly not enforced (got 200)",
+      "duration_ms": 7.73930549621582,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/dashboard",
+      "status": "WARN",
+      "message": "Auth possibly not enforced (got 200)",
+      "duration_ms": 7.902860641479492,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_POST_/transcribe",
+      "status": "PASS",
+      "message": "Method not allowed (405) - endpoint exists",
+      "duration_ms": 4.473209381103516,
+      "details": {
+        "status_code": 405
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/jobs/{job_id}",
+      "status": "PASS",
+      "message": "Resource not found (404) - auth may be enforced",
+      "duration_ms": 6.356954574584961,
+      "details": {
+        "status_code": 404
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/jobs/{job_id}/download",
+      "status": "PASS",
+      "message": "Resource not found (404) - auth may be enforced",
+      "duration_ms": 5.947589874267578,
+      "details": {
+        "status_code": 404
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/jobs",
+      "status": "PASS",
+      "message": "Resource not found (404) - auth may be enforced",
+      "duration_ms": 5.177974700927734,
+      "details": {
+        "status_code": 404
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/admin/jobs",
+      "status": "WARN",
+      "message": "Auth possibly not enforced (got 200)",
+      "duration_ms": 11.84844970703125,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_DELETE_/jobs/{job_id}",
+      "status": "PASS",
+      "message": "Resource not found (404) - auth may be enforced",
+      "duration_ms": 5.519390106201172,
+      "details": {
+        "status_code": 404
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/health",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 4.536867141723633,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/version",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 5.365848541259766,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/admin/performance/summary",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 8.566856384277344,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/admin/performance/queries",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 7.406949996948242,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/admin/performance/metrics",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 6.085395812988281,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 10.170459747314453,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "api_endpoints",
+      "test_name": "endpoint_GET_/{full_path:path}",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 7.099151611328125,
+      "details": {
+        "status_code": 200
+      },
+      "error": null
+    },
+    {
+      "component": "database",
+      "test_name": "db_file_exists",
+      "status": "PASS",
+      "message": "Database file found: /home/buymeagoat/dev/whisper-transcriber/whisper_dev.db",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "database",
+      "test_name": "db_connectivity",
+      "status": "PASS",
+      "message": "Database connection successful",
+      "duration_ms": 1.007080078125,
+      "details": {
+        "sqlite_version": "3.37.2",
+        "integrity_check": "ok",
+        "journal_mode": "delete"
+      },
+      "error": null
+    },
+    {
+      "component": "database",
+      "test_name": "db_schema",
+      "status": "PASS",
+      "message": "All 8 tables present",
+      "duration_ms": 0.4203319549560547,
+      "details": {
+        "tables": [
+          "users",
+          "jobs",
+          "config_entries",
+          "audit_logs",
+          "performance_metrics",
+          "query_performance_logs",
+          "transcript_metadata",
+          "user_settings"
+        ]
+      },
+      "error": null
+    },
+    {
+      "component": "database",
+      "test_name": "db_performance",
+      "status": "PASS",
+      "message": "Good query performance: 0.24ms",
+      "duration_ms": 0.32830238342285156,
+      "details": {
+        "query_time_ms": 0.23818016052246094,
+        "table_count": 53
+      },
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_uploads",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_models",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_storage",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_logs",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_cache",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_transcripts",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_docs/architecture",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_tools",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "file_permissions",
+      "status": "PASS",
+      "message": "File system permissions OK",
+      "duration_ms": 0.48279762268066406,
+      "details": {
+        "write_access": true,
+        "read_access": true
+      },
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "disk_space",
+      "status": "PASS",
+      "message": "Sufficient disk space: 206.4GB free",
+      "duration_ms": 0.03266334533691406,
+      "details": {
+        "free_gb": 206.35180282592773,
+        "total_gb": 250.92389297485352,
+        "used_percent": 12.65581588718924
+      },
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "file_.env",
+      "status": "PASS",
+      "message": "Configuration file exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "file_.env.example",
+      "status": "PASS",
+      "message": "Configuration file exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "var_DB_URL",
+      "status": "PASS",
+      "message": "Variable configured",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "var_SECRET_KEY",
+      "status": "PASS",
+      "message": "Variable configured",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "var_PORT",
+      "status": "PASS",
+      "message": "Variable configured",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "config_consistency",
+      "status": "PASS",
+      "message": "Configuration is consistent",
+      "duration_ms": 0.007152557373046875,
+      "details": {},
+      "error": null
+    },
+    {
+      "component": "security",
+      "test_name": "secret_key",
+      "status": "PASS",
+      "message": "SECRET_KEY properly configured",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "security",
+      "test_name": "cors_config",
+      "status": "PASS",
+      "message": "CORS properly restricted",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "security",
+      "test_name": "auth_endpoints",
+      "status": "WARN",
+      "message": "Token endpoint unexpected response: 401",
+      "duration_ms": 7.817506790161133,
+      "details": {
+        "endpoint": "/token",
+        "status_code": 401
+      },
+      "error": null
+    },
+    {
+      "component": "backup_system",
+      "test_name": "backup_dir_backups",
+      "status": "PASS",
+      "message": "Backup directory exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "backup_system",
+      "test_name": "backup_dir_backups_database",
+      "status": "PASS",
+      "message": "Backup directory exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "backup_system",
+      "test_name": "backup_dir_backups_files",
+      "status": "PASS",
+      "message": "Backup directory exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "backup_system",
+      "test_name": "backup_modules",
+      "status": "PASS",
+      "message": "Backup modules importable",
+      "duration_ms": 0.4584789276123047,
+      "details": {
+        "modules_available": [],
+        "total_modules": 4
+      },
+      "error": null
+    },
+    {
+      "component": "performance",
+      "test_name": "system_resources",
+      "status": "PASS",
+      "message": "System resources healthy",
+      "duration_ms": 1003.6172866821289,
+      "details": {
+        "cpu_percent": 3.5,
+        "memory_percent": 19.5,
+        "process_count": 101
+      },
+      "error": null
+    },
+    {
+      "component": "performance",
+      "test_name": "endpoint_summary",
+      "status": "PASS",
+      "message": "Performance endpoint accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "performance",
+      "test_name": "endpoint_metrics",
+      "status": "PASS",
+      "message": "Performance endpoint accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    }
+  ],
+  "recommendations": [
+    "\u26a0\ufe0f  2 components have warnings that should be reviewed",
+    "Run validation regularly to catch issues early",
+    "Check logs for additional details on any failures"
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "validation_metadata": {
+    "timestamp": "2025-10-20T03:23:06.638273",
+    "duration_ms": 1795.1416969299316,
+    "validator_version": "1.0.0",
+    "components_tested": 1,
+    "inventory_stats": {
+      "total_api_endpoints": 21,
+      "total_config_vars": 38,
+      "total_data_stores": 1,
+      "total_functions": 1032,
+      "total_modules": 49
+    }
+  },
+  "overall_system_status": "WARNING",
+  "summary": {
+    "tests_run": 9,
+    "tests_passed": 8,
+    "tests_failed": 0,
+    "tests_warned": 1,
+    "tests_skipped": 0,
+    "success_rate": 88.88888888888889
+  },
+  "component_statuses": [
+    {
+      "name": "e2e_testing",
+      "overall_status": "WARNING",
+      "tests_run": 9,
+      "tests_passed": 8,
+      "tests_failed": 0,
+      "tests_warned": 1,
+      "tests_skipped": 0,
+      "duration_ms": 1795.0520515441895,
+      "critical_issues": [],
+      "warnings": [
+        "Basic test coverage: auth, transcription, admin, cross-browser, browser"
+      ],
+      "recommendations": [
+        "Review warnings for potential issues"
+      ]
+    }
+  ],
+  "critical_components": [],
+  "warning_components": [
+    "e2e_testing"
+  ],
+  "healthy_components": [],
+  "detailed_results": [
+    {
+      "component": "e2e_testing",
+      "test_name": "framework_exists",
+      "status": "PASS",
+      "message": "E2E testing directory found",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "e2e_testing",
+      "test_name": "playwright_config",
+      "status": "PASS",
+      "message": "Playwright configuration found",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "e2e_testing",
+      "test_name": "test_files",
+      "status": "PASS",
+      "message": "Found 5 E2E test files",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "e2e_testing",
+      "test_name": "test_coverage",
+      "status": "WARN",
+      "message": "Basic test coverage: auth, transcription, admin, cross-browser, browser",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "e2e_testing",
+      "test_name": "playwright_dependency",
+      "status": "PASS",
+      "message": "Playwright version: ^1.40.0",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "e2e_testing",
+      "test_name": "test_scripts",
+      "status": "PASS",
+      "message": "Test scripts found: test, test:headed, test:debug, test:ui, test:report",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "e2e_testing",
+      "test_name": "framework_functional",
+      "status": "PASS",
+      "message": "Playwright framework functional, 1239 tests detected",
+      "duration_ms": 1793.4679985046387,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "e2e_testing",
+      "test_name": "global_hooks",
+      "status": "PASS",
+      "message": "Global setup and teardown files found",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "e2e_testing",
+      "test_name": "browser_coverage",
+      "status": "PASS",
+      "message": "Multi-browser testing configured: chromium, firefox, webkit",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    }
+  ],
+  "recommendations": [
+    "\u26a0\ufe0f  1 components have warnings that should be reviewed",
+    "Run validation regularly to catch issues early",
+    "Check logs for additional details on any failures"
+  ]
+}

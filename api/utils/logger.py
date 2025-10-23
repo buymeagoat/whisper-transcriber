@@ -55,3 +55,7 @@ def get_backend_logger(name: str = "whisper_backend") -> logging.Logger:
 def get_app_logger(name: str = "whisper_app") -> logging.Logger:
     """Get a logger for application-level events."""
     return get_system_logger(name)
+
+def get_logger(name: str = "whisper_api") -> logging.Logger:
+    """Alias for get_system_logger for backward compatibility."""
+    return get_system_logger(name)

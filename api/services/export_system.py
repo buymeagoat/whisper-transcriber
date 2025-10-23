@@ -34,7 +34,7 @@ try:
 except ImportError:
     PDF_AVAILABLE = False
 
-from ..models.export_system import (
+from ..extended_models.export_system import (
     ExportTemplate, ExportJob, BatchExport, ExportHistory, ExportFormatConfig,
     ExportFormat, ExportStatus, BatchExportStatus, TemplateType
 )

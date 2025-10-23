@@ -23,6 +23,11 @@ aiofiles>=23.2.1
 openai-whisper==20240930
 torch>=2.2.2
 pydub>=0.25.1
+# Audio enhancement dependencies
+librosa>=0.10.0
+soundfile>=0.12.1
+numpy>=1.24.0
+scipy>=1.10.0
 
 # --- Background Job Processing ---
 celery>=5.3
@@ -38,6 +43,7 @@ passlib[bcrypt]>=1.7.4
 # --- Configuration ---
 python-dotenv>=1.1.0
 pydantic[dotenv]>=2.6.0
+tomli>=2.0.0  # TOML parsing for Python < 3.11
 
 # --- System Monitoring ---
 psutil>=5.9.0
@@ -67,4 +73,3 @@ paramiko>=3.4.0
 
 # System requirements (install separately):
 # sudo apt-get install -y ffmpeg libmagic1
-\nfiletype>=1.2.0

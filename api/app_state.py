@@ -24,6 +24,12 @@ app_state = {
     "celery_connected": False
 }
 
+def initialize_job_queue():
+    """Initialize the job queue."""
+    from api.services.job_queue import job_queue
+    app_state["job_queue"] = job_queue
+    return job_queue
+
 def handle_whisper(audio_file_path: str, **kwargs) -> Dict[str, Any]:
     """
     Handle whisper transcription.

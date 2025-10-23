@@ -562,7 +562,7 @@ const MultiFormatExportSystem = ({ transcriptJob, onClose }) => {
               </List>
             </CardContent>
           </Card>
-        </div>
+        </Grid>
       </Grid>
     </Box>
   );

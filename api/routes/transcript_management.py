@@ -15,7 +15,7 @@ from api.services.transcript_management import (
     TranscriptSearchService, TranscriptVersioningService, TranscriptTagService,
     TranscriptBookmarkService, BatchOperationService, TranscriptExportService
 )
-from api.services.auth import get_current_user
+from api.services.users import get_current_user
 from api.utils.logger import get_system_logger
 
 # Import admin security if available
@@ -54,7 +54,7 @@ class CreateVersionRequest(BaseModel):
 
 class CreateTagRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=50, description="Tag name")
-    color: str = Field("#3B82F6", regex=r"^#[0-9A-Fa-f]{6}$", description="Hex color code")
+    color: str = Field("#3B82F6", pattern=r"^#[0-9A-Fa-f]{6}$", description="Hex color code")
 
 
 class AssignTagRequest(BaseModel):
@@ -227,7 +227,7 @@ async def get_transcript_version(
 ):
     """Get a specific version of a transcript."""
     try:
-        from api.models.transcript_management import TranscriptVersion
+        from api.extended_models.transcript_management import TranscriptVersion
         from sqlalchemy import and_
         
         version = db.query(TranscriptVersion).filter(

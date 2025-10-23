@@ -55,7 +55,10 @@ The application uses **SQLite** for data storage and **Redis** for task queue ma
 ## Documentation
 
 - **[Setup Guide](docs/SETUP_GUIDE.md)** - Complete installation instructions
-- **[Task Tracking](TASKS.md)** - **📋 Master list of all issues, TODOs, and development tasks**
+## 📋 Project Management
+
+- **[PROJECT_MASTER.md](PROJECT_MASTER.md)** - 📋 **SINGLE SOURCE OF TRUTH** for all tasks, issues, enhancements, and project scope
+- **[DOCUMENT_CONSOLIDATION.md](DOCUMENT_CONSOLIDATION.md)** - Document consolidation notice and guidelines
 - **[Architecture Overview](docs/architecture/)** - Technical details and system design
 
 ## Contributing

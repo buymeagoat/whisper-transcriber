@@ -4,6 +4,7 @@ Integrates enhanced database optimization with existing FastAPI application.
 """
 
 import asyncio
+import time
 from contextlib import asynccontextmanager
 from typing import Optional, Dict, Any
 
@@ -75,7 +76,7 @@ class DatabaseOptimizationService:
         
         # Try cache first if enabled
         if use_cache:
-            cache_service = get_cache_service()
+            cache_service = await get_cache_service()
             if cache_service:
                 cached_data = await cache_service.get(cache_key)
                 if cached_data:
@@ -93,10 +94,11 @@ class DatabaseOptimizationService:
                     data = await self.query_patterns.get_dashboard_data_optimized(session, user_id)
             
             # Cache the result for 5 minutes
-            if use_cache:
-                cache_service = get_cache_service()
-                if cache_service:
+            if use_cache and cache_service:
+                try:
                     await cache_service.set(cache_key, data, 300)  # 5 minutes
+                except Exception as cache_error:
+                    logger.warning(f"Failed to cache dashboard data: {cache_error}")
             
             return data
             

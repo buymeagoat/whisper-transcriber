@@ -1,0 +1,461 @@
+{
+  "validation_metadata": {
+    "timestamp": "2025-10-19T15:34:42.190920",
+    "duration_ms": 1015.308141708374,
+    "validator_version": "1.0.0",
+    "components_tested": 7,
+    "inventory_stats": {
+      "total_api_endpoints": 21,
+      "total_config_vars": 38,
+      "total_data_stores": 1,
+      "total_functions": 1032,
+      "total_modules": 49
+    }
+  },
+  "overall_system_status": "CRITICAL",
+  "summary": {
+    "tests_run": 31,
+    "tests_passed": 27,
+    "tests_failed": 4,
+    "tests_warned": 0,
+    "tests_skipped": 0,
+    "success_rate": 87.09677419354838
+  },
+  "component_statuses": [
+    {
+      "name": "api_endpoints",
+      "overall_status": "CRITICAL",
+      "tests_run": 1,
+      "tests_passed": 0,
+      "tests_failed": 1,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 2.9175281524658203,
+      "critical_issues": [
+        "Server not responding at http://localhost:8000"
+      ],
+      "warnings": [],
+      "recommendations": [
+        "Address critical failures immediately"
+      ]
+    },
+    {
+      "name": "database",
+      "overall_status": "HEALTHY",
+      "tests_run": 4,
+      "tests_passed": 4,
+      "tests_failed": 0,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 2.3632049560546875,
+      "critical_issues": [],
+      "warnings": [],
+      "recommendations": []
+    },
+    {
+      "name": "file_system",
+      "overall_status": "HEALTHY",
+      "tests_run": 10,
+      "tests_passed": 10,
+      "tests_failed": 0,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 1.0554790496826172,
+      "critical_issues": [],
+      "warnings": [],
+      "recommendations": []
+    },
+    {
+      "name": "configuration",
+      "overall_status": "HEALTHY",
+      "tests_run": 6,
+      "tests_passed": 6,
+      "tests_failed": 0,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 0.6122589111328125,
+      "critical_issues": [],
+      "warnings": [],
+      "recommendations": []
+    },
+    {
+      "name": "security",
+      "overall_status": "CRITICAL",
+      "tests_run": 3,
+      "tests_passed": 2,
+      "tests_failed": 1,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 2.0895004272460938,
+      "critical_issues": [
+        "Auth endpoint test failed: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /token (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6f86399480>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+      ],
+      "warnings": [],
+      "recommendations": [
+        "Address critical failures immediately"
+      ]
+    },
+    {
+      "name": "backup_system",
+      "overall_status": "HEALTHY",
+      "tests_run": 4,
+      "tests_passed": 4,
+      "tests_failed": 0,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 0.7734298706054688,
+      "critical_issues": [],
+      "warnings": [],
+      "recommendations": []
+    },
+    {
+      "name": "performance",
+      "overall_status": "CRITICAL",
+      "tests_run": 3,
+      "tests_passed": 1,
+      "tests_failed": 2,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 1004.8844814300537,
+      "critical_issues": [
+        "Performance endpoint not accessible",
+        "Performance endpoint not accessible"
+      ],
+      "warnings": [],
+      "recommendations": [
+        "Address critical failures immediately"
+      ]
+    }
+  ],
+  "critical_components": [
+    "api_endpoints",
+    "security",
+    "performance"
+  ],
+  "warning_components": [],
+  "healthy_components": [
+    "database",
+    "file_system",
+    "configuration",
+    "backup_system"
+  ],
+  "detailed_results": [
+    {
+      "component": "api_endpoints",
+      "test_name": "server_availability",
+      "status": "FAIL",
+      "message": "Server not responding at http://localhost:8000",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "database",
+      "test_name": "db_file_exists",
+      "status": "PASS",
+      "message": "Database file found: /home/buymeagoat/dev/whisper-transcriber/whisper_dev.db",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "database",
+      "test_name": "db_connectivity",
+      "status": "PASS",
+      "message": "Database connection successful",
+      "duration_ms": 1.0929107666015625,
+      "details": {
+        "sqlite_version": "3.37.2",
+        "integrity_check": "ok",
+        "journal_mode": "delete"
+      },
+      "error": null
+    },
+    {
+      "component": "database",
+      "test_name": "db_schema",
+      "status": "PASS",
+      "message": "All 8 tables present",
+      "duration_ms": 0.4024505615234375,
+      "details": {
+        "tables": [
+          "users",
+          "jobs",
+          "config_entries",
+          "audit_logs",
+          "performance_metrics",
+          "query_performance_logs",
+          "transcript_metadata",
+          "user_settings"
+        ]
+      },
+      "error": null
+    },
+    {
+      "component": "database",
+      "test_name": "db_performance",
+      "status": "PASS",
+      "message": "Good query performance: 0.26ms",
+      "duration_ms": 0.3523826599121094,
+      "details": {
+        "query_time_ms": 0.25963783264160156,
+        "table_count": 53
+      },
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_uploads",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_models",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_storage",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_logs",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_cache",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_transcripts",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_docs/architecture",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "dir_tools",
+      "status": "PASS",
+      "message": "Directory exists and accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "file_permissions",
+      "status": "PASS",
+      "message": "File system permissions OK",
+      "duration_ms": 0.28252601623535156,
+      "details": {
+        "write_access": true,
+        "read_access": true
+      },
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "disk_space",
+      "status": "PASS",
+      "message": "Sufficient disk space: 206.7GB free",
+      "duration_ms": 0.0362396240234375,
+      "details": {
+        "free_gb": 206.6872673034668,
+        "total_gb": 250.92389297485352,
+        "used_percent": 12.522124163550677
+      },
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "file_.env",
+      "status": "PASS",
+      "message": "Configuration file exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "file_.env.example",
+      "status": "PASS",
+      "message": "Configuration file exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "var_DB_URL",
+      "status": "PASS",
+      "message": "Variable configured",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "var_SECRET_KEY",
+      "status": "PASS",
+      "message": "Variable configured",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "var_PORT",
+      "status": "PASS",
+      "message": "Variable configured",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "configuration",
+      "test_name": "config_consistency",
+      "status": "PASS",
+      "message": "Configuration is consistent",
+      "duration_ms": 0.023365020751953125,
+      "details": {},
+      "error": null
+    },
+    {
+      "component": "security",
+      "test_name": "secret_key",
+      "status": "PASS",
+      "message": "SECRET_KEY properly configured",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "security",
+      "test_name": "cors_config",
+      "status": "PASS",
+      "message": "CORS properly restricted",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "security",
+      "test_name": "auth_endpoints",
+      "status": "FAIL",
+      "message": "Auth endpoint test failed: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /token (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6f86399480>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "duration_ms": 1.842498779296875,
+      "details": {},
+      "error": null
+    },
+    {
+      "component": "backup_system",
+      "test_name": "backup_dir_backups",
+      "status": "PASS",
+      "message": "Backup directory exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "backup_system",
+      "test_name": "backup_dir_backups_database",
+      "status": "PASS",
+      "message": "Backup directory exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "backup_system",
+      "test_name": "backup_dir_backups_files",
+      "status": "PASS",
+      "message": "Backup directory exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "backup_system",
+      "test_name": "backup_modules",
+      "status": "PASS",
+      "message": "Backup modules importable",
+      "duration_ms": 0.4146099090576172,
+      "details": {
+        "modules_available": [],
+        "total_modules": 4
+      },
+      "error": null
+    },
+    {
+      "component": "performance",
+      "test_name": "system_resources",
+      "status": "PASS",
+      "message": "System resources healthy",
+      "duration_ms": 1001.9752979278564,
+      "details": {
+        "cpu_percent": 12.4,
+        "memory_percent": 14.4,
+        "process_count": 78
+      },
+      "error": null
+    },
+    {
+      "component": "performance",
+      "test_name": "endpoint_summary",
+      "status": "FAIL",
+      "message": "Performance endpoint not accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "performance",
+      "test_name": "endpoint_metrics",
+      "status": "FAIL",
+      "message": "Performance endpoint not accessible",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    }
+  ],
+  "recommendations": [
+    "\ud83d\udea8 URGENT: 3 critical components need immediate attention",
+    "Review critical_components list and address failures",
+    "Run validation regularly to catch issues early",
+    "Check logs for additional details on any failures"
+  ]
+}

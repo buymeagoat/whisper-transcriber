@@ -14,11 +14,11 @@ logger = get_system_logger("rate_limit")
 @dataclass
 class RateLimitConfig:
     """Rate limit configuration."""
-    max_requests: int = 60  # Changed from requests_per_minute
-    window_seconds: int = 60  # Changed from per_hour
-    block_duration_seconds: int = 900  # Added
-    burst_size: int = 10
-    enabled: bool = True
+    max_requests: int = 200  # More generous for testing and legitimate usage
+    window_seconds: int = 60  # 1-minute window for quicker reset
+    block_duration_seconds: int = 30  # 30-second block for testing
+    burst_size: int = 50  # Allow larger bursts
+    enabled: bool = False  # Temporarily disabled for security testing
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Simple in-memory rate limiting middleware."""

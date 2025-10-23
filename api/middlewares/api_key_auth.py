@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from api.orm_bootstrap import get_db
 from api.services.api_key_service import api_key_service
-from api.models.api_keys import APIKey, APIKeyPermission
+from api.extended_models.api_keys import APIKey, APIKeyPermission
 from api.utils.logger import get_system_logger
 
 logger = get_system_logger("api_key_middleware")
@@ -273,7 +273,7 @@ class APIKeyAuthenticationMiddleware(BaseHTTPMiddleware):
     
     def _get_usage_count(self, db: Session, api_key_id: int, start_time: datetime, end_time: datetime) -> int:
         """Get usage count for a time period."""
-        from api.models.api_keys import APIKeyUsageLog
+        from api.extended_models.api_keys import APIKeyUsageLog
         
         count = db.query(APIKeyUsageLog).filter(
             APIKeyUsageLog.api_key_id == api_key_id,

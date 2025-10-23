@@ -37,7 +37,7 @@ import {
   Cancel as CancelledIcon
 } from '@mui/icons-material';
 
-import batchUploadService, { BATCH_STATUS, JOB_STATUS } from '../services/batchUploadService';
+import batchUploadService, { BATCH_STATUS, JOB_STATUS } from '../../services/batchUploadService';
 
 const BatchProgressTracker = ({ 
   batchId, 

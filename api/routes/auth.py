@@ -187,6 +187,24 @@ async def get_current_user(current_user: dict = Depends(verify_token)):
         roles=user.get("roles", [])
     )
 
+async def get_current_admin_user(current_user: dict = Depends(verify_token)) -> dict:
+    """Get current authenticated admin user."""
+    username = current_user["username"]
+    user = USERS_DB.get(username)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    if not user.get("is_admin", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+    
+    return user
+
 @router.post("/logout")
 async def logout(current_user: dict = Depends(verify_token)):
     """Logout user (client should discard token)."""

@@ -16,7 +16,7 @@ from api.orm_bootstrap import get_db
 from api.services.api_key_service import api_key_service, APIKeyUsageStats
 from api.services.users import get_current_admin
 from api.models import User
-from api.models.api_keys import APIKey, APIKeyUsageLog, APIKeyStatus
+from api.extended_models.api_keys import APIKey, APIKeyUsageLog, APIKeyStatus
 from api.utils.logger import get_system_logger
 
 logger = get_system_logger("admin_api_keys")

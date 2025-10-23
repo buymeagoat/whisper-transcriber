@@ -54,12 +54,12 @@ try:
     # T027 API Key Management - API key authentication middleware
     from api.middlewares.api_key_auth import APIKeyAuthenticationMiddleware
     
-    # Enhanced database optimization for T025 Phase 3
-    from api.services.database_optimization_integration import (
-        get_optimization_service,
-        cleanup_optimization_service,
-        database_optimization_lifespan
-    )
+    # Enhanced database optimization for T025 Phase 3 - TEMPORARILY DISABLED FOR DEBUGGING
+    # from api.services.database_optimization_integration import (
+    #     get_optimization_service,
+    #     cleanup_optimization_service,
+    #     database_optimization_lifespan
+    # )
     
     # Enhanced WebSocket service for T025 Phase 4
     from api.services.enhanced_websocket_service import (
@@ -164,10 +164,20 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         system_log.warning(f"Failed to initialize cache service: {e}")
 
-    # Initialize enhanced database optimization for T025 Phase 3
+    # Initialize job queue
     try:
-        optimization_service = await get_optimization_service()
-        system_log.info("Enhanced database optimization service initialized successfully")
+        from api.app_state import initialize_job_queue
+        initialize_job_queue()
+        system_log.info("Job queue initialized successfully")
+    except Exception as e:
+        system_log.warning(f"Failed to initialize job queue: {e}")
+        # Set a fallback job queue directly
+        app_state.app_state["job_queue"] = ThreadJobQueue()
+
+    # Initialize enhanced database optimization for T025 Phase 3 - TEMPORARILY DISABLED
+    try:
+        # optimization_service = await get_optimization_service()
+        system_log.info("Database optimization service temporarily disabled for debugging")
     except Exception as e:
         system_log.warning(f"Failed to initialize database optimization service: {e}")
 
@@ -220,10 +230,10 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         system_log.error(f"Error shutting down cache service: {e}")
     
-    # Cleanup enhanced database optimization service
+    # Cleanup enhanced database optimization service - TEMPORARILY DISABLED
     try:
-        await cleanup_optimization_service()
-        system_log.info("Database optimization service shutdown completed")
+        # await cleanup_optimization_service()
+        system_log.info("Database optimization service cleanup skipped (disabled)")
     except Exception as e:
         system_log.error(f"Error shutting down database optimization service: {e}")
     
@@ -295,14 +305,9 @@ app.add_middleware(RateLimitMiddleware, config=rate_limit_config)
 
 # Enhanced Security Headers with environment-specific configuration
 environment = os.getenv("ENVIRONMENT", "production")
-security_headers_middleware = create_security_headers_middleware(
-    environment=environment,
-    enable_hsts=(environment == "production"),
-    excluded_paths=["/docs", "/redoc", "/openapi.json", "/health", "/version"]
-)
 app.add_middleware(EnhancedSecurityHeadersMiddleware, 
                   environment=environment,
-                  excluded_paths=["/docs", "/redoc", "/openapi.json"])
+                  excluded_paths=["/docs", "/redoc", "/openapi.json", "/health", "/version"])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins.split(","),
@@ -373,14 +378,12 @@ def rehydrate_incomplete_jobs():
             try:
                 upload_path = storage.get_upload_path(job.saved_filename)
                 job_dir = storage.get_transcript_dir(job.id)
-                app_state.job_queue.enqueue(
+                app_state.app_state["job_queue"].enqueue(
                     partial(
                         handle_whisper,
-                        job.id,
-                        upload_path,
-                        job_dir,
-                        job.model,
-                        start_thread=False,
+                        str(upload_path),
+                        model=job.model,
+                        job_id=job.id
                     )
                 )
             except Exception as e:

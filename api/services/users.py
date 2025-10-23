@@ -4,9 +4,11 @@ User management services for the Whisper Transcriber API.
 
 from typing import Optional
 from sqlalchemy.orm import Session
+from fastapi import Depends, HTTPException, status
 from api.orm_bootstrap import get_db
 from api.models import User
 from api.utils.logger import get_system_logger
+from api.routes.auth import verify_token
 import bcrypt
 
 logger = get_system_logger("users")
@@ -58,8 +60,11 @@ def get_user_by_username(db: Session, username: str) -> Optional[User]:
     return db.query(User).filter(User.username == username).first()
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against its hash."""
-    return hash_password(plain_password) == hashed_password
+    """Verify a password against its bcrypt hash."""
+    try:
+        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    except Exception:
+        return False
 
 def create_user(db: Session, username: str, password: str, role: str = "user") -> User:
     """Create a new user."""
@@ -72,3 +77,17 @@ def create_user(db: Session, username: str, password: str, role: str = "user") -
     db.commit()
     db.refresh(user)
     return user
+
+async def get_current_user(current_user: dict = Depends(verify_token)) -> dict:
+    """Get current authenticated user - wrapper for auth function."""
+    # This function provides a service-level interface to the auth function
+    # Import here to avoid circular imports
+    from api.routes.auth import get_current_user as auth_get_current_user
+    return await auth_get_current_user(current_user)
+
+async def get_current_admin(current_user: dict = Depends(verify_token)) -> dict:
+    """Get current authenticated admin user - wrapper for auth function."""
+    # This function provides a service-level interface to the auth function  
+    # Import here to avoid circular imports
+    from api.routes.auth import get_current_admin_user
+    return await get_current_admin_user(current_user)

@@ -298,7 +298,7 @@ def get_available_permissions(
     """
     Get list of available API key permissions.
     """
-    from api.models.api_keys import APIKeyPermission
+    from api.extended_models.api_keys import APIKeyPermission
     
     permissions = [
         {

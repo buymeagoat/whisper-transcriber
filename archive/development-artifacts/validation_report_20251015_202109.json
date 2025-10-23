@@ -1,0 +1,65 @@
+{
+  "validation_metadata": {
+    "timestamp": "2025-10-15T20:21:09.393829",
+    "duration_ms": 0.32806396484375,
+    "validator_version": "1.0.0",
+    "components_tested": 1,
+    "inventory_stats": {
+      "total_api_endpoints": 21,
+      "total_config_vars": 38,
+      "total_data_stores": 1,
+      "total_functions": 1032,
+      "total_modules": 49
+    }
+  },
+  "overall_system_status": "CRITICAL",
+  "summary": {
+    "tests_run": 1,
+    "tests_passed": 0,
+    "tests_failed": 1,
+    "tests_warned": 0,
+    "tests_skipped": 0,
+    "success_rate": 0.0
+  },
+  "component_statuses": [
+    {
+      "name": "database",
+      "overall_status": "CRITICAL",
+      "tests_run": 1,
+      "tests_passed": 0,
+      "tests_failed": 1,
+      "tests_warned": 0,
+      "tests_skipped": 0,
+      "duration_ms": 0.19693374633789062,
+      "critical_issues": [
+        "Database file not found: /home/buymeagoat/dev/whisper-transcriber/whisper_dev.db"
+      ],
+      "warnings": [],
+      "recommendations": [
+        "Address critical failures immediately"
+      ]
+    }
+  ],
+  "critical_components": [
+    "database"
+  ],
+  "warning_components": [],
+  "healthy_components": [],
+  "detailed_results": [
+    {
+      "component": "database",
+      "test_name": "db_file_exists",
+      "status": "FAIL",
+      "message": "Database file not found: /home/buymeagoat/dev/whisper-transcriber/whisper_dev.db",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    }
+  ],
+  "recommendations": [
+    "\ud83d\udea8 URGENT: 1 critical components need immediate attention",
+    "Review critical_components list and address failures",
+    "Run validation regularly to catch issues early",
+    "Check logs for additional details on any failures"
+  ]
+}

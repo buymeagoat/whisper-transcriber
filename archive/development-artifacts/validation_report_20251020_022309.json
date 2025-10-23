@@ -1,0 +1,172 @@
+{
+  "validation_metadata": {
+    "timestamp": "2025-10-20T02:23:09.573257",
+    "duration_ms": 7362.381458282471,
+    "validator_version": "1.0.0",
+    "components_tested": 1,
+    "inventory_stats": {
+      "total_api_endpoints": 21,
+      "total_config_vars": 38,
+      "total_data_stores": 1,
+      "total_functions": 1032,
+      "total_modules": 49
+    }
+  },
+  "overall_system_status": "WARNING",
+  "summary": {
+    "tests_run": 13,
+    "tests_passed": 12,
+    "tests_failed": 0,
+    "tests_warned": 1,
+    "tests_skipped": 0,
+    "success_rate": 92.3076923076923
+  },
+  "component_statuses": [
+    {
+      "name": "frontend",
+      "overall_status": "WARNING",
+      "tests_run": 13,
+      "tests_passed": 12,
+      "tests_failed": 0,
+      "tests_warned": 1,
+      "tests_skipped": 0,
+      "duration_ms": 7362.272024154663,
+      "critical_issues": [],
+      "warnings": [
+        "Authentication returned status 422"
+      ],
+      "recommendations": [
+        "Review warnings for potential issues"
+      ]
+    }
+  ],
+  "critical_components": [],
+  "warning_components": [
+    "frontend"
+  ],
+  "healthy_components": [],
+  "detailed_results": [
+    {
+      "component": "frontend",
+      "test_name": "frontend_directory",
+      "status": "PASS",
+      "message": "Frontend directory exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "package_json",
+      "status": "PASS",
+      "message": "package.json exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "build_process",
+      "status": "PASS",
+      "message": "Frontend builds successfully",
+      "duration_ms": 7343.524932861328,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "build_output",
+      "status": "PASS",
+      "message": "Build output directory created",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "build_index",
+      "status": "PASS",
+      "message": "index.html generated",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "src_directory",
+      "status": "PASS",
+      "message": "Frontend src directory exists",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "api_services",
+      "status": "PASS",
+      "message": "API service files found: services/apiClient.js, services/authService.js, services/jobsService.js, services/adminService.js",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "api_proxy",
+      "status": "PASS",
+      "message": "Vite proxy configuration found",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "auth_components",
+      "status": "PASS",
+      "message": "Authentication components found: AuthContext (context/AuthContext.jsx), Auth page (pages/auth/LoginPage.jsx), Auth page (pages/auth/RegisterPage.jsx)",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "protected_routes",
+      "status": "PASS",
+      "message": "Protected route component found: components/ProtectedRoute.jsx",
+      "duration_ms": 0,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "cors_headers",
+      "status": "PASS",
+      "message": "CORS headers present: Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers",
+      "duration_ms": 5.022525787353516,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "e2e_user_registration",
+      "status": "PASS",
+      "message": "User registration workflow working",
+      "duration_ms": 6.020069122314453,
+      "details": null,
+      "error": null
+    },
+    {
+      "component": "frontend",
+      "test_name": "e2e_authentication",
+      "status": "WARN",
+      "message": "Authentication returned status 422",
+      "duration_ms": 5.759716033935547,
+      "details": null,
+      "error": null
+    }
+  ],
+  "recommendations": [
+    "\u26a0\ufe0f  1 components have warnings that should be reviewed",
+    "Run validation regularly to catch issues early",
+    "Check logs for additional details on any failures"
+  ]
+}

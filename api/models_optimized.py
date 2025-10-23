@@ -220,7 +220,7 @@ class UserSetting(Base):
 class AuditLog(Base):
     """Enhanced audit log model with performance optimizations"""
     
-    __tablename__ = "audit_logs"
+    __tablename__ = "audit_logs_optimized"
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
@@ -243,7 +243,7 @@ class AuditLog(Base):
         # Existing indexes
         Index('idx_audit_time_type', 'timestamp', 'event_type'),
         Index('idx_audit_user_time', 'user_id', 'timestamp'),
-        Index('idx_audit_ip_time', 'client_ip', 'timestamp'),
+        Index('idx_audit_ip_time_opt', 'client_ip', 'timestamp'),
         Index('idx_audit_severity_time', 'severity', 'timestamp'),
         
         # New performance indexes

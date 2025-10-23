@@ -14,7 +14,7 @@ from sqlalchemy import and_, or_, func, desc
 from fastapi import HTTPException
 
 from api.models import Job, JobStatusEnum, TranscriptMetadata
-from api.models.transcript_management import (
+from api.extended_models.transcript_management import (
     TranscriptVersion, TranscriptTag, JobTag, TranscriptBookmark,
     TranscriptSearchIndex, BatchOperation, TranscriptExport
 )

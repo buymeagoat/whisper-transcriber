@@ -22,6 +22,8 @@ class Settings(BaseModel):
     # Database settings
     database_url: str = Field(default="sqlite:///./whisper_dev.db")
     db_url: str = Field(default="sqlite:///./whisper_dev.db")  # Alias for compatibility
+    DB_POOL_SIZE: int = Field(default=10)
+    DB_MAX_OVERFLOW: int = Field(default=20)
     
     # Backend settings
     job_queue_backend: str = Field(default="thread")

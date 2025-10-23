@@ -11,9 +11,9 @@ import io
 from datetime import datetime
 import logging
 
-from api.database import get_db
+from api.orm_bootstrap import get_db
 from api.models import Job, User
-from api.auth import get_current_user
+from api.routes.auth import get_current_user
 from api.services.transcript_export import (
     transcript_export_service,
     ExportFormat,

@@ -12,7 +12,7 @@ from api.services.batch_upload_simple import (
     BatchUploadConfig,
     BatchUploadStatus
 )
-from api.middlewares.access_log import log_route_access
+# from api.middlewares.access_log import log_route_access  # Temporarily disabled
 
 router = APIRouter(prefix="/batch-upload", tags=["batch-upload"])
 batch_service = BatchUploadService()
@@ -56,7 +56,7 @@ class BatchListResponse(BaseModel):
 
 
 @router.post("/create", response_model=BatchUploadResponse)
-@log_route_access
+# @log_route_access  # Temporarily disabled
 async def create_batch_upload(
     files: List[UploadFile] = File(...),
     config_json: str = Form(default='{}')
@@ -96,7 +96,7 @@ async def create_batch_upload(
 
 
 @router.post("/{batch_id}/start")
-@log_route_access
+# @log_route_access  # Temporarily disabled
 async def start_batch_processing(batch_id: str):
     """
     Start processing a batch upload
@@ -117,7 +117,7 @@ async def start_batch_processing(batch_id: str):
 
 
 @router.get("/{batch_id}/progress", response_model=BatchProgressResponse)
-@log_route_access
+# @log_route_access  # Temporarily disabled
 async def get_batch_progress(batch_id: str):
     """
     Get the current progress of a batch upload
@@ -143,7 +143,7 @@ async def get_batch_progress(batch_id: str):
 
 
 @router.get("/{batch_id}/status")
-@log_route_access
+# @log_route_access  # Temporarily disabled
 async def get_batch_status(batch_id: str):
     """
     Get basic status information for a batch upload
@@ -171,7 +171,7 @@ async def get_batch_status(batch_id: str):
 
 
 @router.post("/{batch_id}/cancel")
-@log_route_access
+# @log_route_access  # Temporarily disabled
 async def cancel_batch_upload(batch_id: str):
     """
     Cancel a batch upload
@@ -198,7 +198,7 @@ async def cancel_batch_upload(batch_id: str):
 
 
 @router.get("/list", response_model=BatchListResponse)
-@log_route_access
+# @log_route_access  # Temporarily disabled
 async def list_batch_uploads(
     status: Optional[str] = None,
     limit: int = 50
@@ -232,7 +232,7 @@ async def list_batch_uploads(
 
 
 @router.get("/{batch_id}/jobs")
-@log_route_access
+# @log_route_access  # Temporarily disabled
 async def get_batch_jobs(batch_id: str):
     """
     Get detailed information about jobs in a batch
@@ -267,7 +267,7 @@ async def get_batch_jobs(batch_id: str):
 
 
 @router.delete("/{batch_id}")
-@log_route_access
+# @log_route_access  # Temporarily disabled
 async def delete_batch_upload(batch_id: str):
     """
     Delete a completed or failed batch upload
@@ -301,7 +301,7 @@ async def delete_batch_upload(batch_id: str):
 
 
 @router.get("/stats")
-@log_route_access
+# @log_route_access  # Temporarily disabled
 async def get_batch_upload_stats():
     """
     Get statistics about batch uploads

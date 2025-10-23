@@ -1,0 +1,300 @@
+{
+  "overall_status": "EXCELLENT",
+  "success_rate": 97.22222222222221,
+  "total_tests": 36,
+  "passed_tests": 35,
+  "failed_tests": 0,
+  "warning_tests": 0,
+  "skipped_tests": 1,
+  "duration_seconds": 0.4347519874572754,
+  "results": [
+    {
+      "component": "core_api",
+      "test_name": "server_availability",
+      "status": "PASS",
+      "message": "Server responding at http://localhost:8000",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "core_api",
+      "test_name": "endpoint_GET__",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 19.001245498657227,
+      "error": null
+    },
+    {
+      "component": "core_api",
+      "test_name": "endpoint_GET__health",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 14.663457870483398,
+      "error": null
+    },
+    {
+      "component": "core_api",
+      "test_name": "endpoint_GET__version",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 29.19149398803711,
+      "error": null
+    },
+    {
+      "component": "core_api",
+      "test_name": "endpoint_POST__token",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 422)",
+      "duration_ms": 29.625415802001953,
+      "error": null
+    },
+    {
+      "component": "core_api",
+      "test_name": "endpoint_POST__register",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 18.64027976989746,
+      "error": null
+    },
+    {
+      "component": "core_api",
+      "test_name": "endpoint_GET__jobs",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 404)",
+      "duration_ms": 16.93439483642578,
+      "error": null
+    },
+    {
+      "component": "core_api",
+      "test_name": "endpoint_GET__admin_jobs",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 30.056476593017578,
+      "error": null
+    },
+    {
+      "component": "core_api",
+      "test_name": "endpoint_GET__metrics",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 20.473480224609375,
+      "error": null
+    },
+    {
+      "component": "core_api",
+      "test_name": "endpoint_GET__stats",
+      "status": "PASS",
+      "message": "Endpoint accessible (status: 200)",
+      "duration_ms": 47.21212387084961,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "directory_storage",
+      "status": "PASS",
+      "message": "Directory created: storage",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "directory_uploads",
+      "status": "PASS",
+      "message": "Directory exists: uploads",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "directory_transcripts",
+      "status": "PASS",
+      "message": "Directory created: transcripts",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "directory_models",
+      "status": "PASS",
+      "message": "Directory exists: models",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "directory_logs",
+      "status": "PASS",
+      "message": "Directory exists: logs",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "directory_cache",
+      "status": "PASS",
+      "message": "Directory exists: cache",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "directory_backups_database",
+      "status": "PASS",
+      "message": "Directory created: backups/database",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "directory_backups_files",
+      "status": "PASS",
+      "message": "Directory exists: backups/files",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "file_system",
+      "test_name": "directory_temp",
+      "status": "PASS",
+      "message": "Directory exists: temp",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase1",
+      "test_name": "frontend_build_exists",
+      "status": "PASS",
+      "message": "Frontend build directory found",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase1",
+      "test_name": "code_splitting",
+      "status": "PASS",
+      "message": "Code splitting detected: 14 JS files",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase2",
+      "test_name": "cache_service_exists",
+      "status": "PASS",
+      "message": "Redis cache service found",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase2",
+      "test_name": "cache_endpoint__admin_cache_status",
+      "status": "PASS",
+      "message": "Cache endpoint accessible: 200",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase2",
+      "test_name": "cache_endpoint__admin_cache_stats",
+      "status": "PASS",
+      "message": "Cache endpoint accessible: 200",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase2",
+      "test_name": "cache_endpoint__admin_cache_clear",
+      "status": "PASS",
+      "message": "Cache endpoint accessible: 200",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase3",
+      "test_name": "db_file_enhanced_db_optimizer.py",
+      "status": "PASS",
+      "message": "Database optimization file found: enhanced_db_optimizer.py",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase3",
+      "test_name": "db_file_database_optimization_integration.py",
+      "status": "PASS",
+      "message": "Database optimization file found: database_optimization_integration.py",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase3",
+      "test_name": "db_file_admin_database_optimization.py",
+      "status": "PASS",
+      "message": "Database optimization file found: admin_database_optimization.py",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase3",
+      "test_name": "db_endpoint__admin_database_pool-status",
+      "status": "PASS",
+      "message": "DB optimization endpoint accessible: 200",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase3",
+      "test_name": "db_endpoint__admin_database_performance_summary",
+      "status": "PASS",
+      "message": "DB optimization endpoint accessible: 200",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase4",
+      "test_name": "ws_file_enhanced_websocket_service.py",
+      "status": "PASS",
+      "message": "WebSocket file found: enhanced_websocket_service.py",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase4",
+      "test_name": "ws_file_websockets.py",
+      "status": "PASS",
+      "message": "WebSocket file found: websockets.py",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase4",
+      "test_name": "ws_file_admin_websocket.py",
+      "status": "PASS",
+      "message": "WebSocket file found: admin_websocket.py",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase4",
+      "test_name": "ws_endpoint__admin_websockets_status",
+      "status": "PASS",
+      "message": "WebSocket endpoint accessible: 200",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_phase4",
+      "test_name": "ws_endpoint__admin_websockets_connections",
+      "status": "PASS",
+      "message": "WebSocket endpoint accessible: 200",
+      "duration_ms": 0,
+      "error": null
+    },
+    {
+      "component": "t025_comprehensive",
+      "test_name": "phase5_validator",
+      "status": "SKIP",
+      "message": "T025 Phase 5 validator not available",
+      "duration_ms": 0,
+      "error": null
+    }
+  ]
+}

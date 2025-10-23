@@ -30,6 +30,8 @@ const BatchUpload = React.lazy(() => import('./components/BatchUpload'))
 const AdminLayout = React.lazy(() => import('./components/admin/AdminLayout'))
 const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard'))
 const RealTimePerformanceMonitor = React.lazy(() => import('./components/admin/RealTimePerformanceMonitor'))
+const SystemResourceDashboard = React.lazy(() => import('./components/admin/SystemResourceDashboard'))
+const AuditLogViewer = React.lazy(() => import('./components/admin/AuditLogViewer'))
 const AdminPanel = React.lazy(() => import('./pages/AdminPanel'))
 
 // Loading fallback component
@@ -169,6 +171,16 @@ function App() {
             <Route path="monitoring" element={
               <SuspenseWrapper>
                 <RealTimePerformanceMonitor />
+              </SuspenseWrapper>
+            } />
+            <Route path="resources" element={
+              <SuspenseWrapper>
+                <SystemResourceDashboard />
+              </SuspenseWrapper>
+            } />
+            <Route path="audit" element={
+              <SuspenseWrapper>
+                <AuditLogViewer />
               </SuspenseWrapper>
             } />
           </Route>

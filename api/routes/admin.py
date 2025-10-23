@@ -5,7 +5,7 @@ Admin routes for the Whisper Transcriber API.
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, text
 from api.orm_bootstrap import get_database_info, get_db
 from api.models import Job, JobStatusEnum
 from api.services.job_queue import job_queue
@@ -405,7 +405,7 @@ async def get_system_health(
         
         # Database health
         try:
-            db.execute("SELECT 1").fetchone()
+            db.execute(text("SELECT 1")).fetchone()
             db_status = "healthy"
             db_error = None
         except Exception as e:
@@ -512,7 +512,7 @@ async def get_service_status(
         # Database Health
         try:
             start_time = time.time()
-            result = db.execute("SELECT COUNT(*) FROM jobs").fetchone()
+            result = db.execute(text("SELECT COUNT(*) FROM jobs")).fetchone()
             query_time = (time.time() - start_time) * 1000
             
             services["database"] = {
@@ -556,9 +556,9 @@ async def get_service_status(
             # Check critical directories
             critical_dirs = [
                 settings.upload_dir,
-                settings.storage_dir,
-                "transcripts",
-                "backups"
+                settings.transcripts_dir,
+                settings.models_dir,
+                settings.cache_dir
             ]
             
             dir_status = {}

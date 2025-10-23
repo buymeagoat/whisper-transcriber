@@ -34,7 +34,7 @@ import {
 
 import BatchProgressTracker from './BatchProgressTracker';
 import BatchUploadDialog from './BatchUploadDialog';
-import batchUploadService, { BATCH_STATUS } from '../services/batchUploadService';
+import batchUploadService, { BATCH_STATUS } from '../../services/batchUploadService';
 
 const BatchList = ({ 
   onBatchComplete,

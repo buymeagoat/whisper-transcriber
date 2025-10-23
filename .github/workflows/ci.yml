@@ -48,3 +48,9 @@ jobs:
           path: |
             **/test-results/**
             **/build-logs/**
+
+      - name: Security Validation
+        run: |
+          scripts/validate_production_security.sh
+        env:
+          ENVIRONMENT: production

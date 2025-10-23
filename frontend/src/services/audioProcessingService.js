@@ -3,7 +3,7 @@
  * Frontend service for audio processing API integration
  */
 
-import { apiRequest } from './api';
+import apiClient from './apiClient';
 
 class AudioProcessingService {
   constructor() {
@@ -15,7 +15,7 @@ class AudioProcessingService {
    */
   async getProcessingConfig() {
     try {
-      const response = await apiRequest(`${this.baseUrl}/config`, {
+      const response = await apiClient(`${this.baseUrl}/config`, {
         method: 'GET'
       });
       return response;
@@ -33,7 +33,7 @@ class AudioProcessingService {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await apiRequest(`${this.baseUrl}/analyze`, {
+      const response = await apiClient(`${this.baseUrl}/analyze`, {
         method: 'POST',
         body: formData
       });
@@ -52,7 +52,7 @@ class AudioProcessingService {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await apiRequest(`${this.baseUrl}/analyze/recommendations`, {
+      const response = await apiClient(`${this.baseUrl}/analyze/recommendations`, {
         method: 'POST',
         body: formData
       });
@@ -72,7 +72,7 @@ class AudioProcessingService {
       formData.append('file', file);
       formData.append('config', JSON.stringify(config));
 
-      const response = await apiRequest(`${this.baseUrl}/process`, {
+      const response = await apiClient(`${this.baseUrl}/process`, {
         method: 'POST',
         body: formData
       });
@@ -122,7 +122,7 @@ class AudioProcessingService {
    */
   async getSupportedFormats() {
     try {
-      const response = await apiRequest(`${this.baseUrl}/formats`, {
+      const response = await apiClient(`${this.baseUrl}/formats`, {
         method: 'GET'
       });
       return response;
@@ -137,7 +137,7 @@ class AudioProcessingService {
    */
   async getQualityMetricsInfo() {
     try {
-      const response = await apiRequest(`${this.baseUrl}/quality-metrics`, {
+      const response = await apiClient(`${this.baseUrl}/quality-metrics`, {
         method: 'GET'
       });
       return response;

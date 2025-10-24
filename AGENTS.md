@@ -532,3 +532,27 @@ You are tasked with conducting an **exhaustive, independent review** of the Whis
 Your mission is to provide the most comprehensive, insightful, and actionable review possible. Start with the `REVIEW_GUIDE.md` for optimal approach, then systematically work through each phase of analysis. The goal is to deliver a review that significantly helps the development team improve their already excellent application.
 
 **Begin your analysis now and produce a world-class code review report.**
+---
+
+## Codex Addendum – 2025-10-24 13:41 UTC
+*Authored by OpenAI Codex agent to document cross-platform review dialogue*
+
+### Executive Summary of Findings (Codex)
+- **Authentication Stubbed & Insecure:** FastAPI backend still relies on in-memory demo user (`USERS_DB`) with known SHA-256 hash of "password" and permits blank JWT signing `SECRET_KEY`, meaning deployments default to predictable credentials and unsigned tokens. `ensure_default_admin` announces password `admin123` while silently handling failures.
+- **Session Handling Weaknesses:** React client persists bearer tokens in `localStorage`; backend CSP allows `'unsafe-inline'`/`'unsafe-eval'`. Any XSS grants long-lived API access.
+- **Infrastructure Hardening Gaps:** Docker Compose enables `seccomp:unconfined` while advertising capability drops. Redis password `securepassword123` is committed. Celery initialization failures fall back to in-process queue, masking outages.
+- **Testing Signals Degraded:** `tests/` contains narrative scripts referencing missing modules (`app.backup.service`), leaving CI without executable regression coverage.
+
+### Recommended Remediation Actions
+1. **Replace Placeholder Auth:** Persist real `User` records, enforce non-empty `SECRET_KEY` at startup, implement explicit first-run admin bootstrap, and create tests that fail if defaults regress.
+2. **Secure Sessions & CSP:** Move tokens to httpOnly cookies or hardened storage, tighten CSP to drop inline/eval allowances, and introduce UI sanitization linting/static analysis.
+3. **Reinforce Infrastructure Defaults:** Restore confined seccomp profile (or document exceptions), require operator-supplied secrets via environment, and convert queue initialization fallback into hard failure with observability alerts.
+4. **Rebuild Automated Testing:** Audit `tests/` to remove narrative scripts, add FastAPI/React unit and integration tests runnable under CI, and ensure dependencies resolve in clean environments.
+
+### Additional Observations
+- `ChunkProcessor` leaks threads because `cleanup` is never invoked; repeated restarts accumulate worker pools.
+- `SecurityHardeningMiddleware` opens DB sessions for every request and performs synchronous auditing, increasing latency; consider async sessions or deferring auditing to Celery.
+- `api/main.py` aggregates extensive startup wiring; refactor into modular services to improve maintainability.
+
+> *This section appended by Codex per cross-platform analysis request. Please retain for coordination with GitHub Copilot reviews.*
+

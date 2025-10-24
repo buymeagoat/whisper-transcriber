@@ -26,13 +26,10 @@ try:
         check_celery_connection,
     )
     from api.services.job_queue import ThreadJobQueue
-    from api.middlewares.enhanced_security_headers import (
-    EnhancedSecurityHeadersMiddleware,
-    create_security_headers_middleware
-)
-    from api.middlewares.rate_limit import RateLimitMiddleware, RateLimitConfig
+
+
     from api.middlewares.api_cache import ApiCacheMiddleware, CacheConfig
-    from api.middlewares.audit_middleware import AuditMiddleware
+
     
     # Enhanced caching system for T025 Phase 2
     from api.services.redis_cache import (
@@ -298,34 +295,13 @@ enhanced_cache_config = CacheConfiguration(
 )
 app.add_middleware(EnhancedApiCacheMiddleware, config=enhanced_cache_config)
 
-# Rate limiting for authentication endpoints (100 requests per 5 minutes for testing)
-rate_limit_config = RateLimitConfig(
-    max_requests=100,
-    window_seconds=300,    # 5 minutes
-    block_duration_seconds=900  # 15 minutes block after rate limit hit
-)
-app.add_middleware(RateLimitMiddleware, config=rate_limit_config)
-
 # Enhanced Security Headers with environment-specific configuration
-environment = os.getenv("ENVIRONMENT", "production")
-app.add_middleware(EnhancedSecurityHeadersMiddleware, 
-                  environment=environment,
-                  excluded_paths=["/docs", "/redoc", "/openapi.json", "/health", "/version"])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins.split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
-
-# T026 Security Hardening - Audit Middleware for comprehensive security logging
-app.add_middleware(
-    AuditMiddleware,
-    audit_all_requests=False,  # Only audit sensitive endpoints
-    audit_sensitive_endpoints=True,
-    audit_failures=True,
-    exclude_paths=['/health', '/version', '/docs', '/redoc', '/openapi.json']
 )
 
 app.add_middleware(AccessLogMiddleware)

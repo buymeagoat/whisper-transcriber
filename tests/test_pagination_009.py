@@ -14,9 +14,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.main import app, get_db, Base, Job, User
-from app.pagination import PaginationRequest, JobQueryFilters, CursorGenerator
-from app.schemas import JobResponseSchema, PaginatedJobsResponseSchema
+from api.main import app
+from api.orm_bootstrap import get_db
+from api.models import Base, Job, User
+from api.utils.app_pagination import PaginationRequest, JobQueryFilters, CursorGenerator
+from api.schemas_app import JobResponseSchema, PaginatedJobsResponseSchema
 
 # Test database setup
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"

@@ -85,7 +85,7 @@ HEALTHCHECK --interval=5m --timeout=10s --start-period=30s --retries=3 \
 
 # Security: Use secure entrypoint and command
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD ["python", "-m", "app.main"]
+CMD ["python", "-m", "api.main"]
 
 # Security: Add image metadata for security scanning
 LABEL maintainer="whisper-transcriber" \

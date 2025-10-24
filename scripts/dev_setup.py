@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 def init_database():
     """Initialize SQLite database with tables."""
     try:
-        from app.main import Base, engine, SessionLocal
+        from api.orm_bootstrap import Base, SessionLocal, engine
         from sqlalchemy import text
         
         print("🗄️  Creating database tables...")
@@ -35,7 +35,7 @@ def init_database():
 def test_app_startup():
     """Test that the application can start."""
     try:
-        from app.main import app
+        from api.main import app
         print("✅ Application imports successfully")
         return True
     except Exception as e:

@@ -80,12 +80,15 @@ try:
 
     # Import backup service management if available
     try:
-        from app.backup_api import (
-            initialize_backup_service,
-            start_backup_service_if_configured,
-            shutdown_backup_service
-        )
-        BACKUP_SERVICE_AVAILABLE = True
+        # Backup service temporarily disabled during consolidation  
+        # from app.backup_api import (
+        #     initialize_backup_service,
+        #     start_backup_service_if_configured,
+        #     shutdown_backup_service
+        # )
+        # BACKUP_SERVICE_AVAILABLE = True
+        BACKUP_SERVICE_AVAILABLE = False
+        system_log.info("Backup service disabled during architecture consolidation")
     except ImportError:
         system_log.warning("Backup service not available - backup features disabled")
         BACKUP_SERVICE_AVAILABLE = False

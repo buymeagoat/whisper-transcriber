@@ -13,7 +13,7 @@ from sqlalchemy import desc, asc, func, and_, or_
 import base64
 import json
 
-from app.schemas import BaseSchema, ValidationConfig, sanitize_string
+from api.schemas_app import BaseSchema, ValidationConfig, sanitize_string
 
 # Generic type for paginated data
 T = TypeVar('T')
@@ -192,7 +192,7 @@ class JobPaginator:
         Returns:
             PaginatedResponse with jobs and pagination metadata
         """
-        from app.main import Job  # Import here to avoid circular imports
+        from api.models import Job  # Import here to avoid circular imports
         
         # Apply sorting
         sort_column = getattr(Job, pagination.sort_by)
@@ -362,7 +362,7 @@ class JobQueryFilters(BaseSchema):
     
     def apply_filters(self, query: Query) -> Query:
         """Apply filters to a SQLAlchemy query."""
-        from app.main import Job  # Import here to avoid circular imports
+        from api.models import Job  # Import here to avoid circular imports
         
         if self.status:
             query = query.filter(Job.status == self.status)

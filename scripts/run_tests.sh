@@ -89,7 +89,7 @@ check_docker_containers() {
     fi
     
     # Check if containers are running
-    if docker compose -f "$COMPOSE_FILE" ps api | grep -q "running"; then
+    if docker compose -f "$COMPOSE_FILE" ps app | grep -q "running"; then
         log "INFO" "API container is running"
         return 0
     else
@@ -360,10 +360,10 @@ fi
 
 # Ensure the API container is running before executing tests
 if [ "$RUN_BACKEND" = true ] || [ "$RUN_INTEGRATION" = true ]; then
-    if ! docker compose -f "$COMPOSE_FILE" ps api | grep -q "running"; then
+    if ! docker compose -f "$COMPOSE_FILE" ps app | grep -q "running"; then
         log "ERROR" "API container is not running. Start the stack with scripts/start_containers.sh"
         log "INFO" "Last API container logs:"
-        docker compose -f "$COMPOSE_FILE" logs api | tail -n 20 || true
+        docker compose -f "$COMPOSE_FILE" logs app | tail -n 20 || true
         docker compose -f "$COMPOSE_FILE" ps
         exit 1
     fi

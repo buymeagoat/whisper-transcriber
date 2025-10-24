@@ -14,7 +14,7 @@ module.exports = {
   ],
   
   // Module name mapping for path aliases and styles
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@components/(.*)$': '<rootDir>/src/components/$1',
     '^@pages/(.*)$': '<rootDir>/src/pages/$1',

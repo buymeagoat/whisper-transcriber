@@ -175,8 +175,6 @@ services:
     # Security: Backend network only (worker doesn't need frontend access)
     networks:
       - backend
-    networks:
-      - backend
 
   # Nginx reverse proxy with security hardening (optional, for production)
   nginx:

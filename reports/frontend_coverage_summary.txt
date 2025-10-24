@@ -1,0 +1,20 @@
+
+> whisper-transcriber-frontend@1.0.0 test:coverage
+> jest --config=jest.config.cjs --coverage
+
+  console.error
+    Warning: `ReactDOMTestUtils.act` is deprecated in favor of `React.act`. Import `act` from `react` instead of `react-dom/test-utils`. See https://react.dev/warnings/react-dom-test-utils for more info.
+
+      471 |   }
+      472 |   
+    > 473 |   originalError.call(console, ...args);
+          |                 ^
+      474 | };
+      475 |
+      476 | console.warn = (...args) => {
+
+      at console.call [as error] (src/setupTests.js:473:17)
+      at printWarning (node_modules/react-dom/cjs/react-dom-test-utils.development.js:71:30)
+      at error (node_modules/react-dom/cjs/react-dom-test-utils.development.js:45:7)
+      at actWithWarning (node_modules/react-dom/cjs/react-dom-test-utils.development.js:1736:7)
+      at node_modules/@testing-library/react/dist/act-compat.js:63:25

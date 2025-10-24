@@ -181,6 +181,20 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         system_log.warning(f"Failed to initialize database optimization service: {e}")
 
+    # Initialize database performance monitoring for I005
+    try:
+        from api.database_performance_monitor import initialize_monitoring, log_alert_handler, metrics_alert_handler
+        
+        monitor = initialize_monitoring(start_collection=True, collection_interval=30)
+        
+        # Register alert handlers
+        monitor.register_alert_handler(log_alert_handler)
+        monitor.register_alert_handler(metrics_alert_handler)
+        
+        system_log.info("Database performance monitoring initialized successfully")
+    except Exception as e:
+        system_log.warning(f"Failed to initialize database performance monitoring: {e}")
+
     # Initialize enhanced WebSocket service for T025 Phase 4
     try:
         websocket_service = await get_websocket_service()
@@ -250,6 +264,14 @@ async def lifespan(app: FastAPI):
         system_log.info("Chunked upload service shutdown completed")
     except Exception as e:
         system_log.error(f"Error shutting down chunked upload service: {e}")
+
+    # Cleanup database performance monitoring
+    try:
+        from api.database_performance_monitor import cleanup_monitoring
+        cleanup_monitoring()
+        system_log.info("Database performance monitoring shutdown completed")
+    except Exception as e:
+        system_log.error(f"Error shutting down database performance monitoring: {e}")
     
     # Shutdown backup service gracefully
     if BACKUP_SERVICE_AVAILABLE:

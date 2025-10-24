@@ -1,0 +1,397 @@
+{
+  "analysis_timestamp": "2025-10-24T03:53:12.082161",
+  "configuration": {
+    "database_type": "SQLite",
+    "database_url": "sqlite:///./whisper_dev.db",
+    "connection_pooling": {
+      "enabled": false,
+      "pool_class": "StaticPool",
+      "pool_size": "N/A",
+      "max_overflow": "N/A"
+    },
+    "engine_configuration": {
+      "echo": false,
+      "connect_args": {}
+    },
+    "database_info": {
+      "type": "SQLite",
+      "version": "3.37.2",
+      "url": "sqlite:///./whisper_dev.db"
+    },
+    "database_file_size_mb": 1.0546875
+  },
+  "table_structure": {
+    "users": {
+      "columns": 6,
+      "indexes": 3,
+      "row_count": 1,
+      "index_details": [
+        {
+          "seq": 0,
+          "name": "idx_users_username",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_users_role",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_users_1",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        }
+      ]
+    },
+    "jobs": {
+      "columns": 11,
+      "indexes": 5,
+      "row_count": 0,
+      "index_details": [
+        {
+          "seq": 0,
+          "name": "idx_jobs_status_created",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_jobs_model",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "idx_jobs_status",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "idx_jobs_created_at",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 4,
+          "name": "sqlite_autoindex_jobs_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "transcript_metadata": {
+      "columns": 11,
+      "indexes": 2,
+      "row_count": 0,
+      "index_details": [
+        {
+          "seq": 0,
+          "name": "idx_metadata_job_id",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_transcript_metadata_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "audit_logs": {
+      "columns": 15,
+      "indexes": 1,
+      "row_count": 0,
+      "index_details": [
+        {
+          "seq": 0,
+          "name": "ix_audit_logs_endpoint",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        }
+      ]
+    },
+    "performance_metrics": {
+      "columns": 7,
+      "indexes": 8,
+      "row_count": 0,
+      "index_details": [
+        {
+          "seq": 0,
+          "name": "ix_performance_metrics_timestamp",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "ix_performance_metrics_metric_name",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "idx_perf_type_name",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "idx_perf_name_time",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 4,
+          "name": "ix_performance_metrics_metric_type",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 5,
+          "name": "idx_perf_value",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 6,
+          "name": "idx_perf_time_type",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 7,
+          "name": "idx_perf_type_name_time",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        }
+      ]
+    }
+  },
+  "benchmark_results": {
+    "connection_time": {
+      "avg_ms": 0.04638195037841797,
+      "min_ms": 0.03743171691894531,
+      "max_ms": 0.08082389831542969,
+      "std_dev": 0.010123750861469974,
+      "median_ms": 0.042319297790527344,
+      "samples": 50
+    },
+    "simple_select": {
+      "avg_ms": 0.3746366500854492,
+      "min_ms": 0.3228187561035156,
+      "max_ms": 0.7069110870361328,
+      "std_dev": 0.0748048306840168,
+      "median_ms": 0.3554821014404297,
+      "samples": 50
+    },
+    "join_query": {
+      "error": "No successful operations"
+    },
+    "aggregation_query": {
+      "error": "No successful operations"
+    },
+    "insert_operation": {
+      "avg_ms": 23.27192783355713,
+      "min_ms": -1250.7247924804688,
+      "max_ms": 1206.8920135498047,
+      "std_dev": 248.63399531986784,
+      "median_ms": 20.19357681274414,
+      "samples": 50
+    },
+    "update_operation": {
+      "avg_ms": 23.410801887512207,
+      "min_ms": 16.565561294555664,
+      "max_ms": 47.20592498779297,
+      "std_dev": 7.8262804427259995,
+      "median_ms": 19.999384880065918,
+      "samples": 50
+    }
+  },
+  "concurrent_performance": {
+    "thread_results": [
+      {
+        "thread_id": 0,
+        "operations": 6,
+        "errors": 4,
+        "avg_operation_time": 26.04862054189046,
+        "operation_times": [
+          6.520748138427734,
+          135.51831245422363,
+          9.119749069213867,
+          2.6788711547851562,
+          1.0755062103271484,
+          1.3785362243652344
+        ]
+      },
+      {
+        "thread_id": 2,
+        "operations": 6,
+        "errors": 4,
+        "avg_operation_time": 39.21377658843994,
+        "operation_times": [
+          9.576797485351562,
+          1.3914108276367188,
+          210.51549911499023,
+          2.7909278869628906,
+          3.570079803466797,
+          7.437944412231445
+        ]
+      },
+      {
+        "thread_id": 1,
+        "operations": 5,
+        "errors": 5,
+        "avg_operation_time": 132.0305347442627,
+        "operation_times": [
+          4.20689582824707,
+          145.89738845825195,
+          209.69653129577637,
+          2.1042823791503906,
+          298.2475757598877
+        ]
+      },
+      {
+        "thread_id": 3,
+        "operations": 0,
+        "errors": 10,
+        "avg_operation_time": 0,
+        "operation_times": []
+      },
+      {
+        "thread_id": 4,
+        "operations": 5,
+        "errors": 5,
+        "avg_operation_time": 78.49164009094238,
+        "operation_times": [
+          211.57217025756836,
+          2.8488636016845703,
+          128.5707950592041,
+          1.8305778503417969,
+          47.635793685913086
+        ]
+      }
+    ],
+    "errors": [
+      "Thread 3, Op 0: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n[SQL: SELECT count(*) AS count_1 \nFROM (SELECT users.id AS users_id, users.username AS users_username, users.hashed_password AS users_hashed_password, users.role AS users_role, users.must_change_password AS users_must_change_password, users.created_at AS users_created_at \nFROM users) AS anon_1]\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 2, Op 0: (sqlite3.DatabaseError) no more rows available\n(Background on this error at: https://sqlalche.me/e/20/4xp6)",
+      "Thread 4, Op 0: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n[SQL: SELECT count(*) AS count_1 \nFROM (SELECT users.id AS users_id, users.username AS users_username, users.hashed_password AS users_hashed_password, users.role AS users_role, users.must_change_password AS users_must_change_password, users.created_at AS users_created_at \nFROM users) AS anon_1]\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 1, Op 1: (sqlite3.OperationalError) cannot rollback - no transaction is active\n(Background on this error at: https://sqlalche.me/e/20/e3q8)",
+      "Thread 3, Op 1: (sqlite3.InterfaceError) Error binding parameter 0 - probably unsupported type.\n[SQL: SELECT users.id AS users_id, users.username AS users_username, users.hashed_password AS users_hashed_password, users.role AS users_role, users.must_change_password AS users_must_change_password, users.created_at AS users_created_at \nFROM users \nWHERE users.id = ?]\n[parameters: (5,)]\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 0, Op 1: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 1, Op 2: (sqlite3.OperationalError) cannot rollback - no transaction is active\n(Background on this error at: https://sqlalche.me/e/20/e3q8)",
+      "Thread 3, Op 2: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 2, Op 1: Instance '<User at 0x7f40ff1b3820>' has been deleted, or its row is otherwise not present.",
+      "Thread 3, Op 3: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 2, Op 4: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 0, Op 5: (sqlite3.InterfaceError) Error binding parameter 0 - probably unsupported type.\n[SQL: INSERT INTO users (username, hashed_password, role, must_change_password, created_at) VALUES (?, ?, ?, ?, ?)]\n[parameters: ('thread_0_op_5_1761277996', 'hash', 'user', 0, '2025-10-24 03:53:16.226704')]\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 1, Op 4: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n[SQL: SELECT count(*) AS count_1 \nFROM (SELECT users.id AS users_id, users.username AS users_username, users.hashed_password AS users_hashed_password, users.role AS users_role, users.must_change_password AS users_must_change_password, users.created_at AS users_created_at \nFROM users) AS anon_1]\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 4, Op 1: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 0, Op 6: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n[SQL: SELECT count(jobs.id) AS count_1 \nFROM jobs]\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 3, Op 4: (sqlite3.DatabaseError) cannot rollback - no transaction is active\n(Background on this error at: https://sqlalche.me/e/20/4xp6)",
+      "Thread 0, Op 9: (sqlite3.OperationalError) cannot commit - no transaction is active\n(Background on this error at: https://sqlalche.me/e/20/e3q8)",
+      "Thread 3, Op 5: (sqlite3.OperationalError) cannot commit - no transaction is active\n(Background on this error at: https://sqlalche.me/e/20/e3q8)",
+      "Thread 4, Op 3: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n[SQL: SELECT COUNT(*) FROM users WHERE role = 'user']\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 1, Op 6: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n[SQL: SELECT count(jobs.id) AS count_1 \nFROM jobs]\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 3, Op 6: (sqlite3.DatabaseError) cannot rollback - no transaction is active\n(Background on this error at: https://sqlalche.me/e/20/4xp6)",
+      "Thread 1, Op 8: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n[SQL: SELECT count(*) AS count_1 \nFROM (SELECT users.id AS users_id, users.username AS users_username, users.hashed_password AS users_hashed_password, users.role AS users_role, users.must_change_password AS users_must_change_password, users.created_at AS users_created_at \nFROM users) AS anon_1]\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 3, Op 7: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n[SQL: SELECT COUNT(*) FROM users WHERE role = 'user']\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 3, Op 8: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n[SQL: SELECT count(*) AS count_1 \nFROM (SELECT users.id AS users_id, users.username AS users_username, users.hashed_password AS users_hashed_password, users.role AS users_role, users.must_change_password AS users_must_change_password, users.created_at AS users_created_at \nFROM users) AS anon_1]\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 2, Op 9: (sqlite3.OperationalError) cannot rollback - no transaction is active\n(Background on this error at: https://sqlalche.me/e/20/e3q8)",
+      "Thread 4, Op 5: (sqlite3.OperationalError) cannot rollback - no transaction is active\n(Background on this error at: https://sqlalche.me/e/20/e3q8)",
+      "Thread 4, Op 7: (sqlite3.InterfaceError) Cursor needed to be reset because of commit/rollback and can no longer be fetched from.\n(Background on this error at: https://sqlalche.me/e/20/rvf5)",
+      "Thread 3, Op 9: (sqlite3.OperationalError) cannot rollback - no transaction is active\n(Background on this error at: https://sqlalche.me/e/20/e3q8)"
+    ],
+    "total_operations": 22,
+    "successful_operations": -6,
+    "total_time_seconds": 0.9944362640380859,
+    "operations_per_second": -6.033569185858055,
+    "overall_performance": {
+      "avg_operation_time_ms": 65.64478440718217,
+      "min_operation_time_ms": 1.0755062103271484,
+      "max_operation_time_ms": 298.2475757598877,
+      "std_dev": 94.10998754118843,
+      "median_operation_time_ms": 6.97934627532959
+    }
+  },
+  "sqlite_limitations": {
+    "concurrent_write_support": false,
+    "connection_sharing": "limited",
+    "transaction_isolation": "serializable_by_default",
+    "write_ahead_logging": "delete",
+    "foreign_key_support": false,
+    "max_connections": "no_hard_limit_but_performance_degrades",
+    "current_settings": {
+      "cache_size": -2000,
+      "page_size": 4096,
+      "synchronous": 2,
+      "journal_mode": "delete"
+    },
+    "known_limitations": {
+      "single_writer": "Only one write transaction at a time",
+      "table_locks": "Table-level locking can cause contention",
+      "concurrent_reads": "Multiple readers OK, but writers block everything",
+      "no_connection_pooling": "Connection pooling limited effectiveness",
+      "file_based": "File I/O can be bottleneck on high concurrency",
+      "no_built_in_replication": "No horizontal scaling capability"
+    }
+  },
+  "recommendations": {
+    "immediate_improvements": [
+      "Low throughput: -6.0 ops/sec - investigate bottlenecks",
+      "28 errors in concurrent testing - review error patterns"
+    ],
+    "sqlite_optimizations": [
+      "Enable WAL mode: PRAGMA journal_mode=WAL for better concurrent reads",
+      "Consider PRAGMA synchronous=NORMAL for better performance",
+      "Increase cache size: PRAGMA cache_size=-64000 (64MB cache)"
+    ],
+    "postgresql_migration_benefits": [
+      "True concurrent writes - no single-writer limitation",
+      "Advanced connection pooling with pgbouncer/pgpool",
+      "Better query optimization and execution plans",
+      "Native JSON support and advanced indexing",
+      "Horizontal scaling with read replicas",
+      "Advanced monitoring and performance tools",
+      "Better handling of high-concurrency workloads",
+      "MVCC (Multi-Version Concurrency Control) for better isolation"
+    ],
+    "monitoring_improvements": [
+      "Implement query performance logging",
+      "Add connection pool monitoring",
+      "Set up slow query alerts (>100ms threshold)",
+      "Monitor concurrent operation success rates",
+      "Track database file size growth",
+      "Implement automated performance regression testing"
+    ],
+    "configuration_changes": [
+      "Add WAL mode to database URL: sqlite:///./app.db?mode=wal",
+      "Configure connection pool with StaticPool for SQLite",
+      "Set up proper connection timeouts",
+      "Consider read-only connection pool for reporting queries",
+      "Implement connection lifecycle management"
+    ]
+  }
+}

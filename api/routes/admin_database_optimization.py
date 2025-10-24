@@ -6,11 +6,12 @@ Administrative endpoints for monitoring and managing database optimization.
 from typing import Dict, Any, Optional
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
 from sqlalchemy.orm import Session
 
 from api.orm_bootstrap import get_db
 from api.services.database_optimization_integration import get_optimization_service, DatabaseOptimizationService
+from api.database_performance_monitor import get_performance_monitor, PerformanceThresholds
 from api.routes.auth import verify_token
 from api.models import User
 from api.utils.logger import get_system_logger
@@ -34,6 +35,7 @@ async def get_optimization_status():
     """Get current database optimization status and performance metrics."""
     try:
         optimization_service = await get_optimization_service()
+        performance_monitor = get_performance_monitor()
         
         # Get performance analysis
         performance_data = await optimization_service.get_performance_analysis()
@@ -44,11 +46,16 @@ async def get_optimization_status():
         else:
             pool_status = {"status": "optimizer_not_available"}
         
+        # Get real-time monitoring data
+        monitoring_summary = performance_monitor.get_performance_summary(60)  # Last 60 minutes
+        
         return {
             "status": "active" if optimization_service.optimizer else "not_initialized",
             "timestamp": datetime.utcnow().isoformat(),
             "performance_analysis": performance_data,
             "connection_pool": pool_status,
+            "real_time_monitoring": monitoring_summary,
+            "monitoring_active": performance_monitor.monitoring_active,
             "optimization_features": {
                 "enhanced_connection_pooling": optimization_service.optimizer is not None,
                 "query_performance_monitoring": True,
@@ -429,3 +436,188 @@ def _calculate_performance_grade(stats: Dict[str, Any]) -> str:
     except Exception as e:
         logger.error(f"Failed to calculate performance grade: {e}")
         return "Error"
+
+
+# Enhanced monitoring endpoints
+
+@router.get("/monitoring/summary", response_model=Dict[str, Any])
+async def get_monitoring_summary(minutes: int = Query(60, ge=1, le=1440)):
+    """Get real-time database performance monitoring summary."""
+    try:
+        performance_monitor = get_performance_monitor()
+        
+        summary = performance_monitor.get_performance_summary(minutes)
+        
+        return {
+            "status": "success",
+            "monitoring_summary": summary,
+            "monitoring_active": performance_monitor.monitoring_active,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get monitoring summary: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get monitoring summary: {str(e)}")
+
+
+@router.get("/monitoring/slow-queries", response_model=Dict[str, Any])
+async def get_realtime_slow_queries(limit: int = Query(10, ge=1, le=100), minutes: int = Query(60, ge=1, le=1440)):
+    """Get top slow queries from recent monitoring data."""
+    try:
+        performance_monitor = get_performance_monitor()
+        
+        slow_queries = performance_monitor.get_top_slow_queries(limit, minutes)
+        
+        return {
+            "status": "success",
+            "slow_queries": slow_queries,
+            "period_minutes": minutes,
+            "limit": limit,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get slow queries: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get slow queries: {str(e)}")
+
+
+@router.post("/monitoring/start", response_model=Dict[str, Any])
+async def start_monitoring(interval_seconds: int = Query(30, ge=10, le=300)):
+    """Start database performance monitoring."""
+    try:
+        performance_monitor = get_performance_monitor()
+        
+        if performance_monitor.monitoring_active:
+            return {
+                "status": "already_running",
+                "message": "Database monitoring is already active",
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        
+        performance_monitor.start_monitoring(interval_seconds)
+        
+        return {
+            "status": "started",
+            "message": f"Database monitoring started with {interval_seconds}s interval",
+            "interval_seconds": interval_seconds,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to start monitoring: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to start monitoring: {str(e)}")
+
+
+@router.post("/monitoring/stop", response_model=Dict[str, Any])
+async def stop_monitoring():
+    """Stop database performance monitoring."""
+    try:
+        performance_monitor = get_performance_monitor()
+        
+        if not performance_monitor.monitoring_active:
+            return {
+                "status": "already_stopped",
+                "message": "Database monitoring is not currently active",
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        
+        performance_monitor.stop_monitoring()
+        
+        return {
+            "status": "stopped",
+            "message": "Database monitoring stopped",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to stop monitoring: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to stop monitoring: {str(e)}")
+
+
+@router.post("/monitoring/reset", response_model=Dict[str, Any])
+async def reset_monitoring_statistics():
+    """Reset database performance monitoring statistics."""
+    try:
+        performance_monitor = get_performance_monitor()
+        
+        performance_monitor.reset_statistics()
+        
+        return {
+            "status": "reset",
+            "message": "Database monitoring statistics reset",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to reset monitoring: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to reset monitoring: {str(e)}")
+
+
+@router.get("/monitoring/thresholds", response_model=Dict[str, Any])
+async def get_monitoring_thresholds():
+    """Get current performance monitoring thresholds."""
+    try:
+        performance_monitor = get_performance_monitor()
+        
+        return {
+            "status": "success",
+            "thresholds": {
+                "slow_query_ms": performance_monitor.thresholds.slow_query_ms,
+                "very_slow_query_ms": performance_monitor.thresholds.very_slow_query_ms,
+                "connection_timeout_ms": performance_monitor.thresholds.connection_timeout_ms,
+                "high_cpu_percentage": performance_monitor.thresholds.high_cpu_percentage,
+                "low_throughput_ops_per_sec": performance_monitor.thresholds.low_throughput_ops_per_sec,
+                "high_error_rate_percentage": performance_monitor.thresholds.high_error_rate_percentage
+            },
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get thresholds: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get thresholds: {str(e)}")
+
+
+@router.put("/monitoring/thresholds", response_model=Dict[str, Any])
+async def update_monitoring_thresholds(
+    slow_query_ms: Optional[float] = Query(None, ge=10, le=10000),
+    very_slow_query_ms: Optional[float] = Query(None, ge=100, le=30000),
+    high_error_rate_percentage: Optional[float] = Query(None, ge=0.1, le=50.0),
+    low_throughput_ops_per_sec: Optional[float] = Query(None, ge=0.1, le=1000.0)
+):
+    """Update performance monitoring thresholds."""
+    try:
+        performance_monitor = get_performance_monitor()
+        
+        updated_fields = []
+        
+        if slow_query_ms is not None:
+            performance_monitor.thresholds.slow_query_ms = slow_query_ms
+            updated_fields.append(f"slow_query_ms: {slow_query_ms}")
+        
+        if very_slow_query_ms is not None:
+            performance_monitor.thresholds.very_slow_query_ms = very_slow_query_ms
+            updated_fields.append(f"very_slow_query_ms: {very_slow_query_ms}")
+        
+        if high_error_rate_percentage is not None:
+            performance_monitor.thresholds.high_error_rate_percentage = high_error_rate_percentage
+            updated_fields.append(f"high_error_rate_percentage: {high_error_rate_percentage}")
+        
+        if low_throughput_ops_per_sec is not None:
+            performance_monitor.thresholds.low_throughput_ops_per_sec = low_throughput_ops_per_sec
+            updated_fields.append(f"low_throughput_ops_per_sec: {low_throughput_ops_per_sec}")
+        
+        return {
+            "status": "updated",
+            "message": f"Updated thresholds: {', '.join(updated_fields)}",
+            "updated_thresholds": {
+                "slow_query_ms": performance_monitor.thresholds.slow_query_ms,
+                "very_slow_query_ms": performance_monitor.thresholds.very_slow_query_ms,
+                "high_error_rate_percentage": performance_monitor.thresholds.high_error_rate_percentage,
+                "low_throughput_ops_per_sec": performance_monitor.thresholds.low_throughput_ops_per_sec
+            },
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to update thresholds: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to update thresholds: {str(e)}")

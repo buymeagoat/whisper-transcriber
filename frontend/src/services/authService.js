@@ -39,7 +39,7 @@ export const authService = {
 
   async register(email, password, fullName) {
     try {
-      const response = await apiClient.post('/register', {
+      const response = await apiClient.post('/auth/register', {
         username: email,  // Backend expects 'username' field
         password: password,
         email: email,     // Also send as email field

@@ -1,12 +1,11 @@
 version: '3.8'
 
 services:
-  # Redis for Celery task queue with security hardening
+  # Redis for task queue
   redis:
-    image: redis:7-alpine@sha256:de13e74e14b98eb96bdf886791ae47686c3c5d29f9d5f85ea55206843e3fce26
+    image: redis:7-alpine
     container_name: whisper-redis
     restart: unless-stopped
-    # Security: Limit port exposure - only expose to app network
     expose:
       - "6379"
     volumes:
@@ -17,37 +16,17 @@ services:
       --requirepass ${REDIS_PASSWORD}
       --maxmemory 256mb
       --maxmemory-policy allkeys-lru
-    # Security: Configure security context
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add:
-      - SETUID
-      - SETGID
-    user: "999:999"  # Redis user
-    read_only: true
-    tmpfs:
-      - /tmp:noexec,nosuid,size=100m
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-        reservations:
-          cpus: '0.1'
-          memory: 128M
     healthcheck:
       test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 10s
-    # Security: Backend network only
     networks:
       - backend
 
-  # Main application (FastAPI + React) with security hardening
+  # Main application
   app:
     build: 
       context: .
@@ -55,7 +34,7 @@ services:
     container_name: whisper-app
     restart: unless-stopped
     ports:
-      - "8001:8001"  # Network accessible: Bind to all interfaces for development
+      - "8001:8001"
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
@@ -63,56 +42,29 @@ services:
       - DATABASE_URL=sqlite:///app/data/app.db
       - WHISPER_MODEL_DIR=/app/models
       - LOG_LEVEL=INFO
-      - LOG_FORMAT=json
-      - ENVIRONMENT=development
-      # Security: Additional environment security
+      - ENVIRONMENT=production
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
     volumes:
-      # Security: Use named volumes instead of bind mounts
       - app_storage:/app/storage
-      - app_models:/app/models:ro  # Read-only models
+      - app_models:/app/models:ro
       - app_data:/app/data
       - app_logs:/app/logs
     depends_on:
       redis:
         condition: service_healthy
-    # Security: Comprehensive security context
     security_opt:
       - no-new-privileges:true
-      # Note: seccomp confined for production security (may need ML model exceptions)
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETUID
-      - SETGID
-      - DAC_OVERRIDE  # Needed for file operations
-    user: "1000:1000"  # appuser
-    # read_only: true  # Temporarily disabled to allow directory creation
-    tmpfs:
-      - /tmp:noexec,nosuid,size=200m
-      - /var/tmp:noexec,nosuid,size=50m
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 4G
-        reservations:
-          cpus: '0.5'
-          memory: 1G
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
-    # Security: Network isolation
     networks:
       - frontend
       - backend
 
-  # Celery worker for background transcription with security hardening
+  # Celery worker
   worker:
     build: 
       context: .
@@ -127,16 +79,13 @@ services:
       - DATABASE_URL=sqlite:///app/data/app.db
       - WHISPER_MODEL_DIR=/app/models
       - LOG_LEVEL=INFO
-      - LOG_FORMAT=json
       - WORKER_CONCURRENCY=1
-      - ENVIRONMENT=development
-      # Security: Additional environment security
+      - ENVIRONMENT=production
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
     volumes:
-      # Security: Use named volumes with appropriate permissions
       - app_storage:/app/storage
-      - app_models:/app/models:ro  # Read-only models
+      - app_models:/app/models:ro
       - app_data:/app/data
       - app_logs:/app/logs
     depends_on:
@@ -144,96 +93,17 @@ services:
         condition: service_healthy
       app:
         condition: service_healthy
-    # Security: Comprehensive security context
     security_opt:
       - no-new-privileges:true
-      # Note: seccomp confined in production (ML workloads may need specific syscalls)
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETUID
-      - SETGID
-      - DAC_OVERRIDE
-      - SYS_NICE  # For CPU scheduling in ML workloads
-    user: "1000:1000"  # appuser
-    # read_only: true  # Temporarily disabled to allow directory creation
-    tmpfs:
-      - /tmp:noexec,nosuid,size=1g  # Larger temp space for ML operations
-      - /var/tmp:noexec,nosuid,size=200m
-    deploy:
-      resources:
-        limits:
-          cpus: '4.0'     # Heavy CPU usage for transcription
-          memory: 8G      # Large memory for model loading
-        reservations:
-          cpus: '1.0'
-          memory: 2G
     command: celery -A api.worker worker --loglevel=info --concurrency=1
     healthcheck:
       test: ["CMD", "celery", "-A", "api.worker", "inspect", "ping"]
       interval: 60s
       timeout: 30s
       retries: 3
-      start_period: 60s
-    # Security: Backend network only (worker doesn't need frontend access)
     networks:
       - backend
 
-  # Nginx reverse proxy with security hardening (optional, for production)
-  nginx:
-    image: nginx:1.25-alpine@sha256:a5127daff3d6f4606be3100a252419bfa84fd6ee5cd74d0feaca1a5068f97dcf
-    container_name: whisper-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      # Security: Read-only configuration mounts
-      - nginx_config:/etc/nginx/conf.d:ro
-      - nginx_ssl:/etc/nginx/ssl:ro
-      # Security: Read-only nginx.conf
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      app:
-        condition: service_healthy
-    # Security: Comprehensive security context
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETUID
-      - SETGID
-      - NET_BIND_SERVICE  # Needed for port 80/443
-    user: "nginx:nginx"
-    read_only: true
-    tmpfs:
-      - /var/cache/nginx:noexec,nosuid,size=50m
-      - /var/run:noexec,nosuid,size=10m
-      - /tmp:noexec,nosuid,size=10m
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 256M
-        reservations:
-          cpus: '0.1'
-          memory: 64M
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    # Security: Network isolation
-    networks:
-      - frontend
-    profiles:
-      - production
-
-# Security: Named volumes with proper configuration
 volumes:
   redis_data:
     driver: local
@@ -245,25 +115,12 @@ volumes:
     driver: local
   app_logs:
     driver: local
-  nginx_config:
-    driver: local
-  nginx_ssl:
-    driver: local
 
-# Security: Network isolation and segmentation
 networks:
   frontend:
     name: whisper-frontend
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.20.0.0/24
   backend:
     name: whisper-backend
     driver: bridge
-    internal: true  # Security: Backend network is internal only
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.21.0.0/24
+    internal: true

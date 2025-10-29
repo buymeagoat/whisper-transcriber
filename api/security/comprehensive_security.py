@@ -371,14 +371,16 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         
         if self.config.enable_csp:
+            # Secure CSP without unsafe directives
             csp = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
-                "style-src 'self' 'unsafe-inline'; "
+                "script-src 'self'; "
+                "style-src 'self'; "
                 "img-src 'self' data:; "
                 "font-src 'self'; "
                 "connect-src 'self'; "
-                "frame-ancestors 'none';"
+                "frame-ancestors 'none'; "
+                "object-src 'none';"
             )
             response.headers["Content-Security-Policy"] = csp
         

@@ -33,7 +33,7 @@ export default defineConfig(({ command, mode }) => {
       cors: true,
       proxy: {
         '/api': {
-          target: 'http://localhost:8000',
+          target: 'http://localhost:8001',
           changeOrigin: true,
           secure: false,
           ws: true, // Enable WebSocket proxying
@@ -54,108 +54,29 @@ export default defineConfig(({ command, mode }) => {
     build: {
       outDir: 'dist',
       sourcemap: !isProduction,
-      // Advanced bundle optimization
+      // COMPLETELY DISABLE ALL CHUNK SPLITTING to prevent initialization order issues
       rollupOptions: {
         output: {
-          // Enhanced chunk splitting strategy
-          manualChunks: (id) => {
-            // Vendor chunks
-            if (id.includes('node_modules')) {
-              // React ecosystem
-              if (id.includes('react') || id.includes('react-dom')) {
-                return 'react-vendor'
-              }
-              // Routing
-              if (id.includes('react-router')) {
-                return 'router-vendor'
-              }
-              // Icons (potentially large)
-              if (id.includes('lucide-react')) {
-                return 'icons-vendor'
-              }
-              // HTTP client
-              if (id.includes('axios')) {
-                return 'http-vendor'
-              }
-              // CSS utilities
-              if (id.includes('clsx') || id.includes('class-variance-authority')) {
-                return 'utils-vendor'
-              }
-              // Other third-party libraries
-              return 'vendor'
-            }
-            
-            // Application chunks by route/feature
-            if (id.includes('/pages/admin/')) {
-              return 'admin-pages'
-            }
-            if (id.includes('/pages/auth/')) {
-              return 'auth-pages'
-            }
-            if (id.includes('/components/admin/')) {
-              return 'admin-components'
-            }
-            if (id.includes('/services/')) {
-              return 'services'
-            }
-          },
-          // Optimize chunk file names
-          chunkFileNames: (chunkInfo) => {
-            const facadeModuleId = chunkInfo.facadeModuleId
-              ? chunkInfo.facadeModuleId.split('/').pop().replace(/\.[^/.]+$/, '')
-              : 'chunk'
-            return `assets/[name]-[hash].js`
-          },
-          // Optimize asset file names
-          assetFileNames: (assetInfo) => {
-            const info = assetInfo.name.split('.')
-            const ext = info[info.length - 1]
-            if (/\.(css)$/.test(assetInfo.name)) {
-              return `assets/css/[name]-[hash][extname]`
-            }
-            if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(assetInfo.name)) {
-              return `assets/images/[name]-[hash][extname]`
-            }
-            return `assets/[name]-[hash][extname]`
-          }
+          // FORCE everything into a single bundle to prevent dependency order problems
+          manualChunks: () => 'vendor', // Force all code into single chunk
+          
+          // Simple file naming
+          chunkFileNames: 'assets/[name]-[hash].js',
+          entryFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash][extname]'
         },
       },
-      // Enhanced build optimizations
-      minify: isProduction ? 'terser' : false,
-      terserOptions: isProduction ? {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-          // Remove unused code
-          dead_code: true,
-          // Remove unused variables
-          unused: true,
-          // Inline functions when beneficial
-          inline: true,
-          // Reduce function calls
-          reduce_funcs: true,
-          // Collapse single-use variables
-          collapse_vars: true,
-          // Optimize sequences
-          sequences: true,
-        },
-        mangle: {
-          // Mangle function and variable names
-          toplevel: true,
-        },
-        format: {
-          // Remove comments
-          comments: false,
-        },
-      } : {},
-      // Target modern browsers for smaller bundles
-      target: 'es2020',
-      // Optimize CSS
-      cssCodeSplit: true,
+      // Conservative build settings to prevent initialization errors
+      minify: isProduction ? 'esbuild' : false,
+      // Remove Terser options completely since we're using esbuild
+      // Target older ES version for better compatibility
+      target: 'es2018',
+      // Disable CSS code splitting temporarily to prevent dependency issues
+      cssCodeSplit: false,
       // Report bundle size
-      reportCompressedSize: true,
-      // Chunk size warning limit
-      chunkSizeWarningLimit: 1000,
+      reportCompressedSize: false, // Disable to speed up builds
+      // Increase chunk size warning limit
+      chunkSizeWarningLimit: 2000,
     },
     resolve: {
       alias: {
@@ -167,9 +88,16 @@ export default defineConfig(({ command, mode }) => {
         '@context': resolve(__dirname, './src/context'),
       },
     },
-    // Development optimizations
+    // Simplified development optimizations to prevent circular dependencies
     optimizeDeps: {
-      include: ['react', 'react-dom', 'react-router-dom', 'axios'],
+      include: [
+        'react', 
+        'react-dom', 
+        'react-router-dom', 
+        'axios'
+      ],
+      // Force pre-bundling of problematic packages
+      force: true
     },
     // CSS configuration
     css: {

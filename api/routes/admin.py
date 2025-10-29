@@ -9,7 +9,7 @@ from sqlalchemy import and_, or_, text
 from api.orm_bootstrap import get_database_info, get_db
 from api.models import Job, JobStatusEnum
 from api.services.job_queue import job_queue
-from api.routes.auth import verify_token
+from api.routes.auth import get_current_admin_user as verify_token
 from api.settings import settings
 from api.app_state import get_app_state
 from api.utils.logger import get_system_logger

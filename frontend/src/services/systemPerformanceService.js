@@ -1,9 +1,10 @@
 import axios from 'axios';
+import { API_CONFIG } from '../config';
 
 class SystemPerformanceService {
   constructor() {
     this.apiClient = axios.create({
-      baseURL: '/api',
+      baseURL: API_CONFIG.baseURL,
       timeout: 10000,
     });
 

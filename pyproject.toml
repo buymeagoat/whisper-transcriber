@@ -1,0 +1,85 @@
+[tool.pytest.ini_options]
+# Pytest configuration for Whisper Transcriber
+minversion = "6.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Markers for organizing tests
+markers = [
+    "asyncio: mark test as async",
+    "integration: mark test as integration test", 
+    "slow: mark test as slow running",
+    "auth: mark test as authentication related",
+    "api: mark test as API endpoint test",
+    "unit: mark test as unit test",
+    "security: mark test as security related",
+    "performance: mark test as performance related"
+]
+
+# Test discovery and execution options
+addopts = [
+    "--strict-markers",
+    "--strict-config", 
+    "--verbose",
+    "--tb=short",
+    "--disable-warnings",
+    "--maxfail=10",
+    "--color=yes"
+]
+
+# Asyncio configuration
+asyncio_mode = "auto"
+
+# Filter warnings
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore::UserWarning:whisper.*",
+    "ignore::RuntimeWarning",
+    "ignore:.*unclosed.*:ResourceWarning"
+]
+
+# Test collection options
+norecursedirs = [
+    "setup.py",
+    "conftest.py",
+    ".git",
+    "venv",
+    "env",
+    "__pycache__"
+]
+
+# Log configuration for tests
+log_cli = false
+log_cli_level = "ERROR"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(name)s: %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+
+# Coverage options (if pytest-cov is installed)
+# These will only take effect if pytest-cov is available
+[tool.coverage.run]
+source = ["api"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/env/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod"
+]

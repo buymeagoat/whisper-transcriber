@@ -31,7 +31,7 @@ class PerformanceThresholds:
     very_slow_query_ms: float = 500.0
     connection_timeout_ms: float = 5000.0
     high_cpu_percentage: float = 80.0
-    low_throughput_ops_per_sec: float = 10.0
+    low_throughput_ops_per_sec: float = 1.0
     high_error_rate_percentage: float = 5.0
 
 

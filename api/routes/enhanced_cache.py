@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-from api.routes.auth import verify_token
+from api.routes.auth import get_current_admin_user as verify_token
 from api.services.redis_cache import get_cache_service
 from api.services.cache_hooks import (
     cache_performance_monitor,

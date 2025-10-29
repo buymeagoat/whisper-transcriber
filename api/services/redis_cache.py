@@ -6,9 +6,10 @@ Implements comprehensive caching with intelligent invalidation strategies.
 import json
 import hashlib
 import asyncio
+import os
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional, List, Union
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from contextlib import asynccontextmanager
 
 import redis.asyncio as redis
@@ -24,7 +25,7 @@ logger = get_system_logger("redis_cache")
 class CacheConfiguration:
     """Advanced cache configuration for different endpoint types."""
     # Redis connection
-    redis_url: str = "redis://localhost:6379/0"
+    redis_url: str = field(default_factory=lambda: os.getenv("REDIS_URL", "redis://localhost:6379/0"))
     
     # Cache TTL settings (in seconds)
     default_ttl: int = 300  # 5 minutes

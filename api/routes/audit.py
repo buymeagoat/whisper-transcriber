@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime, timedelta
-from ..routes.auth import verify_token
+from ..routes.auth import get_current_admin_user as verify_token
 
 # Create router instance
 router = APIRouter(tags=["audit"])

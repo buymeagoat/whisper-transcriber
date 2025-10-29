@@ -12,7 +12,7 @@ from sqlalchemy import Index
 
 # revision identifiers
 revision = 'perf_001'
-down_revision = None  # This is the first migration
+down_revision = '000_initial'  # Depends on initial schema
 branch_labels = None
 depends_on = None
 

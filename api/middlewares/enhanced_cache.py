@@ -5,7 +5,7 @@ Provides intelligent caching with compression, invalidation, and performance mon
 
 import time
 import json
-from typing import Dict, Optional, Set
+from typing import Dict, Optional, Set, Any
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -107,7 +107,7 @@ class EnhancedApiCacheMiddleware(BaseHTTPMiddleware):
         
         return True
     
-    def _get_endpoint_config(self, path: str) -> Dict[str, any]:
+    def _get_endpoint_config(self, path: str) -> Dict[str, Any]:
         """Get caching configuration for endpoint."""
         for pattern, config in self.cacheable_endpoints.items():
             if self._path_matches_pattern(path, pattern):
@@ -169,45 +169,57 @@ class EnhancedApiCacheMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         processing_time = time.time() - start_time
         
-        # Check if response should be cached
-        if self._should_cache_response(response):
-            # Read response content for caching
-            response_body = b""
-            async for chunk in response.body_iterator:
-                response_body += chunk
-            
-            content_str = response_body.decode('utf-8')
-            
-            # Store in cache
-            success = await cache_service.set(cache_key, response, request, content_str)
-            
-            # Recreate response with cached content
-            response = Response(
-                content=content_str,
-                status_code=response.status_code,
-                headers=dict(response.headers)
-            )
-            
-            # Add cache headers
-            response.headers["X-Cache"] = "MISS" if success else "STORE-FAILED"
-            response.headers["X-Processing-Time"] = f"{processing_time:.3f}s"
-            
-            # Set cache-control headers
-            endpoint_config = self._get_endpoint_config(request.url.path)
-            response.headers["Cache-Control"] = endpoint_config.get('cache_control', 'private, max-age=300')
-            
-            if success:
-                logger.debug(f"Cache stored for {request.url.path} (key: {cache_key[:8]}...)")
+        # Check if response should be cached and cache service is available
+        if self._should_cache_response(response) and cache_service:
+            # For caching, we need to read the response content
+            # This is a simplified approach - in production you might want to handle streaming responses differently
+            if hasattr(response, 'body') and callable(response.body):
+                try:
+                    response_body = await response.body()
+                    content_str = response_body.decode('utf-8')
+                    
+                    # Store in cache
+                    success = await cache_service.set(cache_key, response, request, content_str)
+                    
+                    # Recreate response with cached content
+                    response = Response(
+                        content=content_str,
+                        status_code=response.status_code,
+                        headers=dict(response.headers)
+                    )
+                    
+                    # Add cache headers
+                    response.headers["X-Cache"] = "MISS" if success else "STORE-FAILED"
+                    response.headers["X-Processing-Time"] = f"{processing_time:.3f}s"
+                    
+                    # Set cache-control headers
+                    endpoint_config = self._get_endpoint_config(request.url.path)
+                    response.headers["Cache-Control"] = endpoint_config.get('cache_control', 'private, max-age=300')
+                    
+                    if success:
+                        logger.debug(f"Cache stored for {request.url.path} (key: {cache_key[:8]}...)")
+                    else:
+                        logger.warning(f"Failed to cache response for {request.url.path}")
+                except Exception as e:
+                    # If we can't read the response body, just add headers and continue
+                    logger.debug(f"Could not cache response for {request.url.path}: {e}")
+                    response.headers["X-Cache"] = "READ-FAILED"
+                    response.headers["X-Processing-Time"] = f"{processing_time:.3f}s"
             else:
-                logger.warning(f"Failed to cache response for {request.url.path}")
+                # Response doesn't support body reading, just add headers
+                response.headers["X-Cache"] = "UNSUPPORTED"
+                response.headers["X-Processing-Time"] = f"{processing_time:.3f}s"
         else:
-            # Response not cacheable
-            response.headers["X-Cache"] = "NOT-CACHEABLE"
+            # Response not cacheable or cache service unavailable
+            if not cache_service:
+                response.headers["X-Cache"] = "SERVICE-UNAVAILABLE"
+            else:
+                response.headers["X-Cache"] = "NOT-CACHEABLE"
             response.headers["X-Processing-Time"] = f"{processing_time:.3f}s"
         
         return response
     
-    def get_performance_stats(self) -> Dict[str, any]:
+    def get_performance_stats(self) -> Dict[str, Any]:
         """Get middleware performance statistics."""
         hit_ratio = (self.cache_hit_count / self.request_count) if self.request_count > 0 else 0.0
         

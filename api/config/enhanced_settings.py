@@ -23,7 +23,7 @@ class EnhancedSettings(BaseModel):
     
     # Server settings
     host: str = Field(default="0.0.0.0")
-    port: int = Field(default=8000)
+    port: int = Field(default=8001)
     
     # Database settings
     database_url: str = Field(default="sqlite:///./whisper_dev.db")
@@ -34,7 +34,7 @@ class EnhancedSettings(BaseModel):
     storage_backend: str = Field(default="local")
     
     # Development server settings
-    vite_api_host: str = Field(default="localhost:8000")
+    vite_api_host: str = Field(default="localhost:8001")
     
     # Security settings - loaded from secure config manager
     secret_key: str = Field(default="")

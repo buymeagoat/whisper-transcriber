@@ -46,7 +46,7 @@ import {
   Clear as ClearIcon,
   Check as CheckIcon,
   GetApp as ExportIcon,
-  Batch as BatchIcon
+  ViewList as BatchIcon
 } from '@mui/icons-material';
 
 import { transcriptManagementService } from '../services/transcriptManagementService';

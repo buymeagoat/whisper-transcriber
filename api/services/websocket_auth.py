@@ -7,11 +7,13 @@ import jwt
 from typing import Optional
 from datetime import datetime
 from fastapi import HTTPException
+from sqlalchemy.orm import Session
 
-from api.routes.auth import USERS_DB, verify_password
 from api.models import User
 from api.settings import settings
 from api.utils.logger import get_system_logger
+from api.services.user_service import user_service
+from api.orm_bootstrap import get_db
 
 logger = get_system_logger("websocket_auth")
 
@@ -39,7 +41,7 @@ def verify_jwt_token(token: str) -> dict:
     except Exception as e:
         raise AuthenticationError(f"Token verification failed: {str(e)}")
 
-async def get_current_user_websocket(token: str) -> Optional[User]:
+async def get_current_user_websocket(token: str, db: Session) -> Optional[User]:
     """Get current user from WebSocket token."""
     try:
         # Verify the JWT token
@@ -49,23 +51,13 @@ async def get_current_user_websocket(token: str) -> Optional[User]:
         if not username:
             raise AuthenticationError("Token missing username")
         
-        # Get user from database (using the dummy store for now)
-        user_data = USERS_DB.get(username)
-        if not user_data:
+        # Get user from database
+        user = user_service.get_user_by_username(db, username)
+        if not user:
             raise AuthenticationError("User not found")
         
-        if not user_data.get("is_active", False):
+        if not user.is_active:
             raise AuthenticationError("User account disabled")
-        
-        # Create user object (simulating database user)
-        user = User(
-            id=int(user_data["id"]),
-            username=user_data["username"],
-            email=f"{username}@example.com",  # Default email
-            hashed_password=user_data["password_hash"],
-            role="admin" if user_data.get("is_admin", False) else "user",
-            is_active=user_data.get("is_active", True)
-        )
         
         return user
         

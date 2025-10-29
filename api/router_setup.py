@@ -1,9 +1,10 @@
 from pathlib import Path
 import logging
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import Response as StarletteResponse
 
 from api.routes import jobs, admin, logs, metrics, auth, users, audit, cache
 from api.routes import progress, audio, tts, user_settings, enhanced_cache
@@ -33,6 +34,23 @@ except ImportError as e:
     BACKUP_API_AVAILABLE = False
 
 
+class CacheBustingStaticFiles(StaticFiles):
+    """Custom StaticFiles that adds cache-busting headers for development"""
+    
+    def is_not_modified(self, response_headers, request_headers):
+        # Always serve fresh files, bypassing cache
+        return False
+    
+    def file_response(self, *args, **kwargs):
+        response = super().file_response(*args, **kwargs)
+        if hasattr(response, 'headers'):
+            # Add cache-busting headers
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+        return response
+
+
 def register_routes(app: FastAPI) -> None:
     """Attach all API routers and static paths."""
     app.include_router(jobs.router)
@@ -41,6 +59,8 @@ def register_routes(app: FastAPI) -> None:
     app.include_router(progress.router)
     app.include_router(metrics.router)
     app.include_router(auth.router)
+    app.include_router(auth.api_router)  # Add API-prefixed auth routes
+    app.include_router(auth.direct_api_router)  # Add direct API routes for /api/register
     app.include_router(auth.root_router)  # Add root-level auth routes
     app.include_router(users.router)
     app.include_router(audit.router, prefix="/admin", tags=["audit"])
@@ -121,14 +141,36 @@ def register_routes(app: FastAPI) -> None:
     )
 
     static_dir = Path(__file__).parent / "static"
-    app.mount("/static", StaticFiles(directory=static_dir, html=True), name="static")
+    app.mount("/static", CacheBustingStaticFiles(directory=static_dir), name="static")
+    
+    # Mount assets directory for frontend with cache busting
+    assets_dir = static_dir / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", CacheBustingStaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/vite.svg", include_in_schema=False)
+    def vite_icon():
+        vite_path = static_dir / "vite.svg"
+        if vite_path.exists():
+            response = FileResponse(vite_path)
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+            return response
+        raise HTTPException(status_code=404, detail="File not found")
 
     @app.get("/", include_in_schema=False)
     def spa_index():
-        return FileResponse(static_dir / "index.html")
+        response = FileResponse(static_dir / "index.html")
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
 
     @app.get("/{full_path:path}", include_in_schema=False)
     def spa_fallback(full_path: str):
+        backend_log.debug(f"SPA Fallback called with path: {full_path}")
+        
         protected = (
             "static",
             "uploads",
@@ -144,9 +186,28 @@ def register_routes(app: FastAPI) -> None:
             "docs",
             "openapi.json",
         )
-        if full_path.startswith(protected):
+        
+        # Block sensitive files and directories - check exact matches and startswith
+        sensitive_files = {".env", "requirements.txt", "Dockerfile", "docker-compose.yml", "pyproject.toml"}
+        sensitive_dirs = {"api/"}
+        
+        # Check protection
+        is_protected = full_path.startswith(protected)
+        is_sensitive_file = full_path in sensitive_files
+        is_sensitive_dir = any(full_path.startswith(pattern) for pattern in sensitive_dirs)
+        
+        backend_log.debug(f"Path '{full_path}' - protected: {is_protected}, sensitive_file: {is_sensitive_file}, sensitive_dir: {is_sensitive_dir}")
+        
+        if is_protected or is_sensitive_file or is_sensitive_dir:
+            backend_log.debug(f"Blocking access to protected path: {full_path}")
             raise HTTPException(status_code=404, detail="Not Found")
-        return FileResponse(static_dir / "index.html")
+        
+        backend_log.debug(f"Serving SPA for path: {full_path}")
+        response = FileResponse(static_dir / "index.html")
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
 
     if backend_log.isEnabledFor(logging.DEBUG):
         backend_log.debug("\nSTATIC ROUTE CHECK:")

@@ -9,10 +9,11 @@
  */
 
 import axios from 'axios';
+import { API_CONFIG } from '../config';
 
 class ExportSystemService {
   constructor() {
-    this.baseURL = '/api/exports';
+    this.baseURL = `${API_CONFIG.baseURL}/exports`;
   }
 
   // Export Format Operations

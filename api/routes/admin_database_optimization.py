@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from api.orm_bootstrap import get_db
 from api.services.database_optimization_integration import get_optimization_service, DatabaseOptimizationService
 from api.database_performance_monitor import get_performance_monitor, PerformanceThresholds
-from api.routes.auth import verify_token
+from api.routes.auth import get_current_admin_user as verify_token
 from api.models import User
 from api.utils.logger import get_system_logger
 

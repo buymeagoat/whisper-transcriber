@@ -5,6 +5,7 @@ import { API_CONFIG, isDebugEnabled } from '../config'
 const apiClient = axios.create({
   baseURL: API_CONFIG.baseURL,
   timeout: API_CONFIG.timeout,
+  withCredentials: true,  // Include cookies in all requests
   headers: {
     'Content-Type': 'application/json',
   },
@@ -35,19 +36,23 @@ if (isDebugEnabled) {
   )
 }
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and security headers
 apiClient.interceptors.request.use(
   async (config) => {
-    // Skip auth for certain endpoints
+    // Add CSRF protection header for all requests
+    config.headers['X-Requested-With'] = 'XMLHttpRequest'
+    
+    // Skip auth token for certain endpoints (cookies will be sent automatically)
     if (config.url?.includes('/auth/login') || 
         config.url?.includes('/register') || 
         config.url?.includes('/health')) {
       return config
     }
 
-    const token = localStorage.getItem('auth_token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    // For backwards compatibility, still check localStorage for legacy tokens
+    const legacyToken = localStorage.getItem('auth_token')
+    if (legacyToken) {
+      config.headers.Authorization = `Bearer ${legacyToken}`
       
       // Check if token needs refresh (but avoid circular dependency)
       const expiresAt = localStorage.getItem('token_expires_at')
@@ -60,22 +65,33 @@ apiClient.interceptors.request.use(
             // Try to refresh token
             const refreshResponse = await axios.post('/auth/refresh', {}, {
               baseURL: apiClient.defaults.baseURL,
-              headers: { Authorization: `Bearer ${token}` }
+              headers: { 
+                Authorization: `Bearer ${legacyToken}`,
+                'X-Requested-With': 'XMLHttpRequest'
+              }
             })
             
             const { access_token, expires_in } = refreshResponse.data
-            localStorage.setItem('auth_token', access_token)
-            localStorage.setItem('token_expires_at', Date.now() + (expires_in * 1000))
             
-            // Update the current request with new token
-            config.headers.Authorization = `Bearer ${access_token}`
+            // Migrate to sessionStorage and clear localStorage
+            sessionStorage.setItem('token_expires_at', Date.now() + (expires_in * 1000))
+            localStorage.removeItem('auth_token')
+            localStorage.removeItem('token_expires_at')
+            
+            // Don't update header - let cookies handle it
           } catch (refreshError) {
-            // If refresh fails, let the request continue with old token
-            console.warn('Token refresh failed:', refreshError)
+            console.warn('Token refresh failed during migration:', refreshError)
+            // Clear legacy tokens
+            localStorage.removeItem('auth_token')
+            localStorage.removeItem('token_expires_at')
           }
         }
       }
     }
+    
+    // Note: httpOnly cookies are sent automatically by the browser
+    // No need to manually add them to headers
+    
     return config
   },
   (error) => {
@@ -94,30 +110,31 @@ apiClient.interceptors.response.use(
 
       // Try to refresh token if this isn't already a refresh request
       if (!originalRequest.url?.includes('/auth/refresh')) {
-        const token = localStorage.getItem('auth_token')
-        if (token) {
-          try {
-            const refreshResponse = await axios.post('/auth/refresh', {}, {
-              baseURL: apiClient.defaults.baseURL,
-              headers: { Authorization: `Bearer ${token}` }
-            })
+        try {
+          // Try to refresh using secure cookies
+          const refreshResponse = await axios.post('/auth/refresh', {}, {
+            baseURL: apiClient.defaults.baseURL,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            withCredentials: true  // Include cookies
+          })
 
-            const { access_token, expires_in } = refreshResponse.data
-            localStorage.setItem('auth_token', access_token)
-            localStorage.setItem('token_expires_at', Date.now() + (expires_in * 1000))
+          const { expires_in } = refreshResponse.data
+          
+          // Update session storage with new expiration
+          sessionStorage.setItem('token_expires_at', Date.now() + (expires_in * 1000))
 
-            // Retry the original request with new token
-            originalRequest.headers.Authorization = `Bearer ${access_token}`
-            return apiClient(originalRequest)
-          } catch (refreshError) {
-            // Refresh failed, clear tokens and redirect
-            localStorage.removeItem('auth_token')
-            localStorage.removeItem('token_expires_at')
-          }
+          // Retry the original request (cookies will be included automatically)
+          return apiClient(originalRequest)
+        } catch (refreshError) {
+          // Refresh failed, clear session data
+          sessionStorage.removeItem('token_expires_at')
+          localStorage.removeItem('auth_token')
+          localStorage.removeItem('token_expires_at')
         }
       }
 
       // If we get here, authentication failed
+      sessionStorage.removeItem('token_expires_at')
       localStorage.removeItem('auth_token')
       localStorage.removeItem('token_expires_at')
       

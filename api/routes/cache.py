@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, List, Optional
-from ..routes.auth import verify_token
+from ..routes.auth import get_current_admin_user as verify_token
 
 # Create router instance
 router = APIRouter(tags=["cache"])

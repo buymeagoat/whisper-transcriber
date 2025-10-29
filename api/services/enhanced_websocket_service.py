@@ -5,6 +5,7 @@ Provides scalable WebSocket connection management with Redis pub/sub, connection
 
 import asyncio
 import json
+import os
 import time
 from typing import Dict, List, Set, Optional, Any, Callable
 from datetime import datetime, timedelta
@@ -309,7 +310,8 @@ class WebSocketConnectionPool:
 class WebSocketMessageQueue:
     """Redis-backed message queue for scalable WebSocket message delivery."""
     
-    def __init__(self, redis_url: str = "redis://localhost:6379/1"):
+    def __init__(self, redis_url: str = None):
+        redis_url = redis_url or os.getenv("REDIS_URL", "redis://localhost:6379/0").replace("/0", "/1")
         self.redis_url = redis_url
         self.redis_client: Optional[redis.Redis] = None
         self.pubsub: Optional[redis.client.PubSub] = None
@@ -477,8 +479,9 @@ class WebSocketMessageQueue:
 class EnhancedWebSocketService:
     """Enhanced WebSocket service with connection pooling, message queuing, and monitoring."""
     
-    def __init__(self, max_connections: int = 1000, redis_url: str = "redis://localhost:6379/1"):
+    def __init__(self, max_connections: int = 1000, redis_url: str = None):
         self.connection_pool = WebSocketConnectionPool(max_connections)
+        redis_url = redis_url or os.getenv("REDIS_URL", "redis://localhost:6379/1")
         self.message_queue = WebSocketMessageQueue(redis_url)
         self.is_running = False
         
@@ -643,7 +646,11 @@ async def get_websocket_service() -> EnhancedWebSocketService:
     global _websocket_service
     
     if _websocket_service is None:
-        _websocket_service = EnhancedWebSocketService()
+        # Use the main Redis URL but switch to database 1 for WebSocket
+        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+        # Change database from 0 to 1 for WebSocket service
+        redis_url = redis_url.replace("/0", "/1")
+        _websocket_service = EnhancedWebSocketService(redis_url=redis_url)
         await _websocket_service.initialize()
     
     return _websocket_service

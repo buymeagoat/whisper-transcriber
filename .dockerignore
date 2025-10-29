@@ -21,10 +21,50 @@ logs/
 /docs/patch_logs/
 /docs/audit/
 /docs/telemetry/
+data/
+temp/
+archive/
+cache/
 
 # frontend
 frontend/node_modules/
+frontend/dist/
 
 # build artifacts
 build/
 *.log
+
+# development files
+monitor_errors.sh
+*.md
+.pytest_cache/
+.coverage
+htmlcov/
+
+# testing artifacts
+tests_broken/
+**/test_*
+**/*_test*
+
+# documentation
+docs/
+README*
+CHANGELOG*
+
+# CI/CD
+.github/
+scripts/test*
+scripts/*test*
+scripts/comprehensive*
+scripts/user_*
+scripts/role_*
+
+# security files
+security_scan_*
+*.json
+
+# temporary files
+*.tmp
+*.temp
+.testing_*
+.build_*

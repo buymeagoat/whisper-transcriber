@@ -70,4 +70,9 @@ PY
 fi
 log_step "START"
 echo "Executing: $@" >&2
-exec gosu appuser "$@"
+# If we're already running as appuser (from Docker user setting), execute directly
+if [ "$(id -u)" -eq 1000 ]; then
+    exec "$@"
+else
+    exec gosu appuser "$@"
+fi

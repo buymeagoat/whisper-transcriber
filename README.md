@@ -31,7 +31,7 @@ cd whisper-transcriber
 docker-compose up -d
 
 # 4. Access the application
-# http://localhost:8000
+# http://localhost:8001
 ```
 
 The application uses **SQLite** for data storage and **Redis** for task queue management.

@@ -34,6 +34,12 @@ class APIKeyAuthenticationMiddleware(BaseHTTPMiddleware):
             "/auth/login",
             "/auth/register",
             "/auth/token",
+            "/api/auth/login",
+            "/api/auth/register", 
+            "/api/auth/token",
+            "/login",
+            "/register",
+            "/token",
             "/jobs/"  # TEMPORARY: bypass auth for testing job model
         }
         
@@ -114,8 +120,13 @@ class APIKeyAuthenticationMiddleware(BaseHTTPMiddleware):
     
     def _requires_authentication(self, path: str) -> bool:
         """Check if path requires authentication."""
-        # API paths that require authentication
-        protected_prefixes = ["/api/", "/admin/", "/jobs/", "/upload/"]
+        # Skip authentication for auth endpoints
+        auth_patterns = ["/auth/", "/login", "/register", "/token"]
+        if any(path.startswith(pattern) or pattern in path for pattern in auth_patterns):
+            return False
+            
+        # API paths that require authentication  
+        protected_prefixes = ["/api/transcribe", "/api/jobs", "/admin/", "/upload/"]
         return any(path.startswith(prefix) for prefix in protected_prefixes)
     
     def _extract_api_key(self, request: Request) -> Optional[str]:

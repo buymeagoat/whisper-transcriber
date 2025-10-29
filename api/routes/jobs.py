@@ -8,6 +8,7 @@ Enhanced with audit logging for T026 Security Hardening.
 from api.utils.log_sanitization import safe_log_format, sanitize_for_log
 
 from typing import Dict, Any, Optional
+from pathlib import Path
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form, Request
 from sqlalchemy.orm import Session
 from api.orm_bootstrap import get_db
@@ -49,8 +50,16 @@ async def create_job(
         user_context = extract_request_context(request)
         user_id = user_context.get("user_id", "anonymous")
         
-        # Validate file type
-        if file.content_type not in settings.allowed_file_types:
+        # Validate file type - check both MIME type and file extension
+        allowed_extensions = ['.wav', '.mp3', '.m4a', '.flac', '.ogg', '.aac', '.webm']
+        file_extension = Path(file.filename).suffix.lower() if file.filename else ""
+        
+        is_valid_mime = file.content_type in settings.allowed_file_types
+        is_valid_extension = file_extension in allowed_extensions
+        is_generic_binary = file.content_type == "application/octet-stream"
+        
+        # Allow if MIME type is valid OR if extension is valid (handles generic MIME types)
+        if not (is_valid_mime or (is_generic_binary and is_valid_extension) or is_valid_extension):
             # Audit failed file upload
             audit_data_operation(
                 user_id=user_id or "anonymous",
@@ -62,7 +71,9 @@ async def create_job(
             
             raise HTTPException(
                 status_code=400,
-                detail=safe_log_format("File type {} not allowed", sanitize_for_log(file.content_type))
+                detail=safe_log_format("File type {} not allowed. Supported formats: {}", 
+                                     sanitize_for_log(f"{file.content_type} (extension: {file_extension})"),
+                                     sanitize_for_log(", ".join(allowed_extensions)))
             )
         
         # Validate file size
@@ -127,6 +138,9 @@ async def create_job(
             "queue_job_id": queue_job_id
         }
     
+    except HTTPException:
+        # Re-raise HTTP exceptions (like validation errors) without modification
+        raise
     except Exception as e:
         logger.error(safe_log_format("Failed to create job: {}", sanitize_for_log(e)))
         raise HTTPException(status_code=500, detail=str(e))
@@ -134,27 +148,36 @@ async def create_job(
 @router.get("/{job_id}", response_model=Dict[str, Any])
 async def get_job(job_id: str, db: Session = Depends(get_db)):
     """Get job status and details."""
-    job = db.query(Job).filter(Job.id == job_id).first()
-    
-    if not job:
-        raise HTTPException(status_code=404, detail="Job not found")
-    
-    # Get queue status if available
-    queue_job = job_queue.get_job(job_id)
-    queue_status = queue_job.status.value if queue_job else None
-    
-    return {
-        "job_id": job.id,
-        "original_filename": job.original_filename,
-        "status": job.status.value,
-        "queue_status": queue_status,
-        "model_name": job.model_name,
-        "language": job.language,
-        "created_at": job.created_at.isoformat() if job.created_at else None,
-        "completed_at": job.completed_at.isoformat() if job.completed_at else None,
-        "transcript": job.transcript,
-        "error_message": job.error_message
-    }
+    try:
+        job = db.query(Job).filter(Job.id == job_id).first()
+        
+        if not job:
+            raise HTTPException(status_code=404, detail="Job not found")
+        
+        # Get queue status if available
+        try:
+            queue_job = job_queue.get_job(job_id)
+            queue_status = queue_job.status.value if queue_job else None
+        except Exception:
+            queue_status = None
+        
+        return {
+            "job_id": job.id,
+            "original_filename": job.original_filename,
+            "status": job.status.value,
+            "queue_status": queue_status,
+            "model_name": job.model_name,
+            "language": job.language,
+            "created_at": job.created_at.isoformat() if job.created_at else None,
+            "completed_at": job.completed_at.isoformat() if job.completed_at else None,
+            "transcript": job.transcript,
+            "error_message": job.error_message
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get job {job_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve job")
 
 @router.get("/", response_model=Dict[str, Any])
 async def list_jobs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

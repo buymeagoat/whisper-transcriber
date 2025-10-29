@@ -117,17 +117,18 @@ class SecurityHardeningMiddleware(BaseHTTPMiddleware):
     
     def _add_security_headers(self, response: Response) -> Response:
         """Add comprehensive security headers to response."""
-        # Content Security Policy
+        # Content Security Policy that supports modern frontend frameworks
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
-            "style-src 'self' 'unsafe-inline'; "
+            "script-src 'self' 'unsafe-inline'; "  # Allow inline scripts for Vite/React
+            "style-src 'self' 'unsafe-inline'; "   # Allow inline styles for Vite/React  
             "img-src 'self' data: blob:; "
             "font-src 'self'; "
             "connect-src 'self'; "
             "frame-ancestors 'none'; "
             "base-uri 'self'; "
-            "form-action 'self';"
+            "form-action 'self'; "
+            "object-src 'none';"
         )
         
         # Security headers

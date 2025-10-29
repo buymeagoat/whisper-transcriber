@@ -85,6 +85,13 @@ try:
         # )
         # BACKUP_SERVICE_AVAILABLE = True
         BACKUP_SERVICE_AVAILABLE = False
+        # Define dummy functions for disabled backup service
+        def initialize_backup_service():
+            return False
+        def start_backup_service_if_configured():
+            return False  
+        def shutdown_backup_service():
+            pass
         system_log.info("Backup service disabled during architecture consolidation")
     except ImportError:
         system_log.warning("Backup service not available - backup features disabled")
@@ -95,7 +102,7 @@ except (ConfigurationError, InitError) as exc:  # pragma: no cover - startup fai
     system_log.critical(str(exc))
     raise SystemExit(1)
 
-from api.orm_bootstrap import SessionLocal, validate_or_initialize_database
+from api.orm_bootstrap import SessionLocal, validate_or_initialize_database, get_db
 from api.models import Job
 from api.models import JobStatusEnum
 from api.services.users import ensure_default_admin
@@ -125,7 +132,7 @@ ROOT = Path(__file__).parent
 # Read API host from environment with a default for local development.
 API_HOST = settings.vite_api_host
 if "VITE_API_HOST" not in os.environ:
-    system_log.warning("VITE_API_HOST not set, defaulting to http://localhost:8000")
+    system_log.warning("VITE_API_HOST not set, defaulting to http://localhost:8001")
 
 
 # ─── Lifespan Hook ───
@@ -196,6 +203,7 @@ async def lifespan(app: FastAPI):
         system_log.warning(f"Failed to initialize database performance monitoring: {e}")
 
     # Initialize enhanced WebSocket service for T025 Phase 4
+    websocket_service = None
     try:
         websocket_service = await get_websocket_service()
         job_notifier = await get_job_notifier()
@@ -208,7 +216,7 @@ async def lifespan(app: FastAPI):
     try:
         # Initialize chunked upload service with WebSocket integration
         chunked_upload_service.progress_tracker.websocket_service = websocket_service
-        system_log.info("Chunked upload service initialized successfully")
+        system_log.info(f"Chunked upload service initialized successfully (WebSocket: {'enabled' if websocket_service else 'disabled'})")
     except Exception as e:
         system_log.warning(f"Failed to initialize chunked upload service: {e}")
 
@@ -393,3 +401,14 @@ def rehydrate_incomplete_jobs():
 
 # ─── Register Routers ─────────────────────────────────────
 register_routes(app)
+
+# ─── Run Application ──────────────────────────────────────
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "api.main:app",
+        host="0.0.0.0",
+        port=8001,
+        reload=False,
+        log_level="info"
+    )

@@ -71,11 +71,11 @@ class SecurityHeadersConfig:
         """Configure Content Security Policy based on environment"""
         
         if self.is_development:
-            # More permissive CSP for development
+            # Secure CSP for development (no unsafe directives)
             csp_directives = [
                 "default-src 'self'",
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* ws://localhost:*",
-                "style-src 'self' 'unsafe-inline'",
+                f"script-src 'self' 'nonce-{self.nonce}' http://localhost:* ws://localhost:*",
+                f"style-src 'self' 'nonce-{self.nonce}'",
                 "img-src 'self' data: blob:",
                 "font-src 'self' data:",
                 "connect-src 'self' http://localhost:* ws://localhost:* wss://localhost:*",
@@ -88,9 +88,11 @@ class SecurityHeadersConfig:
                 f"style-src-attr 'nonce-{self.nonce}'"
             ]
         elif self.is_test:
-            # Minimal CSP for testing
+            # Secure CSP for testing (no unsafe directives)
             csp_directives = [
-                "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
+                "default-src 'self'",
+                f"script-src 'self' 'nonce-{self.nonce}'",
+                f"style-src 'self' 'nonce-{self.nonce}'",
                 "object-src 'none'"
             ]
         else:

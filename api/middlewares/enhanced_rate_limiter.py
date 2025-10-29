@@ -5,6 +5,7 @@ Implements comprehensive rate limiting with advanced security features.
 """
 
 import asyncio
+import os
 import time
 import json
 import logging
@@ -103,7 +104,7 @@ class EnhancedRateLimitConfig:
     
     # Storage and performance
     use_redis: bool = False
-    redis_url: str = "redis://localhost:6379/0"
+    redis_url: str = field(default_factory=lambda: os.getenv("REDIS_URL", "redis://localhost:6379/0"))
     cleanup_interval: int = 300
     max_memory_entries: int = 50000
 

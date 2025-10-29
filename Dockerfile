@@ -1,32 +1,68 @@
 # syntax=docker/dockerfile:1.7
-# Use specific SHA256 digest for security and reproducibility
-FROM python:3.11-slim-bookworm@sha256:a96504e4e5a0e6cacf4fe789411497efb870c29ccd5b6c8082dcaaa9e2a34145
+# Multi-stage build: Stage 1 - Build Frontend
+FROM node:18-alpine AS frontend-builder
 
-# Security: Install dev requirements when building test images
-ARG INSTALL_DEV=false
+# Set working directory for frontend
+WORKDIR /frontend
+
+# Copy frontend dependency files
+COPY frontend/package*.json ./
+
+# Install Node.js dependencies with clean slate
+RUN npm ci --production=false --silent
+
+# Copy frontend source code
+COPY frontend/ ./
+
+# Build the frontend for production
+RUN npm run build
+
+# Verify build output exists
+RUN ls -la dist/ && echo "Frontend build completed"
+
+# Multi-stage build: Stage 2 - Build Backend
+FROM python:3.11-slim-bookworm AS backend-builder
 
 # Security: Create non-root user early to establish proper ownership
 RUN groupadd -r -g 1000 appuser && \
     useradd -r -u 1000 -g appuser -m -d /home/appuser -s /sbin/nologin appuser
 
-# Security: Use slim image and minimize installed packages
-COPY cache/apt /tmp/apt
+# Install system dependencies needed for Python packages
 RUN apt-get update && \
-    # Security: Only install essential packages
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        curl \
+        ca-certificates \
+        ffmpeg \
+        && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy Python dependencies
+COPY requirements.txt requirements-dev.txt ./
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Multi-stage build: Stage 3 - Production Image
+FROM python:3.11-slim-bookworm AS production
+
+# Security: Create non-root user
+RUN groupadd -r -g 1000 appuser && \
+    useradd -r -u 1000 -g appuser -m -d /home/appuser -s /sbin/nologin appuser
+
+# Install runtime dependencies only
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         curl \
         ca-certificates \
-        gosu && \
-    # Install cached packages if available
-    (dpkg -i /tmp/apt/*.deb || apt-get install -f -y --no-install-recommends) && \
-    # Security: Clean up package cache and temporary files
-    rm -rf /tmp/apt /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
+        gosu \
+        && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
 # Security: Create secure application directory structure
 RUN mkdir -p /app /app/data /app/storage /app/storage/uploads /app/storage/transcripts /app/logs && \
-    # Security: Set proper ownership and permissions
     chown -R appuser:appuser /app && \
-    # Security: Restrict permissions (750 for directories, 640 for files)
     chmod -R 750 /app
 
 WORKDIR /app
@@ -38,34 +74,28 @@ ENV PYTHONPATH=/app \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Security: Copy only necessary files as root, then change ownership
-COPY --chown=root:root requirements.txt requirements-dev.txt alembic.ini ./
-COPY --chown=root:root cache/pip ./wheels/
+# Copy Python packages from builder stage
+COPY --from=backend-builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=backend-builder /usr/local/bin /usr/local/bin
 
-# Security: Install Python packages with security considerations
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir --find-links ./wheels -r requirements.txt && \
-    if [ "$INSTALL_DEV" = "true" ]; then \
-        pip install --no-cache-dir --find-links ./wheels -r requirements-dev.txt; \
-    fi && \
-    # Security: Remove installation cache and temporary files
-    rm -rf ./wheels ~/.cache /root/.cache /tmp/* /var/tmp/*
+# Copy application code
+COPY --chown=appuser:appuser api/ ./api/
+COPY --chown=appuser:appuser models/ ./models/
+COPY --chown=root:root alembic.ini ./
 
-# Security: Copy and secure script files
+# Copy built frontend from frontend-builder stage
+COPY --from=frontend-builder --chown=appuser:appuser /frontend/dist/ ./api/static/
+
+# Verify frontend files were copied
+RUN ls -la /app/api/static/ && echo "Frontend files copied successfully"
+
+# Copy and secure script files
 COPY --chown=root:root scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
 COPY --chown=root:root scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod 755 /usr/local/bin/healthcheck.sh /usr/local/bin/docker-entrypoint.sh
 
-# Security: Copy application code with proper ownership
-COPY --chown=appuser:appuser app/ ./app/
-COPY --chown=appuser:appuser models/ ./models/
-
-# Security: Copy frontend assets if available (optional)
-COPY --chown=appuser:appuser web/dist ./app/static/ 2>/dev/null || true
-
 # Security: Set final ownership and permissions for application files
 RUN chown -R appuser:appuser /app && \
-    # Security: Make directories readable/executable, files readable only
     find /app -type d -exec chmod 750 {} \; && \
     find /app -type f -exec chmod 640 {} \;
 

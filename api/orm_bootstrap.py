@@ -24,6 +24,14 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+# Import all models to ensure they're registered with Base.metadata
+# This must happen after Base is defined but before create_all is called
+try:
+    import api.models  # noqa: F401
+    logger.debug("Models imported successfully during bootstrap")
+except Exception as e:
+    logger.warning(f"Failed to import api.models during bootstrap: {e}")
+
 def get_db() -> Session:
     """Get database session."""
     db = SessionLocal()
@@ -47,8 +55,29 @@ def validate_or_initialize_database():
             conn.execute(text("SELECT 1"))
             logger.info("Database connection validated")
         
-        # Create tables if they don't exist
-        Base.metadata.create_all(bind=engine)
+            # Run Alembic migrations if AUTO_MIGRATE is enabled
+            auto_migrate = getattr(settings, 'auto_migrate', False) or os.getenv("AUTO_MIGRATE", "false").lower() in ("true", "1", "yes")
+            if auto_migrate:
+                try:
+                    from alembic.config import Config
+                    from alembic import command
+                    
+                    # Get the directory containing this file to find alembic.ini
+                    current_dir = Path(__file__).parent.parent  # Go up from api/ to root
+                    alembic_ini_path = current_dir / "alembic.ini"
+                    
+                    if alembic_ini_path.exists():
+                        alembic_cfg = Config(str(alembic_ini_path))
+                        command.upgrade(alembic_cfg, "head")
+                        logger.info("Alembic migrations applied successfully")
+                    else:
+                        logger.warning(f"Alembic config not found at {alembic_ini_path}, skipping migrations")
+                except Exception as e:
+                    logger.warning(f"Failed to run Alembic migrations: {e}")
+                    logger.info("Falling back to create_all for table creation")
+
+            # Create tables if they don't exist (fallback or when migrations disabled)
+            Base.metadata.create_all(bind=engine)
         logger.info("Database tables validated/created")
         
         return True

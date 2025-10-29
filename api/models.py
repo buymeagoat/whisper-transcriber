@@ -7,6 +7,9 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
 from api.orm_bootstrap import Base
 
+# Import security audit models to ensure they're registered
+from api.security.audit_models import SecurityAuditLog, APIKeyAudit, SecurityIncident
+
 
 # ─── Users Table ─────────────────────────────────────────────────────────
 class User(Base):
@@ -159,12 +162,12 @@ class AuditLog(Base):
     details: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON string for additional data
     session_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
     
-    # Add composite indexes for common queries
+    # Add composite indexes for common queries (with unique names to avoid conflicts)
     __table_args__ = (
-        Index('idx_audit_time_type', 'timestamp', 'event_type'),
-        Index('idx_audit_user_time', 'user_id', 'timestamp'),
-        Index('idx_audit_ip_time', 'client_ip', 'timestamp'),
-        Index('idx_audit_severity_time', 'severity', 'timestamp'),
+        Index('idx_audit_log_time_type', 'timestamp', 'event_type'),
+        Index('idx_audit_log_user_time', 'user_id', 'timestamp'),
+        Index('idx_audit_log_ip_time', 'client_ip', 'timestamp'),
+        Index('idx_audit_log_severity_time', 'severity', 'timestamp'),
     )
 
     def __repr__(self) -> str:  # pragma: no cover - trivial

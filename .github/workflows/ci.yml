@@ -10,6 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      image-artifact-id: ${{ steps.upload_image.outputs.artifact-id }}
+      image-artifact-url: ${{ steps.upload_image.outputs.artifact-url }}
+      sbom-artifact-id: ${{ steps.upload_sbom.outputs.artifact-id }}
+      sbom-artifact-url: ${{ steps.upload_sbom.outputs.artifact-url }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd719d720b5b0c9d4b7b0e5a89538ba1f3f5d
@@ -23,24 +28,34 @@ jobs:
           pip install -r requirements.txt
       - name: Install tooling
         run: |
-          pip install flake8 pip-audit
+          pip install bandit flake8 pip-audit
       - name: Lint
         run: |
           flake8 api tests
       - name: Static analysis
         run: python -m compileall api
+      - name: Bandit security scan
+        run: bandit -r api scripts
       - name: Run tests
         run: pytest
       - name: Run pip-audit
-        run: pip-audit --strict
+        run: pip-audit --strict -r requirements.txt
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
       - name: Build container image
+        id: build_image
         uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25
         with:
           context: .
           push: false
           tags: whisper-transcriber:ci
+          outputs: type=docker,dest=/tmp/whisper-transcriber-image.tar
+      - name: Upload image artifact
+        id: upload_image
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808
+        with:
+          name: whisper-transcriber-image
+          path: /tmp/whisper-transcriber-image.tar
       - name: Generate SBOM
         uses: anchore/sbom-action@df80a981bc6edbc4e220a492d3cbe9f5547a6e75
         with:
@@ -48,6 +63,7 @@ jobs:
           format: cyclonedx-json
           output: sbom.cdx.json
       - name: Upload SBOM artifact
+        id: upload_sbom
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808
         with:
           name: sbom

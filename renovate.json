@@ -13,6 +13,10 @@
     {
       "matchDatasources": ["docker"],
       "groupName": "container base images"
+    },
+    {
+      "matchDatasources": ["github-actions"],
+      "groupName": "github actions"
     }
   ]
 }

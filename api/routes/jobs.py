@@ -166,12 +166,18 @@ async def get_job(job_id: str, db: Session = Depends(get_db)):
             "original_filename": job.original_filename,
             "status": job.status.value,
             "queue_status": queue_status,
-            "model_name": job.model_name,
-            "language": job.language,
-            "created_at": job.created_at.isoformat() if job.created_at else None,
-            "completed_at": job.completed_at.isoformat() if job.completed_at else None,
-            "transcript": job.transcript,
-            "error_message": job.error_message
+            "model_name": getattr(job, "model_name", getattr(job, "model", None)),
+            "language": getattr(job, "language", None),
+            "created_at": job.created_at.isoformat() if getattr(job, "created_at", None) else None,
+            "completed_at": (
+                getattr(job, "completed_at", None).isoformat()
+                if getattr(job, "completed_at", None)
+                else getattr(job, "finished_at", None).isoformat()
+                if getattr(job, "finished_at", None)
+                else None
+            ),
+            "transcript": getattr(job, "transcript", None),
+            "error_message": getattr(job, "error_message", None)
         }
     except HTTPException:
         raise

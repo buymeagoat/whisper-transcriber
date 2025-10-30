@@ -75,6 +75,34 @@ Required environment variables in `.env.production` (provision via a secrets man
 
 ## Production Deployment
 
+Production images now fail fast unless the following environment variables are provided with non-placeholder values:
+
+- `SECRET_KEY` – application signing key used for session data.
+- `JWT_SECRET_KEY` – signing key for API tokens.
+- `DATABASE_URL` – SQLAlchemy DSN for the primary database.
+- `REDIS_URL` – Redis connection string (also used for the Celery broker when set).
+- `REDIS_PASSWORD` – password supplied to the Redis container/instance.
+- `ADMIN_BOOTSTRAP_PASSWORD` – temporary administrator credential used once at bootstrap.
+
+To prepare a secure deployment:
+
+1. Copy the template to a local secrets file and keep it out of version control:
+   ```bash
+   cp env.template .env
+   ```
+2. Generate the signing keys (rotate them in your secrets manager on a schedule):
+   ```bash
+   openssl rand -hex 64
+   openssl rand -hex 64
+   ```
+   Use two different outputs to populate `SECRET_KEY` and `JWT_SECRET_KEY` in `.env`.
+3. Provision `DATABASE_URL`, `REDIS_URL`, and `ADMIN_BOOTSTRAP_PASSWORD` using your secrets manager. For local
+   experiments you can set `DATABASE_URL=sqlite:////app/data/app.db`,
+   `REDIS_PASSWORD=local-redis-password`, and
+   `REDIS_URL=redis://:local-redis-password@redis:6379/0`.
+4. Store the populated `.env` in your orchestrator's secret store and inject it as environment variables. The
+   Docker Compose file expects these keys via `.env` and refuses to start without them.
+
 Transcription jobs are executed by default through the in-process `ThreadJobQueue` defined in
 `api/services/job_queue.py`. This keeps API latency predictable during tests and local development because the
 transcribe step runs inside the application process. The repository also contains a Celery worker definition in
@@ -87,7 +115,7 @@ The provided Docker Compose file starts the following containers:
 - **redis** – Cache backend and optional Celery broker/result store.
 
 If you deploy to another orchestrator, carry across the same environment variables and mount points used by the
-Compose definition.
+Compose definition and ensure secrets are injected through a secure mechanism (vault, secret manager, etc.).
 
 ## Observability
 

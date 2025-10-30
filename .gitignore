@@ -178,3 +178,6 @@ function_dependency_*.json
 /server.log
 /app.db
 !/whisper_dev.db
+
+# === Performance artifacts ===
+perf/results/*.json

@@ -35,6 +35,24 @@ same command on every push and pull request, so new changes must keep the smoke 
 Refer to [docs/api/routes.md](docs/api/routes.md) for endpoint-level usage examples and
 [docs/traceability.md](docs/traceability.md) to see how the critical requirements map to tests and documentation.
 
+## Continuous Integration and Branch Protection
+
+The `ci` workflow located in `.github/workflows/ci.yml` runs linting (`flake8`), static type checks, security tooling (`bandit`
+and `pip-audit`), the test suite, a Docker build, and Syft-powered CycloneDX SBOM generation on every push and pull request.
+Both the container image tarball (`whisper-transcriber-image`) and generated SBOM (`sbom`) are uploaded as workflow artifacts
+and exposed via the job outputs (`image-artifact-id`, `image-artifact-url`, `sbom-artifact-id`, `sbom-artifact-url`) for
+downstream automation.
+
+To keep `main` protected:
+
+1. Navigate to **Settings → Branches → Branch protection rules**.
+2. Add or edit the rule for `main` and enable **Require status checks to pass before merging**.
+3. Select the `build` job from the `ci` workflow as a required status check.
+4. Optionally enforce admins so every merge confirms the full pipeline remains green.
+
+With branch protection in place, every pull request must complete the security and quality gates run by the workflow before it
+can be merged.
+
 ## Deployment
 
 Build the production image with the multi-stage Dockerfile and provide build metadata so the entrypoint validation passes:

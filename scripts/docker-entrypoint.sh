@@ -12,6 +12,37 @@ log_step() {
     echo "$(date -u +"%Y-%m-%d %H:%M:%S UTC") [ENTRYPOINT] $1"
 }
 
+require_secret() {
+    local name="$1"
+    local description="$2"
+    local value="${!name-}"
+
+    if [ -z "${value}" ]; then
+        echo "ERROR: Required secret ${name} (${description}) is not set. Failing fast." >&2
+        exit 1
+    fi
+
+    case "${value,,}" in
+        "change-me"|"changeme"|"default"|"placeholder"|"example"|"sample"|"localtest")
+            echo "ERROR: Required secret ${name} (${description}) is using an insecure placeholder value. Provide a rotated secret." >&2
+            exit 1
+            ;;
+    esac
+}
+
+validate_required_secrets() {
+    log_step "SECRETS"
+    echo "Validating required runtime secrets (values redacted)" >&2
+
+    require_secret "JWT_SECRET_KEY" "JWT signing key"
+    require_secret "DATABASE_URL" "database connection string"
+    require_secret "REDIS_URL" "Redis connection string"
+    require_secret "ADMIN_BOOTSTRAP_PASSWORD" "bootstrap administrator password"
+
+    log_step "SECRETS OK"
+    echo "All required secrets are present" >&2
+}
+
 validate_build_metadata() {
     if [ ! -s "$BUILD_INFO_FILE" ]; then
         cat >&2 <<'EOM'
@@ -85,6 +116,8 @@ validate_build_metadata
 
 log_step "ENVIRONMENT"
 echo "Container entrypoint starting (environment variables redacted)" >&2
+
+validate_required_secrets
 
 # If this container is running a worker, wait for the broker to be ready
 if [ "${SERVICE_TYPE:-app}" = "worker" ]; then

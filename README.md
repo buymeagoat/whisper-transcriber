@@ -37,10 +37,21 @@ The entrypoint (`scripts/docker-entrypoint.sh`) validates the build metadata fil
 
 ## Configuration
 
-Required environment variables in `.env`:
-- `SECRET_KEY` - Application secret key
-- `JWT_SECRET_KEY` - JWT token signing key  
-- `REDIS_PASSWORD` - Redis authentication password
+Required environment variables in `.env.production` (provision via a secrets manager):
+- `SECRET_KEY` – 64+ character application signing key
+- `JWT_SECRET_KEY` – dedicated JWT signing key
+- `DATABASE_URL` – production database connection string
+- `REDIS_URL` / `REDIS_PASSWORD` – Redis connection details
+- `ADMIN_BOOTSTRAP_PASSWORD` – temporary administrator credential for first run
+- `ADMIN_METRICS_TOKEN` – token for secured admin metrics endpoint
+
+### Secret provisioning and rotation
+
+1. **Provision secrets in a vault** – Store all runtime secrets in your cloud provider's secret manager (AWS Secrets Manager, HashiCorp Vault, etc.) and scope access to the deployment service account.
+2. **Inject secrets at runtime** – Configure your orchestrator (Docker Swarm, Kubernetes, ECS) to mount the vault values as environment variables before the container entrypoint runs. Avoid baking secrets into images or `.env` files in source control.
+3. **Rotate regularly** – Rotate `SECRET_KEY` and `JWT_SECRET_KEY` together at least quarterly; rotate database and Redis credentials according to your infrastructure policy and immediately revoke old credentials.
+4. **Bootstrap administrator safely** – Generate `ADMIN_BOOTSTRAP_PASSWORD` just-in-time, use it once to create a permanent admin, then trigger rotation to invalidate the bootstrap credential.
+5. **Verify during deploys** – The Docker entrypoint and production startup scripts now fail fast when required secrets are missing or use placeholder values. Monitor deployment logs to confirm validation before rolling traffic.
 
 ## Production Deployment
 

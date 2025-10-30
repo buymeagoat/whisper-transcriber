@@ -3,15 +3,18 @@ User management services for the Whisper Transcriber API.
 """
 
 import os
+from contextlib import suppress
 from typing import Optional
-from sqlalchemy.orm import Session
+
+import bcrypt
 from fastapi import Depends, HTTPException, status
-from api.orm_bootstrap import get_db
+from sqlalchemy.orm import Session
+
 from api.models import User
+from api.orm_bootstrap import get_db
 from api.utils.logger import get_system_logger
 # Note: Removed circular import to avoid startup issues
 # from api.routes.auth import get_current_user as auth_get_current_user
-import bcrypt
 
 logger = get_system_logger("users")
 
@@ -29,20 +32,36 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     except Exception:
         return False
 
+def _require_admin_bootstrap_password() -> str:
+    """Return a validated bootstrap password, raising if it is missing or insecure."""
+    admin_password = os.getenv("ADMIN_BOOTSTRAP_PASSWORD", "")
+
+    if not admin_password:
+        message = "ADMIN_BOOTSTRAP_PASSWORD is required to create the default admin user"
+        logger.critical(message)
+        raise RuntimeError(message)
+
+    lowered = admin_password.lower()
+    if lowered in {"change-me", "changeme", "default", "placeholder", "example", "sample", "localtest"}:
+        message = "ADMIN_BOOTSTRAP_PASSWORD cannot use insecure placeholder values"
+        logger.critical(message)
+        raise RuntimeError(message)
+
+    return admin_password
+
+
 def ensure_default_admin():
     """Ensure a default admin user exists."""
+    db = None
     try:
         # Get a database session
         db = next(get_db())
-        
+
         # Check if admin user exists
         admin_user = db.query(User).filter(User.username == "admin").first()
-        
+
         if not admin_user:
-            admin_password = os.getenv("ADMIN_BOOTSTRAP_PASSWORD")
-            if not admin_password:
-                logger.error("ADMIN_BOOTSTRAP_PASSWORD is required to create the default admin user")
-                return
+            admin_password = _require_admin_bootstrap_password()
             admin_user = User(
                 username="admin",
                 hashed_password=hash_password(admin_password),
@@ -51,14 +70,17 @@ def ensure_default_admin():
             )
             db.add(admin_user)
             db.commit()
-            logger.info("Created default admin user with password supplied via ADMIN_BOOTSTRAP_PASSWORD")
+            logger.info("Created default admin user using secure bootstrap password (value redacted)")
         else:
             logger.info("Admin user already exists")
-        
-        db.close()
-        
+
     except Exception as e:
-        logger.error(f"Failed to ensure default admin user: {e}")
+        logger.critical(f"Failed to ensure default admin user: {e}")
+        raise
+    finally:
+        with suppress(Exception):
+            if db is not None:
+                db.close()
 
 def get_user_by_username(db: Session, username: str) -> Optional[User]:
     """Get user by username."""

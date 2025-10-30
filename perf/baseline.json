@@ -1,0 +1,24 @@
+{
+  "description": "Baseline metrics captured from local docker-compose run using tiny Whisper model on 8 vCPU runner.",
+  "captured_at": "2024-05-07T00:00:00Z",
+  "environment": {
+    "model": "tiny",
+    "arrival_rate_per_second": 3,
+    "duration_seconds": 120,
+    "worker_concurrency": 1
+  },
+  "metrics": {
+    "http_req_duration_ms_avg": 1850,
+    "http_req_duration_ms_p95": 4200,
+    "transcription_latency_seconds_avg": 46.5,
+    "transcription_latency_seconds_p95": 88.4,
+    "transcription_success_rate": 0.98
+  },
+  "tolerances": {
+    "http_req_duration_ms_avg": 1.2,
+    "http_req_duration_ms_p95": 1.2,
+    "transcription_latency_seconds_avg": 1.25,
+    "transcription_latency_seconds_p95": 1.25,
+    "transcription_success_rate": 0.97
+  }
+}

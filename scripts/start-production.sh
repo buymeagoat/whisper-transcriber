@@ -2,7 +2,25 @@
 # Production startup script for Whisper Transcriber
 # This script loads production environment variables and starts the application
 
-set -e
+set -euo pipefail
+
+require_secret() {
+    local name="$1"
+    local description="$2"
+    local value="${!name-}"
+
+    if [ -z "${value}" ]; then
+        echo "🚨 CRITICAL: ${name} (${description}) is not set for production!"
+        exit 1
+    fi
+
+    case "${value,,}" in
+        "change-me"|"changeme"|"default"|"placeholder"|"example"|"sample"|"localtest")
+            echo "🚨 CRITICAL: ${name} (${description}) is using an insecure placeholder. Provide a rotated value before starting."
+            exit 1
+            ;;
+    esac
+}
 
 echo "🚀 Starting Whisper Transcriber in PRODUCTION mode"
 
@@ -18,26 +36,18 @@ fi
 export ENVIRONMENT=production
 export DEBUG=false
 
-# Validate that we have required secrets
-if [ -z "$SECRET_KEY" ] || [ "$SECRET_KEY" = "" ]; then
-    echo "🚨 CRITICAL: SECRET_KEY is not set for production!"
-    exit 1
-fi
+# Validate that we have required secrets (values redacted)
+require_secret "SECRET_KEY" "application signing key"
+require_secret "JWT_SECRET_KEY" "JWT signing key"
+require_secret "DATABASE_URL" "database connection string"
+require_secret "REDIS_URL" "Redis connection string"
+require_secret "ADMIN_BOOTSTRAP_PASSWORD" "bootstrap administrator password"
 
-if [ -z "$JWT_SECRET_KEY" ] || [ "$JWT_SECRET_KEY" = "" ]; then
-    echo "🚨 CRITICAL: JWT_SECRET_KEY is not set for production!"
-    exit 1
-fi
-
-# Print configuration summary (without secrets)
-echo "📊 Production Configuration:"
-echo "   Environment: $ENVIRONMENT"
-echo "   Debug: $DEBUG"
-echo "   API Host: ${API_HOST:-0.0.0.0}"
-echo "   API Port: ${API_PORT:-8000}"
-echo "   Database: ${DATABASE_URL:-sqlite:///app/data/whisper_production.db}"
-echo "   Secret Key: [SET - ${#SECRET_KEY} characters]"
-echo "   JWT Key: [SET - ${#JWT_SECRET_KEY} characters]"
+# Print configuration summary without exposing environment variables
+echo "📊 Production configuration validated (environment values redacted)"
+echo "   • Critical secrets present and verified for rotation"
+echo "   • Network bindings and service endpoints loaded from environment"
+echo "   • Detailed values intentionally withheld from logs"
 
 # Create required directories
 mkdir -p /app/data /app/logs /app/storage/uploads /app/storage/transcripts

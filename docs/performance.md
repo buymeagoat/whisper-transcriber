@@ -36,13 +36,18 @@ Nightly CI fails if any metric drifts more than the tolerance percentages stored
 
 ## Queue depth and concurrency
 
-- The nightly job queue uses Redis with a single worker (`WORKER_CONCURRENCY=1`). In production,
-  raise concurrency to match available CPU/GPU resources. Start at `concurrency = vCPUs / 2` for CPU
-  workers and tune after observing CPU saturation.
-- Monitor Redis `enqueued` backlog. Sustained queue depth above 3× the arrival rate indicates the
-  worker pool is undersized.
-- Increase `MAX_POLLS` or `POLL_INTERVAL` in the k6 scenario for environments with higher latency to
-  avoid classifying long-running jobs as failures.
+- The default deployment executes transcriptions through the in-process
+  `ThreadJobQueue`. Throughput therefore depends on how many concurrent
+  uploads the API process can service. Increase the FastAPI worker count
+  when you expect sustained concurrency above a handful of jobs.
+- Teams that opt into the optional Celery worker should start with
+  `WORKER_CONCURRENCY=vCPUs/2` and increase after observing CPU or GPU
+  utilisation. Celery currently exposes only a health-check task; wire in a
+  Celery-based transcription task before switching the API away from the
+  thread queue.
+- Increase `MAX_POLLS` or `POLL_INTERVAL` in the k6 scenario for
+  environments with higher latency to avoid classifying long-running jobs
+  as failures.
 
 ## Additional tips
 

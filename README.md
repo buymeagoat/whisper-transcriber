@@ -17,12 +17,13 @@ A production-ready audio transcription service using OpenAI Whisper.
 
 3. **Access the application:**
    - Web Interface: http://localhost:8001
-   - API Documentation: http://localhost:8001/docs
+   - Interactive OpenAPI docs: http://localhost:8001/docs
+   - Prometheus metrics: http://localhost:8001/metrics/
 
 ## Testing
 
-The API includes deterministic smoke tests that exercise authentication, file uploads, the health endpoint, and job queue
-integration. Run the full suite with coverage locally using:
+The API includes deterministic smoke tests that exercise authentication, file uploads, the health endpoint, Prometheus metrics,
+and job queue integration. Run the full suite with coverage locally using:
 
 ```bash
 pytest
@@ -30,6 +31,9 @@ pytest
 
 Pytest is configured (see `pytest.ini`) to fail when coverage for the API and tests drops below 25%. The CI workflow runs the
 same command on every push and pull request, so new changes must keep the smoke tests and coverage budget green.
+
+Refer to [docs/api/routes.md](docs/api/routes.md) for endpoint-level usage examples and
+[docs/traceability.md](docs/traceability.md) to see how the critical requirements map to tests and documentation.
 
 ## Deployment
 
@@ -59,7 +63,7 @@ Required environment variables in `.env.production` (provision via a secrets man
 - `DATABASE_URL` – production database connection string
 - `REDIS_URL` / `REDIS_PASSWORD` – Redis connection details
 - `ADMIN_BOOTSTRAP_PASSWORD` – temporary administrator credential for first run
-- `ADMIN_METRICS_TOKEN` – token for secured admin metrics endpoint
+- `ADMIN_METRICS_TOKEN` – token for the `/admin/uploads/metrics` endpoint that reports chunked upload statistics
 
 ### Secret provisioning and rotation
 
@@ -71,10 +75,27 @@ Required environment variables in `.env.production` (provision via a secrets man
 
 ## Production Deployment
 
-The application runs as three Docker containers:
-- **app** - FastAPI backend + React frontend (port 8001)
-- **worker** - Celery worker for transcription tasks
-- **redis** - Task queue and cache
+Transcription jobs are executed by default through the in-process `ThreadJobQueue` defined in
+`api/services/job_queue.py`. This keeps API latency predictable during tests and local development because the
+transcribe step runs inside the application process. The repository also contains a Celery worker definition in
+`api/worker.py` that currently exposes only the `api.worker.health_check` task; you can extend it with your own task
+module if you wish to offload the transcription workload to Redis.
+
+The provided Docker Compose file starts the following containers:
+- **app** – FastAPI backend + React frontend (port 8001) that handles job execution via the in-process queue.
+- **worker** – Optional Celery worker. Safe to remove when you are not experimenting with Celery-backed tasks.
+- **redis** – Cache backend and optional Celery broker/result store.
+
+If you deploy to another orchestrator, carry across the same environment variables and mount points used by the
+Compose definition.
+
+## Observability
+
+- **Structured logging** – All FastAPI services use the JSON logger provided by `api/utils/logger.py`. Each entry
+  includes the timestamp, severity, request ID (when available), caller metadata, and any additional context supplied
+  via the logging API.
+- **Metrics** – The `/metrics/` endpoint exposes RED/USE style Prometheus metrics by default without additional
+  authentication. Network layer controls should therefore guard access to the endpoint in production environments.
 
 ## API Usage
 

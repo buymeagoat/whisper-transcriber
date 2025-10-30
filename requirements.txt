@@ -21,7 +21,7 @@ python-multipart>=0.0.6
 aiofiles>=23.2.1
 
 # --- Audio Processing & Transcription ---
-openai-whisper==20240930
+openai-whisper==20250625
 torch>=2.2.2
 pydub>=0.25.1
 # Audio enhancement dependencies

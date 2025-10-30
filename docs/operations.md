@@ -2,8 +2,8 @@
 
 ## Structured Logging
 
-All API services now emit structured JSON logs. Each event includes the
-following fields:
+The FastAPI application emits structured JSON logs via
+`api/utils/logger.py`. Each event includes the following fields:
 
 | Field | Description |
 | --- | --- |
@@ -19,6 +19,11 @@ following fields:
 | `thread_id` | Thread identifier inside the process. |
 | `extra` | Optional dictionary with domain-specific context (only present when additional metadata is provided). |
 | `exception` | Stack trace rendered when an exception is captured. |
+
+> **Note:** The optional Celery worker defined in `api/worker.py` uses the
+> default Python logging formatter. Enable JSON logging there by importing
+> `api.utils.logger.get_system_logger` if you extend the worker with
+> production workloads.
 
 ### Sample log entry
 
@@ -74,5 +79,7 @@ Notify when Redis connections approach exhaustion:
 whisper_resource_saturation_ratio{resource="redis_connections"} > 0.8
 ```
 
-These queries assume the `/metrics` endpoint is scraped at regular
-intervals. Adjust thresholds to match your environment and error budgets.
+These queries assume the `/metrics/` endpoint is scraped at regular
+intervals. The route does not enforce authentication, so apply network
+policies (IP allowlists, private ingress) when deploying to production.
+Adjust thresholds to match your environment and error budgets.

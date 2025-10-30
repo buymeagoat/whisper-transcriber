@@ -97,6 +97,7 @@ whisper_dev.db
 *.orig
 *.rej
 models/
+storage/
 tests/assets/
 scripts/test_cache_access.sh
 

@@ -19,6 +19,22 @@ A production-ready audio transcription service using OpenAI Whisper.
    - Web Interface: http://localhost:8001
    - API Documentation: http://localhost:8001/docs
 
+## Deployment
+
+Build the production image with the multi-stage Dockerfile and provide build metadata so the entrypoint validation passes:
+
+```bash
+docker build \
+  --target production \
+  --build-arg BUILD_VERSION=$(git describe --tags --always) \
+  --build-arg BUILD_SHA=$(git rev-parse HEAD) \
+  --build-arg BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+  -t whisper-transcriber:latest .
+```
+
+The runtime container runs as a non-root user, exposes port 8001, and publishes a healthcheck at `/` via `scripts/healthcheck.sh`.
+The entrypoint (`scripts/docker-entrypoint.sh`) validates the build metadata file (`/etc/whisper-build.info`), failing fast if it is missing and issuing a warning when placeholder values are detected so you know to rebuild with the expected Docker build arguments.
+
 ## Configuration
 
 Required environment variables in `.env`:

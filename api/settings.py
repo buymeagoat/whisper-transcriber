@@ -73,11 +73,14 @@ def load_settings() -> Settings:
 
     core_settings = get_core_settings()
 
+    database_dsn = core_settings.database_dsn()
+
     return Settings(
         secret_key=os.getenv("SECRET_KEY", "change-me-in-production"),
         jwt_secret_key=os.getenv("JWT_SECRET_KEY", "change-me-in-production"),
         redis_password=os.getenv("REDIS_PASSWORD", "change-me-in-production"),
-        database_url=os.getenv("DATABASE_URL", "sqlite:///./whisper.db"),
+        database_url=database_dsn,
+        db_url=database_dsn,
         redis_url=core_settings.redis_url,
         celery_broker_url=core_settings.broker_url(),
         celery_result_backend=core_settings.result_backend(),

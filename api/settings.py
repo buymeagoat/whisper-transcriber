@@ -2,11 +2,20 @@
 
 import os
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from pydantic import BaseModel, Field
 
-from api.core.settings import get_core_settings
+
+PLACEHOLDER_SENTINELS = {
+    "change-me",
+    "changeme",
+    "default",
+    "placeholder",
+    "example",
+    "sample",
+    "localtest",
+}
 
 
 class Settings(BaseModel):
@@ -24,12 +33,13 @@ class Settings(BaseModel):
     vite_api_host: str = "http://localhost:8001"
 
     # Database settings
-    database_url: str = Field(default="sqlite:///./whisper.db")
-    db_url: str = Field(default="sqlite:///./whisper.db")
+    database_url: str = Field(...)
+    db_url: str = Field(...)
 
     # Security settings - REQUIRED
     secret_key: str = Field(...)
     jwt_secret_key: str = Field(...)
+    admin_bootstrap_password: str = Field(...)
     redis_password: str = Field(...)
 
     # Backend selection
@@ -60,30 +70,72 @@ class Settings(BaseModel):
     cache_dir: Path = Path("./cache")
 
     # Queue settings
-    redis_url: str = "redis://localhost:6379/0"
-    celery_broker_url: str = "redis://localhost:6379/0"
-    celery_result_backend: str = "redis://localhost:6379/0"
+    redis_url: str = Field(...)
+    celery_broker_url: str = Field(...)
+    celery_result_backend: str = Field(...)
 
     # Logging
     log_level: str = "INFO"
 
 
+def _require_env(name: str, description: str) -> str:
+    """Return a non-placeholder environment variable.
+
+    Args:
+        name: Environment variable name to fetch.
+        description: Human-readable description used in error messages.
+
+    Raises:
+        RuntimeError: When the variable is unset or contains a placeholder value.
+    """
+
+    value = os.getenv(name, "").strip()
+    if not value:
+        raise RuntimeError(f"{name} ({description}) must be provided via an environment variable.")
+
+    if value.lower() in PLACEHOLDER_SENTINELS:
+        raise RuntimeError(
+            f"{name} ({description}) is using an insecure placeholder value. Provide a rotated secret."
+        )
+
+    return value
+
+
+def _load_required_secrets() -> Dict[str, str]:
+    """Load and validate the mandatory runtime secrets."""
+
+    required = {
+        "SECRET_KEY": "application signing key",
+        "JWT_SECRET_KEY": "JWT signing key",
+        "ADMIN_BOOTSTRAP_PASSWORD": "bootstrap administrator password",
+        "DATABASE_URL": "database connection string",
+        "REDIS_URL": "Redis connection string",
+    }
+
+    return {name: _require_env(name, description) for name, description in required.items()}
+
+
 def load_settings() -> Settings:
     """Load settings from environment variables."""
 
-    core_settings = get_core_settings()
+    secrets = _load_required_secrets()
 
-    database_dsn = core_settings.database_dsn()
+    database_dsn = secrets["DATABASE_URL"]
+    redis_url = secrets["REDIS_URL"]
+
+    celery_broker_url = os.getenv("CELERY_BROKER_URL", redis_url)
+    celery_result_backend = os.getenv("CELERY_RESULT_BACKEND", redis_url)
 
     return Settings(
-        secret_key=os.getenv("SECRET_KEY", "change-me-in-production"),
-        jwt_secret_key=os.getenv("JWT_SECRET_KEY", "change-me-in-production"),
-        redis_password=os.getenv("REDIS_PASSWORD", "change-me-in-production"),
+        secret_key=secrets["SECRET_KEY"],
+        jwt_secret_key=secrets["JWT_SECRET_KEY"],
+        admin_bootstrap_password=secrets["ADMIN_BOOTSTRAP_PASSWORD"],
+        redis_password=_require_env("REDIS_PASSWORD", "Redis password"),
         database_url=database_dsn,
         db_url=database_dsn,
-        redis_url=core_settings.redis_url,
-        celery_broker_url=core_settings.broker_url(),
-        celery_result_backend=core_settings.result_backend(),
+        redis_url=redis_url,
+        celery_broker_url=celery_broker_url,
+        celery_result_backend=celery_result_backend,
         host=os.getenv("HOST", "0.0.0.0"),
         port=int(os.getenv("PORT", "8001")),
         log_level=os.getenv("LOG_LEVEL", "INFO"),

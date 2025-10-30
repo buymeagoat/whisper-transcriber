@@ -6,14 +6,16 @@ services:
     image: redis:7-alpine
     container_name: whisper-redis
     restart: unless-stopped
+    env_file:
+      - .env
     expose:
       - "6379"
     volumes:
       - redis_data:/data
     command: >
-      redis-server 
-      --appendonly yes 
-      --requirepass ${REDIS_PASSWORD}
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD:?Missing REDIS_PASSWORD for redis container}
       --maxmemory 256mb
       --maxmemory-policy allkeys-lru
     security_opt:
@@ -28,20 +30,16 @@ services:
 
   # Main application
   app:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     container_name: whisper-app
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "8001:8001"
     environment:
-      - SECRET_KEY=${SECRET_KEY}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
-      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
-      - DATABASE_URL=sqlite:///app/data/app.db
       - WHISPER_MODEL_DIR=/app/models
       - LOG_LEVEL=INFO
       - ENVIRONMENT=production
@@ -68,19 +66,15 @@ services:
 
   # Celery worker
   worker:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     container_name: whisper-worker
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       - SERVICE_TYPE=worker
-      - SECRET_KEY=${SECRET_KEY}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
-      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
-      - DATABASE_URL=sqlite:///app/data/app.db
       - WHISPER_MODEL_DIR=/app/models
       - LOG_LEVEL=INFO
       - WORKER_CONCURRENCY=1

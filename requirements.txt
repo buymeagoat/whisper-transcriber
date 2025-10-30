@@ -49,6 +49,7 @@ tomli>=2.0.0  # TOML parsing for Python < 3.11
 
 # --- System Monitoring ---
 psutil>=5.9.0
+prometheus-client>=0.20.0
 
 # --- Testing ---
 pytest>=7.4.0

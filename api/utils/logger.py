@@ -1,12 +1,16 @@
-"""
-System logger utility for the Whisper Transcriber API.
-"""
+"""System logger utility for the Whisper Transcriber API."""
 
+from __future__ import annotations
+
+import json
 import logging
 import os
 import sys
+from contextvars import ContextVar, Token
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
+from uuid import uuid4
 
 
 SENSITIVE_ENV_VARS = (
@@ -18,6 +22,33 @@ SENSITIVE_ENV_VARS = (
     "ADMIN_BOOTSTRAP_PASSWORD",
     "ADMIN_METRICS_TOKEN",
 )
+
+LOG_RECORD_BUILTINS = {
+    "name",
+    "msg",
+    "args",
+    "levelname",
+    "levelno",
+    "pathname",
+    "filename",
+    "module",
+    "exc_info",
+    "exc_text",
+    "stack_info",
+    "lineno",
+    "funcName",
+    "created",
+    "msecs",
+    "relativeCreated",
+    "thread",
+    "threadName",
+    "processName",
+    "process",
+    "message",
+    "request_id",
+}
+
+_request_id_ctx: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
 
 
 class EnvironmentSecretRedactor(logging.Filter):
@@ -41,59 +72,137 @@ class EnvironmentSecretRedactor(logging.Filter):
 
         return True
 
+
+class RequestIdFilter(logging.Filter):
+    """Attach the active request identifier to log records."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        context_request_id = _request_id_ctx.get()
+        if getattr(record, "request_id", None) is None:
+            record.request_id = context_request_id
+        return True
+
+
+class JsonLogFormatter(logging.Formatter):
+    """Formatter that outputs structured JSON log lines."""
+
+    def format(self, record: logging.LogRecord) -> str:  # noqa: D401
+        log_record: Dict[str, Any] = {
+            "timestamp": datetime.utcfromtimestamp(record.created).isoformat() + "Z",
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+            "request_id": getattr(record, "request_id", None),
+            "module": record.module,
+            "function": record.funcName,
+            "line": record.lineno,
+            "process_id": record.process,
+            "thread_id": record.thread,
+        }
+
+        if record.exc_info:
+            log_record["exception"] = self.formatException(record.exc_info)
+        if record.stack_info:
+            log_record["stack"] = self.formatStack(record.stack_info)
+
+        extra = {
+            key: value
+            for key, value in record.__dict__.items()
+            if key not in LOG_RECORD_BUILTINS and not key.startswith("_")
+        }
+        if extra:
+            log_record["extra"] = extra
+
+        return json.dumps({k: v for k, v in log_record.items() if v is not None})
+
+
+def bind_request_id(request_id: Optional[str]) -> Optional[Token]:
+    """Bind a request identifier to the logging context."""
+
+    if request_id is None:
+        return _request_id_ctx.set(None)
+    return _request_id_ctx.set(request_id)
+
+
+def release_request_id(token: Optional[Token]) -> None:
+    """Release a bound request identifier from the logging context."""
+
+    if token is not None:
+        _request_id_ctx.reset(token)
+    else:  # pragma: no cover - defensive guard
+        _request_id_ctx.set(None)
+
+
+def get_request_id() -> Optional[str]:
+    """Return the active request identifier, if any."""
+
+    return _request_id_ctx.get()
+
+
+def generate_request_id() -> str:
+    """Generate a unique request identifier suitable for tracing."""
+
+    return uuid4().hex
+
+
 def get_system_logger(name: str = "whisper_api", level: Optional[str] = None) -> logging.Logger:
-    """
-    Get a configured system logger.
-    
-    Args:
-        name: Logger name
-        level: Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-    
-    Returns:
-        Configured logger instance
-    """
+    """Get a configured system logger."""
+
     logger = logging.getLogger(name)
-    
-    # Avoid adding handlers multiple times
+
     if logger.handlers:
         return logger
-    
-    # Set log level
+
     log_level = level or os.getenv("LOG_LEVEL", "INFO")
     logger.setLevel(getattr(logging, log_level.upper(), logging.INFO))
-    
-    # Create formatter
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
+    logger.propagate = False
 
-    # Prepare redaction filter once so all handlers share the same rules
+    formatter = JsonLogFormatter()
     redactor = EnvironmentSecretRedactor({key: os.getenv(key, "") for key in SENSITIVE_ENV_VARS})
+    request_filter = RequestIdFilter()
 
-    # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     console_handler.addFilter(redactor)
+    console_handler.addFilter(request_filter)
     logger.addHandler(console_handler)
 
-    # File handler (if logs directory exists)
     logs_dir = Path("logs")
     if logs_dir.exists():
         file_handler = logging.FileHandler(logs_dir / "api.log")
         file_handler.setFormatter(formatter)
         file_handler.addFilter(redactor)
+        file_handler.addFilter(request_filter)
         logger.addHandler(file_handler)
 
     return logger
 
+
 def get_backend_logger(name: str = "whisper_backend") -> logging.Logger:
     """Get a logger for backend processes."""
+
     return get_system_logger(name)
+
 
 def get_app_logger(name: str = "whisper_app") -> logging.Logger:
     """Get a logger for application-level events."""
+
     return get_system_logger(name)
+
 
 def get_logger(name: str = "whisper_api") -> logging.Logger:
     """Alias for get_system_logger for backward compatibility."""
+
     return get_system_logger(name)
+
+
+__all__ = [
+    "get_system_logger",
+    "get_backend_logger",
+    "get_app_logger",
+    "get_logger",
+    "bind_request_id",
+    "release_request_id",
+    "get_request_id",
+    "generate_request_id",
+]

@@ -22,6 +22,7 @@ from api.routes import audio_processing  # T035 Audio Processing Pipeline routes
 from api.routes import search  # T021 Transcript Search functionality
 from api.routes import export  # T022 Multi-Format Export System
 from api.routes import batch_upload  # T020 Batch Upload capabilities
+from api.routes import health
 from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
 from api.app_state import backend_log
 
@@ -58,6 +59,7 @@ def register_routes(app: FastAPI) -> None:
     app.include_router(logs.router)
     app.include_router(progress.router)
     app.include_router(metrics.router)
+    app.include_router(health.router)
     app.include_router(auth.router)
     app.include_router(auth.api_router)  # Add API-prefixed auth routes
     app.include_router(auth.direct_api_router)  # Add direct API routes for /api/register

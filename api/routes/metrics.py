@@ -5,7 +5,8 @@ from __future__ import annotations
 import asyncio
 import os
 import time
-from typing import Any, Dict
+from collections import deque
+from typing import Any, Deque, Dict, List, Tuple
 
 import psutil
 from fastapi import APIRouter
@@ -19,6 +20,9 @@ from prometheus_client import (  # type: ignore
 )
 
 from api.services.redis_cache import get_cache_service
+from api.orm_bootstrap import SessionLocal
+from api.models import Job, JobStatusEnum
+from sqlalchemy import func
 
 router = APIRouter(prefix="/metrics", tags=["metrics"])
 
@@ -66,6 +70,33 @@ LAST_SCRAPE_TIME = Gauge(
     "Unix timestamp when metrics were last collected",
 )
 
+# ─── Job Queue Metrics ───────────────────────────────────────────────────────
+JOB_STATUS_COUNT = Gauge(
+    "whisper_jobs_total",
+    "Number of transcription jobs by status",
+    ["status"],
+)
+
+JOB_QUEUE_DEPTH = Gauge(
+    "whisper_job_queue_depth",
+    "Number of transcription jobs waiting to be processed",
+)
+
+JOB_DURATION_SECONDS = Histogram(
+    "whisper_job_duration_seconds",
+    "Distribution of Whisper job processing durations",
+    buckets=(30, 60, 120, 300, 600, 900, 1800, 3600),
+)
+
+WORKER_FAILURE_COUNT = Gauge(
+    "whisper_worker_failures",
+    "Number of jobs currently flagged as worker failures by failure status",
+    ["status"],
+)
+
+_OBSERVED_JOBS: Deque[str] = deque(maxlen=2048)
+_OBSERVED_JOB_SET: set[str] = set()
+
 
 def record_http_request(method: str, endpoint: str, status_code: int, duration_seconds: float) -> None:
     """Record a completed HTTP request for RED metrics."""
@@ -108,6 +139,7 @@ async def _update_system_metrics() -> None:
         RESOURCE_ERRORS.labels(resource="disk", kind="collection").inc()
 
     await _update_redis_metrics()
+    await _update_job_metrics()
     LAST_SCRAPE_TIME.set(time.time())
 
 
@@ -140,6 +172,73 @@ async def _update_redis_metrics() -> None:
             RESOURCE_SATURATION.labels(resource="redis_connections").set(0.0)
     except Exception:  # pragma: no cover - defensive guard
         RESOURCE_ERRORS.labels(resource="redis", kind="collection").inc()
+
+
+def _remember_job(job_id: str) -> bool:
+    """Return True if job_id has not yet been observed for duration metrics."""
+
+    if job_id in _OBSERVED_JOB_SET:
+        return False
+
+    if len(_OBSERVED_JOBS) == _OBSERVED_JOBS.maxlen:
+        oldest = _OBSERVED_JOBS.popleft()
+        _OBSERVED_JOB_SET.discard(oldest)
+
+    _OBSERVED_JOBS.append(job_id)
+    _OBSERVED_JOB_SET.add(job_id)
+    return True
+
+
+async def _update_job_metrics() -> None:
+    """Collect job queue metrics from the database."""
+
+    def _collect() -> Tuple[Dict[str, int], List[Tuple[str, float]]]:
+        with SessionLocal() as session:
+            status_rows = (
+                session.query(Job.status, func.count(Job.id))
+                .group_by(Job.status)
+                .all()
+            )
+            status_counts = {
+                (status.value if isinstance(status, JobStatusEnum) else str(status)): int(count)
+                for status, count in status_rows
+            }
+
+            duration_rows = (
+                session.query(Job.id, Job.started_at, Job.finished_at)
+                .filter(Job.started_at.isnot(None), Job.finished_at.isnot(None))
+                .order_by(Job.finished_at.desc())
+                .limit(512)
+            )
+
+            durations: List[Tuple[str, float]] = []
+            for job_id, started_at, finished_at in duration_rows:
+                assert started_at is not None and finished_at is not None
+                duration = max((finished_at - started_at).total_seconds(), 0.0)
+                durations.append((job_id, duration))
+
+            return status_counts, durations
+
+    try:
+        status_counts, durations = await asyncio.to_thread(_collect)
+    except Exception:  # pragma: no cover - defensive guard
+        return
+
+    for status in JobStatusEnum:
+        count = status_counts.get(status.value, 0)
+        JOB_STATUS_COUNT.labels(status=status.value).set(count)
+
+    queued = status_counts.get(JobStatusEnum.QUEUED.value, 0)
+    JOB_QUEUE_DEPTH.set(queued)
+
+    failure_statuses = [s for s in JobStatusEnum if s.value.startswith("failed")]
+    for status in failure_statuses:
+        count = status_counts.get(status.value, 0)
+        WORKER_FAILURE_COUNT.labels(status=status.value).set(count)
+
+    for job_id, duration in durations:
+        if _remember_job(job_id):
+            JOB_DURATION_SECONDS.observe(duration)
 
 
 @router.get("/")

@@ -46,9 +46,13 @@ LOG_RECORD_BUILTINS = {
     "process",
     "message",
     "request_id",
+    "job_id",
+    "latency_ms",
 }
 
 _request_id_ctx: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
+_job_id_ctx: ContextVar[Optional[str]] = ContextVar("job_id", default=None)
+_latency_ctx: ContextVar[Optional[float]] = ContextVar("latency_ms", default=None)
 
 
 class EnvironmentSecretRedactor(logging.Filter):
@@ -74,12 +78,18 @@ class EnvironmentSecretRedactor(logging.Filter):
 
 
 class RequestIdFilter(logging.Filter):
-    """Attach the active request identifier to log records."""
+    """Attach contextual identifiers to log records."""
 
     def filter(self, record: logging.LogRecord) -> bool:
         context_request_id = _request_id_ctx.get()
         if getattr(record, "request_id", None) is None:
             record.request_id = context_request_id
+        context_job_id = _job_id_ctx.get()
+        if getattr(record, "job_id", None) is None:
+            record.job_id = context_job_id
+        context_latency = _latency_ctx.get()
+        if getattr(record, "latency_ms", None) is None:
+            record.latency_ms = context_latency
         return True
 
 
@@ -93,6 +103,8 @@ class JsonLogFormatter(logging.Formatter):
             "logger": record.name,
             "message": record.getMessage(),
             "request_id": getattr(record, "request_id", None),
+            "job_id": getattr(record, "job_id", None),
+            "latency_ms": getattr(record, "latency_ms", None),
             "module": record.module,
             "function": record.funcName,
             "line": record.lineno,
@@ -143,6 +155,48 @@ def generate_request_id() -> str:
     """Generate a unique request identifier suitable for tracing."""
 
     return uuid4().hex
+
+
+def bind_job_id(job_id: Optional[str]) -> Optional[Token]:
+    """Bind a job identifier to the logging context."""
+
+    return _job_id_ctx.set(job_id)
+
+
+def release_job_id(token: Optional[Token]) -> None:
+    """Release a bound job identifier from the logging context."""
+
+    if token is not None:
+        _job_id_ctx.reset(token)
+    else:  # pragma: no cover - defensive guard
+        _job_id_ctx.set(None)
+
+
+def get_job_id() -> Optional[str]:
+    """Return the active job identifier, if any."""
+
+    return _job_id_ctx.get()
+
+
+def bind_latency(latency_ms: Optional[float]) -> Optional[Token]:
+    """Bind a latency measurement (in milliseconds) to the logging context."""
+
+    return _latency_ctx.set(latency_ms)
+
+
+def release_latency(token: Optional[Token]) -> None:
+    """Release a bound latency measurement from the logging context."""
+
+    if token is not None:
+        _latency_ctx.reset(token)
+    else:  # pragma: no cover - defensive guard
+        _latency_ctx.set(None)
+
+
+def get_latency() -> Optional[float]:
+    """Return the active latency measurement, if any."""
+
+    return _latency_ctx.get()
 
 
 def get_system_logger(name: str = "whisper_api", level: Optional[str] = None) -> logging.Logger:
@@ -205,4 +259,10 @@ __all__ = [
     "release_request_id",
     "get_request_id",
     "generate_request_id",
+    "bind_job_id",
+    "release_job_id",
+    "get_job_id",
+    "bind_latency",
+    "release_latency",
+    "get_latency",
 ]

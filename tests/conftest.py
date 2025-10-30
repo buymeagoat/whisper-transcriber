@@ -1,63 +1,167 @@
-"""Pytest configuration for API smoke tests."""
+"""Pytest configuration for asynchronous API integration tests."""
 
+from __future__ import annotations
+
+import asyncio
 import os
+import shutil
+import tempfile
+from contextlib import suppress
+from importlib import reload
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Callable, Dict, Optional
 
 import pytest
+import pytest_asyncio
+from contextlib import AsyncExitStack
 
-# ── Deterministic environment configuration ───────────────────────────────────
-TEST_DB_PATH = Path("test_whisper.db")
-if TEST_DB_PATH.exists():
-    TEST_DB_PATH.unlink()
+from httpx import ASGITransport, AsyncClient
 
+# ── Ephemeral filesystem layout ─────────────────────────────────────────────────
+TEST_ROOT = Path(tempfile.mkdtemp(prefix="whisper-tests-"))
+TEST_DB_PATH = TEST_ROOT / "test.db"
+UPLOAD_DIR = TEST_ROOT / "uploads"
+TRANSCRIPTS_DIR = TEST_ROOT / "transcripts"
+CACHE_DIR = TEST_ROOT / "cache"
+MODELS_DIR = TEST_ROOT / "models"
+LOGS_DIR = TEST_ROOT / "logs"
+
+for directory in (UPLOAD_DIR, TRANSCRIPTS_DIR, CACHE_DIR, MODELS_DIR, LOGS_DIR):
+    directory.mkdir(parents=True, exist_ok=True)
+
+# ── Deterministic environment configuration ─────────────────────────────────────
 os.environ.setdefault("SECRET_KEY", "unit-test-secret-key-should-be-long-and-randomized-1234567890")
 os.environ.setdefault("JWT_SECRET_KEY", "unit-test-jwt-secret-key-that-is-also-long-0987654321")
 os.environ.setdefault("REDIS_PASSWORD", "unit-test-redis-password")
 os.environ.setdefault("ADMIN_BOOTSTRAP_PASSWORD", "super-secure-test-password-!123")
 os.environ.setdefault("DATABASE_URL", f"sqlite:///{TEST_DB_PATH}")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
+os.environ.setdefault("CELERY_BROKER_URL", "memory://")
+os.environ.setdefault("CELERY_RESULT_BACKEND", "cache+memory://")
 
+# Settings must be configured after environment variables are in place.
 import api.settings as settings_module  # noqa: E402
 
-settings = settings_module.settings
-from api.paths import storage  # noqa: E402
-from api.middlewares.session_security import session_security  # noqa: E402
+settings = settings_module.settings.model_copy(
+    update={
+        "debug": True,
+        "cors_origins": "http://localhost,http://testserver",
+        "vite_api_host": "http://localhost:8001",
+        "database_url": os.environ["DATABASE_URL"],
+        "db_url": os.environ["DATABASE_URL"],
+        "redis_url": os.environ["REDIS_URL"],
+        "celery_broker_url": os.environ["CELERY_BROKER_URL"],
+        "celery_result_backend": os.environ["CELERY_RESULT_BACKEND"],
+        "upload_dir": UPLOAD_DIR,
+        "transcripts_dir": TRANSCRIPTS_DIR,
+        "cache_dir": CACHE_DIR,
+        "models_dir": MODELS_DIR,
+    }
+)
+settings_module.settings = settings
 
-# Enable debug mode for relaxed local security checks during tests.
-settings.debug = True
-settings.cors_origins = "http://localhost,http://testserver"
-if "vite_api_host" not in settings.model_fields_set:
-    settings = settings.model_copy(update={"vite_api_host": "http://localhost:8001"})
-    settings_module.settings = settings
+# Reload path helpers so they pick up the updated settings.
+import api.paths as paths_module  # noqa: E402
 
-# Ensure runtime directories exist for tests.
+paths_module = reload(paths_module)
+storage = paths_module.storage
 storage.ensure_directories()
 
-# Align session security cookie settings with debug mode overrides.
+# Align session security with relaxed local settings.
+from api.middlewares.session_security import session_security  # noqa: E402
+
 session_security.cookie_config["secure"] = False
 session_security.refresh_cookie_config["secure"] = False
 session_security.cookie_config["samesite"] = "lax"
 session_security.refresh_cookie_config["samesite"] = "lax"
 
+# Re-initialise ORM so that the engine points to the temporary database.
+import api.orm_bootstrap as orm_bootstrap_module  # noqa: E402
+
+orm_bootstrap = reload(orm_bootstrap_module)
+import api.security.audit_models as audit_models  # noqa: E402
+import api.models as models_module  # noqa: E402
+
+reload(audit_models)
+reload(models_module)
+orm_bootstrap.validate_or_initialize_database()
+
 
 @pytest.fixture(scope="session", autouse=True)
-def cleanup_test_db() -> None:
-    """Remove the temporary SQLite database after the test session."""
+def cleanup_test_artifacts() -> None:
+    """Remove the ephemeral database and storage directories after the test run."""
+
     yield
-    if TEST_DB_PATH.exists():
+    with suppress(FileNotFoundError):
         TEST_DB_PATH.unlink()
+    shutil.rmtree(TEST_ROOT, ignore_errors=True)
 
 
 @pytest.fixture(scope="session")
-def client() -> "TestClient":
-    """Provide a FastAPI test client with application lifespan events."""
-    from fastapi.testclient import TestClient
-    from api.main import app
+def event_loop():
+    """Provide a dedicated asyncio event loop for the entire test session."""
 
-    with TestClient(app) as test_client:
-        yield test_client
+    loop = asyncio.new_event_loop()
+    yield loop
+    loop.run_until_complete(loop.shutdown_asyncgens())
+    loop.close()
+
+
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def fakeredis_server():
+    """Back Redis integrations with an in-memory fakeredis instance."""
+
+    import fakeredis.aioredis as fredis
+    import redis.asyncio as redis_async
+
+    fake_server = fredis.FakeServer()
+
+    def _create_client() -> fredis.FakeRedis:
+        client = fredis.FakeRedis(server=fake_server, decode_responses=True)
+
+        async def _config_set(*args, **kwargs):  # type: ignore[override]
+            return True
+
+        client.config_set = _config_set  # type: ignore[assignment]
+        return client
+
+    patcher = pytest.MonkeyPatch()
+    patcher.setattr(redis_async, "from_url", lambda *args, **kwargs: _create_client())
+    patcher.setattr(redis_async, "Redis", fredis.FakeRedis)
+
+    yield
+
+    client = fredis.FakeRedis(server=fake_server, decode_responses=True)
+    await client.flushall()
+    await client.close()
+    patcher.undo()
+
+
+@pytest.fixture(scope="session")
+def app():
+    """Import the FastAPI application once for all tests."""
+
+    from api.main import app as fastapi_app
+
+    return fastapi_app
+
+
+@pytest_asyncio.fixture
+async def async_client(app):
+    """Provide an HTTPX asynchronous client wired to the FastAPI app."""
+
+    transport = ASGITransport(app=app)
+    async with AsyncExitStack() as stack:
+        lifespan_cm = app.router.lifespan_context
+        if lifespan_cm is not None:
+            await stack.enter_async_context(lifespan_cm(app))
+        else:
+            await app.router.startup()
+            stack.push_async_callback(app.router.shutdown)
+        client = AsyncClient(transport=transport, base_url="http://testserver")
+        await stack.enter_async_context(client)
+        yield client
 
 
 @pytest.fixture
@@ -79,10 +183,11 @@ def security_headers() -> Callable[[Optional[str], bool], Dict[str, str]]:
     return _build
 
 
-@pytest.fixture
-def admin_token(client, security_headers) -> str:
+@pytest_asyncio.fixture
+async def admin_token(async_client: AsyncClient, security_headers) -> str:
     """Authenticate using the bootstrap admin credentials and return the JWT."""
-    response = client.post(
+
+    response = await async_client.post(
         "/auth/login",
         json={"username": "admin", "password": os.environ["ADMIN_BOOTSTRAP_PASSWORD"]},
         headers=security_headers(include_placeholder_auth=True),
@@ -92,14 +197,13 @@ def admin_token(client, security_headers) -> str:
     return payload["access_token"]
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def stub_job_queue(monkeypatch):
-    """Stub the in-process job queue to avoid heavy background work."""
-    import api.routes.jobs as jobs_routes
+    """Stub the Celery-backed job queue to avoid hitting a real broker."""
 
     class StubQueue:
         def __init__(self):
-            self.submitted = []
+            self.submitted: list[Dict[str, object]] = []
             self.jobs: Dict[str, SimpleNamespace] = {}
 
         def submit_job(self, task_name: str, **kwargs) -> str:
@@ -113,6 +217,11 @@ def stub_job_queue(monkeypatch):
             return self.jobs.get(job_id)
 
     stub = StubQueue()
-    monkeypatch.setattr(jobs_routes, "job_queue", stub)
-    yield stub
+    import importlib
 
+    job_queue_module = importlib.import_module("api.services.job_queue")
+    jobs_routes = importlib.import_module("api.routes.jobs")
+
+    monkeypatch.setattr(job_queue_module, "job_queue", stub, raising=False)
+    monkeypatch.setattr(jobs_routes, "job_queue", stub, raising=False)
+    return stub

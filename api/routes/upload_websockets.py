@@ -30,8 +30,7 @@ async def get_user_id_from_websocket(websocket: WebSocket) -> str:
     if user_id:
         return user_id
     
-    # Default for development
-    return "default-user"
+    raise HTTPException(status_code=401, detail="Missing user identity for WebSocket connection")
 
 
 @router.websocket("/{session_id}/progress")

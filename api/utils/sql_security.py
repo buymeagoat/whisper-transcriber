@@ -57,7 +57,7 @@ def quote_identifier(identifier: str) -> str:
         The quoted identifier
     """
     # Remove any existing quotes and validate the identifier
-    clean_identifier = identifier.strip('"'`')
+    clean_identifier = identifier.strip("\"`'")
     
     # Check for valid identifier characters (alphanumeric, underscore)
     if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', clean_identifier):

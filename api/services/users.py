@@ -2,6 +2,7 @@
 User management services for the Whisper Transcriber API.
 """
 
+import os
 from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException, status
@@ -38,16 +39,19 @@ def ensure_default_admin():
         admin_user = db.query(User).filter(User.username == "admin").first()
         
         if not admin_user:
-            # Create default admin user with simple password for development
+            admin_password = os.getenv("ADMIN_BOOTSTRAP_PASSWORD")
+            if not admin_password:
+                logger.error("ADMIN_BOOTSTRAP_PASSWORD is required to create the default admin user")
+                return
             admin_user = User(
                 username="admin",
-                hashed_password=hash_password("admin123"),  # Simple default password
+                hashed_password=hash_password(admin_password),
                 role="admin",
                 must_change_password=True
             )
             db.add(admin_user)
             db.commit()
-            logger.info("Created default admin user (username: admin, password: admin123)")
+            logger.info("Created default admin user with password supplied via ADMIN_BOOTSTRAP_PASSWORD")
         else:
             logger.info("Admin user already exists")
         

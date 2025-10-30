@@ -33,39 +33,40 @@ log_step() {
 }
 
 log_step "ENVIRONMENT"
-echo "Container entrypoint starting with environment:" >&2
-env | sort >&2
+echo "Container entrypoint starting (environment variables redacted)" >&2
 
 # If this container is running a worker, wait for the broker to be ready
-if [ "${SERVICE_TYPE:-api}" = "worker" ]; then
+if [ "${SERVICE_TYPE:-app}" = "worker" ]; then
     if [ ! -f /app/api/worker.py ]; then
         echo "ERROR: /app/api/worker.py not found" >&2
         exit 1
     fi
-    broker_host="${CELERY_BROKER_HOST:-broker}"
-    broker_port="${CELERY_BROKER_PORT:-5672}"
+    broker_url="${REDIS_URL:-redis://redis:6379/0}"
     max_wait=${BROKER_PING_TIMEOUT:-60}
     log_step "WAIT FOR BROKER"
-    echo "Waiting for RabbitMQ at ${broker_host}:${broker_port}..."
-    BROKER_HOST="$broker_host" BROKER_PORT="$broker_port" TIMEOUT="$max_wait" \
+    BROKER_URL="$broker_url" TIMEOUT="$max_wait" \
     python - <<'PY'
-import os, socket, sys, time
+import os
+import socket
+import sys
+import time
+from urllib.parse import urlparse
 
-host = os.environ["BROKER_HOST"]
-port = int(os.environ["BROKER_PORT"])
+url = urlparse(os.environ["BROKER_URL"])
+host = url.hostname or "redis"
+port = url.port or 6379
 timeout = int(os.environ["TIMEOUT"])
 start = time.time()
+
 while True:
     try:
         with socket.create_connection((host, port), timeout=1):
             break
     except OSError:
-        print("waiting...", flush=True)
         if time.time() - start >= timeout:
             print(f"Broker unreachable after {timeout}s", file=sys.stderr)
             sys.exit(1)
         time.sleep(1)
-print("Broker is available. Starting worker.")
 PY
 fi
 log_step "START"

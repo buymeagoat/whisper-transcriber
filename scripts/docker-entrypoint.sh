@@ -5,6 +5,60 @@ IFS=$'\n\t'
 
 # Security: Define secure logging and directory creation
 LOG_FILE="/app/logs/entrypoint.log"
+BUILD_INFO_FILE="/etc/whisper-build.info"
+
+# Logging function for security audit trail
+log_step() {
+    echo "$(date -u +"%Y-%m-%d %H:%M:%S UTC") [ENTRYPOINT] $1"
+}
+
+validate_build_metadata() {
+    if [ ! -s "$BUILD_INFO_FILE" ]; then
+        cat >&2 <<'EOM'
+ERROR: Required Docker build metadata missing.
+Rebuild the image with build arguments for BUILD_VERSION, BUILD_SHA, and BUILD_DATE.
+EOM
+        exit 1
+    fi
+
+    declare -A build_meta=()
+    while IFS='=' read -r key value; do
+        if [ -n "${key:-}" ]; then
+            build_meta["$key"]="${value:-}"
+        fi
+    done < "$BUILD_INFO_FILE"
+
+    local required_keys=(BUILD_VERSION BUILD_SHA BUILD_DATE)
+    for key in "${required_keys[@]}"; do
+        if [ -z "${build_meta[$key]:-}" ]; then
+            echo "ERROR: Docker image missing $key metadata." >&2
+            exit 1
+        fi
+    done
+
+    if [ "${build_meta[BUILD_SHA]}" = "unknown" ] || [ "${build_meta[BUILD_DATE]}" = "unknown" ]; then
+        local suggest_sha
+        local suggest_date
+        suggest_sha=$(git rev-parse HEAD 2>/dev/null || echo '<commit>')
+        suggest_date=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo '<timestamp>')
+        log_step "BUILD WARNING"
+        cat >&2 <<EOM
+WARNING: Docker image built without full metadata.
+Rebuild with:
+  docker build \
+    --build-arg BUILD_SHA=${suggest_sha} \
+    --build-arg BUILD_DATE=${suggest_date} \
+    --build-arg BUILD_VERSION=<version> \
+    -t whisper-transcriber:latest .
+EOM
+    fi
+
+    log_step "BUILD METADATA"
+    echo "Using build metadata from $BUILD_INFO_FILE" >&2
+    while IFS= read -r line; do
+        echo "$line" >&2
+    done < "$BUILD_INFO_FILE"
+}
 
 # Security: Create required directories with proper permissions (non-root safe)
 mkdir -p /app/storage/uploads /app/storage/transcripts /app/logs /app/data
@@ -27,10 +81,7 @@ fi
 # Security: Set up secure logging with log rotation consideration
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-# Logging function for security audit trail
-log_step() {
-    echo "$(date -u +"%Y-%m-%d %H:%M:%S UTC") [ENTRYPOINT] $1"
-}
+validate_build_metadata
 
 log_step "ENVIRONMENT"
 echo "Container entrypoint starting (environment variables redacted)" >&2

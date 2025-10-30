@@ -1,127 +1,122 @@
 # syntax=docker/dockerfile:1.7
-# Multi-stage build: Stage 1 - Build Frontend
-FROM node:18-alpine AS frontend-builder
 
-# Set working directory for frontend
+########################
+# Frontend build stage #
+########################
+FROM node:18-alpine@sha256:8d6421d663b4c28fd3ebc498332f249011d118945588d0a35cb9bc4b8ca09d9e AS frontend-builder
+
 WORKDIR /frontend
 
-# Copy frontend dependency files
-COPY frontend/package*.json ./
+# Copy only the files required for dependency resolution first
+COPY frontend/package.json frontend/package-lock.json ./
 
-# Install Node.js dependencies with clean slate
-RUN npm ci --production=false --silent
+RUN npm ci --silent
 
-# Copy frontend source code
+# Copy the remainder of the frontend source and build
 COPY frontend/ ./
-
-# Build the frontend for production
 RUN npm run build
 
-# Verify build output exists
-RUN ls -la dist/ && echo "Frontend build completed"
+######################
+# Python deps stage  #
+######################
+FROM python:3.11-slim-bookworm@sha256:e5b49052cdc5d8223d037a718e3cecd4169f41701e03d0baf5c994bf19522bf4 AS python-builder
 
-# Multi-stage build: Stage 2 - Build Backend
-FROM python:3.11-slim-bookworm AS backend-builder
-
-# Security: Create non-root user early to establish proper ownership
-RUN groupadd -r -g 1000 appuser && \
-    useradd -r -u 1000 -g appuser -m -d /home/appuser -s /sbin/nologin appuser
-
-# Install system dependencies needed for Python packages
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        build-essential \
-        curl \
-        ca-certificates \
-        ffmpeg \
-        && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-# Copy Python dependencies
-COPY requirements.txt ./
-
-# Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir -r requirements.txt
-
-# Multi-stage build: Stage 3 - Production Image
-FROM python:3.11-slim-bookworm AS production
-
-# Security: Create non-root user
-RUN groupadd -r -g 1000 appuser && \
-    useradd -r -u 1000 -g appuser -m -d /home/appuser -s /sbin/nologin appuser
-
-# Install runtime dependencies only
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        curl \
-        ca-certificates \
-        gosu \
-        && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
-
-# Security: Create secure application directory structure
-RUN mkdir -p /app /app/data /app/storage /app/storage/uploads /app/storage/transcripts /app/logs && \
-    chown -R appuser:appuser /app && \
-    chmod -R 750 /app
-
-WORKDIR /app
-
-# Security: Set secure Python environment variables
-ENV PYTHONPATH=/app \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
+ENV DEBIAN_FRONTEND=noninteractive \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Copy Python packages from builder stage
-COPY --from=backend-builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=backend-builder /usr/local/bin /usr/local/bin
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        ffmpeg \
+        libmagic1 \
+        && rm -rf /var/lib/apt/lists/*
 
-# Copy application code
+ENV VIRTUAL_ENV=/opt/venv
+RUN python -m venv "$VIRTUAL_ENV"
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+WORKDIR /tmp/build
+
+# Copy application Python dependency manifests only
+COPY requirements.txt ./
+
+# Install Python dependencies into the virtual environment
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install -r requirements.txt
+
+##################
+# Runtime stage  #
+##################
+FROM python:3.11-slim-bookworm@sha256:e5b49052cdc5d8223d037a718e3cecd4169f41701e03d0baf5c994bf19522bf4 AS production
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    VIRTUAL_ENV=/opt/venv \
+    PATH="/opt/venv/bin:$PATH"
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        ffmpeg \
+        gosu \
+        libmagic1 \
+        && rm -rf /var/lib/apt/lists/*
+
+ARG APP_UID=1000
+ARG APP_GID=1000
+RUN groupadd -r -g "$APP_GID" appuser && \
+    useradd -r -u "$APP_UID" -g appuser -m -d /home/appuser -s /usr/sbin/nologin appuser
+
+WORKDIR /app
+
+# Copy in the Python environment built in the previous stage
+COPY --from=python-builder /opt/venv /opt/venv
+
+# Copy backend application code
 COPY --chown=appuser:appuser api/ ./api/
 COPY --chown=appuser:appuser models/ ./models/
-COPY --chown=root:root alembic.ini ./
+COPY --chown=appuser:appuser alembic.ini ./
 
-# Copy built frontend from frontend-builder stage
+# Copy built frontend assets
 COPY --from=frontend-builder --chown=appuser:appuser /frontend/dist/ ./api/static/
 
-# Verify frontend files were copied
-RUN ls -la /app/api/static/ && echo "Frontend files copied successfully"
-
-# Copy and secure script files
+# Copy runtime scripts
 COPY --chown=root:root scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
 COPY --chown=root:root scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod 755 /usr/local/bin/healthcheck.sh /usr/local/bin/docker-entrypoint.sh
 
-# Security: Set final ownership and permissions for application files
-RUN chown -R appuser:appuser /app && \
+# Prepare directories required at runtime
+RUN mkdir -p /app/data /app/storage/uploads /app/storage/transcripts /app/logs && \
+    chown -R appuser:appuser /app && \
     find /app -type d -exec chmod 750 {} \; && \
     find /app -type f -exec chmod 640 {} \;
 
-# Security: Set service configuration with secure defaults
+ARG BUILD_VERSION=dev
+ARG BUILD_SHA=unknown
+ARG BUILD_DATE=unknown
+RUN printf 'BUILD_VERSION=%s\nBUILD_SHA=%s\nBUILD_DATE=%s\n' "$BUILD_VERSION" "$BUILD_SHA" "$BUILD_DATE" > /etc/whisper-build.info && \
+    chown appuser:appuser /etc/whisper-build.info && \
+    chmod 640 /etc/whisper-build.info
+
 ENV SERVICE_TYPE=app \
     VITE_API_HOST=http://localhost:8001
 
-# Security: Use non-privileged port
 EXPOSE 8001
 
-# Security: Switch to non-root user for all subsequent operations
 USER appuser
 
-# Security: Configure healthcheck with proper timeouts
 HEALTHCHECK --interval=5m --timeout=10s --start-period=30s --retries=3 \
     CMD /usr/local/bin/healthcheck.sh
 
-# Security: Use secure entrypoint and command
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["python", "-m", "api.main"]
 
-# Security: Add image metadata for security scanning
 LABEL maintainer="whisper-transcriber" \
-      description="Secure Whisper Transcriber Application" \
-      version="2.0.0" \
-      security.scan="enabled" \
       org.opencontainers.image.source="https://github.com/buymeagoat/whisper-transcriber" \
       org.opencontainers.image.title="Whisper Transcriber" \
       org.opencontainers.image.description="Secure containerized audio transcription service"

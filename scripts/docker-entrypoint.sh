@@ -125,32 +125,70 @@ if [ "${SERVICE_TYPE:-app}" = "worker" ]; then
         echo "ERROR: /app/api/worker.py not found" >&2
         exit 1
     fi
-    broker_url="${REDIS_URL:-redis://redis:6379/0}"
+    broker_url="${CELERY_BROKER_URL:-${REDIS_URL:-redis://redis:6379/0}}"
+    result_url="${CELERY_RESULT_BACKEND:-$broker_url}"
     max_wait=${BROKER_PING_TIMEOUT:-60}
     log_step "WAIT FOR BROKER"
-    BROKER_URL="$broker_url" TIMEOUT="$max_wait" \
+    BROKER_URL="$broker_url" RESULT_URL="$result_url" TIMEOUT="$max_wait" \
     python - <<'PY'
 import os
-import socket
 import sys
 import time
 from urllib.parse import urlparse
 
-url = urlparse(os.environ["BROKER_URL"])
-host = url.hostname or "redis"
-port = url.port or 6379
-timeout = int(os.environ["TIMEOUT"])
-start = time.time()
+try:
+    from redis import Redis
+except ImportError as exc:  # pragma: no cover - runtime safety
+    print(f"redis library missing: {exc}", file=sys.stderr)
+    sys.exit(1)
 
-while True:
-    try:
-        with socket.create_connection((host, port), timeout=1):
-            break
-    except OSError:
-        if time.time() - start >= timeout:
-            print(f"Broker unreachable after {timeout}s", file=sys.stderr)
-            sys.exit(1)
-        time.sleep(1)
+
+def build_params(url: str) -> dict:
+    parsed = urlparse(url)
+    if parsed.scheme not in {"redis", "rediss"}:
+        raise ValueError(f"Unsupported Redis scheme: {parsed.scheme}")
+    return {
+        "host": parsed.hostname or "redis",
+        "port": parsed.port or 6379,
+        "db": int(parsed.path.lstrip("/") or 0),
+        "username": parsed.username,
+        "password": parsed.password,
+        "ssl": parsed.scheme == "rediss",
+        "socket_connect_timeout": 5,
+    }
+
+
+def wait_for(url: str, timeout: int) -> None:
+    deadline = time.monotonic() + timeout
+    attempt = 0
+    params = build_params(url)
+    last_error = None
+
+    while time.monotonic() < deadline:
+        attempt += 1
+        try:
+            client = Redis(**params)
+            client.ping()
+            client.close()
+            print(f"Redis ready at {url} (attempt {attempt})")
+            return
+        except Exception as exc:  # pragma: no cover - network dependent
+            last_error = exc
+            sleep_for = min(2 ** (attempt - 1), 5)
+            print(
+                f"Redis not ready at {url} (attempt {attempt}): {exc}. Retrying in {sleep_for}s",
+                file=sys.stderr,
+            )
+            time.sleep(sleep_for)
+
+    raise RuntimeError(f"Redis not ready after {timeout}s: {last_error}")
+
+
+timeout = int(os.environ["TIMEOUT"])
+wait_for(os.environ["BROKER_URL"], timeout)
+result_url = os.environ.get("RESULT_URL")
+if result_url and result_url != os.environ["BROKER_URL"]:
+    wait_for(result_url, timeout)
 PY
 fi
 log_step "START"

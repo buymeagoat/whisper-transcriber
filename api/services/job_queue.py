@@ -7,7 +7,7 @@ from typing import Any, Optional
 from celery import Celery
 from celery.result import AsyncResult
 
-from api.utils.logger import get_backend_logger
+from api.utils.logger import get_backend_logger, bind_job_id, release_job_id
 from api.worker import celery_app
 
 
@@ -34,9 +34,13 @@ class CeleryJobQueue:
         qualified_name = _resolve_task_name(task_name)
         task = self._app.signature(qualified_name, kwargs=kwargs)
         task_id = kwargs.get("job_id")
-        result = task.apply_async(task_id=task_id)
-        LOGGER.info("Submitted Celery task %s as %s", qualified_name, result.id)
-        return result.id
+        context_token = bind_job_id(task_id)
+        try:
+            result = task.apply_async(task_id=task_id)
+            LOGGER.info("Submitted Celery task %s as %s", qualified_name, result.id)
+            return result.id
+        finally:
+            release_job_id(context_token)
 
     def get_job(self, task_id: str) -> Optional[AsyncResult]:
         """Return the Celery ``AsyncResult`` for ``task_id`` if available."""
@@ -58,9 +62,13 @@ class CeleryJobQueue:
         if not result:
             return False
 
-        result.revoke(terminate=True)
-        LOGGER.info("Revoked Celery task %s", task_id)
-        return True
+        token = bind_job_id(task_id)
+        try:
+            result.revoke(terminate=True)
+            LOGGER.info("Revoked Celery task %s", task_id)
+            return True
+        finally:
+            release_job_id(token)
 
 
 # Global job queue instance used throughout the application.

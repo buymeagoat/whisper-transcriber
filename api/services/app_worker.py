@@ -20,6 +20,7 @@ from api.models import Job, JobStatusEnum
 from api.orm_bootstrap import SessionLocal
 from api.paths import storage
 from api.worker import celery_app
+from api.utils.logger import bind_job_id, release_job_id
 
 
 LOGGER = get_task_logger(__name__)
@@ -54,6 +55,7 @@ def transcribe_audio(self, job_id: str, **kwargs: Any) -> Dict[str, Any]:  # pra
     """
 
     session = SessionLocal()
+    job_token = bind_job_id(job_id)
     job: Job | None = None
 
     try:
@@ -114,6 +116,7 @@ def transcribe_audio(self, job_id: str, **kwargs: Any) -> Dict[str, Any]:  # pra
 
     finally:
         session.close()
+        release_job_id(job_token)
 
 
 @celery_app.task(name="api.services.app_worker.health_check")

@@ -3,7 +3,6 @@ Access logging middleware for the Whisper Transcriber API.
 """
 
 import time
-import json
 from typing import Callable, Optional
 
 from fastapi import Request, Response
@@ -12,8 +11,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from api.routes.metrics import REQUESTS_IN_PROGRESS, record_http_request
 from api.utils.logger import (
     bind_request_id,
+    bind_latency,
     generate_request_id,
     get_system_logger,
+    release_latency,
     release_request_id,
 )
 
@@ -55,32 +56,33 @@ class AccessLogMiddleware(BaseHTTPMiddleware):
             REQUESTS_IN_PROGRESS.labels(endpoint=endpoint).dec()
 
             # Log access information
-            log_data = {
-                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(start_time)),
+            latency_ms = round(process_time * 1000, 2)
+            latency_token = bind_latency(latency_ms)
+
+            log_extra = {
                 "client_ip": client_ip,
                 "method": request.method,
                 "url": str(request.url),
                 "path": endpoint,
                 "query_params": dict(request.query_params),
                 "status_code": status_code,
-                "response_time_ms": round(process_time * 1000, 2),
+                "response_time_ms": latency_ms,
                 "user_agent": user_agent,
                 "content_length": response.headers.get("content-length", "0") if response else "0",
-                "request_id": request_id,
+                "authenticated": "authorization" in request.headers,
             }
-
-            # Add authentication info if available
-            if "authorization" in request.headers:
-                log_data["authenticated"] = True
 
             if response:
                 response.headers["X-Process-Time"] = str(process_time)
 
-            # Log the access
-            if status_code >= 400:
-                access_logger.warning(json.dumps(log_data))
-            else:
-                access_logger.info(json.dumps(log_data))
+            message = "HTTP request completed"
+            try:
+                if status_code >= 400:
+                    access_logger.warning(message, extra=log_extra)
+                else:
+                    access_logger.info(message, extra=log_extra)
+            finally:
+                release_latency(latency_token)
 
             record_http_request(request.method, endpoint, status_code, process_time)
             release_request_id(token)

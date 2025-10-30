@@ -101,7 +101,7 @@ services:
       - no-new-privileges:true
     command: celery -A api.worker worker --loglevel=info --concurrency=1
     healthcheck:
-      test: ["CMD", "celery", "-A", "api.worker", "inspect", "ping"]
+      test: ["CMD-SHELL", "celery -A api.worker call api.services.app_worker.smoke_transcription --args '[]'"]
       interval: 60s
       timeout: 30s
       retries: 3

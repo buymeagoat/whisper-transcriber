@@ -106,8 +106,8 @@ def stub_job_queue(monkeypatch):
             job_id = kwargs.get("job_id") or f"job-{len(self.submitted)}"
             record = {"task_name": task_name, "kwargs": kwargs, "job_id": job_id}
             self.submitted.append(record)
-            self.jobs[job_id] = SimpleNamespace(status=SimpleNamespace(value="pending"))
-            return f"queue-{job_id}"
+            self.jobs[job_id] = SimpleNamespace(state="PENDING")
+            return job_id
 
         def get_job(self, job_id: str) -> Optional[SimpleNamespace]:
             return self.jobs.get(job_id)

@@ -18,14 +18,12 @@ try:
     from api.paths import storage, UPLOAD_DIR, TRANSCRIPTS_DIR
     import api.app_state as app_state
     from api.app_state import (
-        handle_whisper,
         LOCAL_TZ,
         backend_log,
         start_cleanup_thread,
         stop_cleanup_thread,
         check_celery_connection,
     )
-    from api.services.job_queue import ThreadJobQueue
 
 
     from api.middlewares.api_cache import ApiCacheMiddleware, CacheConfig
@@ -110,7 +108,6 @@ from api.utils.model_validation import validate_models_dir
 from api.router_setup import register_routes
 from api.middlewares.access_log import AccessLogMiddleware
 from api.utils.db_lock import db_lock
-from functools import partial
 
 
 def log_startup_settings() -> None:
@@ -174,12 +171,11 @@ async def lifespan(app: FastAPI):
     # Initialize job queue
     try:
         from api.app_state import initialize_job_queue
+
         initialize_job_queue()
         system_log.info("Job queue initialized successfully")
     except Exception as e:
         system_log.warning(f"Failed to initialize job queue: {e}")
-        # Set a fallback job queue directly
-        app_state.app_state["job_queue"] = ThreadJobQueue()
 
     # Initialize enhanced database optimization for T025 Phase 3 - TEMPORARILY DISABLED
     try:
@@ -385,15 +381,13 @@ def rehydrate_incomplete_jobs():
         for job in jobs:
             backend_log.info(f"Rehydrating job {job.id} with model '{job.model}'")
             try:
-                upload_path = storage.get_upload_path(job.saved_filename)
-                job_dir = storage.get_transcript_dir(job.id)
-                app_state.app_state["job_queue"].enqueue(
-                    partial(
-                        handle_whisper,
-                        str(upload_path),
-                        model=job.model,
-                        job_id=job.id
-                    )
+                saved_path = Path(job.saved_filename)
+                audio_path = saved_path if saved_path.exists() else storage.get_upload_path(saved_path.name)
+                app_state.app_state["job_queue"].submit_job(
+                    "transcribe_audio",
+                    job_id=job.id,
+                    model=job.model,
+                    audio_path=str(audio_path),
                 )
             except Exception as e:
                 backend_log.error(f"Failed to rehydrate job {job.id}: {e}")

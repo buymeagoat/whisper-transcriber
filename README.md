@@ -47,6 +47,10 @@ docker build \
 The runtime container runs as a non-root user, exposes port 8001, and publishes a healthcheck at `/` via `scripts/healthcheck.sh`.
 The entrypoint (`scripts/docker-entrypoint.sh`) validates the build metadata file (`/etc/whisper-build.info`), failing fast if it is missing and issuing a warning when placeholder values are detected so you know to rebuild with the expected Docker build arguments.
 
+## Versioning
+
+We follow [Semantic Versioning](https://semver.org/) and document our release workflow, tagging conventions, and rollback guidance in [docs/releases.md](docs/releases.md).
+
 ## Configuration
 
 Required environment variables in `.env.production` (provision via a secrets manager):

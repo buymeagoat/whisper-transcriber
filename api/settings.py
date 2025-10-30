@@ -21,6 +21,7 @@ class Settings(BaseModel):
     # Server settings
     host: str = "0.0.0.0"
     port: int = 8001
+    vite_api_host: str = "http://localhost:8001"
 
     # Database settings
     database_url: str = Field(default="sqlite:///./whisper.db")
@@ -30,6 +31,10 @@ class Settings(BaseModel):
     secret_key: str = Field(...)
     jwt_secret_key: str = Field(...)
     redis_password: str = Field(...)
+
+    # Backend selection
+    job_queue_backend: str = "thread"
+    storage_backend: str = "filesystem"
 
     # Network settings
     allowed_hosts: List[str] = ["*"]

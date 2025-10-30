@@ -19,6 +19,18 @@ A production-ready audio transcription service using OpenAI Whisper.
    - Web Interface: http://localhost:8001
    - API Documentation: http://localhost:8001/docs
 
+## Testing
+
+The API includes deterministic smoke tests that exercise authentication, file uploads, the health endpoint, and job queue
+integration. Run the full suite with coverage locally using:
+
+```bash
+pytest
+```
+
+Pytest is configured (see `pytest.ini`) to fail when coverage for the API and tests drops below 25%. The CI workflow runs the
+same command on every push and pull request, so new changes must keep the smoke tests and coverage budget green.
+
 ## Deployment
 
 Build the production image with the multi-stage Dockerfile and provide build metadata so the entrypoint validation passes:

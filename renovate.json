@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "timezone": "UTC",
+  "schedule": ["after 8am and before 5pm on monday"],
+  "automerge": false,
+  "packageRules": [
+    {
+      "matchDatasources": ["pypi"],
+      "groupName": "python dependencies",
+      "separateMajorMinor": true
+    },
+    {
+      "matchDatasources": ["docker"],
+      "groupName": "container base images"
+    }
+  ]
+}

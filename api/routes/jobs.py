@@ -156,8 +156,8 @@ async def get_job(job_id: str, db: Session = Depends(get_db)):
         
         # Get queue status if available
         try:
-            queue_job = job_queue.get_job(job_id)
-            queue_status = queue_job.status.value if queue_job else None
+            queue_job = job_queue.get_job(job.id)
+            queue_status = queue_job.state.lower() if queue_job else None
         except Exception:
             queue_status = None
         

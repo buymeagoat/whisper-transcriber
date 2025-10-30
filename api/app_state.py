@@ -2,11 +2,13 @@
 Application state management for the Whisper Transcriber API.
 """
 
-import asyncio
 import threading
 import time
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any
+from typing import Dict, Any
+
+from celery.exceptions import CeleryError
+
 from api.utils.logger import get_backend_logger, get_app_logger
 
 # Loggers
@@ -25,10 +27,13 @@ app_state = {
 }
 
 def initialize_job_queue():
-    """Initialize the job queue."""
-    from api.services.job_queue import job_queue
-    app_state["job_queue"] = job_queue
-    return job_queue
+    """Initialize the Celery-backed job queue."""
+
+    from api.services.job_queue import CeleryJobQueue, job_queue as global_queue
+
+    queue = global_queue if isinstance(global_queue, CeleryJobQueue) else CeleryJobQueue()
+    app_state["job_queue"] = queue
+    return queue
 
 def handle_whisper(audio_file_path: str, **kwargs) -> Dict[str, Any]:
     """
@@ -107,19 +112,16 @@ def check_celery_connection() -> bool:
         True if Celery is connected, False otherwise
     """
     try:
-        from celery import Celery
-        from api.settings import settings
-        
-        if settings.celery_broker_url:
-            celery_app = Celery('whisper', broker=settings.celery_broker_url)
-            # Try to inspect active queues
-            inspect = celery_app.control.inspect()
-            inspect.active()
+        from api.worker import celery_app
+
+        with celery_app.connection_for_read():
             app_state["celery_connected"] = True
             return True
-    except Exception as e:
-        backend_log.debug(f"Celery not available: {e}")
-    
+    except CeleryError as exc:
+        backend_log.debug(f"Celery not available: {exc}")
+    except Exception as exc:  # pragma: no cover - defensive
+        backend_log.debug(f"Celery connection check failed: {exc}")
+
     app_state["celery_connected"] = False
     return False
 

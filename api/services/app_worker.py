@@ -1,180 +1,130 @@
-# Celery worker for background transcription processing
-# Integrates with the streamlined FastAPI application
+"""Celery tasks for handling background transcription jobs.
 
-import os
-import asyncio
-from celery import Celery
-from pathlib import Path
-import whisper
-import logging
+This module integrates with the shared Celery application defined in
+``api.worker`` and operates directly on the SQLAlchemy ``Job`` model.  The
+tasks here are intentionally lightweight: they mark job progress in the
+database, perform a very small stand-in "transcription" step so that the
+pipeline can be exercised in development and automated tests, and persist a
+log when failures occur.
+"""
+
+from __future__ import annotations
+
 from datetime import datetime
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from pathlib import Path
+from typing import Any, Dict
 
-# Import our models
-from .main import Job, Base, ConnectionManager
+from celery.utils.log import get_task_logger
 
-# Setup
-BASE_DIR = Path(__file__).parent.parent
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR}/app.db")
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-WHISPER_MODEL_DIR = os.getenv("WHISPER_MODEL_DIR", BASE_DIR / "models")
+from api.models import Job, JobStatusEnum
+from api.orm_bootstrap import SessionLocal
+from api.paths import storage
+from api.worker import celery_app
 
-# Database setup
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Celery setup
-celery_app = Celery("whisper_transcriber", broker=REDIS_URL, backend=REDIS_URL)
+LOGGER = get_task_logger(__name__)
 
-# Configure Celery
-celery_app.conf.update(
-    task_serializer="json",
-    accept_content=["json"],
-    result_serializer="json",
-    timezone="UTC",
-    enable_utc=True,
-    task_track_started=True,
-    task_time_limit=30 * 60,  # 30 minutes
-    task_soft_time_limit=25 * 60,  # 25 minutes
-    worker_prefetch_multiplier=1,
-    worker_max_tasks_per_child=10,
-)
 
-# Connection manager for WebSocket updates
-manager = ConnectionManager()
+def _ensure_transcript_directory(job_id: str) -> Path:
+    """Return the transcript directory for ``job_id`` ensuring it exists."""
 
-# Load Whisper models (lazy loading)
-_whisper_models = {}
+    transcript_dir = storage.get_transcript_dir(job_id)
+    transcript_dir.mkdir(parents=True, exist_ok=True)
+    return transcript_dir
 
-def get_whisper_model(model_name: str):
-    """Load and cache Whisper models"""
-    if model_name not in _whisper_models:
-        logging.info(f"Loading Whisper model: {model_name}")
-        _whisper_models[model_name] = whisper.load_model(model_name)
-    return _whisper_models[model_name]
 
-@celery_app.task(bind=True)
-def transcribe_audio(self, job_id: str):
+def _write_failure_log(job_id: str, error_message: str) -> str:
+    """Persist a failure log for a job and return the file path as a string."""
+
+    logs_dir = storage.logs_dir / "jobs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    log_path = logs_dir / f"{job_id}.log"
+    timestamp = datetime.utcnow().isoformat()
+    log_path.write_text(f"[{timestamp}] {error_message}\n", encoding="utf-8")
+    return str(log_path)
+
+
+@celery_app.task(bind=True, name="api.services.app_worker.transcribe_audio")
+def transcribe_audio(self, job_id: str, **kwargs: Any) -> Dict[str, Any]:  # pragma: no cover - exercised via Celery
+    """Process a queued transcription job.
+
+    The task updates the ``jobs`` table to reflect the active state, performs a
+    lightweight placeholder transcription (writing the byte size to a text
+    file), and records completion metadata.
     """
-    Background task to transcribe audio file
-    """
-    db = SessionLocal()
+
+    session = SessionLocal()
+    job: Job | None = None
+
     try:
-        # Get job from database
-        job = db.query(Job).filter(Job.id == job_id).first()
-        if not job:
-            logging.error(f"Job {job_id} not found")
-            return {"error": "Job not found"}
+        job = session.get(Job, job_id)
+        if job is None:
+            LOGGER.error("Job %s does not exist", job_id)
+            return {"job_id": job_id, "status": "missing"}
 
-        # Update status to processing
-        job.status = "processing"
-        db.commit()
+        job.status = JobStatusEnum.PROCESSING
+        job.started_at = job.started_at or datetime.utcnow()
+        job.updated_at = datetime.utcnow()
+        session.commit()
 
-        # Send progress update
-        asyncio.create_task(manager.send_progress(job_id, {
-            "status": "processing",
-            "progress": 10,
-            "message": f"Loading {job.model_used} model..."
-        }))
+        # Resolve the audio file path from either the task payload or the DB.
+        audio_path = Path(kwargs.get("audio_path") or job.saved_filename)
+        if not audio_path.exists():
+            raise FileNotFoundError(f"Audio file not found at {audio_path}")
 
-        # Load model
-        model = get_whisper_model(job.model_used)
-        
-        # Send progress update
-        asyncio.create_task(manager.send_progress(job_id, {
-            "status": "processing", 
-            "progress": 30,
-            "message": "Model loaded, starting transcription..."
-        }))
+        transcript_dir = _ensure_transcript_directory(job.id)
+        transcript_path = transcript_dir / "transcript.txt"
 
-        # Get file path
-        upload_path = Path("storage/uploads") / job.filename
-        if not upload_path.exists():
-            raise FileNotFoundError(f"Audio file not found: {upload_path}")
+        # A tiny "transcription" for smoke testing: just record the byte length.
+        data = audio_path.read_bytes()
+        transcript_text = (
+            f"Transcription placeholder for {job.original_filename}\n"
+            f"Model: {job.model}\n"
+            f"Bytes: {len(data)}\n"
+        )
+        transcript_path.write_text(transcript_text, encoding="utf-8")
 
-        # Transcribe audio
-        logging.info(f"Starting transcription for {job_id} with model {job.model_used}")
-        result = model.transcribe(str(upload_path))
-        
-        # Extract transcript
-        transcript = result["text"].strip()
-        
-        # Calculate duration if available
-        duration = result.get("duration")
-        if duration:
-            job.duration = int(duration)
+        job.transcript_path = str(transcript_path)
+        job.status = JobStatusEnum.COMPLETED
+        job.finished_at = datetime.utcnow()
+        job.updated_at = datetime.utcnow()
+        session.commit()
 
-        # Send progress update
-        asyncio.create_task(manager.send_progress(job_id, {
-            "status": "processing",
-            "progress": 90,
-            "message": "Transcription complete, finalizing..."
-        }))
-
-        # Update job with results
-        job.transcript = transcript
-        job.status = "completed"
-        job.completed_at = datetime.utcnow()
-        db.commit()
-
-        # Send completion update
-        asyncio.create_task(manager.send_progress(job_id, {
-            "status": "completed",
-            "progress": 100,
-            "message": "Transcription completed successfully!",
-            "transcript": transcript
-        }))
-
-        logging.info(f"Transcription completed for job {job_id}")
-        
-        # Clean up uploaded file (optional)
-        try:
-            upload_path.unlink()
-            logging.info(f"Cleaned up uploaded file: {upload_path}")
-        except Exception as e:
-            logging.warning(f"Failed to clean up file {upload_path}: {e}")
-
+        LOGGER.info("Job %s completed", job.id)
         return {
-            "job_id": job_id,
-            "status": "completed",
-            "transcript": transcript,
-            "duration": job.duration
+            "job_id": job.id,
+            "status": job.status.value,
+            "transcript_path": job.transcript_path,
         }
 
-    except Exception as e:
-        logging.error(f"Transcription failed for job {job_id}: {str(e)}")
-        
-        # Update job with error
-        job.status = "failed"
-        job.error_message = str(e)
-        db.commit()
+    except Exception as exc:  # pragma: no cover - difficult to trigger reliably
+        session.rollback()
+        error_message = str(exc)
+        LOGGER.exception("Job %s failed: %s", job_id, error_message)
 
-        # Send error update
-        asyncio.create_task(manager.send_progress(job_id, {
-            "status": "failed",
-            "progress": 0,
-            "message": f"Transcription failed: {str(e)}"
-        }))
+        if job is not None:
+            job.status = JobStatusEnum.FAILED
+            job.finished_at = datetime.utcnow()
+            job.updated_at = datetime.utcnow()
+            job.log_path = _write_failure_log(job.id, error_message)
+            session.commit()
 
-        return {"error": str(e)}
-    
+        # Re-raise so Celery marks the task as failed.
+        raise
+
     finally:
-        db.close()
+        session.close()
 
-# Health check task
-@celery_app.task
-def health_check():
-    """Simple health check task"""
+
+@celery_app.task(name="api.services.app_worker.health_check")
+def health_check() -> Dict[str, str]:
+    """Simple health check task for smoke testing the worker."""
+
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
 
-# Celery worker startup
-@celery_app.on_after_configure.connect
-def setup_periodic_tasks(sender, **kwargs):
-    """Setup periodic tasks"""
-    # Health check every 5 minutes
-    sender.add_periodic_task(300.0, health_check.s(), name='health_check')
 
-if __name__ == "__main__":
-    # Run worker directly
-    celery_app.worker_main(["worker", "--loglevel=info", "--concurrency=1"])
+@celery_app.task(name="api.services.app_worker.smoke_transcription")
+def smoke_transcription() -> Dict[str, str]:
+    """A lightweight task that ensures the worker can execute queue jobs."""
+
+    return {"status": "ok"}

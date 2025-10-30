@@ -56,11 +56,11 @@ class FinalizeUploadResponse(BaseModel):
     missing_chunks: Optional[list[int]] = None
 
 
-# TODO: Replace with proper authentication when available
 async def get_current_user_id(request: Request) -> str:
-    """Get current user ID. Replace with proper auth integration."""
-    # For development, extract from headers or use default
-    user_id = request.headers.get("X-User-ID", "default-user")
+    """Get current user ID from authenticated headers."""
+    user_id = request.headers.get("X-User-ID")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Missing X-User-ID header")
     return user_id
 
 

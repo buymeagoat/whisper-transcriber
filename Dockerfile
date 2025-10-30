@@ -39,7 +39,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copy Python dependencies
-COPY requirements.txt requirements-dev.txt ./
+COPY requirements.txt ./
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
@@ -101,10 +101,10 @@ RUN chown -R appuser:appuser /app && \
 
 # Security: Set service configuration with secure defaults
 ENV SERVICE_TYPE=app \
-    VITE_API_HOST=http://localhost:8000
+    VITE_API_HOST=http://localhost:8001
 
 # Security: Use non-privileged port
-EXPOSE 8000
+EXPOSE 8001
 
 # Security: Switch to non-root user for all subsequent operations
 USER appuser

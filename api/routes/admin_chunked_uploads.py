@@ -5,13 +5,16 @@ Provides administrative endpoints for monitoring upload performance,
 managing active upload sessions, and viewing system metrics.
 """
 
-from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, HTTPException, Depends, Query
-from pydantic import BaseModel
-from datetime import datetime, timedelta
-from api.services.chunked_upload_service import chunked_upload_service, UploadStatus
-from api.utils.logger import get_system_logger
 import asyncio
+import os
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from pydantic import BaseModel
+
+from api.services.chunked_upload_service import UploadStatus, chunked_upload_service
+from api.utils.logger import get_system_logger
 
 logger = get_system_logger("admin_upload")
 
@@ -56,11 +59,17 @@ class BulkActionRequest(BaseModel):
     action: str  # "cancel", "cleanup", "force_expire"
 
 
-# TODO: Replace with proper admin authentication
-async def verify_admin_access():
-    """Verify admin access. Replace with proper auth integration."""
-    # For development, allow all access
-    # In production, check admin role/permissions
+async def verify_admin_access(request: Request) -> bool:
+    """Verify admin access using shared secret header."""
+    required_token = os.getenv("ADMIN_METRICS_TOKEN")
+    if not required_token:
+        logger.error("ADMIN_METRICS_TOKEN environment variable must be set")
+        raise HTTPException(status_code=503, detail="Admin access not configured")
+
+    provided_token = request.headers.get("X-Admin-Token")
+    if provided_token != required_token:
+        raise HTTPException(status_code=403, detail="Invalid admin token")
+
     return True
 
 

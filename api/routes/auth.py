@@ -91,18 +91,14 @@ async def get_current_user(
                 headers={"WWW-Authenticate": "Bearer"},
             )
         
-        # Validate session security (allow medium for API usage in development)
+        # Validate session security requirements for API usage
         security_check = session_security.validate_session_security(request)
         if security_check["security_level"] == "low":
-            # In development environment, allow API usage with auth header
-            is_development = settings.environment == "development"
-            has_auth_header = security_check["checks"].get("has_auth_header", False)
-            if not (is_development and has_auth_header):
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Insufficient session security",
-                    headers={"WWW-Authenticate": "Bearer"},
-                )
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Insufficient session security",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         
         # Extract and verify token
         user_data = token_service.extract_user_from_token(credentials.credentials)

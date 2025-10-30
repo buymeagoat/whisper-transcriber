@@ -1,0 +1,23 @@
+name: ci
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd719d720b5b0c9d4b7b0e5a89538ba1f3f5d
+      - name: Set up Python
+        uses: actions/setup-python@5d5c6b2de18ef1b8d508fe5b6a9cfb5c1fba9c38
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Static analysis
+        run: python -m compileall api

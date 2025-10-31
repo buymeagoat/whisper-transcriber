@@ -1,0 +1,31 @@
+[tool.pytest.ini_options]
+# Basic pytest configuration for production testing
+minversion = "6.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+addopts = [
+    "--strict-markers",
+    "--verbose",
+    "--tb=short",
+    "--disable-warnings",
+    "--maxfail=10"
+]
+
+asyncio_mode = "auto"
+
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning:whisper.*",
+    "ignore::RuntimeWarning"
+]
+
+[tool.coverage.run]
+source = ["api"]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/__pycache__/*"
+]

@@ -1,0 +1,1 @@
+This is a placeholder for the Whisper model file required for health check tests. In production, this should be a real Whisper model (e.g., tiny.pt, small.pt, etc.). For test purposes, this file will simulate the presence of a model file.

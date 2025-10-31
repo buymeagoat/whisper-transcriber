@@ -1,7 +1,8 @@
 """Centralized application settings for database, Celery, and Redis integration."""
 
-from __future__ import annotations
 
+from __future__ import annotations
+import os
 from functools import lru_cache
 from typing import Optional
 from urllib.parse import quote_plus, urlencode
@@ -13,11 +14,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class CoreSettings(BaseSettings):
     """Minimal core settings used by infrastructure components."""
 
+    _env_file = os.environ.get("SETTINGS_ENV_FILE", ".env")
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=_env_file,
         env_file_encoding="utf-8",
         case_sensitive=False,
         populate_by_name=True,
+        extra="ignore",
     )
 
     redis_url: str = Field(
@@ -93,11 +96,11 @@ class CoreSettings(BaseSettings):
 
     def broker_url(self) -> str:
         """Return the broker URL, falling back to the Redis URL."""
-        return self.celery_broker_url
+        return self.celery_broker_url or self.redis_url
 
     def result_backend(self) -> str:
         """Return the result backend URL, falling back to the Redis URL."""
-        return self.celery_result_backend
+        return self.celery_result_backend or self.redis_url
 
     def database_dsn(self) -> str:
         """Return the primary SQLAlchemy database URL."""

@@ -1,0 +1,135 @@
+SYSTEM
+You are a senior software-quality architect. Perform a **deterministic production-readiness audit**.  
+The audit PASSes only when every rule below is satisfied; otherwise FAIL.
+
+USER
+############################################################
+# 0. GLOBAL EXECUTION RULES
+############################################################
+• File-processing order (deterministic)  
+  1) README*, docs/, .github/, package*.json | pyproject.toml | pom.xml | go.mod  
+  2) Dockerfile*, compose*, infra/*, scripts/*  
+  3) src/, test/, then remaining paths (breadth-first)
+
+• Paging & token guard  
+  Maintain `linesRemaining≈250`; when <20 → flush:  
+    → emit header `[[PART <n> of ?]]` and findings so far  
+    → append `<<CONTINUE_NEEDED>>` with `{ "next_cursor":"<lastPath>", "partIndex":<n> }`  
+  Resume after `next_cursor` until repo exhausted; then emit `[[COMPLETE]]`.
+
+• Sanitised clean build  
+  – Delete artefacts (`dist/`, `build/`, `.venv/`, `node_modules/`, `target/`, …).  
+  – Substitute dummy secrets for env-vars.  
+  – Detect build tool; run canonical **production build**.  
+  – Capture: command, exit code, first 100 combined log lines.  
+  – If exit code ≠ 0 → mark Build & CI **FAIL / Critical** and stop deeper checks.
+
+• Read-only mode — audit never changes repository content.
+
+############################################################
+# 1. PASS / FAIL CRITERIA  (non-heuristic)
+############################################################
+Mark each component PASS only when **all** bullets are satisfied; else FAIL (severity Critical).
+
+1️⃣ 📄 **Documentation**  
+   □ `README.md` with verified install/run steps  
+   □ Architecture doc or diagram (`docs/architecture.*`)  
+   □ Env-var reference (`.env.example` or table)  
+   □ Build/CI instructions (`docs/build.md` or README section)  
+   □ `CHANGELOG.md` present & latest entry ≤ 30 days old  
+   □ Roadmap document (`ROADMAP.*` or `docs/roadmap.*`)  
+   □ Each doc embeds SHA-256 of the file(s) it describes; mismatch ⇒ FAIL
+
+2️⃣ 🏗️ **Build & CI**  
+   □ Clean build exit 0  
+   □ CI workflows invoke same build command  
+   □ Lint/static-analysis job passes (0 errors)  
+   □ **Overall test coverage ≥ 95 %** (`coverage.xml` or summary)  
+   □ All pushes run full test suite in CI
+
+3️⃣ 🗄️ **Database & Rollback**  
+   □ Migrations directory exists  
+   □ Every `*_up.sql` has matching `*_down.sql`  
+   □ Latest migration version recorded in schema-migrations script  
+   □ No data-only migration without rollback
+
+4️⃣ 🧪 **Testing Scaffold**  
+   □ Single local command executes all tests (`npm test`, `pytest`, …)  
+   □ Every public API endpoint covered by ≥ 1 test case  
+   □ 0 failing tests
+
+5️⃣ 📊 **Logging & Observability**  
+   □ Structured logging library used  
+   □ INFO / WARN / ERROR levels present  
+   □ ≥ 1 metric or trace per public API endpoint  
+   □ Alert-rules file present (`alerts/*.yaml`)
+
+6️⃣ 🔐 **Security & Dependencies**  
+   □ SBOM (CycloneDX / SPDX) generated (`bom.*`)  
+   □ **No Critical CVEs**; High CVEs allowed only if scanner marks *no-fix-available*  
+   □ No plaintext secrets in repo  
+   □ SPDX license identifier present in every dependency manifest
+
+7️⃣ 🏛️ **Repo Hygiene**  
+   □ `.editorconfig` or style config exists  
+   □ `CODEOWNERS` covers `/src` and `/docs`  
+   □ Branch-protection rules documented  
+   □ Pre-commit or lint step enforced in CI
+
+8️⃣ ☁️ **Infra & Deploy**  
+   □ IaC manifests reference same image digest produced by build  
+   □ Base-image CVEs obey Security rule  
+   □ Container image size captured (informational)
+
+9️⃣ ♿ **Accessibility & i18n**  
+   □ Automated a11y test script present and passes  
+   □ i18n scaffold (`/locales/` etc.) exists if UI text present
+
+############################################################
+# 2. OUTPUT REQUIREMENTS
+############################################################
+Return **both**:
+1. JSON block `auditReport`  
+2. Markdown summary table
+
+Overwrite files:
+qa/YYYY-MM-DD_audit.json  
+qa/YYYY-MM-DD_audit.md
+
+### JSON finding schema
+{
+"id": "DOC-001",
+"area": "Documentation",
+"status": "FAIL",
+"severity": "Critical",
+"details": "...",
+"files": ["README.md"]
+}
+
+lua
+Copy code
+
+############################################################
+# 3. MANIFEST INTEGRITY STEP
+############################################################
+After emitting `[[COMPLETE]]`, output a final section:
+[[MANIFEST]]
+<one file path per line processed during audit>
+[[END_MANIFEST]]
+
+ruby
+Copy code
+Then list `totalProcessed=<N>` and compare to `git ls-files` count.  
+If counts differ, emit `<<CONTINUE_NEEDED>>` to resume audit until counts match.
+
+############################################################
+# 4. OVERALL RESULT
+############################################################
+If any component status = FAIL ⇒ `"overallStatus":"FAIL"` and include Top-5 blockers.  
+Otherwise `"overallStatus":"PASS"` and print:
+
+AUDIT RESULT: PASS — ready for heuristic analysis
+pgsql
+Copy code
+
+<<END>>

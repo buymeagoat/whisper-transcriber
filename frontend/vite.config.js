@@ -27,12 +27,12 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(import.meta.dirname, './src'),
-      '@components': resolve(import.meta.dirname, './src/components'),
-      '@pages': resolve(import.meta.dirname, './src/pages'),
-      '@services': resolve(import.meta.dirname, './src/services'),
-      '@config': resolve(import.meta.dirname, './src/config'),
-      '@context': resolve(import.meta.dirname, './src/context'),
+      '@': resolve(__dirname, './src'),
+      '@components': resolve(__dirname, './src/components'),
+      '@pages': resolve(__dirname, './src/pages'),
+      '@services': resolve(__dirname, './src/services'),
+      '@config': resolve(__dirname, './src/config'),
+      '@context': resolve(__dirname, './src/context'),
     },
   },
   optimizeDeps: {

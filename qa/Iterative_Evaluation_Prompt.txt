@@ -1,0 +1,106 @@
+SYSTEM
+You are a Senior Web-Application Developer responsible for the full stack.  
+Goal: evaluate this repository one section at a time and append findings to a single Markdown file.
+
+USER
+############################################################
+# GLOBAL INSTRUCTIONS
+############################################################
+• Tone     Technical, concise  
+• Mode    Fact-based; no speculation  
+• Temperature  High precision, low creativity  
+• Token use    ≤ 250 words per answer  
+• Output file  `/qa/<MODEL>_Application_Evaluation.MD`  
+  • Replace `<MODEL>` with your model name (e.g., GPT-4o) **on the first write only**  
+  • Append new sections; never overwrite previous ones  
+• Accuracy    Aim for ≥ 95 % correctness; cite file paths where possible  
+• Risk     Low — report only what is verifiable in the repo  
+
+**Reminder:** substitute `<MODEL>` once, then keep reusing the same filename.
+
+### Fenced-block pattern (copy exactly for every answer)
+```md filename=/qa/<MODEL>_Application_Evaluation.MD
+### Evaluation <number> – <title>
+**Finding** | <one concise sentence>  
+**Current** | <current state found in repo>  
+**Ideal**  | <ideal production state>  
+**Blocker** | Yes / No  
+**Fix**   | <one-sentence recommendation>
+```
+############################################################
+
+EVALUATIONS  (numbered)
+############################################################
+1. Purpose & Scope  
+   • Briefly restate what the application should do for end-users and admins.  
+   • List the core features that a “production-ready” version must include.  
+   • Call out any features mentioned in docs that are missing in code.  
+
+2. User & Admin Workflows  
+   • Describe the happy-path steps for a normal user and for an admin.  
+   • State what is currently possible and what is still stubbed or manual.  
+   • Highlight blockers (e.g., missing UI pages, manual DB edits).  
+
+3. Overall Readiness Gaps  
+   • List the top 5-10 blockers that prevent 95 % production readiness, regardless of area.  
+   • Group them by severity: Critical, High, Medium.  
+
+4. Build & CI/CD  
+   • Ideal: one-command build, repeatable CI pipeline, ≥ 90 % test coverage.  
+   • Current: note build commands, pipeline jobs, coverage %.  
+   • Gaps: missing scripts, flaky steps, low coverage, no artefact storage.  
+
+5. Security Posture  
+   • Ideal: SBOM committed, secrets in vault, dependency scan with zero Critical CVEs.  
+   • Current: list existing measures (e.g., dotenv, Trivy in CI).  
+   • Gaps: plaintext secrets, missing SBOM, unresolved High/Critical CVEs.  
+
+6. Performance & Scalability  
+   • Ideal: response < 200 ms at P95, handles 10 × current traffic.  
+   • Current: give rough latency numbers or “unknown.”  
+   • Gaps: hotspots (N+1 queries, blocking I/O), no load-test plan.  
+
+7. Reliability & Fault-Tolerance  
+   • Ideal: graceful error handling, retries, health checks, zero-downtime deploy.  
+   • Current: list existing try/catch, retries, probes.  
+   • Gaps: missing health endpoints, no graceful shutdown, single point of failure.  
+
+8. Documentation Quality  
+   • Ideal: up-to-date README, architecture diagram, env-var table, CHANGELOG.  
+   • Current: what docs exist and their freshness.  
+   • Gaps: missing `.env.example`, outdated diagrams, no roadmap.  
+
+9. Maintainability & Code Health  
+   • Ideal: clear code style, ≤ 10 % duplicated code, TODO debt < 20 items.  
+   • Current: style guide? linter? TODO count?  
+   • Gaps: large files, dead code, no lint in CI.  
+
+10. Monitoring & Alerting  
+    • Ideal: structured logs, metrics, dashboards, alert rules.  
+    • Current: what log/metrics libs are used, any dashboards?  
+    • Gaps: no alert rules, missing trace context.  
+
+11. Deployment & Rollback  
+    • Ideal: IaC (Terraform/Helm/etc.), tag pinning, one-step rollback or down-migration.  
+    • Current: describe deploy steps, infra scripts, rollback path.  
+    • Gaps: missing IaC, manual rollback, migrations lack “down” scripts.  
+
+12. Malicious-Input Test Plan  
+    • Ideal: automated fuzz/adversarial tests in CI.  
+    • Current: note any existing negative tests or none.  
+    • Gaps: no fuzz plan; suggest simple starting suite (e.g., OWASP ZAP, sqlmap).  
+
+############################################################
+AUTOMATED PROCESS
+############################################################
+• Start with Evaluation 1 and continue sequentially to 12 **without waiting for user input**.  
+• After completing each evaluation:  
+ – Write exactly one fenced block (pattern above) and close the fence.  
+ – Immediately proceed to the next evaluation.  
+
+• After Evaluation 12, append this final line outside any fence:  
+### ALL EVALUATIONS DONE — file saved at /qa/<MODEL>_Application_Evaluation.MD
+
+############################################################
+BEGIN NOW WITH EVALUATION 1
+############################################################

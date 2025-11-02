@@ -218,8 +218,10 @@ EOM
     done < "$BUILD_INFO_FILE"
 }
 
+
 # Security: Create required directories with proper permissions (non-root safe)
-mkdir -p /app/storage/uploads /app/storage/transcripts /app/logs /app/data
+mkdir -p /app/data /app/storage/uploads /app/storage/transcripts /app/logs /app/models
+chown -R appuser:appuser /app/data /app/storage /app/logs /app/models 2>/dev/null || true
 
 ensure_non_root "$@"
 

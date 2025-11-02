@@ -1,0 +1,30 @@
+diff --git a/qa/gpt-5-codex_Malicious_testing.md b/qa/gpt-5-codex_Malicious_testing.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..79ecec1b3a33048175a1aa75729741403bd7727d
+--- /dev/null
++++ b/qa/gpt-5-codex_Malicious_testing.md
+@@ -0,0 +1,24 @@
++Test: Unauthenticated access to /jobs/ and /admin/cleanup
++Results: GET /jobs/ returned 200 with empty job list (no auth required). POST /admin/cleanup responded 401 "API key required", indicating protection is partially enforced but relies on API key middleware rather than admin auth.
++Test: Fuzzed job uploads with oversize, unsupported MIME, and malformed multipart bodies
++Results: 101MB WAV upload rejected with 400 and "File too large" message. text/plain payload rejected with 400 and clear unsupported format detail. Multipart request without boundary returned 400 "Missing boundary". Validation paths returned structured errors but still disclose supported extensions verbatim.
++Test: Upload attempts with path traversal filenames and archive payloads
++Results: Uploading invalid.txt as ../../evil.wav triggered 500 and leaked filesystem path, indicating insufficient filename sanitization. ZIP payload rejected with 400 unsupported format before reaching storage, so archive handling relies on extension filtering.
++Test: Replay with valid, stale, and forged JWTs/cookies
++Results: Accessing /auth/me required both bearer token and auth_token cookie; missing cookie triggered 401 "Insufficient session security". Providing both succeeded (200). Using forged token/cookie returned 401 with detailed error "Not enough segments", revealing validation internals.
++Test: Enumerated job identifiers over /jobs/{id}
++Results: Known job UUIDs retrieved without authentication (200, full metadata). Guessing adjacent UUID returned 404, so enumeration depends on leaking real IDs from list endpoint which is publicly accessible.
++Test: Parallel job submission stress (3 concurrent uploads)
++Results: Each request hung ~19s then returned 500 due to Redis connection refusal; repeated attempts caused Celery to exhaust retry budget and crash the API process during startup recovery. Demonstrates lack of graceful degradation without Redis and no rate limiting.
++Test: SQL/command/template injection probes via query params and headers
++Results: URL-encoded payload in jobs search returned 200 with full job list; no sanitization feedback and raw job metadata leaked. Additional header-based injection not executed due to time—potential for log injection remains given verbose logging, but not confirmed.
++Test: WebSocket abuse with malformed frames and flooding attempts
++Results: Connection to ws://127.0.0.1:8001/ws/status rejected with HTTP 403 before handshake (WebSocket service disabled due to Redis). No frames delivered; resilience against malformed traffic unverified because channel never opens.
++Test: Abuse observability endpoints (/metrics/, /health/*)
++Results: /metrics/ responded 200 with detailed internal counters (including precise job IDs and secrets like Redis URL). /health/livez returned 200 but /health/readyz reported 503 exposing Redis password in URL and model states, so probes leak sensitive configuration when dependencies fail.
++Test: Admin API probes with missing/incorrect X-Admin-Token
++Results: Requests to /admin/chunked-uploads/metrics without a valid API key short-circuited with 401 "API key required" before shared-secret validation, so X-Admin-Token enforcement could not be evaluated. Endpoint remains inaccessible for further testing without bootstrap API keys.
++Test: Simulated broker outage (Redis unreachable)
++Results: With REDIS_URL pointing to localhost without a server, every queue interaction returned 500 "Error 111 connecting to localhost:6379" and Celery retried until hitting its limit, crashing the API lifespan. Readiness probe exposes the failure but API endpoints remain accessible and leak stack errors.
++Test: Transcript download attempts for real and fake job IDs
++Results: Download endpoint is unimplemented—both existing and random job IDs returned 404 without authentication. Endpoint leaks no data but confirms advertised download feature is missing.

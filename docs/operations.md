@@ -41,6 +41,11 @@ The FastAPI application emits structured JSON logs via
   "thread_id": 139912345678912
 }
 ```
+## Testing Redis integrations
+
+Whisper Transcriber uses `fakeredis` for testing Redis-dependent features (caching, job queues) in local and CI environments. `fakeredis` emulates a Redis server in memory, allowing tests to run without a real Redis instance.
+
+**Note:** `fakeredis` is not used in production. Production deployments must use a real Redis server for caching and job queue features.
 
 Use the `request_id` field to correlate application logs with API access
 logs, background workers, and audit trails when troubleshooting incidents.

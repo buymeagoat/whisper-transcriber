@@ -1,0 +1,5 @@
+# Development and test dependencies for Whisper Transcriber
+pytest
+pytest-asyncio
+pytest-cov
+fakeredis

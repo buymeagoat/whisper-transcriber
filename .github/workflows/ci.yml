@@ -57,7 +57,7 @@ jobs:
           name: whisper-transcriber-image
           path: /tmp/whisper-transcriber-image.tar
       - name: Generate SBOM
-        uses: anchore/sbom-action@df80a981bc6edbc4e220a492d3cbe9f5547a6e75
+        uses: anchore/sbom-action@8e94d75ddd33f69f691467e42275782e4bfefe84
         with:
           path: .
           format: cyclonedx-json

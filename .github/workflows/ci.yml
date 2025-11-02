@@ -52,7 +52,7 @@ jobs:
           outputs: type=docker,dest=/tmp/whisper-transcriber-image.tar
       - name: Upload image artifact
         id: upload_image
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: whisper-transcriber-image
           path: /tmp/whisper-transcriber-image.tar
@@ -64,7 +64,7 @@ jobs:
           output: sbom.cdx.json
       - name: Upload SBOM artifact
         id: upload_sbom
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: sbom
           path: sbom.cdx.json

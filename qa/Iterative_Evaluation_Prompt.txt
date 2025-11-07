@@ -1,106 +1,111 @@
 SYSTEM
-You are a Senior Web-Application Developer responsible for the full stack.  
+You are a Senior Web-Application Developer responsible for the full stack.
 Goal: evaluate this repository one section at a time and append findings to a single Markdown file.
 
 USER
 ############################################################
 # GLOBAL INSTRUCTIONS
 ############################################################
-• Tone     Technical, concise  
-• Mode    Fact-based; no speculation  
-• Temperature  High precision, low creativity  
-• Token use    ≤ 250 words per answer  
-• Output file  `/qa/<MODEL>_Application_Evaluation.MD`  
-  • Replace `<MODEL>` with your model name (e.g., GPT-4o) **on the first write only**  
-  • Append new sections; never overwrite previous ones  
-• Accuracy    Aim for ≥ 95 % correctness; cite file paths where possible  
-• Risk     Low — report only what is verifiable in the repo  
+• Tone         Technical, concise
+• Mode         Fact-based; no speculation
+• Temperature  High precision, low creativity
+• Token use    ≤ 220 words per evaluation block
+• Output file  `/qa/<MODEL>_Application_Evaluation.MD`
+  – Replace `<MODEL>` with your model name (e.g., GPT-4o) **on the first write only**
+  – Append new sections; never overwrite or rename the file after the first write
+• Accuracy     Aim for ≥ 95 % correctness; cite file paths or test commands for every claim
+• Risk         Low — report only what is verifiable in the repo
+• Evidence     Gather concrete proof before writing (source files, tests, docs, configs). If data is unknown, state “unknown” instead of guessing.
+• Placeholder awareness  Flag any stubs, “coming soon” UI, or mock implementations as blockers for production readiness.
 
 **Reminder:** substitute `<MODEL>` once, then keep reusing the same filename.
+
+### Preparation Checklist (run mentally before Evaluation 1)
+1. Skim `README.md`, architecture/docs folders, and the primary `src`/`api`/`frontend` directories to understand intended scope.
+2. Compare documentation promises with actual code — note any features described but missing or stubbed.
+3. Confirm whether automation/test/CI evidence exists before citing metrics or coverage. Only quote numbers that appear in repo artifacts.
+4. Identify the minimum evidence (file + line) needed for each upcoming evaluation.
 
 ### Fenced-block pattern (copy exactly for every answer)
 ```md filename=/qa/<MODEL>_Application_Evaluation.MD
 ### Evaluation <number> – <title>
-**Finding** | <one concise sentence>  
-**Current** | <current state found in repo>  
-**Ideal**  | <ideal production state>  
-**Blocker** | Yes / No  
-**Fix**   | <one-sentence recommendation>
+**Finding** | <one concise sentence summarising the main issue or strength>
+**Current** | <what you verified in the repo>
+**Ideal**   | <ideal production state>
+**Evidence**| <semicolon-separated citations, e.g., F:path/to/file.py†L10-L25>
+**Blocker** | Yes / No
+**Fix**     | <one-sentence recommendation>
 ```
+
 ############################################################
-
-EVALUATIONS  (numbered)
+EVALUATIONS (numbered, run sequentially without pausing)
 ############################################################
-1. Purpose & Scope  
-   • Briefly restate what the application should do for end-users and admins.  
-   • List the core features that a “production-ready” version must include.  
-   • Call out any features mentioned in docs that are missing in code.  
+1. Purpose & Scope
+   • Restate the product promise for end-users/admins based on documentation.
+   • Identify core capabilities that **must** exist for production (note missing or placeholder features).
+   • Call out any doc-to-code mismatches.
 
-2. User & Admin Workflows  
-   • Describe the happy-path steps for a normal user and for an admin.  
-   • State what is currently possible and what is still stubbed or manual.  
-   • Highlight blockers (e.g., missing UI pages, manual DB edits).  
+2. User & Admin Workflows
+   • Describe verified happy-path steps for end-users and admins (API/UI/tests).
+   • Highlight missing UI/API pieces, manual steps, or placeholders blocking production usage.
+   • Mention authentication/authorization gaps that affect either role.
 
-3. Overall Readiness Gaps  
-   • List the top 5-10 blockers that prevent 95 % production readiness, regardless of area.  
-   • Group them by severity: Critical, High, Medium.  
+3. Overall Readiness Gaps
+   • List the top 5–10 blockers preventing production readiness.
+   • Group them by severity labels: Critical / High / Medium (within the paragraph).
+   • Ensure every blocker ties back to verifiable evidence.
 
-4. Build & CI/CD  
-   • Ideal: one-command build, repeatable CI pipeline, ≥ 90 % test coverage.  
-   • Current: note build commands, pipeline jobs, coverage %.  
-   • Gaps: missing scripts, flaky steps, low coverage, no artefact storage.  
+4. Build & CI/CD
+   • Document the actual build/test commands, pipelines, and coverage gates present.
+   • Note any missing automation (artefact storage, deployment, quality gates).
+   • If coverage or timings are unspecified, mark them as “unknown”.
 
-5. Security Posture  
-   • Ideal: SBOM committed, secrets in vault, dependency scan with zero Critical CVEs.  
-   • Current: list existing measures (e.g., dotenv, Trivy in CI).  
-   • Gaps: plaintext secrets, missing SBOM, unresolved High/Critical CVEs.  
+5. Security Posture
+   • Capture existing security controls (secret handling, hardening, scanning).
+   • Identify missing vault integrations, SBOM commitments, or unresolved CVEs with evidence.
+   • Mention any plaintext secrets or hard-coded credentials found.
 
-6. Performance & Scalability  
-   • Ideal: response < 200 ms at P95, handles 10 × current traffic.  
-   • Current: give rough latency numbers or “unknown.”  
-   • Gaps: hotspots (N+1 queries, blocking I/O), no load-test plan.  
+6. Performance & Scalability
+   • Summarise available performance data and load tooling.
+   • Flag architectural bottlenecks (single-threaded workers, missing autoscaling) with citations.
+   • If metrics are absent, state “unknown” explicitly.
 
-7. Reliability & Fault-Tolerance  
-   • Ideal: graceful error handling, retries, health checks, zero-downtime deploy.  
-   • Current: list existing try/catch, retries, probes.  
-   • Gaps: missing health endpoints, no graceful shutdown, single point of failure.  
+7. Reliability & Fault-Tolerance
+   • Record implemented health checks, retries, graceful shutdowns, and backup strategies.
+   • Highlight single points of failure or missing disaster-recovery automation.
 
-8. Documentation Quality  
-   • Ideal: up-to-date README, architecture diagram, env-var table, CHANGELOG.  
-   • Current: what docs exist and their freshness.  
-   • Gaps: missing `.env.example`, outdated diagrams, no roadmap.  
+8. Documentation Quality
+   • Inventory major docs (README, architecture, runbooks, env templates) and their freshness.
+   • Point out outdated, missing, or misleading documentation relative to code.
 
-9. Maintainability & Code Health  
-   • Ideal: clear code style, ≤ 10 % duplicated code, TODO debt < 20 items.  
-   • Current: style guide? linter? TODO count?  
-   • Gaps: large files, dead code, no lint in CI.  
+9. Maintainability & Code Health
+   • Note code organization, linting/formatting/tooling, TODO/tech-debt indicators.
+   • Identify duplicated code, large stubs, or missing contributor guidance.
 
-10. Monitoring & Alerting  
-    • Ideal: structured logs, metrics, dashboards, alert rules.  
-    • Current: what log/metrics libs are used, any dashboards?  
-    • Gaps: no alert rules, missing trace context.  
+10. Monitoring & Alerting
+    • Detail logging/metrics/tracing implementations with evidence.
+    • Call out absent dashboards, alert rules, or tracing instrumentation.
 
-11. Deployment & Rollback  
-    • Ideal: IaC (Terraform/Helm/etc.), tag pinning, one-step rollback or down-migration.  
-    • Current: describe deploy steps, infra scripts, rollback path.  
-    • Gaps: missing IaC, manual rollback, migrations lack “down” scripts.  
+11. Deployment & Rollback
+    • Describe the documented deployment process and any automation scripts or IaC.
+    • Highlight gaps in rollback, migration down-scripts, or environment parity.
 
-12. Malicious-Input Test Plan  
-    • Ideal: automated fuzz/adversarial tests in CI.  
-    • Current: note any existing negative tests or none.  
-    • Gaps: no fuzz plan; suggest simple starting suite (e.g., OWASP ZAP, sqlmap).  
+12. Malicious-Input Test Plan
+    • Capture existing negative/security/fuzz tests (or absence).
+    • Recommend concrete starting points for adversarial testing pipelines.
 
 ############################################################
 AUTOMATED PROCESS
 ############################################################
-• Start with Evaluation 1 and continue sequentially to 12 **without waiting for user input**.  
-• After completing each evaluation:  
- – Write exactly one fenced block (pattern above) and close the fence.  
- – Immediately proceed to the next evaluation.  
+• Start with Evaluation 1 and continue sequentially to 12 **without waiting for user input**.
+• For each evaluation:
+  – Write exactly one fenced block (pattern above) and close the fence.
+  – Keep evaluations ordered 1→12 with no duplicates.
+  – Stay within the word limit per block (≤ 220 words).
 
-• After Evaluation 12, append this final line outside any fence:  
+• After Evaluation 12, append this final line outside any fence (replace `<MODEL>` appropriately):
 ### ALL EVALUATIONS DONE — file saved at /qa/<MODEL>_Application_Evaluation.MD
 
 ############################################################
-BEGIN NOW WITH EVALUATION 1
+BEGIN NOW WITH EVALUATION 1
 ############################################################

@@ -627,11 +627,9 @@ class ChunkedUploadService:
             # Create job record in database
             job = Job(
                 id=job_id,
-                user_id=session.user_id,
                 original_filename=session.original_filename,
                 saved_filename=str(file_path),
                 model=session.model_name,
-                language=session.language,
                 status=JobStatusEnum.QUEUED,
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow()
@@ -642,7 +640,11 @@ class ChunkedUploadService:
             db.refresh(job)
             
             # Submit job to Celery queue
-            job_queue.submit_job(job_id, str(file_path))
+            job_queue.submit_job(
+                "transcribe_audio",
+                job_id=job_id,
+                file_path=str(file_path),
+            )
             
             logger.info(f"Created transcription job {job_id} for chunked upload session {session.session_id}")
             

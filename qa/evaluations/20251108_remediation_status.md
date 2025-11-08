@@ -10,11 +10,10 @@ Following the master findings from 2025-11-07, significant progress has been mad
    - Docker entrypoint and production startup scripts now invoke the bootstrapper so containers refuse to start without valid model assets
    - Added integration test `tests/integration/test_worker_model_loading.py` to assert `transcribe_audio` loads the provisioned checkpoint (see docs/deployment.md for verification steps)
 
-2. ❌ **Upload/transcript services fully implemented**
-   - Direct uploads stop after inserting a `QUEUED` job row; `ConsolidatedUploadService.handle_direct_upload` never enqueues the Celery task, so jobs never reach the worker
-   - Chunked uploads call `job_queue.submit_job(job_id, str(file_path))`, but `submit_job` expects the task name plus keyword args—no task is ever queued, so chunked jobs also stall
-   - Transcript service updates are not verifiable because no upload path successfully produces a transcript
-   - **Remediation needed:** wire both upload flows to `job_queue.submit_job("transcribe_audio", ...)` and add integration tests that assert a Celery task gets scheduled
+2. ⚠️ **Upload/transcript services fully implemented**
+   - Direct and chunked uploads now invoke `job_queue.submit_job("transcribe_audio", job_id=..., file_path=...)`, wiring the queue correctly for both flows
+   - Added regression coverage in `tests/integration/test_upload_queue.py`; `pytest --no-cov tests/integration/test_upload_queue.py` passes and confirms Celery task submission for direct and chunked uploads
+   - Transcript service verification is still pending until end-to-end transcription output is exercised
 
 3. ❌ **End-user transcription UI now functional**
    - The React client posts to `/api/uploads/init`, `/api/uploads/{id}/chunk`, `/api/uploads/{id}/finalize`, and `/api/upload`

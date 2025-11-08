@@ -17,12 +17,14 @@ USER
 • Risk         Low — report only what is verifiable in the repo
 • Evidence     Gather concrete proof before writing (source files, tests, docs, configs). If data is unknown, state “unknown” instead of guessing.
 • Placeholder awareness  Flag any stubs, “coming soon” UI, or mock implementations as blockers for production readiness.
+• Verification Guardrails  Do not quote metrics, coverage numbers, or performance targets unless a repository artifact contains that value. If no artifact exists, record the gap as “unknown”.
+• Doc-to-code alignment  When documentation promises behaviour that code does not deliver, cite both the documentation and the missing or stubbed implementation.
 
 **Reminder:** substitute `<MODEL>` once, then keep reusing the same filename.
 
 ### Preparation Checklist (run mentally before Evaluation 1)
-1. Skim `README.md`, architecture/docs folders, and the primary `src`/`api`/`frontend` directories to understand intended scope.
-2. Compare documentation promises with actual code — note any features described but missing or stubbed.
+1. Skim the primary README, architecture/docs folders, and the main backend/frontend directories to understand intended scope.
+2. Compare documentation promises with actual code — note any features described but missing, stubbed, or returning placeholders.
 3. Confirm whether automation/test/CI evidence exists before citing metrics or coverage. Only quote numbers that appear in repo artifacts.
 4. Identify the minimum evidence (file + line) needed for each upcoming evaluation.
 
@@ -102,6 +104,7 @@ AUTOMATED PROCESS
   – Write exactly one fenced block (pattern above) and close the fence.
   – Keep evaluations ordered 1→12 with no duplicates.
   – Stay within the word limit per block (≤ 220 words).
+  – Do not add commentary outside the fences except where explicitly instructed.
 
 • After Evaluation 12, append this final line outside any fence (replace `<MODEL>` appropriately):
 ### ALL EVALUATIONS DONE — file saved at /qa/<MODEL>_Application_Evaluation.MD

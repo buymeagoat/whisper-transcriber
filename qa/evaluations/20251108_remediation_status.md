@@ -5,22 +5,22 @@ Following the master findings from 2025-11-07, significant progress has been mad
 
 ## Critical Findings - Status
 
-1. ✅ **Transcription jobs now perform real inference**
-   - Implemented real Whisper model loading and inference in `app_worker.py`
-   - Added CUDA support for GPU acceleration when available
-   - Integrated with existing model files (tiny.pt through large-v3.pt)
+1. ❌ **Transcription jobs now perform real inference**
+   - `app_worker.py` still looks for `.pt` checkpoints in `storage.models_dir`, but the repository only ships an empty `models/` directory, so every job fails before inference starts
+   - CUDA/GPU toggles remain theoretical because the worker never reaches the model-loading path without the missing weights
+   - **Remediation needed:** provide deployable model assets (or adjust the build to download them) and add automated checks that fail fast when the directory is empty
 
-2. ✅ **Upload/transcript services fully implemented**
-   - Created comprehensive `consolidated_upload_service.py` with both direct and chunked upload support
-   - Implemented `consolidated_transcript_service.py` with retrieval, search, and export capabilities
-   - Added proper file validation, progress tracking, and error handling
+2. ❌ **Upload/transcript services fully implemented**
+   - Direct uploads stop after inserting a `QUEUED` job row; `ConsolidatedUploadService.handle_direct_upload` never enqueues the Celery task, so jobs never reach the worker
+   - Chunked uploads call `job_queue.submit_job(job_id, str(file_path))`, but `submit_job` expects the task name plus keyword args—no task is ever queued, so chunked jobs also stall
+   - Transcript service updates are not verifiable because no upload path successfully produces a transcript
+   - **Remediation needed:** wire both upload flows to `job_queue.submit_job("transcribe_audio", ...)` and add integration tests that assert a Celery task gets scheduled
 
-3. ✅ **End-user transcription UI now functional**
-   - Replaced placeholder with full-featured upload interface
-   - Added support for both direct and chunked uploads
-   - Implemented progress tracking and WebSocket updates
-   - Added model selection and language options
-   - Integrated transcript display and download functionality
+3. ❌ **End-user transcription UI now functional**
+   - The React client posts to `/api/uploads/init`, `/api/uploads/{id}/chunk`, `/api/uploads/{id}/finalize`, and `/api/upload`
+   - FastAPI exposes `/uploads/initialize`, `/uploads/{id}/chunks/{n}`, `/uploads/{id}/finalize`, and `/jobs/`—the `/api/...` endpoints the UI calls return 404s
+   - Progress tracking and transcript display never activate because the network layer fails immediately
+   - **Remediation needed:** align the frontend service layer with the actual backend routes or register matching `/api/uploads/*` endpoints server-side
 
 4. ✅ **Admin dashboard now shows real-time data**
    - Connected dashboard to real backend metrics endpoints
@@ -28,20 +28,16 @@ Following the master findings from 2025-11-07, significant progress has been mad
    - Added system health monitoring from `/admin/health/system`
    - Implemented performance metrics from `/admin/health/performance`
 
-5. ✅ **Backup system fully operational**
-   - Implemented comprehensive backup solution in `backup.py`
-   - Added support for both database and file backups
-   - Implemented scheduled backups (daily DB, weekly full)
-   - Added retention policies and cleanup
-   - Created restore functionality
-   - Integrated health monitoring and disk space checks
+5. ❌ **Backup system fully operational**
+   - `api.routes.backup` references `storage.uploads_dir`, but `StoragePaths` only exposes `upload_dir`; any attempt to back up uploads raises `AttributeError`
+   - Scheduling hooks remain disabled in `api.main` (`BACKUP_SERVICE_AVAILABLE = False`), so no automated backups run
+   - **Remediation needed:** fix the storage attribute mismatch, re-enable the backup service lifecycle, and add tests that exercise the backup/restore paths
 
 ## High-Priority Findings - Status
 
-1. ✅ **Chunked uploads integration** (COMPLETED)
-   - Upload service now properly creates transcription jobs
-   - Integrated with Celery job queue
-   - Jobs are created in database and queued for processing
+1. ❌ **Chunked uploads integration** (Still Broken)
+   - Jobs are inserted into the database, but `job_queue.submit_job(job_id, str(file_path))` omits the Celery task name so nothing is ever queued
+   - No evidence of a passing integration test to catch the missing task submission
 
 2. ✅ **Security configuration checks** (COMPLETED)
    - Removed debug print statements that exposed secret values
@@ -53,10 +49,9 @@ Following the master findings from 2025-11-07, significant progress has been mad
    - Removed references to ThreadJobQueue
    - Documented Redis as message broker and result backend
 
-4. ⚠️ **Performance baselines** (Partially Fixed)
-   - Transcription now performs real work
-   - TODO: New performance baselines needed with real inference
-   - TODO: Update k6 scripts and performance targets
+4. ❌ **Performance baselines** (Blocked)
+   - With inference never starting (missing models + jobs not enqueued), there are no new performance measurements
+   - Load testing scripts still target the old stub endpoints and need to be rewritten once functional paths exist
 
 5. ✅ **Test coverage improvements** (COMPLETED)
    - Added comprehensive error scenario tests (test_error_scenarios.py)
@@ -85,15 +80,14 @@ Following the master findings from 2025-11-07, significant progress has been mad
 ## Next Steps
 
 1. **Immediate Focus:**
-   - ✅ ~~Implement security validation in UserService~~ COMPLETED
-   - ✅ ~~Update documentation to match Celery implementation~~ COMPLETED
-   - Create new performance baselines with real transcription
+   - Restore end-to-end upload ➜ queue ➜ worker ➜ transcript flow (missing Celery submissions, missing model assets)
+   - Provide deterministic verification (tests or smoke scripts) that a submitted job reaches the worker
+   - Only after functional parity should new performance baselines be gathered
 
 2. **Short-term Priorities:**
-   - ✅ ~~Expand test coverage beyond happy paths~~ COMPLETED
-   - ✅ ~~Implement dashboard configurations~~ (Backend ready, dashboards TBD)
-   - ✅ ~~Add security test suite~~ COMPLETED
-   - Run test coverage analysis to verify improvements
+   - Add regression tests for direct + chunked uploads that assert a Celery task is enqueued
+   - Update frontend service clients (or backend routes) so `/api/uploads/*` requests succeed
+   - Re-enable and test the backup scheduler once the storage path bug is fixed
 
 3. **Medium-term Goals:**
    - Create infrastructure-as-code templates
@@ -102,11 +96,9 @@ Following the master findings from 2025-11-07, significant progress has been mad
    - Add performance benchmarking with real Whisper inference
 
 ## Notes
-- All critical functionality is now operational
-- Security vulnerabilities have been addressed
-- Test coverage significantly expanded with error and security tests
-- Documentation now accurately reflects implementation
-- Remaining work focuses on performance validation and deployment automation
+- Critical-path functionality (upload ➜ queue ➜ inference ➜ transcript) is still broken end-to-end
+- Several “completed” items in earlier summaries have regressed or were never wired up
+- Documentation and dashboards should be revisited after functional parity is restored
 
 ## Summary of Changes (2025-11-08)
 
@@ -150,34 +142,21 @@ Expected: 50-60%+ with error and security scenarios
 
 ## Final Status Summary
 
-### Completed (11/11 Critical and High Priority Items)
-✅ All 5 Critical Findings Resolved
-✅ 5 of 5 High-Priority Findings Resolved  
-✅ Security hardening complete
-✅ Test coverage significantly expanded
-✅ Documentation updated and accurate
+### Completed
+⚠️ Security validation hardening appears merged but needs verification once main flows run again
+⚠️ Documentation updates reference Celery but omit current queue gaps
 
 ### Production Readiness Assessment
-**Status: Ready for Staging/Testing**
+🚫 Not production-ready. Core upload ➜ transcription pipeline fails, backups error out, and frontend/backend APIs do not align.
 
-The application has progressed from having critical blockers to being ready for staging deployment and real-world testing. Key milestones achieved:
+### Recommended Next Steps for Recovery
+1. Ship (or download during deployment) the Whisper `.pt` checkpoints the worker expects.
+2. Patch direct + chunked upload services to submit `transcribe_audio` jobs via `job_queue.submit_job` and add regression tests.
+3. Bring the React client and FastAPI routes back into alignment so `/api/uploads/*` requests succeed.
+4. Fix `storage.uploads_dir` references in the backup API and re-enable the scheduler only after a green end-to-end test.
+5. Once jobs run successfully, regenerate performance baselines and update documentation to reflect the actual architecture.
 
-1. **Core Functionality**: Real Whisper transcription, complete upload workflows, functional UI
-2. **Security**: Validated configuration, no secret leaks, comprehensive security tests
-3. **Integration**: Properly integrated Celery queue, job lifecycle complete
-4. **Quality**: Extensive error handling tests, security vulnerability tests
-5. **Documentation**: Accurate architecture documentation, clear deployment guide
-
-### Recommended Next Steps for Production
-1. Deploy to staging environment
-2. Run full test suite including new error and security tests
-3. Perform load testing with real Whisper inference
-4. Generate updated performance baselines
-5. Create monitoring dashboards from documented metrics
-6. Implement infrastructure-as-code for production deployment
-
-## Existing Strengths Maintained
-- Runtime guardrails remain effective
-- Environment scaffolding remains comprehensive
-- CI pipeline continues to enforce quality gates
-- Load-testing infrastructure ready for updated benchmarks
+## Existing Strengths to Preserve
+- Security configuration hardening work can remain once the core flows are repaired.
+- The Celery-based architecture is a solid foundation if the submission wiring is corrected.
+- Observability, deployment automation, and advanced dashboards can resume after the production blockers are cleared.

@@ -62,7 +62,7 @@ const TranscribePage = () => {
       abortControllerRef.current = new AbortController()
 
       // Initialize upload
-      const initResponse = await axios.post('/api/uploads/init', {
+      const initResponse = await axios.post('/uploads/init', {
         filename: file.name,
         fileSize: file.size,
         modelName: selectedModel,
@@ -85,14 +85,14 @@ const TranscribePage = () => {
         formData.append('chunk', chunk)
         formData.append('chunk_number', i)
 
-        await axios.post(`/api/uploads/${session_id}/chunk`, formData)
+        await axios.post(`/uploads/${session_id}/chunk`, formData)
         
         const progress = Math.round(((i + 1) / chunks) * 100)
         setUploadProgress(progress)
       }
 
       // Finalize upload
-      const finalizeResponse = await axios.post(`/api/uploads/${session_id}/finalize`)
+      const finalizeResponse = await axios.post(`/uploads/${session_id}/finalize`)
       const { job_id } = finalizeResponse.data
 
       // Start polling for transcription status

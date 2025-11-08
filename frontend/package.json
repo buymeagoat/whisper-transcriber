@@ -5,7 +5,8 @@
   "scripts": {
     "build": "vite build",
     "preview": "vite preview",
-    "start": "vite preview --port 3002 --host"
+    "start": "vite preview --port 3002 --host",
+    "test": "vitest run"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -25,5 +26,12 @@
     "react-hot-toast": "^2.6.0",
     "react-router-dom": "^6.16.0",
     "vite": "^4.4.5"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "jsdom": "^27.1.0",
+    "vitest": "^1.6.0"
   }
 }

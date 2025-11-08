@@ -49,5 +49,10 @@ export default defineConfig({
   preview: {
     port: 3002,
     host: true
+  },
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.js',
+    include: ['src/pages/**/*.test.{js,jsx,ts,tsx}']
   }
 })

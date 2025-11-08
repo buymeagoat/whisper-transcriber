@@ -52,6 +52,29 @@ echo "   • Detailed values intentionally withheld from logs"
 # Create required directories
 mkdir -p /app/data /app/logs /app/storage/uploads /app/storage/transcripts
 
+# Ensure Whisper model assets are present before launching the API
+echo "📦 Ensuring Whisper checkpoints are available"
+python - <<'PY'
+import sys
+
+from api.app_worker import bootstrap_model_assets, WhisperModelBootstrapError
+
+
+def main() -> None:
+    try:
+        paths = bootstrap_model_assets()
+    except WhisperModelBootstrapError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    for path in paths:
+        print(f"   • {path}")
+
+
+if __name__ == "__main__":
+    main()
+PY
+
 # Start the application
 echo "🚀 Starting application with production settings..."
 exec python -m api.main

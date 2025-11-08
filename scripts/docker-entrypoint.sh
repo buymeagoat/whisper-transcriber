@@ -170,6 +170,32 @@ PY
     log_step "BROKER OK"
 }
 
+ensure_whisper_models() {
+    log_step "WHISPER MODELS"
+    python - <<'PY'
+import sys
+
+from api.app_worker import bootstrap_model_assets, WhisperModelBootstrapError
+
+
+def main() -> None:
+    try:
+        paths = bootstrap_model_assets()
+    except WhisperModelBootstrapError as exc:
+        print(f"Whisper model bootstrap failed: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    print("Whisper checkpoints ready:")
+    for path in paths:
+        print(f" - {path}")
+
+
+if __name__ == "__main__":
+    main()
+PY
+    log_step "WHISPER MODELS OK"
+}
+
 validate_build_metadata() {
     if [ ! -s "$BUILD_INFO_FILE" ]; then
         cat >&2 <<'EOM'
@@ -234,6 +260,8 @@ log_step "ENVIRONMENT"
 echo "Container entrypoint starting (environment variables redacted)" >&2
 
 validate_required_secrets
+
+ensure_whisper_models
 
 check_database_connectivity
 check_broker_connectivity

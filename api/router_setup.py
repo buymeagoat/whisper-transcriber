@@ -32,6 +32,11 @@ try:
     BACKUP_API_AVAILABLE = True
 except ImportError as e:
     backend_log.warning(f"Backup API not available: {e}")
+    backup_router = None  # type: ignore[assignment]
+    BACKUP_API_AVAILABLE = False
+except Exception as exc:  # pragma: no cover - defensive import guard
+    backend_log.warning(f"Backup API failed to import: {exc}")
+    backup_router = None  # type: ignore[assignment]
     BACKUP_API_AVAILABLE = False
 
 

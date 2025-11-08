@@ -612,14 +612,48 @@ class ChunkedUploadService:
     
     async def _create_transcription_job(self, session: UploadSession, file_path: Path) -> str:
         """Create transcription job from uploaded file."""
-        # This will integrate with the existing job creation system
-        # For now, return a placeholder job ID
-        job_id = str(uuid.uuid4())
+        from api.models import Job, JobStatusEnum
+        from api.orm_bootstrap import SessionLocal
+        from api.services.job_queue import job_queue
+        from datetime import datetime
         
-        # TODO: Integrate with api.routes.jobs or api.services.job_queue
-        # to create actual transcription job
+        # Create database session
+        db = SessionLocal()
         
-        return job_id
+        try:
+            # Generate job ID
+            job_id = str(uuid.uuid4())
+            
+            # Create job record in database
+            job = Job(
+                id=job_id,
+                user_id=session.user_id,
+                original_filename=session.original_filename,
+                saved_filename=str(file_path),
+                model=session.model_name,
+                language=session.language,
+                status=JobStatusEnum.QUEUED,
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow()
+            )
+            
+            db.add(job)
+            db.commit()
+            db.refresh(job)
+            
+            # Submit job to Celery queue
+            job_queue.submit_job(job_id, str(file_path))
+            
+            logger.info(f"Created transcription job {job_id} for chunked upload session {session.session_id}")
+            
+            return job_id
+            
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Failed to create transcription job: {e}")
+            raise
+        finally:
+            db.close()
     
     async def _cleanup_session_chunks(self, session_id: str):
         """Cleanup temporary chunk files."""

@@ -11,6 +11,8 @@ TRANSCRIPTS_DIR = settings.transcripts_dir
 MODELS_DIR = settings.models_dir
 CACHE_DIR = settings.cache_dir
 LOGS_DIR = Path("logs")
+BACKUPS_DIR = Path("data/backups")
+EXPORTS_DIR = Path("data/exports")
 
 # Create a storage object for compatibility
 class StoragePaths:
@@ -22,6 +24,8 @@ class StoragePaths:
         self.models_dir = MODELS_DIR
         self.cache_dir = CACHE_DIR
         self.logs_dir = LOGS_DIR
+        self.backups_dir = BACKUPS_DIR
+        self.exports_dir = EXPORTS_DIR
         
         # Uppercase aliases for compatibility
         self.UPLOAD_DIR = UPLOAD_DIR
@@ -29,11 +33,13 @@ class StoragePaths:
         self.MODELS_DIR = MODELS_DIR
         self.CACHE_DIR = CACHE_DIR
         self.LOGS_DIR = LOGS_DIR
+        self.BACKUPS_DIR = BACKUPS_DIR
+        self.EXPORTS_DIR = EXPORTS_DIR
     
     def ensure_directories(self):
         """Ensure all required directories exist."""
         for directory in [self.upload_dir, self.transcripts_dir, self.models_dir, 
-                         self.cache_dir, self.logs_dir]:
+                         self.cache_dir, self.logs_dir, self.backups_dir, self.exports_dir]:
             directory.mkdir(parents=True, exist_ok=True)
     
     def get_upload_path(self, filename: str) -> Path:

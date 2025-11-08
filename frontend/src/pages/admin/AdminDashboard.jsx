@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
+import { toast } from 'react-hot-toast'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import StatisticsCard from '../../components/StatisticsCard'
 
@@ -26,21 +28,33 @@ const AdminDashboard = () => {
     try {
       setLoading(true)
       
-      // Set some realistic data for demonstration
+      // Fetch job statistics
+      const jobStatsResponse = await axios.get('/api/admin/jobs/stats')
+      const jobStats = jobStatsResponse.data
+      
+      // Fetch system health metrics
+      const healthResponse = await axios.get('/api/admin/health/system')
+      const healthData = healthResponse.data
+      
+      // Fetch performance metrics
+      const perfResponse = await axios.get('/api/admin/health/performance')
+      const perfData = perfResponse.data
+      
       setStats({
-        totalJobs: 156,
-        activeJobs: 3,
-        completedJobs: 142,
-        failedJobs: 11,
-        totalUsers: 28,
-        systemHealth: 'healthy',
-        storageUsed: 2.4, // GB
-        memoryUsage: 68,   // %
-        cpuUsage: 12       // %
+        totalJobs: jobStats.total_jobs,
+        activeJobs: jobStats.queue.active_jobs,
+        completedJobs: jobStats.jobs_COMPLETED || 0,
+        failedJobs: jobStats.jobs_FAILED || 0,
+        totalUsers: perfData.job_processing.total_jobs,
+        systemHealth: healthData.overall_status,
+        storageUsed: Math.round(healthData.system_metrics.disk.used / (1024 * 1024 * 1024) * 10) / 10, // Convert to GB
+        memoryUsage: healthData.system_metrics.memory.percent,
+        cpuUsage: healthData.system_metrics.cpu.usage_percent
       })
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
       setError('Failed to load dashboard data')
+      toast.error('Failed to load dashboard data')
     } finally {
       setLoading(false)
     }

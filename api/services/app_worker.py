@@ -14,6 +14,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict
 
+import whisper
+import torch
+
 from celery.utils.log import get_task_logger
 
 from api.models import Job, JobStatusEnum
@@ -77,13 +80,28 @@ def transcribe_audio(self, job_id: str, **kwargs: Any) -> Dict[str, Any]:  # pra
         transcript_dir = _ensure_transcript_directory(job.id)
         transcript_path = transcript_dir / "transcript.txt"
 
-        # A tiny "transcription" for smoke testing: just record the byte length.
-        data = audio_path.read_bytes()
-        transcript_text = (
-            f"Transcription placeholder for {job.original_filename}\n"
-            f"Model: {job.model}\n"
-            f"Bytes: {len(data)}\n"
-        )
+        # Load Whisper model and perform transcription
+        import whisper
+        import torch
+
+        # Get the model path based on the job's model selection
+        model_path = storage.models_dir / f"{job.model}.pt"
+        if not model_path.exists():
+            raise FileNotFoundError(f"Model file not found at {model_path}")
+
+        # Load model with CUDA if available
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        LOGGER.info("Loading Whisper model %s on %s", job.model, device)
+        
+        model = whisper.load_model(str(model_path))
+        model.to(device)
+
+        # Transcribe the audio file
+        LOGGER.info("Starting transcription for %s", job.original_filename)
+        result = model.transcribe(str(audio_path))
+        
+        # Write the transcription result
+        transcript_text = result["text"]
         transcript_path.write_text(transcript_text, encoding="utf-8")
 
         job.transcript_path = str(transcript_path)

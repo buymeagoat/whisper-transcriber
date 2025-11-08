@@ -121,16 +121,17 @@ To prepare a secure deployment:
 4. Store the populated `.env` in your orchestrator's secret store and inject it as environment variables. The
    Docker Compose file expects these keys via `.env` and refuses to start without them.
 
-Transcription jobs are executed by default through the in-process `ThreadJobQueue` defined in
-`api/services/job_queue.py`. This keeps API latency predictable during tests and local development because the
-transcribe step runs inside the application process. The repository also contains a Celery worker definition in
-`api/worker.py` that currently exposes only the `api.worker.health_check` task; you can extend it with your own task
-module if you wish to offload the transcription workload to Redis.
+Transcription jobs are executed through a **Celery-backed distributed task queue** defined in
+`api/services/job_queue.py` and `api/worker.py`. The Celery worker processes transcription jobs
+asynchronously, allowing the API to remain responsive while handling long-running transcription tasks.
+Redis serves as both the message broker and result backend. The worker is defined in `worker.py` at
+the repository root and executes tasks from `api.services.app_worker.py`, which performs the actual
+Whisper model inference.
 
 The provided Docker Compose file starts the following containers:
-- **app** – FastAPI backend + React frontend (port 8001) that handles job execution via the in-process queue.
-- **worker** – Optional Celery worker. Safe to remove when you are not experimenting with Celery-backed tasks.
-- **redis** – Cache backend and optional Celery broker/result store.
+- **app** – FastAPI backend + React frontend (port 8001) that submits jobs to the Celery queue.
+- **worker** – Celery worker that processes transcription jobs asynchronously.
+- **redis** – Message broker and result backend for Celery, also used for caching.
 
 If you deploy to another orchestrator, carry across the same environment variables and mount points used by the
 Compose definition and ensure secrets are injected through a secure mechanism (vault, secret manager, etc.).

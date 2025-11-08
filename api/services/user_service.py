@@ -21,13 +21,9 @@ class UserService:
     
     def _validate_security_configuration(self) -> None:
         """Validate that security configuration meets production standards."""
-        # Temporarily disabled for debugging - THIS IS A PRODUCTION BLOCKER
-        # TODO: Fix settings loading and re-enable validation
-        print(f"DEBUG: SECRET_KEY value: '{settings.secret_key}' (length: {len(settings.secret_key)})")
-        print(f"DEBUG: Environment: {settings.environment}")
-        
-        # Skip validation for now to get application running
-        return
+        # Skip validation in development/test environments to allow easier setup
+        if hasattr(settings, 'environment') and settings.environment in ['development', 'test']:
+            return
         
         if not settings.secret_key:
             raise ValueError(

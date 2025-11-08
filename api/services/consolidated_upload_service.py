@@ -86,11 +86,9 @@ class ConsolidatedUploadService:
             # Create job
             job = Job(
                 id=file_id,
-                user_id=user_id,
                 original_filename=file.filename,
                 saved_filename=str(file_path),
                 model=model_name,
-                language=language,
                 status=JobStatusEnum.QUEUED,
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow()
@@ -98,6 +96,14 @@ class ConsolidatedUploadService:
 
             db.add(job)
             db.commit()
+
+            from api.services.job_queue import job_queue
+
+            job_queue.submit_job(
+                "transcribe_audio",
+                job_id=job.id,
+                file_path=str(file_path),
+            )
 
             logger.info(f"Direct upload completed for user {user_id}, job {job.id}")
 

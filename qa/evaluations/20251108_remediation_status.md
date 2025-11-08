@@ -5,10 +5,10 @@ Following the master findings from 2025-11-07, significant progress has been mad
 
 ## Critical Findings - Status
 
-1. ❌ **Transcription jobs now perform real inference**
-   - `app_worker.py` still looks for `.pt` checkpoints in `storage.models_dir`, but the repository only ships an empty `models/` directory, so every job fails before inference starts
-   - CUDA/GPU toggles remain theoretical because the worker never reaches the model-loading path without the missing weights
-   - **Remediation needed:** provide deployable model assets (or adjust the build to download them) and add automated checks that fail fast when the directory is empty
+1. ✅ **Transcription jobs now perform real inference**
+   - `api/app_worker.py` bootstraps Whisper checkpoints into `storage.models_dir`, allowing deployments to copy or download production weights and failing fast if no `.pt` files are present
+   - Docker entrypoint and production startup scripts now invoke the bootstrapper so containers refuse to start without valid model assets
+   - Added integration test `tests/integration/test_worker_model_loading.py` to assert `transcribe_audio` loads the provisioned checkpoint (see docs/deployment.md for verification steps)
 
 2. ❌ **Upload/transcript services fully implemented**
    - Direct uploads stop after inserting a `QUEUED` job row; `ConsolidatedUploadService.handle_direct_upload` never enqueues the Celery task, so jobs never reach the worker

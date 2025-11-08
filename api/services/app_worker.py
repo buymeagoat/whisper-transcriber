@@ -19,6 +19,7 @@ import torch
 
 from celery.utils.log import get_task_logger
 
+from api.app_worker import bootstrap_model_assets, WhisperModelBootstrapError
 from api.models import Job, JobStatusEnum
 from api.orm_bootstrap import SessionLocal
 from api.paths import storage
@@ -83,6 +84,11 @@ def transcribe_audio(self, job_id: str, **kwargs: Any) -> Dict[str, Any]:  # pra
         # Load Whisper model and perform transcription
         import whisper
         import torch
+
+        try:
+            bootstrap_model_assets()
+        except WhisperModelBootstrapError as exc:
+            raise RuntimeError(f"Whisper model assets unavailable: {exc}") from exc
 
         # Get the model path based on the job's model selection
         model_path = storage.models_dir / f"{job.model}.pt"

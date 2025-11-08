@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import io
+import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -11,10 +13,11 @@ from api.models import Job, JobStatusEnum
 from api.orm_bootstrap import SessionLocal
 from api.services.app_worker import transcribe_audio
 from api.worker import celery_app
+from api.paths import storage
 
 
 @pytest.mark.asyncio
-async def test_celery_transcription_task_updates_job(async_client, admin_token, security_headers, stub_job_queue):
+async def test_celery_transcription_task_updates_job(async_client, admin_token, security_headers, stub_job_queue, monkeypatch):
     """Executing the Celery task should mark the job complete and persist a transcript."""
 
     upload = await async_client.post(
@@ -30,6 +33,37 @@ async def test_celery_transcription_task_updates_job(async_client, admin_token, 
         job = session.get(Job, job_id)
         assert job is not None
         audio_path = Path(job.saved_filename)
+
+    model_path = storage.models_dir / "small.pt"
+    model_path.write_bytes(b"fake model contents")
+
+    loaded_paths: list[str] = []
+
+    class _StubModel:
+        def __init__(self) -> None:
+            self.device: str | None = None
+            self.transcribe_called_with: str | None = None
+
+        def to(self, device: str) -> "_StubModel":
+            self.device = device
+            return self
+
+        def transcribe(self, audio_file: str):
+            self.transcribe_called_with = audio_file
+            return {"text": "stub transcript"}
+
+    stub_model = _StubModel()
+
+    def _fake_load_model(path: str) -> _StubModel:
+        loaded_paths.append(path)
+        return stub_model
+
+    monkeypatch.setitem(sys.modules, "whisper", SimpleNamespace(load_model=_fake_load_model))
+    monkeypatch.setitem(
+        sys.modules,
+        "torch",
+        SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: False)),
+    )
 
     previous_always_eager = celery_app.conf.task_always_eager
     previous_store = celery_app.conf.task_store_eager_result
@@ -53,4 +87,7 @@ async def test_celery_transcription_task_updates_job(async_client, admin_token, 
         transcript_file = Path(refreshed.transcript_path)
         assert transcript_file.exists()
         contents = transcript_file.read_text(encoding="utf-8")
-        assert "Bytes:" in contents
+        assert contents == "stub transcript"
+
+    assert loaded_paths == [str(model_path)]
+    assert stub_model.transcribe_called_with == str(audio_path)

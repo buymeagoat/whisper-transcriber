@@ -15,11 +15,10 @@ Following the master findings from 2025-11-07, significant progress has been mad
    - Added regression coverage in `tests/integration/test_upload_queue.py`; `pytest --no-cov tests/integration/test_upload_queue.py` passes and confirms Celery task submission for direct and chunked uploads
    - Transcript service verification is still pending until end-to-end transcription output is exercised
 
-3. ❌ **End-user transcription UI now functional**
-   - The React client posts to `/api/uploads/init`, `/api/uploads/{id}/chunk`, `/api/uploads/{id}/finalize`, and `/api/upload`
-   - FastAPI exposes `/uploads/initialize`, `/uploads/{id}/chunks/{n}`, `/uploads/{id}/finalize`, and `/jobs/`—the `/api/...` endpoints the UI calls return 404s
-   - Progress tracking and transcript display never activate because the network layer fails immediately
-   - **Remediation needed:** align the frontend service layer with the actual backend routes or register matching `/api/uploads/*` endpoints server-side
+3. ✅ **End-user transcription UI now functional**
+   - The React client now targets the FastAPI routes at `/uploads/init`, `/uploads/{id}/chunk`, and `/uploads/{id}/finalize`, eliminating the previous `/api/uploads/*` 404s
+   - Added React Testing Library coverage (`frontend/src/pages/user/TranscribePage.test.jsx`) to drive the mocked chunked upload flow through the finalize step
+   - `npm test` passes, confirming the UI completes the finalize sequence against the mocked backend
 
 4. ✅ **Admin dashboard now shows real-time data**
    - Connected dashboard to real backend metrics endpoints

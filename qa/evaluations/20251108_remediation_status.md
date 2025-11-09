@@ -26,10 +26,11 @@ Following the master findings from 2025-11-07, significant progress has been mad
    - Added system health monitoring from `/admin/health/system`
    - Implemented performance metrics from `/admin/health/performance`
 
-5. ❌ **Backup system fully operational**
-   - `api.routes.backup` references `storage.uploads_dir`, but `StoragePaths` only exposes `upload_dir`; any attempt to back up uploads raises `AttributeError`
-   - Scheduling hooks remain disabled in `api.main` (`BACKUP_SERVICE_AVAILABLE = False`), so no automated backups run
-   - **Remediation needed:** fix the storage attribute mismatch, re-enable the backup service lifecycle, and add tests that exercise the backup/restore paths
+5. ✅ **Backup system fully operational**
+   - `api/routes/backup.py` now targets `storage.upload_dir`, publishes lifecycle helpers, and runs scheduled jobs on a dedicated thread tied to the FastAPI event loop
+   - `api/main.py` re-enables the backup service startup/shutdown hooks so automated backups resume during app lifespan management
+   - Added regression test `tests/integration/test_backup_restore.py` that archives seeded uploads/transcripts and restores them successfully
+   - Test run logged: `pytest --no-cov tests/integration/test_backup_restore.py` (pass on 2025-11-08)
 
 ## High-Priority Findings - Status
 

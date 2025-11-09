@@ -1,3 +1,4 @@
+import asyncio
 import os
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -75,22 +76,14 @@ try:
 
     # Import backup service management if available
     try:
-        # Backup service temporarily disabled during consolidation  
-        # from app.backup_api import (
-        #     initialize_backup_service,
-        #     start_backup_service_if_configured,
-        #     shutdown_backup_service
-        # )
-        # BACKUP_SERVICE_AVAILABLE = True
-        BACKUP_SERVICE_AVAILABLE = False
-        # Define dummy functions for disabled backup service
-        def initialize_backup_service():
-            return False
-        def start_backup_service_if_configured():
-            return False  
-        def shutdown_backup_service():
-            pass
-        system_log.info("Backup service disabled during architecture consolidation")
+        from api.routes.backup import (
+            initialize_backup_service,
+            shutdown_backup_service,
+            start_backup_service_if_configured,
+        )
+
+        BACKUP_SERVICE_AVAILABLE = True
+        system_log.info("Backup service available")
     except ImportError:
         system_log.warning("Backup service not available - backup features disabled")
         BACKUP_SERVICE_AVAILABLE = False
@@ -222,10 +215,10 @@ async def lifespan(app: FastAPI):
     # Initialize backup service if available
     if BACKUP_SERVICE_AVAILABLE:
         try:
+            loop = asyncio.get_running_loop()
             if initialize_backup_service():
                 system_log.info("Backup service initialized successfully")
-                # Optionally start backup service with scheduling
-                if start_backup_service_if_configured():
+                if start_backup_service_if_configured(loop=loop):
                     system_log.info("Backup service started with scheduling")
             else:
                 system_log.warning("Backup service initialization failed")

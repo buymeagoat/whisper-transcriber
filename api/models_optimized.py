@@ -77,8 +77,10 @@ class Job(Base):
         nullable=False,
         default=JobStatusEnum.QUEUED,
     )
-    # User association for multi-user support
-    user_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("users.id"), nullable=True)
+    # User association for multi-user support via external identity providers
+    user_id: Mapped[str] = mapped_column(
+        String(255), nullable=False, index=True, default="legacy"
+    )
     
     # Filled after processing
     transcript_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)

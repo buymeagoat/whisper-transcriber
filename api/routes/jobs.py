@@ -13,6 +13,7 @@ from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form, R
 from sqlalchemy.orm import Session
 from api.orm_bootstrap import get_db
 from api.models import Job, JobStatusEnum
+from api.routes.dependencies import get_authenticated_user_id
 from api.services.job_queue import job_queue
 from api.settings import settings
 from api.utils.logger import get_system_logger
@@ -42,13 +43,15 @@ async def create_job(
     file: UploadFile = File(...),
     model: str = Form(default="small"),
     language: Optional[str] = Form(default=None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_authenticated_user_id)
 ):
     """Create a new transcription job."""
     try:
         # Extract user context for auditing
         user_context = extract_request_context(request)
-        user_id = user_context.get("user_id", "anonymous")
+        # Fall back to the authenticated header if the audit context is missing a user reference.
+        user_id = user_context.get("user_id") or user_id
         
         # Validate file type - check both MIME type and file extension
         allowed_extensions = ['.wav', '.mp3', '.m4a', '.flac', '.ogg', '.aac', '.webm']
@@ -106,7 +109,8 @@ async def create_job(
             original_filename=file.filename,
             saved_filename=str(file_path),
             model=model,
-            status=JobStatusEnum.QUEUED
+            status=JobStatusEnum.QUEUED,
+            user_id=user_id
         )
         
         db.add(job)
@@ -126,7 +130,8 @@ async def create_job(
         await job_cache_manager.job_created(file_id, {
             "status": job.status.value,
             "filename": file.filename,
-            "model": model
+            "model": model,
+            "user_id": user_id
         })
         
         logger.info(safe_log_format("Created transcription job {} for file {}", sanitize_for_log(file_id), sanitize_for_log(file.filename)))
@@ -135,7 +140,8 @@ async def create_job(
             "job_id": file_id,
             "status": job.status.value,
             "message": "Job created successfully",
-            "queue_job_id": queue_job_id
+            "queue_job_id": queue_job_id,
+            "user_id": user_id
         }
     
     except HTTPException:
@@ -146,12 +152,16 @@ async def create_job(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{job_id}", response_model=Dict[str, Any])
-async def get_job(job_id: str, db: Session = Depends(get_db)):
+async def get_job(
+    job_id: str,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_authenticated_user_id)
+):
     """Get job status and details."""
     try:
         job = db.query(Job).filter(Job.id == job_id).first()
         
-        if not job:
+        if not job or job.user_id != user_id:
             raise HTTPException(status_code=404, detail="Job not found")
         
         # Get queue status if available
@@ -186,10 +196,21 @@ async def get_job(job_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Failed to retrieve job")
 
 @router.get("/", response_model=Dict[str, Any])
-async def list_jobs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def list_jobs(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_authenticated_user_id)
+):
     """List all jobs."""
-    jobs = db.query(Job).offset(skip).limit(limit).all()
-    total = db.query(Job).count()
+    jobs = (
+        db.query(Job)
+        .filter(Job.user_id == user_id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    total = db.query(Job).filter(Job.user_id == user_id).count()
     
     return {
         "jobs": [
@@ -207,11 +228,15 @@ async def list_jobs(skip: int = 0, limit: int = 100, db: Session = Depends(get_d
     }
 
 @router.delete("/{job_id}")
-async def delete_job(job_id: str, db: Session = Depends(get_db)):
+async def delete_job(
+    job_id: str,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_authenticated_user_id)
+):
     """Delete a job."""
     job = db.query(Job).filter(Job.id == job_id).first()
     
-    if not job:
+    if not job or job.user_id != user_id:
         raise HTTPException(status_code=404, detail="Job not found")
     
     # Cancel from queue if still pending

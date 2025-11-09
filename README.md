@@ -146,10 +146,18 @@ Compose definition and ensure secrets are injected through a secure mechanism (v
 
 ## API Usage
 
-Upload audio files via the web interface or API:
+Upload audio files via the web interface or API. All job endpoints require an `X-User-ID`
+header that carries the caller's opaque identity:
 ```bash
-curl -X POST -F "file=@audio.wav" http://localhost:8001/upload
+curl -X POST \
+  -H "X-User-ID: demo-user-123" \
+  -F "file=@audio.wav" \
+  http://localhost:8001/jobs/
 ```
+
+Subsequent requests (polling `/jobs/{job_id}` or listing `/jobs/`) must send the same
+`X-User-ID` value; otherwise, the API will return `404 Not Found` to prevent accidental
+data leakage across accounts.
 
 ## Supported Audio Formats
 

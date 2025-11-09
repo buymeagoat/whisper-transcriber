@@ -89,7 +89,7 @@
 
 #### `create_job(job_data: schemas.JobCreate)`
 - **Purpose**: Create new transcription job
-- **Input**: Job parameters (file, model, language)
+- **Input**: Job parameters (file, model, language) sent with an `X-User-ID` header identifying the caller
 - **Output**: Job ID and initial status
 - **Workflow**: Database record → queue task → status tracking
 - **Options**: Model selection, language hints, custom settings
@@ -100,6 +100,7 @@
 - **Output**: Status, progress percentage, results
 - **States**: pending, processing, completed, failed
 - **Progress**: Real-time updates via WebSocket
+- **Security**: Requires matching `X-User-ID` header; mismatched users receive 404
 
 #### `list_user_jobs(user_id: str, filters: dict)`
 - **Purpose**: Get paginated list of user's jobs
@@ -107,6 +108,7 @@
 - **Output**: Job list with metadata
 - **Filters**: Status, date range, filename search
 - **Sorting**: Creation date, status, filename
+- **Security**: Results limited to the authenticated `X-User-ID`
 
 #### `cancel_job(job_id: str)`
 - **Purpose**: Cancel pending or running job
@@ -114,6 +116,7 @@
 - **Output**: Cancellation confirmation
 - **Process**: Queue removal → cleanup → status update
 - **Limitations**: Cannot cancel completed jobs
+- **Security**: Only the job owner (matching `X-User-ID`) may cancel
 
 ### Audio Processing (`api/services/audio_processing.py`)
 

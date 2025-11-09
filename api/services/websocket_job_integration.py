@@ -90,8 +90,13 @@ class WebSocketJobNotifier:
         except Exception as e:
             logger.error(f"Failed to send WebSocket notification for job {job.id}: {e}")
     
-    async def notify_job_progress(self, job_id: str, progress: int, message: str = "",
-                                user_id: Optional[int] = None):
+    async def notify_job_progress(
+        self,
+        job_id: str,
+        progress: int,
+        message: str = "",
+        user_id: Optional[str] = None,
+    ):
         """Send WebSocket notification for job progress update."""
         if not self._initialized or not self.websocket_service:
             return
@@ -119,7 +124,12 @@ class WebSocketJobNotifier:
         except Exception as e:
             logger.error(f"Failed to send WebSocket progress notification for job {job_id}: {e}")
     
-    async def notify_job_error(self, job_id: str, error_message: str, user_id: Optional[int] = None):
+    async def notify_job_error(
+        self,
+        job_id: str,
+        error_message: str,
+        user_id: Optional[str] = None,
+    ):
         """Send WebSocket notification for job error."""
         if not self._initialized or not self.websocket_service:
             return
@@ -206,7 +216,7 @@ async def _handle_job_create_async(job: Job):
 
 # Manual notification functions for use in job processing
 
-async def notify_job_started(job_id: str, user_id: int):
+async def notify_job_started(job_id: str, user_id: str):
     """Manually notify that a job has started processing."""
     try:
         job_notifier = await get_job_notifier()
@@ -219,7 +229,12 @@ async def notify_job_started(job_id: str, user_id: int):
     except Exception as e:
         logger.error(f"Error notifying job start: {e}")
 
-async def notify_job_progress_update(job_id: str, progress: int, message: str = "", user_id: Optional[int] = None):
+async def notify_job_progress_update(
+    job_id: str,
+    progress: int,
+    message: str = "",
+    user_id: Optional[str] = None,
+):
     """Manually notify job progress update."""
     try:
         job_notifier = await get_job_notifier()
@@ -232,7 +247,7 @@ async def notify_job_progress_update(job_id: str, progress: int, message: str = 
     except Exception as e:
         logger.error(f"Error notifying job progress: {e}")
 
-async def notify_job_completed(job_id: str, user_id: int, download_url: Optional[str] = None):
+async def notify_job_completed(job_id: str, user_id: str, download_url: Optional[str] = None):
     """Manually notify that a job has completed."""
     try:
         job_notifier = await get_job_notifier()
@@ -261,7 +276,7 @@ async def notify_job_completed(job_id: str, user_id: int, download_url: Optional
     except Exception as e:
         logger.error(f"Error notifying job completion: {e}")
 
-async def notify_job_failed(job_id: str, error_message: str, user_id: int):
+async def notify_job_failed(job_id: str, error_message: str, user_id: str):
     """Manually notify that a job has failed."""
     try:
         job_notifier = await get_job_notifier()

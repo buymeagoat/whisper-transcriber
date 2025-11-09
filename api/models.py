@@ -56,6 +56,9 @@ class Job(Base):
     original_filename: Mapped[str] = mapped_column(String, nullable=False)
     saved_filename: Mapped[str] = mapped_column(String, nullable=False)
     model: Mapped[str] = mapped_column(String, nullable=False)
+    user_id: Mapped[str] = mapped_column(
+        String(255), nullable=False, index=True, default="legacy"
+    )
     status: Mapped[JobStatusEnum] = mapped_column(
         Enum(JobStatusEnum, values_callable=lambda e: [v.value for v in e]),
         nullable=False,
@@ -80,10 +83,11 @@ class Job(Base):
         Index('idx_jobs_created_at', 'created_at'),
         Index('idx_jobs_status_created', 'status', 'created_at'),
         Index('idx_jobs_model', 'model'),
+        Index('idx_jobs_user_status', 'user_id', 'status'),
     )
 
     def __repr__(self):
-        return f"<Job id={self.id} status={self.status.value}>"
+        return f"<Job id={self.id} status={self.status.value} user_id={self.user_id}>"
 
 
 # ─── MVP Metadata Table ─────────────────────────────────────────────────

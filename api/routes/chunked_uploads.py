@@ -6,8 +6,9 @@ parallel processing, resumable uploads, and real-time progress tracking.
 """
 
 from typing import Dict, Any, Optional
-from fastapi import APIRouter, HTTPException, Depends, Request, File, UploadFile
+from fastapi import APIRouter, HTTPException, Depends, File, UploadFile
 from pydantic import BaseModel, Field
+from api.routes.dependencies import get_authenticated_user_id
 from api.services.chunked_upload_service import chunked_upload_service
 from api.utils.logger import get_system_logger
 
@@ -56,18 +57,10 @@ class FinalizeUploadResponse(BaseModel):
     missing_chunks: Optional[list[int]] = None
 
 
-async def get_current_user_id(request: Request) -> str:
-    """Get current user ID from authenticated headers."""
-    user_id = request.headers.get("X-User-ID")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Missing X-User-ID header")
-    return user_id
-
-
 @router.post("/initialize", response_model=Dict[str, Any])
 async def initialize_upload(
     request: InitializeUploadRequest,
-    user_id: str = Depends(get_current_user_id)
+    user_id: str = Depends(get_authenticated_user_id)
 ):
     """Initialize a new chunked upload session."""
     try:
@@ -93,7 +86,7 @@ async def upload_chunk(
     session_id: str,
     chunk_number: int,
     chunk_data: UploadFile = File(..., description="Chunk data"),
-    user_id: str = Depends(get_current_user_id)
+    user_id: str = Depends(get_authenticated_user_id)
 ):
     """Upload a single chunk for a session."""
     try:
@@ -127,7 +120,7 @@ async def upload_chunk(
 @router.post("/{session_id}/finalize", response_model=FinalizeUploadResponse)
 async def finalize_upload(
     session_id: str,
-    user_id: str = Depends(get_current_user_id)
+    user_id: str = Depends(get_authenticated_user_id)
 ):
     """Finalize upload by assembling chunks into final file."""
     try:
@@ -147,7 +140,7 @@ async def finalize_upload(
 @router.get("/{session_id}/status", response_model=UploadStatusResponse)
 async def get_upload_status(
     session_id: str,
-    user_id: str = Depends(get_current_user_id)
+    user_id: str = Depends(get_authenticated_user_id)
 ):
     """Get current upload status and progress."""
     try:
@@ -166,7 +159,7 @@ async def get_upload_status(
 @router.get("/{session_id}/resume", response_model=Dict[str, Any])
 async def get_resume_info(
     session_id: str,
-    user_id: str = Depends(get_current_user_id)
+    user_id: str = Depends(get_authenticated_user_id)
 ):
     """Get information needed to resume an interrupted upload."""
     try:
@@ -199,7 +192,7 @@ async def get_resume_info(
 @router.delete("/{session_id}")
 async def cancel_upload(
     session_id: str,
-    user_id: str = Depends(get_current_user_id)
+    user_id: str = Depends(get_authenticated_user_id)
 ):
     """Cancel an upload session and cleanup resources."""
     try:
@@ -218,7 +211,7 @@ async def cancel_upload(
 
 @router.get("/", response_model=Dict[str, Any])
 async def list_user_uploads(
-    user_id: str = Depends(get_current_user_id),
+    user_id: str = Depends(get_authenticated_user_id),
     active_only: bool = False
 ):
     """List upload sessions for the current user."""

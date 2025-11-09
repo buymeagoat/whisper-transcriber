@@ -34,9 +34,10 @@ Following the master findings from 2025-11-07, significant progress has been mad
 
 ## High-Priority Findings - Status
 
-1. ❌ **Chunked uploads integration** (Still Broken)
-   - Jobs are inserted into the database, but `job_queue.submit_job(job_id, str(file_path))` omits the Celery task name so nothing is ever queued
-   - No evidence of a passing integration test to catch the missing task submission
+1. ✅ **Chunked uploads integration** (Completed)
+   - `ChunkedUploadService` now enqueues Celery work with the fully-qualified `transcribe_audio` task name when sessions finalize
+   - Added regression coverage in `tests/integration/test_chunked_uploads.py` (happy path + empty chunk rejection) to assert the queue receives the task and that invalid chunks are ignored
+   - Test run logged: `pytest --no-cov tests/integration/test_chunked_uploads.py` (pass on 2025-11-09)
 
 2. ✅ **Security configuration checks** (COMPLETED)
    - Removed debug print statements that exposed secret values
@@ -79,12 +80,12 @@ Following the master findings from 2025-11-07, significant progress has been mad
 ## Next Steps
 
 1. **Immediate Focus:**
-   - Restore end-to-end upload ➜ queue ➜ worker ➜ transcript flow (missing Celery submissions, missing model assets)
+   - Restore end-to-end upload ➜ queue ➜ worker ➜ transcript flow (worker inference + transcript validation remain pending even though Celery submissions now pass regression tests)
    - Provide deterministic verification (tests or smoke scripts) that a submitted job reaches the worker
    - Only after functional parity should new performance baselines be gathered
 
 2. **Short-term Priorities:**
-   - Add regression tests for direct + chunked uploads that assert a Celery task is enqueued
+   - Maintain regression tests for direct + chunked uploads (see `tests/integration/test_upload_queue.py` and `tests/integration/test_chunked_uploads.py`) that assert a Celery task is enqueued
    - Update frontend service clients (or backend routes) so `/api/uploads/*` requests succeed
    - Re-enable and test the backup scheduler once the storage path bug is fixed
 
@@ -150,7 +151,7 @@ Expected: 50-60%+ with error and security scenarios
 
 ### Recommended Next Steps for Recovery
 1. Ship (or download during deployment) the Whisper `.pt` checkpoints the worker expects.
-2. Patch direct + chunked upload services to submit `transcribe_audio` jobs via `job_queue.submit_job` and add regression tests.
+2. Keep direct + chunked upload services validated via regression tests that ensure `job_queue.submit_job` submits `transcribe_audio` tasks.
 3. Bring the React client and FastAPI routes back into alignment so `/api/uploads/*` requests succeed.
 4. Fix `storage.uploads_dir` references in the backup API and re-enable the scheduler only after a green end-to-end test.
 5. Once jobs run successfully, regenerate performance baselines and update documentation to reflect the actual architecture.

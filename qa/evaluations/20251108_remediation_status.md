@@ -63,10 +63,12 @@ Following the master findings from 2025-11-07, significant progress has been mad
 
 ## Medium-Priority Findings - Status
 
-1. ❌ **Observability implementation** (Still Open)
-   - Need to create and commit dashboard configurations
-   - Alert rules need to be implemented
-   - Monitoring stack needs to be defined
+1. ✅ **Observability implementation** (Completed)
+   - Added Prometheus configuration and alert rules under `observability/prometheus/`
+   - Provisioned Grafana datasources and dashboards (`observability/grafana/**`)
+   - Extended `docker-compose.yml` to run Prometheus + Grafana locally for the app
+   - Added observability smoke tests (`tests/observability/test_metrics_endpoints.py`) to verify exported series
+   - Test run logged: `pytest --no-cov tests/observability/test_metrics_endpoints.py` (pass on 2025-11-09)
 
 2. ❌ **Deployment automation** (Still Open)
    - Infrastructure-as-code needed

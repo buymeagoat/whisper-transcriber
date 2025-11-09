@@ -115,6 +115,12 @@ def record_http_request(method: str, endpoint: str, status_code: int, duration_s
 async def _update_system_metrics() -> None:
     """Refresh USE metrics for system resources."""
 
+    # Ensure baseline samples exist even when no errors have occurred yet.
+    RESOURCE_ERRORS.labels(resource="cpu", kind="collection").inc(0)
+    RESOURCE_ERRORS.labels(resource="memory", kind="collection").inc(0)
+    RESOURCE_ERRORS.labels(resource="disk", kind="collection").inc(0)
+    RESOURCE_ERRORS.labels(resource="redis", kind="collection").inc(0)
+
     try:
         cpu_ratio = psutil.cpu_percent(interval=None) / 100.0
         RESOURCE_UTILIZATION.labels(resource="cpu").set(cpu_ratio)

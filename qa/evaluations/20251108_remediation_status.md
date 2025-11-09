@@ -70,10 +70,10 @@ Following the master findings from 2025-11-07, significant progress has been mad
    - Added observability smoke tests (`tests/observability/test_metrics_endpoints.py`) to verify exported series
    - Test run logged: `pytest --no-cov tests/observability/test_metrics_endpoints.py` (pass on 2025-11-09)
 
-2. ❌ **Deployment automation** (Still Open)
-   - Infrastructure-as-code needed
-   - Automated rollback procedures required
-   - CI/CD pipeline needs expansion
+2. ⚠️ **Deployment automation** (Complete-Pending Tests)
+   - Added Terraform infrastructure definitions, Ansible deployment playbooks, and documented parameters under `deploy/`
+   - Introduced CI validation and rollback dry-run scripts (`scripts/ci/run_infra_checks.sh`, `scripts/ci/rollback_infra.sh`) and wired them into `.github/workflows/ci.yml`
+   - Local terraform provider downloads are blocked in the remediation container (`terraform init` 403 to registry.terraform.io on 2025-11-08), so dry-run execution is deferred to hosted CI where networking is unrestricted
 
 3. ❌ **Security testing** (Still Open)
    - No progress on fuzz testing

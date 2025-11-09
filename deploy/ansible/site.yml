@@ -1,0 +1,80 @@
+---
+- name: Deploy Whisper Transcriber stack
+  hosts: transcriber
+  gather_facts: true
+  vars:
+    rendered_at: "{{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}"
+  tasks:
+    - name: Ensure deployment root exists
+      ansible.builtin.file:
+        path: "{{ deployment_root }}"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_group }}"
+        mode: "0755"
+      tags:
+        - deploy
+        - plan
+
+    - name: Render environment file
+      ansible.builtin.template:
+        src: templates/env.j2
+        dest: "{{ deployment_root }}/.env"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_group }}"
+        mode: "0640"
+      tags:
+        - deploy
+        - plan
+
+    - name: Render docker compose bundle
+      ansible.builtin.template:
+        src: templates/docker-compose.yml.j2
+        dest: "{{ deployment_root }}/docker-compose.generated.yml"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_group }}"
+        mode: "0644"
+      tags:
+        - deploy
+        - plan
+
+    - name: Document desired release
+      ansible.builtin.copy:
+        dest: "{{ deployment_root }}/release.json"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_group }}"
+        mode: "0644"
+        content: |
+          {
+            "project": "{{ project }}",
+            "environment": "{{ deploy_env }}",
+            "desired_release": "{{ desired_release_tag }}",
+            "rendered_at": "{{ rendered_at }}"
+          }
+      tags:
+        - deploy
+        - plan
+
+    - name: Capture rollback metadata
+      ansible.builtin.copy:
+        dest: "{{ deployment_root }}/rollback.json"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_group }}"
+        mode: "0644"
+        content: |
+          {
+            "project": "{{ project }}",
+            "environment": "{{ deploy_env }}",
+            "rollback_release": "{{ rollback_release_tag }}",
+            "rendered_at": "{{ rendered_at }}"
+          }
+      tags:
+        - rollback
+
+    - name: Describe rollback action
+      ansible.builtin.debug:
+        msg: >-
+          Rolling back {{ project }} {{ deploy_env }} to image tag {{ rollback_release_tag }}
+      tags:
+        - rollback
+

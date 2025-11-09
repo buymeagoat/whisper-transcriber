@@ -1,0 +1,20 @@
+---
+project: whisper-transcriber
+deploy_env: dev
+compose_project_name: "{{ project | replace('-', '_') }}_{{ deploy_env }}"
+deployment_root: /opt/whisper-transcriber
+deploy_user: whisper
+deploy_group: whisper
+container_registry: "public.ecr.aws/whisper"
+container_image: "{{ container_registry }}/transcriber"
+desired_release_tag: latest
+rollback_release_tag: previous
+uploads_bucket: "{{ project }}-uploads-{{ deploy_env }}"
+logs_bucket: "{{ project }}-logs-{{ deploy_env }}"
+aws_region: us-east-1
+db_host: "aurora-{{ deploy_env }}.database.example.com"
+db_name: "{{ project | replace('-', '_') }}_{{ deploy_env }}"
+db_username: transcriber
+db_password: change-me
+redis_endpoint: "redis.{{ deploy_env }}.example.com:6379"
+queue_backend: redis

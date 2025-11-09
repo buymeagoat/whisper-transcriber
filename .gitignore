@@ -100,6 +100,10 @@ models/
 storage/
 tests/assets/
 scripts/test_cache_access.sh
+deploy/terraform/.terraform/
+deploy/terraform/.terraform.lock.hcl
+deploy/terraform/*.tfstate*
+deploy/terraform/.terraform-plan
 
 # === Runtime Files ===
 app.db

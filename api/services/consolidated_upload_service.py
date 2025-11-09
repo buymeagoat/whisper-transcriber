@@ -91,7 +91,8 @@ class ConsolidatedUploadService:
                 model=model_name,
                 status=JobStatusEnum.QUEUED,
                 created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow()
+                updated_at=datetime.utcnow(),
+                user_id=user_id
             )
 
             db.add(job)

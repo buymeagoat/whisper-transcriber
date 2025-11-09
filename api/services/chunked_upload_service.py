@@ -632,7 +632,8 @@ class ChunkedUploadService:
                 model=session.model_name,
                 status=JobStatusEnum.QUEUED,
                 created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow()
+                updated_at=datetime.utcnow(),
+                user_id=session.user_id
             )
             
             db.add(job)

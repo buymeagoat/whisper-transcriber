@@ -75,10 +75,11 @@ Following the master findings from 2025-11-07, significant progress has been mad
    - Introduced CI validation and rollback dry-run scripts (`scripts/ci/run_infra_checks.sh`, `scripts/ci/rollback_infra.sh`) and wired them into `.github/workflows/ci.yml`
    - Local terraform provider downloads are blocked in the remediation container (`terraform init` 403 to registry.terraform.io on 2025-11-08), so dry-run execution is deferred to hosted CI where networking is unrestricted
 
-3. ❌ **Security testing** (Still Open)
-   - No progress on fuzz testing
-   - DAST integration still needed
-   - Malicious input testing required
+3. ⚠️ **Security testing** (Complete-Pending Tests)
+   - Added Hypothesis-based fuzz suite targeting direct and chunked uploads (`tests/security/test_upload_fuzz.py`) to ensure storage paths remain sandboxed even under adversarial filenames and payloads
+   - Added sanitizer regression coverage (`tests/security/test_sanitization_regressions.py`) verifying log sanitization and filename validation reject traversal, CRLF, and SQL injection probes
+   - Introduced OWASP ZAP baseline pipeline (`scripts/security/run_dast.sh`) and wired it into CI (`security-dast` job in `.github/workflows/ci.yml`) for automated DAST scanning; execution deferred in remediation container pending Docker/ZAP availability
+   - Test run logged: `pytest --no-cov tests/security` (pass on 2025-11-10)
 
 ## Next Steps
 

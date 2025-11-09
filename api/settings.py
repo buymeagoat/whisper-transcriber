@@ -68,6 +68,7 @@ class Settings(BaseModel):
     transcripts_dir: Path = Path("./storage/transcripts")
     models_dir: Path = Path("./models")
     cache_dir: Path = Path("./cache")
+    backup_scheduler_enabled: bool = True
 
     # Queue settings
     redis_url: str = Field(...)
@@ -139,6 +140,8 @@ def load_settings() -> Settings:
         host=os.getenv("HOST", "0.0.0.0"),
         port=int(os.getenv("PORT", "8001")),
         log_level=os.getenv("LOG_LEVEL", "INFO"),
+        backup_scheduler_enabled=os.getenv("BACKUP_SCHEDULER_ENABLED", "true").lower()
+        not in {"false", "0", "no"},
     )
 
 

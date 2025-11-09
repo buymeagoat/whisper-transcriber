@@ -6,9 +6,11 @@ supporting both manual and scheduled backups with retention policies.
 """
 
 import asyncio
+import contextlib
 import json
 import os
 import shutil
+import threading
 import zstandard
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -17,9 +19,7 @@ from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import Session
 import aiofiles
-import boto3
 import schedule
 
 from api.orm_bootstrap import get_db
@@ -50,6 +50,9 @@ class BackupService:
         """Initialize the backup service."""
         self.manifest = self._load_manifest()
         self.scheduler = schedule.Scheduler()
+        self._scheduler_thread: Optional[threading.Thread] = None
+        self._scheduler_stop = threading.Event()
+        self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._setup_scheduled_backups()
 
     def _load_manifest(self) -> Dict:
@@ -72,12 +75,93 @@ class BackupService:
         """Setup scheduled backup jobs."""
         # Daily database backup at 2 AM
         self.scheduler.every().day.at("02:00").do(
-            lambda: asyncio.create_task(self.create_backup(backup_type="database"))
+            self._run_scheduled_backup,
+            "database",
         )
         # Weekly full backup on Sunday at 3 AM
         self.scheduler.every().sunday.at("03:00").do(
-            lambda: asyncio.create_task(self.create_backup(backup_type="full"))
+            self._run_scheduled_backup,
+            "full",
         )
+
+    def configure_event_loop(self, loop: Optional[asyncio.AbstractEventLoop]) -> None:
+        """Persist the event loop used for scheduled tasks."""
+        self._loop = loop
+
+    def start_scheduler(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> bool:
+        """Start the background scheduler thread if enabled."""
+        if loop is not None:
+            self.configure_event_loop(loop)
+        elif self._loop is None:
+            try:
+                self._loop = asyncio.get_running_loop()
+            except RuntimeError:
+                try:
+                    self._loop = asyncio.get_event_loop()
+                except RuntimeError:
+                    logger.error("No event loop available for backup scheduler")
+                    return False
+
+        if self._loop is None:
+            logger.warning("Backup scheduler cannot start without an event loop")
+            return False
+
+        if self._scheduler_thread and self._scheduler_thread.is_alive():
+            return True
+
+        self._scheduler_stop.clear()
+        self._scheduler_thread = threading.Thread(
+            target=self._run_scheduler_loop,
+            name="backup-scheduler",
+            daemon=True,
+        )
+        self._scheduler_thread.start()
+        logger.info("Backup scheduler thread started")
+        return True
+
+    def stop_scheduler(self) -> None:
+        """Stop the background scheduler thread."""
+        self._scheduler_stop.set()
+        if self._scheduler_thread and self._scheduler_thread.is_alive():
+            self._scheduler_thread.join(timeout=5)
+        self._scheduler_thread = None
+
+    def _run_scheduler_loop(self) -> None:
+        """Run scheduled jobs until shutdown."""
+        while not self._scheduler_stop.is_set():
+            try:
+                self.scheduler.run_pending()
+            except Exception as exc:  # pragma: no cover - defensive logging
+                logger.error(f"Backup scheduler run failed: {exc}")
+            self._scheduler_stop.wait(60)
+
+    def _enqueue_scheduled_backup(self, backup_type: str) -> None:
+        """Submit a scheduled backup to the application event loop."""
+        if self._loop is None or self._loop.is_closed():
+            logger.warning(
+                "Skipping scheduled backup because event loop is unavailable"
+            )
+            return
+
+        try:
+            future = asyncio.run_coroutine_threadsafe(
+                self.create_backup(backup_type=backup_type),
+                self._loop,
+            )
+
+            def _log_future_result(_future: asyncio.Future) -> None:
+                with contextlib.suppress(Exception):
+                    _future.result()
+
+            future.add_done_callback(_log_future_result)
+        except Exception as exc:
+            logger.error(f"Failed to schedule backup task: {exc}")
+
+    def _run_scheduled_backup(self, backup_type: str) -> bool:
+        """Run a scheduled backup job via the configured loop."""
+        logger.info(f"Scheduled backup triggered: {backup_type}")
+        self._enqueue_scheduled_backup(backup_type)
+        return True
 
     async def _compress_directory(self, source_dir: Path, output_file: Path):
         """Compress a directory using Zstandard compression."""
@@ -163,7 +247,7 @@ class BackupService:
             if backup_type == "full":
                 # Backup uploads
                 uploads_backup = FILES_BACKUP_DIR / f"{backup_id}_uploads.tar.zst"
-                await self._compress_directory(storage.uploads_dir, uploads_backup)
+                await self._compress_directory(storage.upload_dir, uploads_backup)
                 backup_info["files"]["uploads"] = str(uploads_backup)
 
                 # Backup transcripts
@@ -222,7 +306,7 @@ class BackupService:
                         data_result = conn.execute(text(f"SELECT * FROM {table_name}"))
                         for data_row in data_result:
                             values = [
-                                f"'{str(v).replace(\"'\", \"''\")}'" if v is not None else 'NULL'
+                                "'{}'".format(str(v).replace("'", "''")) if v is not None else "NULL"
                                 for v in data_row
                             ]
                             f.write(f"INSERT INTO {table_name} VALUES ({','.join(values)});\n")
@@ -272,18 +356,20 @@ class BackupService:
             if restore_type == "full":
                 if "uploads" in backup["files"]:
                     # Clear existing uploads
-                    shutil.rmtree(storage.uploads_dir)
-                    storage.uploads_dir.mkdir(parents=True)
+                    if storage.upload_dir.exists():
+                        shutil.rmtree(storage.upload_dir)
+                    storage.upload_dir.mkdir(parents=True, exist_ok=True)
                     # Restore uploads
                     await self._decompress_directory(
                         Path(backup["files"]["uploads"]),
-                        storage.uploads_dir
+                        storage.upload_dir
                     )
 
                 if "transcripts" in backup["files"]:
                     # Clear existing transcripts
-                    shutil.rmtree(storage.transcripts_dir)
-                    storage.transcripts_dir.mkdir(parents=True)
+                    if storage.transcripts_dir.exists():
+                        shutil.rmtree(storage.transcripts_dir)
+                    storage.transcripts_dir.mkdir(parents=True, exist_ok=True)
                     # Restore transcripts
                     await self._decompress_directory(
                         Path(backup["files"]["transcripts"]),
@@ -532,3 +618,50 @@ async def backup_health():
             status_code=503,
             detail=f"Backup service health check failed: {str(e)}"
         )
+
+
+def initialize_backup_service() -> bool:
+    """Initialize the backup subsystem."""
+    try:
+        backup_service.configure_event_loop(None)
+        logger.info("Backup service initialized")
+        return True
+    except Exception as exc:  # pragma: no cover - defensive logging
+        logger.error(f"Failed to initialize backup service: {exc}")
+        return False
+
+
+def start_backup_service_if_configured(
+    loop: Optional[asyncio.AbstractEventLoop] = None,
+) -> bool:
+    """Start the backup scheduler when enabled via configuration."""
+    try:
+        scheduler_enabled = getattr(settings, "backup_scheduler_enabled", True)
+        if not scheduler_enabled:
+            logger.info("Backup scheduler disabled via configuration")
+            return False
+
+        started = backup_service.start_scheduler(loop=loop)
+        if started:
+            logger.info("Backup scheduler started")
+        return started
+    except Exception as exc:  # pragma: no cover - defensive logging
+        logger.error(f"Failed to start backup scheduler: {exc}")
+        return False
+
+
+def shutdown_backup_service() -> None:
+    """Stop the backup scheduler."""
+    try:
+        backup_service.stop_scheduler()
+        logger.info("Backup scheduler stopped")
+    except Exception as exc:  # pragma: no cover - defensive logging
+        logger.error(f"Error during backup scheduler shutdown: {exc}")
+
+
+__all__ = [
+    "backup_router",
+    "initialize_backup_service",
+    "start_backup_service_if_configured",
+    "shutdown_backup_service",
+]

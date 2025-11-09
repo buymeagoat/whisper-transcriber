@@ -85,6 +85,12 @@ def bootstrap_model_assets(*, force_download: bool = False) -> List[Path]:
     If ``force_download`` is set the routine ignores any pre-existing assets
     and re-runs the download/copy steps.  Otherwise, an existing ``*.pt`` file
     short-circuits the bootstrap logic.
+
+    The Celery worker expects checkpoints named ``<model>.pt`` within
+    :mod:`api.paths.storage.models_dir`.  Provisioning scripts should ensure the
+    desired Whisper variants are staged here (for example ``small.pt`` or
+    ``medium.pt``) before the worker is scaled out, otherwise jobs will fail the
+    health checks performed in :func:`api.services.app_worker.transcribe_audio`.
     """
 
     models_dir = storage.models_dir

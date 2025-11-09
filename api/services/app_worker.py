@@ -1,21 +1,19 @@
 """Celery tasks for handling background transcription jobs.
 
-This module integrates with the shared Celery application defined in
-``api.worker`` and operates directly on the SQLAlchemy ``Job`` model.  The
-tasks here are intentionally lightweight: they mark job progress in the
-database, perform a very small stand-in "transcription" step so that the
-pipeline can be exercised in development and automated tests, and persist a
-log when failures occur.
+Unlike the original scaffolding, the worker now performs a full Whisper
+inference cycle.  Jobs are promoted to ``processing`` when dequeued, the
+configured checkpoint is loaded via :mod:`api.app_worker.bootstrap_model_assets`,
+audio is transcribed with Whisper, and the resulting text is persisted to the
+transcript directory.  Failures are captured in a per-job log file so that
+operations teams can diagnose missing checkpoints or inference errors.
 """
 
 from __future__ import annotations
 
+import importlib
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict
-
-import whisper
-import torch
 
 from celery.utils.log import get_task_logger
 
@@ -53,9 +51,9 @@ def _write_failure_log(job_id: str, error_message: str) -> str:
 def transcribe_audio(self, job_id: str, **kwargs: Any) -> Dict[str, Any]:  # pragma: no cover - exercised via Celery
     """Process a queued transcription job.
 
-    The task updates the ``jobs`` table to reflect the active state, performs a
-    lightweight placeholder transcription (writing the byte size to a text
-    file), and records completion metadata.
+    The task updates the ``jobs`` table to reflect the active state, resolves
+    the requested Whisper checkpoint, executes ``model.transcribe`` against the
+    uploaded audio, and persists the resulting transcript on disk.
     """
 
     session = SessionLocal()
@@ -82,27 +80,28 @@ def transcribe_audio(self, job_id: str, **kwargs: Any) -> Dict[str, Any]:  # pra
         transcript_path = transcript_dir / "transcript.txt"
 
         # Load Whisper model and perform transcription
-        import whisper
-        import torch
-
         try:
             bootstrap_model_assets()
         except WhisperModelBootstrapError as exc:
             raise RuntimeError(f"Whisper model assets unavailable: {exc}") from exc
 
-        # Get the model path based on the job's model selection
-        model_path = storage.models_dir / f"{job.model}.pt"
+        model_name = job.model
+        if not model_name:
+            raise ValueError("Job is missing a Whisper model selection")
+
+        model_path = storage.models_dir / f"{model_name}.pt"
         if not model_path.exists():
             raise FileNotFoundError(f"Model file not found at {model_path}")
 
-        # Load model with CUDA if available
+        whisper = importlib.import_module("whisper")
+        torch = importlib.import_module("torch")
+
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        LOGGER.info("Loading Whisper model %s on %s", job.model, device)
-        
-        model = whisper.load_model(str(model_path))
+        LOGGER.info("Loading Whisper model %s on %s", model_name, device)
+
+        model = whisper.load_model(model_name, download_root=str(storage.models_dir))
         model.to(device)
 
-        # Transcribe the audio file
         LOGGER.info("Starting transcription for %s", job.original_filename)
         result = model.transcribe(str(audio_path))
         

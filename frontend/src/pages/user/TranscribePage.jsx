@@ -62,37 +62,41 @@ const TranscribePage = () => {
       abortControllerRef.current = new AbortController()
 
       // Initialize upload
-      const initResponse = await axios.post('/uploads/init', {
+      const initResponse = await axios.post('/uploads/initialize', {
         filename: file.name,
-        fileSize: file.size,
-        modelName: selectedModel,
+        file_size: file.size,
+        model_name: selectedModel,
         language: language || undefined
       })
 
       const { session_id, chunk_size, total_chunks } = initResponse.data
-      const chunks = Math.ceil(file.size / chunk_size)
-      
+      const effectiveChunkSize = chunk_size || CHUNK_SIZE
+      const chunks = Math.ceil(file.size / effectiveChunkSize)
+
       for (let i = 0; i < chunks; i++) {
         if (abortControllerRef.current.signal.aborted) {
           throw new Error('Upload cancelled')
         }
 
-        const start = i * chunk_size
-        const end = Math.min(start + chunk_size, file.size)
+        const start = i * effectiveChunkSize
+        const end = Math.min(start + effectiveChunkSize, file.size)
         const chunk = file.slice(start, end)
-        
-        const formData = new FormData()
-        formData.append('chunk', chunk)
-        formData.append('chunk_number', i)
 
-        await axios.post(`/uploads/${session_id}/chunk`, formData)
-        
+        const formData = new FormData()
+        formData.append('chunk_data', chunk)
+
+        await axios.post(`/uploads/${session_id}/chunks/${i}`, formData, {
+          signal: abortControllerRef.current.signal
+        })
+
         const progress = Math.round(((i + 1) / chunks) * 100)
         setUploadProgress(progress)
       }
 
       // Finalize upload
-      const finalizeResponse = await axios.post(`/uploads/${session_id}/finalize`)
+      const finalizeResponse = await axios.post(`/uploads/${session_id}/finalize`, null, {
+        signal: abortControllerRef.current.signal
+      })
       const { job_id } = finalizeResponse.data
 
       // Start polling for transcription status
@@ -121,7 +125,7 @@ const TranscribePage = () => {
         formData.append('language', language)
       }
 
-      const response = await axios.post('/api/upload', formData, {
+      const response = await axios.post('/jobs/', formData, {
         signal: abortControllerRef.current.signal,
         onUploadProgress: (progressEvent) => {
           const progress = Math.round(
@@ -148,17 +152,37 @@ const TranscribePage = () => {
   const pollTranscriptionStatus = async (jobId) => {
     try {
       const interval = setInterval(async () => {
-        const response = await axios.get(`/api/jobs/${jobId}`)
-        const { status, transcript } = response.data
+        const response = await axios.get(`/jobs/${jobId}`)
+        const {
+          status,
+          transcript,
+          transcript_path: transcriptPath,
+          transcript_download_url: transcriptDownloadUrl
+        } = response.data
 
-        setTranscriptionStatus(status)
+        const normalizedStatus = typeof status === 'string' ? status.toUpperCase() : status
 
-        if (status === 'COMPLETED') {
+        setTranscriptionStatus(normalizedStatus)
+
+        if (normalizedStatus === 'COMPLETED') {
           clearInterval(interval)
-          setTranscript(transcript)
+          if (transcript) {
+            setTranscript(transcript)
+          } else if (transcriptDownloadUrl || transcriptPath) {
+            try {
+              const downloadTarget = transcriptDownloadUrl || transcriptPath
+              const transcriptResponse = await axios.get(downloadTarget, {
+                responseType: 'text'
+              })
+              setTranscript(transcriptResponse.data)
+            } catch (transcriptError) {
+              console.error('Failed to fetch transcript file:', transcriptError)
+              toast.error('Transcript ready but could not be downloaded automatically.')
+            }
+          }
           setIsUploading(false)
           toast.success('Transcription completed!')
-        } else if (status === 'FAILED') {
+        } else if (normalizedStatus === 'FAILED') {
           clearInterval(interval)
           setIsUploading(false)
           toast.error('Transcription failed. Please try again.')

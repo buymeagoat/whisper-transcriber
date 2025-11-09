@@ -1,166 +1,84 @@
-# Remediation Status Update – 2025-11-08
+# Remediation Status Update – 2025-11-08 (Revalidated)
 
 ## Overview
-Following the master findings from 2025-11-07, significant progress has been made in addressing critical gaps and implementing core functionality. This document tracks the status of each finding and remaining work needed for full production readiness.
+A follow-up review of the repository after the remediation push shows that several headline fixes never landed in the running application.  The Celery worker now expects real Whisper checkpoints and the backup pipeline is wired back in, but every user-facing workflow (upload ➜ job creation ➜ transcript) still fails in practice.  The sections below update the status of each master finding and highlight the concrete work required to finish the remediations.
 
-## Critical Findings - Status
+## Critical Findings – Current Status
 
-1. ✅ **Transcription jobs now perform real inference**
-   - `api/app_worker.py` bootstraps Whisper checkpoints into `storage.models_dir`, allowing deployments to copy or download production weights and failing fast if no `.pt` files are present
-   - Docker entrypoint and production startup scripts now invoke the bootstrapper so containers refuse to start without valid model assets
-   - Added integration test `tests/integration/test_worker_model_loading.py` to assert `transcribe_audio` loads the provisioned checkpoint (see docs/deployment.md for verification steps)
+1. ❌ **Transcription jobs fail without provisioned checkpoints**  
+   - `transcribe_audio` now loads `storage.models_dir / f"{job.model}.pt"`, so any model that is not already present on disk raises `FileNotFoundError`.【F:api/services/app_worker.py†L58-L94】  
+   - The bootstrapper only knows how to copy checkpoints that physically exist under `/models`; it does not download or alias `large-v3`, yet the UI exposes that option by default.  Jobs created with that model crash before inference starts.  
+   - ✅ Follow-up requirement: either provision every advertised model during bootstrap, or down-scope the UI/validation to the checkpoints that are actually shippable.
 
-2. ⚠️ **Upload/transcript services fully implemented**
-   - Direct and chunked uploads now invoke `job_queue.submit_job("transcribe_audio", job_id=..., file_path=...)`, wiring the queue correctly for both flows
-   - Added regression coverage in `tests/integration/test_upload_queue.py`; `pytest --no-cov tests/integration/test_upload_queue.py` passes and confirms Celery task submission for direct and chunked uploads
-   - Transcript service verification is still pending until end-to-end transcription output is exercised
+2. ❌ **Consolidated upload/transcript services remain disconnected**  
+   - The new service classes live in `api/services/consolidated_*`, but no router delegates to them.  REST endpoints still point at the legacy chunked upload module, which requires custom headers and bypasses the new orchestration.  
+   - `/api/upload` is still the only direct upload entry point; the documented `/api/uploads/*` routes do not exist.  Clients relying on the published API surface receive `404` responses.
 
-3. ✅ **End-user transcription UI now functional**
-   - The React client now targets the FastAPI routes at `/uploads/init`, `/uploads/{id}/chunk`, and `/uploads/{id}/finalize`, eliminating the previous `/api/uploads/*` 404s
-   - Added React Testing Library coverage (`frontend/src/pages/user/TranscribePage.test.jsx`) to drive the mocked chunked upload flow through the finalize step
-   - `npm test` passes, confirming the UI completes the finalize sequence against the mocked backend
+3. ❌ **End-user transcription UI cannot talk to the backend**  
+   - The React flow posts to `/uploads/init` and `/uploads/{id}/chunk`, but the FastAPI router exports `/uploads/initialize` and `/uploads/{id}/chunks/{chunk_number}`; every request 404s even before authentication.  
+   - Chunked endpoints enforce an `X-User-ID` header, yet the UI never sends it, so the backend responds with `401` when the path names do line up.【F:api/routes/chunked_uploads.py†L36-L118】【F:frontend/src/pages/user/TranscribePage.jsx†L47-L119】  
+   - Direct uploads target `/api/upload`, which is not defined in the backend, and status polling hits `/api/jobs/{id}` while only `/jobs/{id}` exists.  The UI therefore cannot observe job progress.
 
-4. ✅ **Admin dashboard now shows real-time data**
-   - Connected dashboard to real backend metrics endpoints
-   - Integrated job statistics from `/admin/jobs/stats`
-   - Added system health monitoring from `/admin/health/system`
-   - Implemented performance metrics from `/admin/health/performance`
+4. ❌ **Admin dashboard crashes when fetching metrics**  
+   - Dashboard API handlers now look up `job_queue.jobs`, but the Celery wrapper exposes no such attribute, so every stats call raises `AttributeError`.【F:api/routes/admin.py†L47-L549】【F:api/services/job_queue.py†L19-L63】  
+   - Queue metrics, cancellation, and health endpoints therefore fail before returning JSON.
 
-5. ✅ **Backup system fully operational**
-   - `api/routes/backup.py` now targets `storage.upload_dir`, publishes lifecycle helpers, and runs scheduled jobs on a dedicated thread tied to the FastAPI event loop
-   - `api/main.py` re-enables the backup service startup/shutdown hooks so automated backups resume during app lifespan management
-   - Added regression test `tests/integration/test_backup_restore.py` that archives seeded uploads/transcripts and restores them successfully
-   - Test run logged: `pytest --no-cov tests/integration/test_backup_restore.py` (pass on 2025-11-08)
+5. ✅ **Backup system is operational**  
+   - `/admin/backup` routes mount again, manifests are persisted under `storage.backups_dir`, and scheduler hooks run during application lifespan management.  This portion of the remediation held up under review.
 
-## High-Priority Findings - Status
+## High-Priority Findings – Current Status
 
-1. ✅ **Chunked uploads integration** (Completed)
-   - `ChunkedUploadService` now enqueues Celery work with the fully-qualified `transcribe_audio` task name when sessions finalize
-   - Added regression coverage in `tests/integration/test_chunked_uploads.py` (happy path + empty chunk rejection) to assert the queue receives the task and that invalid chunks are ignored
-   - Test run logged: `pytest --no-cov tests/integration/test_chunked_uploads.py` (pass on 2025-11-09)
+1. ❌ **Chunked uploads do not create runnable jobs**  
+   - The service enqueues Celery work, but the missing header and route mismatches prevent any real client from finalizing an upload.  No end-to-end job reaches the worker.  
+   - Required fix: align HTTP signatures (paths + headers) and add a smoke test that posts chunks and asserts a Celery task fires.
 
-2. ✅ **Security configuration checks** (COMPLETED)
-   - Removed debug print statements that exposed secret values
-   - Implemented proper validation that enforces in production
-   - Added environment check to skip validation only in dev/test
+2. ✅ **Security configuration checks execute**  
+   - `UserService` now validates secrets during construction; this remediation remains in place.
 
-3. ✅ **Documentation and queue implementation mismatch** (COMPLETED)
-   - Updated README to accurately reflect Celery implementation
-   - Removed references to ThreadJobQueue
-   - Documented Redis as message broker and result backend
+3. ✅ **Documentation matches the Celery queue**  
+   - README and architecture docs describe the Celery/Redis stack accurately.
 
-4. ⚠️ **Performance baselines** (Partially blocked)
-   - `perf/transcription_scenario.js` now exercises the restored `/uploads → /jobs` flow, ensuring chunked uploads finalize before polling job status
-   - Added `perf/run_load_test.py` wrapper so `python perf/run_load_test.py` runs the k6 scenario and archives summaries under `perf/results/`
-   - Attempted run in the remediation container failed because `k6` is not installed; captured this in `perf/results/summary_20251108.md` for traceability
+4. ❌ **Performance baselines remain blocked**  
+   - `perf/` scripts invoke k6, but the scenario cannot run without a working upload/transcription loop.  Results remain missing and will stay that way until the functional regressions above are fixed.
 
-5. ✅ **Test coverage improvements** (COMPLETED)
-   - Added comprehensive error scenario tests (test_error_scenarios.py)
-   - Added security testing suite (test_security.py)
-   - Tests cover authentication errors, upload errors, job errors, admin errors
-   - Security tests cover password security, auth/authz, input validation, XSS/SQLi prevention
-   - TODO: Run coverage analysis to measure improvement
+5. ❌ **New tests miss the failing surfaces**  
+   - Error-handling suites target `/api/upload` and other non-existent endpoints, so they fail with `404` rather than validating the desired behaviour.  
+   - Action: rewrite the negative tests to exercise the real routers once they exist and add coverage for the header/route alignment issues uncovered here.
 
-## Medium-Priority Findings - Status
+## Medium-Priority Findings – Current Status
 
-1. ✅ **Observability implementation** (Completed)
-   - Added Prometheus configuration and alert rules under `observability/prometheus/`
-   - Provisioned Grafana datasources and dashboards (`observability/grafana/**`)
-   - Extended `docker-compose.yml` to run Prometheus + Grafana locally for the app
-   - Added observability smoke tests (`tests/observability/test_metrics_endpoints.py`) to verify exported series
-   - Test run logged: `pytest --no-cov tests/observability/test_metrics_endpoints.py` (pass on 2025-11-09)
+1. ⚠️ **Observability assets exist but are unverified**  
+   - Prometheus/Grafana configs were added, yet with the core workflows still broken, none of the dashboards or alerts can be exercised.
 
-2. ⚠️ **Deployment automation** (Complete-Pending Tests)
-   - Added Terraform infrastructure definitions, Ansible deployment playbooks, and documented parameters under `deploy/`
-   - Introduced CI validation and rollback dry-run scripts (`scripts/ci/run_infra_checks.sh`, `scripts/ci/rollback_infra.sh`) and wired them into `.github/workflows/ci.yml`
-   - Local terraform provider downloads are blocked in the remediation container (`terraform init` 403 to registry.terraform.io on 2025-11-08), so dry-run execution is deferred to hosted CI where networking is unrestricted
+2. ⚠️ **Deployment automation remains untested**  
+   - Terraform/Ansible assets landed, but failed provider downloads blocked validation.  CI needs to run `terraform init`/`plan` successfully once networking is available.
 
-3. ⚠️ **Security testing** (Complete-Pending Tests)
-   - Added Hypothesis-based fuzz suite targeting direct and chunked uploads (`tests/security/test_upload_fuzz.py`) to ensure storage paths remain sandboxed even under adversarial filenames and payloads
-   - Added sanitizer regression coverage (`tests/security/test_sanitization_regressions.py`) verifying log sanitization and filename validation reject traversal, CRLF, and SQL injection probes
-   - Introduced OWASP ZAP baseline pipeline (`scripts/security/run_dast.sh`) and wired it into CI (`security-dast` job in `.github/workflows/ci.yml`) for automated DAST scanning; execution deferred in remediation container pending Docker/ZAP availability
-   - Test run logged: `pytest --no-cov tests/security` (pass on 2025-11-10)
+3. ❌ **Negative/adversarial testing still absent in practice**  
+   - Although additional suites exist on disk, the tests do not touch the real endpoints (see item 5 above), so the protection they promise is not realized.
 
-## Next Steps
+## Task Backlog to Complete Remediations
 
-1. **Immediate Focus:**
-   - Restore end-to-end upload ➜ queue ➜ worker ➜ transcript flow (worker inference + transcript validation remain pending even though Celery submissions now pass regression tests)
-   - Provide deterministic verification (tests or smoke scripts) that a submitted job reaches the worker
-   - Only after functional parity should new performance baselines be gathered
+1. **Provision Whisper checkpoints consistently**  
+   - Update `api/app_worker.bootstrap_model_assets` to fetch or copy every model exposed in the UI, including `large-v3`, and fail fast when provisioning cannot satisfy the menu.  
+   - Add a worker integration test that seeds a job for each supported model and asserts the model file exists before inference.
 
-2. **Short-term Priorities:**
-   - Maintain regression tests for direct + chunked uploads (see `tests/integration/test_upload_queue.py` and `tests/integration/test_chunked_uploads.py`) that assert a Celery task is enqueued
-   - Update frontend service clients (or backend routes) so `/api/uploads/*` requests succeed
-   - Re-enable and test the backup scheduler once the storage path bug is fixed
+2. **Expose the consolidated upload/transcript services**  
+   - Mount REST routes under `/api/uploads/*` (matching documentation) and delegate to the consolidated services.  
+   - Ensure direct uploads, chunked flows, and transcript retrieval share the same queue orchestration.  Add regression tests that simulate both happy-path uploads and failure cases (missing headers, duplicate chunks).
 
-3. **Medium-term Goals:**
-   - Create infrastructure-as-code templates
-   - Implement automated deployment procedures
-   - Generate Grafana/Prometheus dashboards from documented metrics
-   - Add performance benchmarking with real Whisper inference
+3. **Unblock the end-user UI**  
+   - Align frontend API calls with the real endpoints (`/uploads/initialize`, `/uploads/{id}/chunks/{chunk_number}`, `/jobs/{id}`) and attach the `X-User-ID` header for every request.  
+   - Provide an environment toggle so the header value is sourced from auth state rather than a constant.  Cover the flow with React Testing Library + MSW tests that mock the fixed backend.
 
-## Notes
-- Critical-path functionality (upload ➜ queue ➜ inference ➜ transcript) is still broken end-to-end
-- Several “completed” items in earlier summaries have regressed or were never wired up
-- Documentation and dashboards should be revisited after functional parity is restored
+4. **Repair admin dashboard metrics**  
+   - Replace direct `job_queue.jobs` access with Celery-native inspection (`celery_app.control.inspect()`) or database queries that reflect queue state.  
+   - Add API-level tests that exercise each admin endpoint and guard against regressions with Celery mocks.
 
-## Summary of Changes (2025-11-08)
+5. **Deliver meaningful performance and resilience tests**  
+   - After the upload pipeline is green, run `python perf/run_load_test.py` with k6 installed to capture baseline metrics.  
+   - Update negative/security test suites to call the functioning routes and assert real edge-case behaviour instead of 404s.
 
-### Security Improvements
-- Fixed security configuration validation in `api/services/user_service.py`
-- Removed debug print statements that exposed secret values
-- Implemented proper production validation with dev/test environment bypass
-
-### Documentation Updates
-- Updated `README.md` to accurately describe Celery-backed queue architecture
-- Removed incorrect ThreadJobQueue references
-- Clarified role of Redis as message broker and result backend
-
-### Integration Fixes
-- Completed chunked upload job creation in `api/services/chunked_upload_service.py`
-- Integrated job creation with database and Celery queue
-- Ensured proper job lifecycle from upload to transcription
-
-### Test Coverage Expansion
-- Created `tests/test_error_scenarios.py` with 50+ error case tests
-  - Authentication error handling
-  - Upload validation and edge cases
-  - Job lifecycle error scenarios
-  - Admin functionality error handling
-  - Input validation and sanitization
-  - Concurrency edge cases
-  
-- Created `tests/test_security.py` with comprehensive security tests
-  - Password security (hashing, bcrypt rounds, timing attacks)
-  - Authentication security (token expiration, signature validation)
-  - Authorization checks (privilege escalation prevention)
-  - Input validation (SQL injection, XSS, path traversal, command injection)
-  - File upload security
-  - Cryptographic security
-  - Rate limiting tests
-
-### Coverage Impact
-Previous coverage: ~30% (happy path only)
-New coverage: TBD (need to run `pytest --cov` to measure)
-Expected: 50-60%+ with error and security scenarios
-
-## Final Status Summary
-
-### Completed
-⚠️ Security validation hardening appears merged but needs verification once main flows run again
-⚠️ Documentation updates reference Celery but omit current queue gaps
-
-### Production Readiness Assessment
-🚫 Not production-ready. Core upload ➜ transcription pipeline fails, backups error out, and frontend/backend APIs do not align.
-
-### Recommended Next Steps for Recovery
-1. Ship (or download during deployment) the Whisper `.pt` checkpoints the worker expects.
-2. Keep direct + chunked upload services validated via regression tests that ensure `job_queue.submit_job` submits `transcribe_audio` tasks.
-3. Bring the React client and FastAPI routes back into alignment so `/api/uploads/*` requests succeed.
-4. Fix `storage.uploads_dir` references in the backup API and re-enable the scheduler only after a green end-to-end test.
-5. Once jobs run successfully, regenerate performance baselines and update documentation to reflect the actual architecture.
-
-## Existing Strengths to Preserve
-- Security configuration hardening work can remain once the core flows are repaired.
-- The Celery-based architecture is a solid foundation if the submission wiring is corrected.
-- Observability, deployment automation, and advanced dashboards can resume after the production blockers are cleared.
+## Summary
+- Core transcription functionality is still offline because uploads cannot complete and the worker lacks guaranteed model assets.  
+- Documentation and security validation improvements landed, and backups are restored, but they do not compensate for the broken workflows.  
+- The tasks above are required to turn the remediation effort into a production-ready release.

@@ -173,16 +173,18 @@ async def get_job(
 
         transcript_content = None
         transcript_download_url = None
+        transcript_filename = None
         if getattr(job, "transcript_path", None):
             transcript_path = Path(job.transcript_path)
             try:
-                if transcript_path.exists():
-                    transcript_content = transcript_path.read_text(encoding="utf-8")
+                resolved_path = transcript_path.expanduser().resolve()
+                if resolved_path.exists():
+                    transcript_content = resolved_path.read_text(encoding="utf-8")
                     transcript_download_url = safe_log_format(
-                        "/transcripts/{}/{}",
+                        "/transcripts/{}/download",
                         sanitize_for_log(job.id),
-                        sanitize_for_log(transcript_path.name)
                     )
+                    transcript_filename = transcript_path.name
             except Exception as exc:
                 logger.warning(
                     safe_log_format(
@@ -208,7 +210,7 @@ async def get_job(
                 else None
             ),
             "transcript": transcript_content,
-            "transcript_path": getattr(job, "transcript_path", None),
+            "transcript_path": transcript_filename,
             "transcript_download_url": transcript_download_url,
             "error_message": getattr(job, "error_message", None)
         }

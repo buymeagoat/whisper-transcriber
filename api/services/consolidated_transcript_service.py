@@ -60,11 +60,12 @@ class ConsolidatedTranscriptService:
                 raise HTTPException(status_code=404, detail="Transcript not found")
 
             transcript_path = Path(job.transcript_path)
-            if not transcript_path.exists():
+            resolved_path = self._validate_transcript_path(transcript_path)
+            if not resolved_path.exists():
                 raise HTTPException(status_code=404, detail="Transcript file not found")
 
             # Read transcript
-            async with aiofiles.open(transcript_path, "r", encoding="utf-8") as f:
+            async with aiofiles.open(resolved_path, "r", encoding="utf-8") as f:
                 transcript_text = await f.read()
 
             return {
@@ -73,8 +74,8 @@ class ConsolidatedTranscriptService:
                 "transcript": transcript_text,
                 "created_at": job.created_at.isoformat(),
                 "completed_at": job.finished_at.isoformat() if job.finished_at else None,
-                "model": job.model,
-                "language": job.language,
+                "model": getattr(job, "model", None),
+                "language": getattr(job, "language", None),
                 "original_filename": job.original_filename
             }
 
@@ -163,11 +164,16 @@ class ConsolidatedTranscriptService:
             matches = []
             for job in jobs:
                 transcript_path = Path(job.transcript_path)
-                if not transcript_path.exists():
+                try:
+                    resolved_path = self._validate_transcript_path(transcript_path)
+                except HTTPException:
+                    continue
+
+                if not resolved_path.exists():
                     continue
 
                 try:
-                    async with aiofiles.open(transcript_path, "r", encoding="utf-8") as f:
+                    async with aiofiles.open(resolved_path, "r", encoding="utf-8") as f:
                         content = await f.read()
                         if query.lower() in content.lower():
                             matches.append({
@@ -279,6 +285,33 @@ class ConsolidatedTranscriptService:
         except Exception as e:
             logger.error(f"Error exporting transcript for job {job_id}: {e}")
             raise HTTPException(status_code=500, detail=str(e))
+
+    def _validate_transcript_path(self, transcript_path: Path) -> Path:
+        """Ensure transcript paths resolve inside the configured directory."""
+        resolved = transcript_path.expanduser().resolve()
+        if not str(resolved).startswith(str(self.transcript_dir.resolve())):
+            logger.error("Transcript path %s escapes transcript directory", transcript_path)
+            raise HTTPException(status_code=500, detail="Invalid transcript path")
+        return resolved
+
+    async def get_transcript_path(
+        self,
+        job_id: str,
+        user_id: str,
+        db: Session,
+    ) -> Path:
+        """Return a validated transcript path after enforcing ownership."""
+        job = db.get(Job, job_id)
+        if not job:
+            raise HTTPException(status_code=404, detail="Job not found")
+        if job.user_id != user_id:
+            raise HTTPException(status_code=403, detail="Access denied")
+        if job.status != JobStatusEnum.COMPLETED:
+            raise HTTPException(status_code=400, detail="Transcript not yet available")
+        if not job.transcript_path:
+            raise HTTPException(status_code=404, detail="Transcript not found")
+
+        return self._validate_transcript_path(Path(job.transcript_path))
 
     def get_metrics(self) -> Dict[str, Any]:
         """Get transcript service metrics."""

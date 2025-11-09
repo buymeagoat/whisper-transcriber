@@ -1,0 +1,11 @@
+project                = "whisper-transcriber"
+environment            = "dev"
+aws_region             = "us-east-1"
+allowed_cidr_blocks    = ["198.51.100.0/24"]
+db_username            = "transcriber"
+db_password            = "please-rotate-me"
+db_name                = "whisper_transcriber_dev"
+release_image_tag      = "dev-2025-11-08"
+rollback_image_tag     = "dev-2025-11-01"
+ecs_execution_role_arn = "arn:aws:iam::123456789012:role/dev-execution"
+ecs_task_role_arn      = "arn:aws:iam::123456789012:role/dev-task"

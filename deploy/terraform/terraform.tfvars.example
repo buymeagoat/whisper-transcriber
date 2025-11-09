@@ -1,0 +1,12 @@
+# Copy this file to environments/<env>.tfvars and adjust values to your needs.
+project                = "whisper-transcriber"
+environment            = "dev"
+aws_region             = "us-east-1"
+allowed_cidr_blocks    = ["203.0.113.0/24"]
+db_username            = "transcriber"
+db_password            = "change-me"
+db_name                = "whisper_transcriber_dev"
+release_image_tag      = "main-2025-11-08"
+rollback_image_tag     = "main-2025-11-01"
+ecs_execution_role_arn = "arn:aws:iam::123456789012:role/whisper-transcriber-execution"
+ecs_task_role_arn      = "arn:aws:iam::123456789012:role/whisper-transcriber-task"

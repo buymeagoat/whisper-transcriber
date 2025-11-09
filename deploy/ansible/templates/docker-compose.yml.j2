@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  api:
+    image: {{ container_image }}:{{ desired_release_tag }}
+    env_file:
+      - {{ deployment_root }}/.env
+    ports:
+      - "8080:8080"
+    deploy:
+      restart_policy:
+        condition: on-failure
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: {{ aws_region }}
+        awslogs-group: /ecs/{{ project }}-{{ deploy_env }}
+        awslogs-stream: api
+  worker:
+    image: {{ container_image }}:{{ desired_release_tag }}
+    command: ["python", "-m", "api.worker"]
+    env_file:
+      - {{ deployment_root }}/.env
+    depends_on:
+      - api

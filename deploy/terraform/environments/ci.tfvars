@@ -1,0 +1,11 @@
+project                = "whisper-transcriber"
+environment            = "ci"
+aws_region             = "us-east-1"
+allowed_cidr_blocks    = ["0.0.0.0/0"]
+db_username            = "transcriber"
+db_password            = "example-password"
+db_name                = "whisper_transcriber_ci"
+release_image_tag      = "ci"
+rollback_image_tag     = "ci-previous"
+ecs_execution_role_arn = "arn:aws:iam::000000000000:role/mock-execution"
+ecs_task_role_arn      = "arn:aws:iam::000000000000:role/mock-task"

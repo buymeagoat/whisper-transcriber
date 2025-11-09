@@ -1,0 +1,12 @@
+apiVersion: 1
+
+disableDeletion: true
+allowUiUpdates: false
+
+dashboards:
+  - name: whisper-observability
+    orgId: 1
+    folder: Whisper Observability
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards

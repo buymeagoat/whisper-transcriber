@@ -1,0 +1,98 @@
+# Alerting rules derived from docs/observability.md guidance.
+# Tune thresholds per-environment once baseline traffic is available.
+
+groups:
+  - name: whisper-job-health
+    rules:
+      - alert: WhisperJobQueueDepthHigh
+        expr: whisper_job_queue_depth > 25
+        for: 5m
+        labels:
+          severity: warning
+          service: whisper-transcriber
+        annotations:
+          summary: "Job queue depth is elevated"
+          description: |
+            whisper_job_queue_depth has been above 25 for more than five minutes,
+            indicating workers may be overloaded or offline.
+            Investigate worker health and recent deployments.
+      - alert: WhisperJobQueueDepthCritical
+        expr: whisper_job_queue_depth > 50
+        for: 10m
+        labels:
+          severity: critical
+          service: whisper-transcriber
+        annotations:
+          summary: "Job queue depth critically high"
+          description: |
+            whisper_job_queue_depth has remained above 50 for at least ten minutes.
+            Jobs are not being processed fast enough; scale workers or inspect for failures.
+      - alert: WhisperWorkerFailuresDetected
+        expr: max_over_time(whisper_worker_failures[2m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+          service: whisper-transcriber
+        annotations:
+          summary: "Persistent worker failures detected"
+          description: |
+            One or more whisper_worker_failures gauges have been non-zero for at least two minutes.
+            Review worker logs and recent deployments for failures.
+
+  - name: whisper-http-performance
+    rules:
+      - alert: WhisperHttpLatencyHigh
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(whisper_http_request_duration_seconds_bucket[5m]))
+          ) > 2
+        for: 15m
+        labels:
+          severity: warning
+          service: whisper-transcriber
+        annotations:
+          summary: "HTTP P95 latency above 2s"
+          description: |
+            The 95th percentile HTTP latency has exceeded two seconds for at least fifteen minutes.
+            Check recent deploys, upstream dependencies, and resource utilisation.
+      - alert: WhisperHttpErrorRateElevated
+        expr: |
+          sum(rate(whisper_http_request_errors_total[5m]))
+            /
+          sum(rate(whisper_http_requests_total[5m]))
+          > 0.05
+        for: 10m
+        labels:
+          severity: warning
+          service: whisper-transcriber
+        annotations:
+          summary: "HTTP error rate above 5%"
+          description: |
+            Error responses have exceeded 5% of total traffic for at least ten minutes.
+            Investigate application logs and upstream services for regressions.
+
+  - name: whisper-resource-health
+    rules:
+      - alert: WhisperCpuUtilizationHigh
+        expr: whisper_resource_utilization_ratio{resource="cpu"} > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          service: whisper-transcriber
+        annotations:
+          summary: "CPU utilisation above 80%"
+          description: |
+            CPU utilisation has been above 80% for more than ten minutes.
+            Consider scaling up or investigating runaway workloads.
+      - alert: WhisperRedisSaturationHigh
+        expr: whisper_resource_saturation_ratio{resource="redis_connections"} > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          service: whisper-transcriber
+        annotations:
+          summary: "Redis connection saturation above 80%"
+          description: |
+            Redis connection saturation has exceeded 80% for at least ten minutes.
+            Increase connection limits or add worker throttling.

@@ -97,3 +97,18 @@ Use the following starting points when wiring alert rules:
 
 Tune the exact thresholds per environment once you have baseline data from
 production traffic or load tests.
+
+## Dashboards and alerting assets
+
+The repository now ships a local monitoring stack to visualise these metrics:
+
+- **Prometheus configuration & alert rules:** `observability/prometheus/`
+  contains the scrape configuration (`prometheus.yml`) and alert definitions
+  (`alerts.yml`) aligned with the thresholds above.
+- **Grafana dashboards:** prebuilt JSON dashboards live under
+  `observability/grafana/dashboards/`. They are automatically provisioned via
+  the files in `observability/grafana/provisioning/` when you run the bundled
+  Docker Compose services.
+- **Local stack:** run `docker-compose up prometheus grafana` to launch the
+  monitoring stack alongside the application. Grafana becomes available at
+  <http://localhost:3000> (default credentials `admin` / `admin`).

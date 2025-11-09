@@ -49,9 +49,10 @@ Following the master findings from 2025-11-07, significant progress has been mad
    - Removed references to ThreadJobQueue
    - Documented Redis as message broker and result backend
 
-4. ❌ **Performance baselines** (Blocked)
-   - With inference never starting (missing models + jobs not enqueued), there are no new performance measurements
-   - Load testing scripts still target the old stub endpoints and need to be rewritten once functional paths exist
+4. ⚠️ **Performance baselines** (Partially blocked)
+   - `perf/transcription_scenario.js` now exercises the restored `/uploads → /jobs` flow, ensuring chunked uploads finalize before polling job status
+   - Added `perf/run_load_test.py` wrapper so `python perf/run_load_test.py` runs the k6 scenario and archives summaries under `perf/results/`
+   - Attempted run in the remediation container failed because `k6` is not installed; captured this in `perf/results/summary_20251108.md` for traceability
 
 5. ✅ **Test coverage improvements** (COMPLETED)
    - Added comprehensive error scenario tests (test_error_scenarios.py)

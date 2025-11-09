@@ -75,10 +75,10 @@ describe('TranscribePage upload flow', () => {
     await waitFor(() => {
       expect(axios.post).toHaveBeenNthCalledWith(
         1,
-        '/uploads/init',
+        '/uploads/initialize',
         expect.objectContaining({
           filename: 'sample.wav',
-          fileSize: file.size
+          file_size: file.size
         })
       )
     })
@@ -86,13 +86,19 @@ describe('TranscribePage upload flow', () => {
     await waitFor(() => {
       expect(axios.post).toHaveBeenNthCalledWith(
         2,
-        '/uploads/session123/chunk',
-        expect.any(FormData)
+        '/uploads/session123/chunks/0',
+        expect.any(FormData),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
       )
     })
 
     await waitFor(() => {
-      expect(axios.post).toHaveBeenNthCalledWith(3, '/uploads/session123/finalize')
+      expect(axios.post).toHaveBeenNthCalledWith(
+        3,
+        '/uploads/session123/finalize',
+        null,
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      )
     })
 
   })

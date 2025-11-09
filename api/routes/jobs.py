@@ -160,17 +160,38 @@ async def get_job(
     """Get job status and details."""
     try:
         job = db.query(Job).filter(Job.id == job_id).first()
-        
+
         if not job or job.user_id != user_id:
             raise HTTPException(status_code=404, detail="Job not found")
-        
+
         # Get queue status if available
         try:
             queue_job = job_queue.get_job(job.id)
             queue_status = queue_job.state.lower() if queue_job else None
         except Exception:
             queue_status = None
-        
+
+        transcript_content = None
+        transcript_download_url = None
+        if getattr(job, "transcript_path", None):
+            transcript_path = Path(job.transcript_path)
+            try:
+                if transcript_path.exists():
+                    transcript_content = transcript_path.read_text(encoding="utf-8")
+                    transcript_download_url = safe_log_format(
+                        "/transcripts/{}/{}",
+                        sanitize_for_log(job.id),
+                        sanitize_for_log(transcript_path.name)
+                    )
+            except Exception as exc:
+                logger.warning(
+                    safe_log_format(
+                        "Unable to read transcript for job {}: {}",
+                        sanitize_for_log(job_id),
+                        sanitize_for_log(exc)
+                    )
+                )
+
         return {
             "job_id": job.id,
             "original_filename": job.original_filename,
@@ -186,7 +207,9 @@ async def get_job(
                 if getattr(job, "finished_at", None)
                 else None
             ),
-            "transcript": getattr(job, "transcript", None),
+            "transcript": transcript_content,
+            "transcript_path": getattr(job, "transcript_path", None),
+            "transcript_download_url": transcript_download_url,
             "error_message": getattr(job, "error_message", None)
         }
     except HTTPException:

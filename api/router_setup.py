@@ -10,6 +10,7 @@ from api.routes import jobs, admin, logs, metrics, auth, users, audit, cache
 from api.routes import progress, audio, tts, user_settings, enhanced_cache
 from api.routes import websockets, admin_websocket, admin_database_optimization
 from api.routes import chunked_uploads, upload_websockets, admin_chunked_uploads
+from api.routes import transcripts
 from api.routes import admin_security  # T026 Security Hardening admin routes
 from api.routes import api_keys, admin_api_keys  # T027 API Key Management routes
 from api.routes import batch  # T027 Batch Processing routes
@@ -83,6 +84,7 @@ def register_routes(app: FastAPI) -> None:
     
     # Chunked upload routes for T025 Phase 5
     app.include_router(chunked_uploads.router, tags=["chunked-uploads", "file-upload"])
+    app.include_router(transcripts.router, tags=["transcripts"])
     app.include_router(upload_websockets.router, tags=["upload-websockets", "real-time"])
     app.include_router(admin_chunked_uploads.router, tags=["admin", "chunked-uploads"])
     
@@ -141,11 +143,6 @@ def register_routes(app: FastAPI) -> None:
     app.include_router(tts.router)
 
     app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR, html=True), name="uploads")
-    app.mount(
-        "/transcripts",
-        StaticFiles(directory=TRANSCRIPTS_DIR, html=True),
-        name="transcripts",
-    )
 
     static_dir = Path(__file__).parent / "static"
     app.mount("/static", CacheBustingStaticFiles(directory=static_dir), name="static")

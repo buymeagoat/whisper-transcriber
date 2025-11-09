@@ -16,4 +16,5 @@ __all__ = [
     'tts',
     'user_settings',
     'health',
+    'transcripts',
 ]

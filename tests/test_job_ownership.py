@@ -4,7 +4,8 @@ from pathlib import Path
 import pytest
 
 from api.orm_bootstrap import SessionLocal
-from api.models import Job
+from api.models import Job, JobStatusEnum
+from tests.conftest import TRANSCRIPTS_DIR
 
 
 @pytest.mark.asyncio
@@ -56,3 +57,45 @@ async def test_job_lifecycle_scoped_to_user(async_client, stub_job_queue, securi
 
     forbidden_get = await async_client.get(f"/jobs/{job_id}", headers=other_headers)
     assert forbidden_get.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_transcript_routes_enforce_ownership(async_client, security_headers):
+    owner_headers = security_headers()
+    owner_headers["X-User-ID"] = "owner-1"
+
+    job_id = "job-transcript-1"
+    transcript_file = TRANSCRIPTS_DIR / f"{job_id}.txt"
+    transcript_file.write_text("hello world", encoding="utf-8")
+
+    with SessionLocal() as session:
+        job = Job(
+            id=job_id,
+            original_filename="sample.wav",
+            saved_filename="/tmp/sample.wav",
+            model="small",
+            status=JobStatusEnum.COMPLETED,
+            user_id="owner-1",
+            transcript_path=str(transcript_file),
+        )
+        session.add(job)
+        session.commit()
+
+    response = await async_client.get(f"/transcripts/{job_id}", headers=owner_headers)
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["job_id"] == job_id
+    assert payload["transcript"] == "hello world"
+
+    download = await async_client.get(f"/transcripts/{job_id}/download", headers=owner_headers)
+    assert download.status_code == 200
+    assert download.text == "hello world"
+
+    intruder_headers = security_headers()
+    intruder_headers["X-User-ID"] = "intruder"
+
+    denied = await async_client.get(f"/transcripts/{job_id}", headers=intruder_headers)
+    assert denied.status_code == 403
+
+    denied_download = await async_client.get(f"/transcripts/{job_id}/download", headers=intruder_headers)
+    assert denied_download.status_code == 403

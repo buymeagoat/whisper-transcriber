@@ -627,6 +627,7 @@ class ChunkedUploadService:
             # Create job record in database
             job = Job(
                 id=job_id,
+                user_id=str(session.user_id),
                 original_filename=session.original_filename,
                 saved_filename=str(file_path),
                 model=session.model_name,

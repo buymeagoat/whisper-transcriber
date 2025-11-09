@@ -4,6 +4,7 @@ import os
 import pytest
 from fastapi import UploadFile
 
+from api.models import Job
 from api.orm_bootstrap import SessionLocal
 from api.services.chunked_upload_service import ChunkedUploadService
 from api.services.consolidated_upload_service import ConsolidatedUploadService
@@ -36,8 +37,19 @@ async def test_direct_upload_enqueues_celery_task(stub_job_queue):
         saved_path = submission["kwargs"]["file_path"]
         assert saved_path.endswith(".wav")
         assert os.path.exists(saved_path)
+
+        with SessionLocal() as verify_db:
+            job = verify_db.get(Job, result["job_id"])
+            assert job is not None
+            assert job.user_id == "user-123"
     finally:
         await upload.close()
+        with SessionLocal() as cleanup_db:
+            job = cleanup_db.get(Job, result["job_id"])
+            if job:
+                cleanup_db.delete(job)
+                cleanup_db.commit()
+
         if "saved_path" in locals() and os.path.exists(saved_path):
             os.remove(saved_path)
 
@@ -79,6 +91,17 @@ async def test_chunked_upload_enqueues_celery_task(stub_job_queue):
     saved_path = submission["kwargs"]["file_path"]
     assert saved_path.endswith("chunked.wav")
     assert os.path.exists(saved_path)
+
+    with SessionLocal() as verify_db:
+        job = verify_db.get(Job, finalize["job_id"])
+        assert job is not None
+        assert job.user_id == "user-456"
+
+    with SessionLocal() as cleanup_db:
+        job = cleanup_db.get(Job, finalize["job_id"])
+        if job:
+            cleanup_db.delete(job)
+            cleanup_db.commit()
 
     if os.path.exists(saved_path):
         os.remove(saved_path)

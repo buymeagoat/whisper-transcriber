@@ -53,6 +53,8 @@ class Job(Base):
     __tablename__ = "jobs"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
+    # Track the owner of the job so transcript access can be enforced per-user.
+    user_id: Mapped[Optional[str]] = mapped_column(String, nullable=True, index=True)
     original_filename: Mapped[str] = mapped_column(String, nullable=False)
     saved_filename: Mapped[str] = mapped_column(String, nullable=False)
     model: Mapped[str] = mapped_column(String, nullable=False)
@@ -80,6 +82,7 @@ class Job(Base):
         Index('idx_jobs_created_at', 'created_at'),
         Index('idx_jobs_status_created', 'status', 'created_at'),
         Index('idx_jobs_model', 'model'),
+        Index('idx_jobs_user_id_created', 'user_id', 'created_at'),
     )
 
     def __repr__(self):

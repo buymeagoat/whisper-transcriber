@@ -48,7 +48,7 @@ async def create_job(
     try:
         # Extract user context for auditing
         user_context = extract_request_context(request)
-        user_id = user_context.get("user_id", "anonymous")
+        user_id = user_context.get("user_id") or "anonymous"
         
         # Validate file type - check both MIME type and file extension
         allowed_extensions = ['.wav', '.mp3', '.m4a', '.flac', '.ogg', '.aac', '.webm']
@@ -103,6 +103,7 @@ async def create_job(
         # Create job record
         job = Job(
             id=file_id,
+            user_id=str(user_id),
             original_filename=file.filename,
             saved_filename=str(file_path),
             model=model,

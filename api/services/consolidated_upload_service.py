@@ -86,6 +86,7 @@ class ConsolidatedUploadService:
             # Create job
             job = Job(
                 id=file_id,
+                user_id=str(user_id),
                 original_filename=file.filename,
                 saved_filename=str(file_path),
                 model=model_name,

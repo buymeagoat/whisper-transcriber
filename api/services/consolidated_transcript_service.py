@@ -44,6 +44,9 @@ class ConsolidatedTranscriptService:
                 raise HTTPException(status_code=404, detail="Job not found")
 
             # Verify ownership
+            if not job.user_id:
+                raise HTTPException(status_code=403, detail="Transcript owner missing")
+
             if job.user_id != user_id:
                 raise HTTPException(status_code=403, detail="Access denied")
 
@@ -74,7 +77,7 @@ class ConsolidatedTranscriptService:
                 "created_at": job.created_at.isoformat(),
                 "completed_at": job.finished_at.isoformat() if job.finished_at else None,
                 "model": job.model,
-                "language": job.language,
+                "language": getattr(job, "language", None),
                 "original_filename": job.original_filename
             }
 
@@ -122,7 +125,7 @@ class ConsolidatedTranscriptService:
                     "created_at": job.created_at.isoformat(),
                     "completed_at": job.finished_at.isoformat() if job.finished_at else None,
                     "model": job.model,
-                    "language": job.language,
+                    "language": getattr(job, "language", None),
                     "has_transcript": bool(job.transcript_path)
                 }
                 results.append(job_data)

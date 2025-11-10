@@ -104,7 +104,7 @@ jobs:
         uses: actions/checkout@11bd719d720b5b0c9d4b7b0e5a89538ba1f3f5d
 
       - name: Download container image artifact
-        uses: actions/download-artifact@7a1cd3216ca9260cd8022db641d960b1db4d1be4
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
         with:
           name: whisper-transcriber-image
           path: /tmp

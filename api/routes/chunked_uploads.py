@@ -81,6 +81,16 @@ async def initialize_upload(
         raise
 
 
+@router.post("/init", response_model=Dict[str, Any], include_in_schema=False)
+async def initialize_upload_legacy(
+    request: InitializeUploadRequest,
+    user_id: str = Depends(get_authenticated_user_id)
+):
+    """Legacy alias for initializing uploads (supports older clients)."""
+
+    return await initialize_upload(request, user_id)
+
+
 @router.post("/{session_id}/chunks/{chunk_number}", response_model=ChunkUploadResponse)
 async def upload_chunk(
     session_id: str,
@@ -115,6 +125,18 @@ async def upload_chunk(
     except Exception as e:
         logger.error(f"Failed to upload chunk: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{session_id}/chunk/{chunk_number}", response_model=ChunkUploadResponse, include_in_schema=False)
+async def upload_chunk_legacy_path(
+    session_id: str,
+    chunk_number: int,
+    chunk_data: UploadFile = File(..., description="Chunk data"),
+    user_id: str = Depends(get_authenticated_user_id)
+):
+    """Legacy alias that accepts a singular 'chunk' path segment."""
+
+    return await upload_chunk(session_id, chunk_number, chunk_data, user_id)
 
 
 @router.post("/{session_id}/finalize", response_model=FinalizeUploadResponse)

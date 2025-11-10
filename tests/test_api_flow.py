@@ -93,6 +93,51 @@ async def test_job_upload_accepts_legacy_header(async_client, security_headers, 
 
 
 @pytest.mark.asyncio
+async def test_legacy_upload_aliases_forward_to_jobs(async_client, admin_token, security_headers, stub_job_queue):
+    """Legacy /upload and /api/upload endpoints should behave like /jobs/."""
+
+    headers = security_headers(token=admin_token)
+
+    for path in ("/upload", "/api/upload"):
+        response = await async_client.post(
+            path,
+            data={"model": "small"},
+            files={"file": ("alias.wav", io.BytesIO(b"alias audio"), "audio/wav")},
+            headers=headers,
+        )
+
+        assert response.status_code == 200, f"{path} failed: {response.text}"
+        payload = response.json()
+        assert "job_id" in payload
+
+    # Ensure the job queue saw submissions from the alias uploads
+    assert stub_job_queue.submitted, "Job queue was not invoked through legacy aliases"
+
+
+@pytest.mark.asyncio
+async def test_chunk_initialize_legacy_alias(async_client, admin_token, security_headers):
+    """Legacy /uploads/init should map to the canonical initializer."""
+
+    headers = security_headers(token=admin_token)
+    payload = {
+        "filename": "chunk-legacy.wav",
+        "file_size": 1024,
+        "model_name": "small",
+    }
+
+    response = await async_client.post("/uploads/init", json=payload, headers=headers)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert "session_id" in body
+
+    # Clean up the in-memory session to avoid test interference
+    from api.services.chunked_upload_service import chunked_upload_service
+
+    session_id = body["session_id"]
+    await chunked_upload_service.cancel_upload(session_id=session_id, user_id="1")
+
+
+@pytest.mark.asyncio
 async def test_health_endpoints_report_ready(async_client):
     """Liveness and readiness probes should respond with healthy payloads."""
 

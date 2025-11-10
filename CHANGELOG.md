@@ -10,9 +10,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial production hardening scaffolds for CI, security policy, and container fixes.
 - Regression test ensuring legacy X-User-ID uploads remain accepted by the jobs API.
 - Environment templates for local development and production deployments.
+- Compatibility upload aliases so legacy `/upload` clients route through the
+	jobs API without changes.
 
 ### Changed
 - Jobs authentication now resolves callers from JWT/cookie credentials while
 	retaining legacy header compatibility.
 - Docker builder and runtime images pin to Python 3.13 to keep Whisper/Numba
 	dependencies installable within container builds.
+	- Chunked upload routing now accepts legacy `/uploads/init` and singular
+		`/uploads/{session_id}/chunk/{n}` paths used by the current frontend.

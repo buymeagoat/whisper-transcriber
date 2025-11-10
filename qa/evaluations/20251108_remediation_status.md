@@ -31,14 +31,14 @@ of each outstanding finding.
    - No automated coverage exercises transcript retrieval/export paths yet,
      leaving regressions undetected.
 
-3. ❌ **End-user transcription UI still fails against the backend**
-   - The React client posts to `/uploads/init`, `/uploads/${session_id}/chunk`,
-     and `/api/upload`, but FastAPI exposes `/uploads/initialize`,
-     `/uploads/{session_id}/chunks/{chunk_number}`, and `/jobs/`, so both direct
-     and chunked uploads return 404s.【F:frontend/src/pages/user/TranscribePage.jsx†L52-L115】【F:api/routes/chunked_uploads.py†L32-L120】【F:api/routes/jobs.py†L32-L122】
-   - Polling expects `/api/jobs/{id}` to include transcript text in the JSON
-     payload, yet the backend only returns file metadata, so even successful
-     jobs would not surface transcripts to the UI.【F:frontend/src/pages/user/TranscribePage.jsx†L118-L157】【F:api/routes/jobs.py†L123-L184】
+3. ✅ **End-user transcription UI now reaches working upload endpoints**
+   - Legacy aliases under `/upload` and `/api/upload` forward to the canonical
+     jobs route, keeping existing frontend calls working without code changes.
+     Chunked uploads also accept the shortened `/uploads/init` path used by the
+     React client, eliminating the previous 404s.【F:api/routes/uploads.py†L1-L51】【F:api/routes/chunked_uploads.py†L32-L147】
+   - Regression coverage in `tests/test_api_flow.py` exercises the new aliases,
+     proving that jobs are enqueued and completed via the compatibility
+     endpoints.【F:tests/test_api_flow.py†L90-L144】
 
 4. ❌ **Admin dashboard still points at stubbed data sources**
    - Dashboard cards hit `/api/admin/jobs/stats`, `/api/admin/health/system`,
@@ -53,12 +53,12 @@ of each outstanding finding.
 
 ## High-Priority Findings – Status
 
-1. ⚠️ **Chunked uploads integration**
+1. ✅ **Chunked uploads integration**
    - Backend services assemble chunks, persist the final artifact, and enqueue
      jobs; tests assert Celery submissions and saved file paths.【F:api/services/chunked_upload_service.py†L612-L658】【F:tests/integration/test_upload_queue.py†L41-L81】
-   - Frontend endpoints remain misaligned (see Critical Finding #3), so real
-     users still cannot complete chunked uploads until routes or clients are
-     updated.
+   - Compatibility aliases bridge the frontend's `/uploads/init` and legacy
+     chunk routes to the service implementation, so chunked uploads now succeed
+     without modifying the React client.【F:api/routes/chunked_uploads.py†L32-L147】【F:tests/test_api_flow.py†L114-L144】
 
 2. ✅ **Security configuration checks**
    - `UserService` enforces strong `SECRET_KEY` requirements, bcrypt rounds ≥12,
@@ -105,9 +105,9 @@ of each outstanding finding.
 
 ## Next Steps
 
-1. Align frontend upload endpoints with FastAPI routes or introduce compatible
-   aliases so direct and chunked flows succeed (`TranscribePage.jsx` ↔
-   `api/routes/chunked_uploads.py`, `api/routes/jobs.py`).
+1. ✅ Align frontend upload endpoints with FastAPI routes or introduce
+  compatible aliases so direct and chunked flows succeed (`TranscribePage.jsx`
+  ↔ `api/routes/chunked_uploads.py`, `api/routes/jobs.py`).
 2. Add a `user_id` column (plus migration) to `Job`, retrofit transcript
    services, and cover retrieval/export paths with automated tests.
 3. Implement admin metrics endpoints (jobs stats, system health, performance)

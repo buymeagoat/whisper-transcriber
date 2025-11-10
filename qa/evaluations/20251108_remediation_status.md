@@ -21,15 +21,13 @@ of each outstanding finding.
      transcript contents plus failure logging, proving the fix end-to-end with
      stubbed Whisper/Torch modules.【F:tests/integration/test_worker_model_loading.py†L1-L94】【F:tests/test_celery_processing.py†L1-L74】
 
-2. ⚠️ **Upload/transcript services exist but require hardening**
-   - Consolidated upload and chunked services now create `Job` rows and enqueue
-     `transcribe_audio`, with regression tests confirming queue submissions for
-     both direct and chunked flows.【F:api/services/consolidated_upload_service.py†L1-L120】【F:api/services/chunked_upload_service.py†L612-L658】【F:tests/integration/test_upload_queue.py†L1-L81】
-   - Ownership checks in `ConsolidatedTranscriptService` still reference
-     `job.user_id`, which does not exist on `Job`, so runtime access will raise
-     until the schema is extended and migrations run.【F:api/services/consolidated_transcript_service.py†L23-L87】【F:api/models.py†L52-L89】
-   - No automated coverage exercises transcript retrieval/export paths yet,
-     leaving regressions undetected.
+2. ✅ **Upload/transcript services enforce ownership with coverage**
+   - The `t035_job_user_id_string` migration and runtime code persist
+     per-request user identifiers on `Job`, so transcript lookups can enforce
+     ownership.【F:api/migrations/versions/t035_job_user_id_string.py†L1-L37】【F:api/routes/jobs.py†L32-L122】
+   - Consolidated transcript routes now have regression coverage: happy-path
+     requests succeed for owners while non-owners receive 403, and downloads
+     stream the stored files.【F:tests/test_api_flow.py†L146-L210】【F:api/services/consolidated_transcript_service.py†L23-L214】
 
 3. ✅ **End-user transcription UI now reaches working upload endpoints**
    - Legacy aliases under `/upload` and `/api/upload` forward to the canonical
@@ -108,8 +106,8 @@ of each outstanding finding.
 1. ✅ Align frontend upload endpoints with FastAPI routes or introduce
   compatible aliases so direct and chunked flows succeed (`TranscribePage.jsx`
   ↔ `api/routes/chunked_uploads.py`, `api/routes/jobs.py`).
-2. Add a `user_id` column (plus migration) to `Job`, retrofit transcript
-   services, and cover retrieval/export paths with automated tests.
+2. ✅ Add a `user_id` column (plus migration) to `Job`, retrofit transcript
+  services, and cover retrieval/export paths with automated tests.
 3. Implement admin metrics endpoints (jobs stats, system health, performance)
    or adjust the dashboard to consume existing APIs.
 4. Capture a k6 baseline after staging real Whisper checkpoints to quantify
@@ -124,9 +122,9 @@ of each outstanding finding.
   API surface before treating their failures as regressions.
 
 ## Production Readiness Assessment
-🚫 **Still not production ready.** Backend inference works, yet the primary web
-experience cannot reach the working APIs, transcript ownership checks will
-raise, and admin visibility remains stubbed.
+🚫 **Still not production ready.** Backend inference works and the primary web
+experience now reaches working upload/transcript APIs, but admin visibility
+remains stubbed and dashboard routes lack implementations.
 
 ## Recommended Recovery Actions
 1. Ship (or bake into images) the Whisper `.pt` checkpoints referenced by

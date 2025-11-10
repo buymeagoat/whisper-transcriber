@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+import contextlib
 import io
+import uuid
+from datetime import datetime
 from typing import Dict
 
 import pytest
 
-from api.models import Job
+from api.models import Job, JobStatusEnum, User
 from api.orm_bootstrap import SessionLocal
+from api.paths import storage
 
 
 @pytest.mark.asyncio
@@ -25,7 +29,7 @@ async def test_admin_login_returns_token_and_cookie(async_client, security_heade
     payload: Dict[str, str] = response.json()
     assert payload["token_type"] == "bearer"
     assert payload["access_token"]
-    assert payload["expires_in"] > 0
+    assert int(payload["expires_in"]) > 0
     assert "auth_token" in response.cookies
 
 
@@ -135,6 +139,76 @@ async def test_chunk_initialize_legacy_alias(async_client, admin_token, security
 
     session_id = body["session_id"]
     await chunked_upload_service.cancel_upload(session_id=session_id, user_id="1")
+
+
+@pytest.mark.asyncio
+async def test_transcript_routes_enforce_ownership(async_client, admin_token, security_headers):
+    """Transcript endpoints should return content for owners and reject others."""
+
+    headers = security_headers(token=admin_token)
+
+    transcript_text = "hello transcript"
+    job_id = str(uuid.uuid4())
+    transcript_path = storage.transcripts_dir / f"{job_id}.txt"
+    upload_path = storage.upload_dir / f"{job_id}.wav"
+    transcript_path.write_text(transcript_text, encoding="utf-8")
+    upload_path.write_bytes(b"audio")
+
+    with SessionLocal() as db:
+        admin_user = db.query(User).filter(User.username == "admin").one()
+        job = Job(
+            id=job_id,
+            original_filename="example.wav",
+            saved_filename=str(upload_path),
+            model="small",
+            status=JobStatusEnum.COMPLETED,
+            user_id=str(admin_user.id),
+            transcript_path=str(transcript_path),
+            finished_at=datetime.utcnow(),
+        )
+        db.add(job)
+        db.commit()
+
+    try:
+        response = await async_client.get(f"/transcripts/{job_id}", headers=headers)
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["transcript"] == transcript_text
+
+        download = await async_client.get(f"/transcripts/{job_id}/download", headers=headers)
+        assert download.status_code == 200
+        assert download.text == transcript_text
+
+        other_username = f"viewer_{uuid.uuid4().hex[:6]}"
+        other_password = "ViewerPass123!"
+        register = await async_client.post(
+            "/register",
+            json={"username": other_username, "password": other_password},
+            headers=security_headers(include_placeholder_auth=True),
+        )
+        assert register.status_code == 200
+
+        other_login = await async_client.post(
+            "/auth/login",
+            json={"username": other_username, "password": other_password},
+            headers=security_headers(include_placeholder_auth=True),
+        )
+        assert other_login.status_code == 200
+        other_token = other_login.json()["access_token"]
+
+        forbidden = await async_client.get(
+            f"/transcripts/{job_id}",
+            headers=security_headers(token=other_token),
+        )
+        assert forbidden.status_code == 403
+    finally:
+        with SessionLocal() as db:
+            db.query(Job).filter(Job.id == job_id).delete()
+            db.commit()
+        with contextlib.suppress(FileNotFoundError):
+            transcript_path.unlink()
+        with contextlib.suppress(FileNotFoundError):
+            upload_path.unlink()
 
 
 @pytest.mark.asyncio

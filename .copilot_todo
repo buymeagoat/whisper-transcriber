@@ -1,0 +1,7 @@
+# TODO: Copilot Evaluation
+- [ ] A1 Jobs API rejects authenticated uploads
+		- Details: `/jobs/` currently depends on `X-User-ID`; authenticated admin requests without that header fail with 401 and block uploads (`tests/test_api_flow.py`).
+			- New: `docker compose up --build` fails because the worker image installs Python 3.14, but `numba` (pulled in by `openai-whisper`) only supports <3.14; wheel build aborts before tests run.
+	- Fix: Update `api/routes/dependencies.get_authenticated_user_id` to derive the caller from the JWT/cookie session (fall back to header for legacy) and validate against the database.
+	- Model: `pytest tests/test_api_flow.py`; docker smoke cycle (upload tiny WAV).
+	- Next Action: Patch dependency module to resolve user identity via `Authorization` token.

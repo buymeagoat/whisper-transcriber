@@ -95,6 +95,10 @@ celery_app.conf.update(
 
 celery_app.autodiscover_tasks(["api.services"])
 
+# Import task modules explicitly so health checks succeed without relying on
+# Celery's default "tasks" module discovery naming.
+import api.services.app_worker  # noqa: E402,F401
+
 
 @celery_app.task(name="api.worker.health_check")
 def worker_health_check() -> dict[str, str]:

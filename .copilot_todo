@@ -1,9 +1,7 @@
 # TODO: Copilot Evaluation
-- [ ] A1 Jobs API rejects authenticated uploads
-	- Details: `/jobs/` currently depends on `X-User-ID`; authenticated admin requests without that header fail with 401 and block uploads (`tests/test_api_flow.py`).
-		- New: `docker compose up --build` fails because the worker image installs Python 3.14, but `numba` (pulled in by `openai-whisper`) only supports <3.14; wheel build aborts before tests run.
+- [x] A1 Jobs API rejects authenticated uploads – resolved
+	- Details: Adjusted auth dependency to honor JWT/cookie identity, retagged Docker Python base to 3.13 so `openai-whisper` dependencies build, and aligned `.env` runtime values with bundled SQLite + redis password for compose parity.
 	- Fix:
-		- Update `api/routes/dependencies.get_authenticated_user_id` to derive the caller from the JWT/cookie session (fall back to header for legacy) and validate against the database.
-		- Downgrade the Docker builder/runtime base images to Python 3.13-slim so `openai-whisper`/`numba` can install.
-	- Model: `pytest tests/test_api_flow.py`; docker smoke cycle (upload tiny WAV).
-	- Next Action: Point all Python stages in `Dockerfile` to `python:3.13-slim-bookworm`, rebuild, then re-run the smoke workflow.
+		- Final Dockerfile targets `python:3.13-slim-bookworm` for builder/runtime; `.env` points `DATABASE_URL` to `/app/data/whisper.db` and syncs `REDIS_URL` credentials; JWT-based auth dependency already merged earlier.
+	- Model: `pytest --override-ini addopts='' tests/test_api_flow.py`; manual docker smoke (home page, admin login, user registration via `/api/register`, WAV upload, container restart + job persistence).
+	- Next Action: None.

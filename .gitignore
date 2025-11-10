@@ -93,6 +93,8 @@ whisper_dev.db
 .env
 .env.*
 *.env
+!/.env.production.template
+!/.env.production.template
 *.bak
 *.orig
 *.rej

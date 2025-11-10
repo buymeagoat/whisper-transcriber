@@ -19,7 +19,7 @@ RUN npm run build
 ######################
 # Python deps stage  #
 ######################
-FROM python:3.14-slim-bookworm@sha256:8a8d3341dfc71b7420256ceff425f64247da7e23fbe3fc23c3ea8cfbad59096d AS python-builder
+FROM python:3.13-slim-bookworm AS python-builder
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PIP_NO_CACHE_DIR=1 \
@@ -48,7 +48,7 @@ RUN pip install --upgrade pip setuptools wheel && \
 ##################
 # Runtime stage  #
 ##################
-FROM python:3.14-slim-bookworm@sha256:8a8d3341dfc71b7420256ceff425f64247da7e23fbe3fc23c3ea8cfbad59096d AS production
+FROM python:3.13-slim-bookworm AS production
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \

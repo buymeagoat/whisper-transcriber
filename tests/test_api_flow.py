@@ -73,6 +73,26 @@ async def test_job_listing_includes_recent_submission(async_client, admin_token,
 
 
 @pytest.mark.asyncio
+async def test_job_upload_accepts_legacy_header(async_client, security_headers, stub_job_queue):
+    """Legacy X-User-ID header should continue to authenticate uploads."""
+
+    headers = security_headers()
+    headers["X-User-ID"] = "legacy-user"
+
+    response = await async_client.post(
+        "/jobs/",
+        data={"model": "small"},
+        files={"file": ("legacy.wav", io.BytesIO(b"legacy audio"), "audio/wav")},
+        headers=headers,
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["user_id"] == "legacy-user"
+    assert stub_job_queue.submitted, "Job queue did not receive the legacy upload"
+
+
+@pytest.mark.asyncio
 async def test_health_endpoints_report_ready(async_client):
     """Liveness and readiness probes should respond with healthy payloads."""
 

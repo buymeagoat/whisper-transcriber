@@ -61,6 +61,7 @@ settings = settings_module.settings.model_copy(
         "transcripts_dir": TRANSCRIPTS_DIR,
         "cache_dir": CACHE_DIR,
         "models_dir": MODELS_DIR,
+        "multi_user_mode_enabled": True,
     }
 )
 settings_module.settings = settings

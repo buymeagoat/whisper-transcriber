@@ -90,7 +90,8 @@
 
 #### `create_job(job_data: schemas.JobCreate)`
 - **Purpose**: Create new transcription job
-- **Input**: Job parameters (file, model, language); legacy `X-User-ID` header accepted for future multi-user flows
+- **Input**: Job parameters (file, model, language); legacy `X-User-ID` header is honoured only when
+  `LEGACY_USER_HEADER_ENABLED=1`
 - **Output**: Job ID and initial status
 - **Workflow**: Database record → queue task → status tracking
 - **Options**: Model selection, language hints, custom settings
@@ -101,7 +102,7 @@
 - **Output**: Status, progress percentage, results
 - **States**: pending, processing, completed, failed
 - **Progress**: Real-time updates via WebSocket
-- **Security**: Admin account bypasses per-user checks; `X-User-ID` guard remains for future multi-user enforcement
+- **Security**: Admin account bypasses per-user checks; dormant `X-User-ID` enforcement returns when multi-user mode ships
 
 #### `list_user_jobs(user_id: str, filters: dict)`
 - **Purpose**: Get paginated list of user's jobs

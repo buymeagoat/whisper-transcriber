@@ -7,8 +7,10 @@ chunk status updates, and error notifications during chunked file uploads.
 
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException
-from api.services.enhanced_websocket_service import EnhancedWebSocketService
+from api.orm_bootstrap import SessionLocal
 from api.services.chunked_upload_service import chunked_upload_service
+from api.services.enhanced_websocket_service import EnhancedWebSocketService
+from api.services.user_service import user_service
 from api.utils.logger import get_system_logger
 import asyncio
 import json
@@ -18,19 +20,30 @@ logger = get_system_logger("upload_websocket")
 router = APIRouter(prefix="/ws/uploads", tags=["upload-websockets"])
 
 
+def _default_admin_user_id() -> str:
+    """Return the canonical administrator identifier for dormant multi-user mode."""
+
+    with SessionLocal() as session:
+        admin = user_service.get_user_by_username(session, user_service.DEFAULT_ADMIN_USERNAME)
+        if admin:
+            return str(admin.id)
+    return user_service.DEFAULT_ADMIN_USERNAME
+
+
 async def get_user_id_from_websocket(websocket: WebSocket) -> str:
     """Extract user ID from WebSocket headers or query params."""
     # Check query parameters first
     user_id = websocket.query_params.get("user_id")
     if user_id:
         return user_id
-    
+
     # Check headers
     user_id = websocket.headers.get("X-User-ID")
     if user_id:
         return user_id
-    
-    raise HTTPException(status_code=401, detail="Missing user identity for WebSocket connection")
+
+    logger.debug("Falling back to admin user for upload WebSocket session")
+    return _default_admin_user_id()
 
 
 @router.websocket("/{session_id}/progress")

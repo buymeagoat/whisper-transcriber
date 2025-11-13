@@ -122,7 +122,8 @@ async def login(
 ):
     """Authenticate the single admin user and return an access token."""
     supplied_username = (login_data.username or "admin").strip().lower()
-    if supplied_username and supplied_username != "admin":
+
+    if not settings.multi_user_mode_enabled and supplied_username != "admin":
         audit_login_attempt(
             user_id=supplied_username,
             success=False,
@@ -135,8 +136,10 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    target_username = supplied_username if settings.multi_user_mode_enabled else "admin"
+
     try:
-        user = user_service.authenticate_user(db, "admin", login_data.password)
+        user = user_service.authenticate_user(db, target_username, login_data.password)
 
         audit_login_attempt(
             user_id=str(user.id),

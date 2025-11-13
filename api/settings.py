@@ -46,6 +46,11 @@ class Settings(BaseModel):
     job_queue_backend: str = "thread"
     storage_backend: str = "filesystem"
 
+    # Dormant feature toggles
+    multi_user_mode_enabled: bool = False
+    legacy_user_header_enabled: bool = False
+    container_builds_enabled: bool = False
+
     # Network settings
     allowed_hosts: List[str] = ["*"]
     cors_origins: str = "*"
@@ -157,6 +162,9 @@ def load_settings() -> Settings:
         environment=environment,
         backup_scheduler_enabled=os.getenv("BACKUP_SCHEDULER_ENABLED", "true").lower()
         not in {"false", "0", "no"},
+        multi_user_mode_enabled=_get_bool_env("MULTI_USER_MODE_ENABLED", False),
+        legacy_user_header_enabled=_get_bool_env("LEGACY_USER_HEADER_ENABLED", False),
+        container_builds_enabled=_get_bool_env("CONTAINER_BUILDS_ENABLED", False),
     )
 
 

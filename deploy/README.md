@@ -2,6 +2,9 @@
 
 This directory centralises the infrastructure-as-code definitions that support the Whisper Transcriber platform.
 
+> **Dormant status:** Container-first deployment artefacts remain for future ECS/ECR work but are disabled by default in favour
+> of host-based installs. Set `CONTAINER_BUILDS_ENABLED=1` when reviving the Docker rollout.
+
 - [`terraform/`](./terraform/) provisions the core AWS infrastructure (networking, storage, compute, container registry, and database services).
 - [`ansible/`](./ansible/) configures the application stack on top of the provisioned compute capacity and orchestrates roll-forward/roll-back deploys.
 
@@ -10,7 +13,9 @@ This directory centralises the infrastructure-as-code definitions that support t
 1. Copy [`terraform/terraform.tfvars.example`](./terraform/terraform.tfvars.example) to `terraform/environments/<env>.tfvars` and customise the values for your account.
 2. Run the Terraform plan pipeline locally (see [`scripts/ci/run_infra_checks.sh`](../scripts/ci/run_infra_checks.sh)) to validate the manifests.
 3. Apply the Terraform plan when you are ready to create/update infrastructure.
-4. Use the Ansible playbook in [`ansible/site.yml`](./ansible/site.yml) to render host configuration or execute a rollback using the tags described below. The playbook currently emits a Docker Compose bundle that is being phased out in favour of systemd unit templates.
+4. Use the Ansible playbook in [`ansible/site.yml`](./ansible/site.yml) to render host configuration or execute a rollback using
+   the tags described below. The Docker Compose bundle generation is archived and only executes when
+   `CONTAINER_BUILDS_ENABLED=1`; systemd unit templates are the primary deployment vehicle.
 
 ## Terraform Parameters
 

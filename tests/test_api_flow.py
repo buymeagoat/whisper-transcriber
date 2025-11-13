@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import io
+import os
 import uuid
 from datetime import datetime
 from typing import Dict
@@ -237,7 +238,10 @@ async def test_prometheus_metrics_endpoint(async_client):
 
     await async_client.get("/health/livez")
 
-    response = await async_client.get("/metrics/")
+    response = await async_client.get(
+        "/metrics/",
+        headers={"X-Metrics-Token": os.environ["METRICS_TOKEN"]},
+    )
     assert response.status_code == 200
     body = response.text
 

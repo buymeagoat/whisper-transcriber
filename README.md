@@ -93,6 +93,7 @@ Required environment variables in `.env.production` (provision via a secrets man
 - `REDIS_URL` / `REDIS_PASSWORD` – Redis connection details
 - `ADMIN_BOOTSTRAP_PASSWORD` – temporary administrator credential for first run
 - `ADMIN_METRICS_TOKEN` – token for the `/admin/uploads/metrics` endpoint that reports chunked upload statistics
+- `METRICS_TOKEN` – shared secret presented via the `X-Metrics-Token` header when scraping `/metrics/`
 
 ### Secret provisioning and rotation
 
@@ -111,6 +112,7 @@ Provide the following environment variables with non-placeholder values before s
 - `DATABASE_URL` – SQLAlchemy DSN for the primary database
 - `REDIS_URL` – Redis connection string (also used for the Celery broker when set)
 - `REDIS_PASSWORD` – password supplied to the Redis instance
+- `METRICS_TOKEN` – shared secret presented via the `X-Metrics-Token` header when scraping `/metrics/`
 - `ADMIN_BOOTSTRAP_PASSWORD` – temporary administrator credential used once at bootstrap
 
 For local development you can use SQLite and a loopback Redis instance, for example:
@@ -134,8 +136,8 @@ When deploying to an orchestrator, ensure the job queue (Redis + Celery worker) 
 - **Structured logging** – All FastAPI services use the JSON logger provided by `api/utils/logger.py`. Each entry
   includes the timestamp, severity, request ID (when available), caller metadata, and any additional context supplied
   via the logging API.
-- **Metrics** – The `/metrics/` endpoint exposes RED/USE style Prometheus metrics by default without additional
-  authentication. Network layer controls should therefore guard access to the endpoint in production environments.
+- **Metrics** – The `/metrics/` endpoint exposes RED/USE style Prometheus metrics. Scrape requests must include
+  the `X-Metrics-Token` header with the `METRICS_TOKEN` secret; unauthenticated requests are rejected with 401 responses.
 
 ## Dormant features
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Set
 
 import pytest
@@ -31,7 +32,10 @@ async def test_metrics_endpoint_returns_expected_series(async_client):
     health_response = await async_client.get("/health/livez")
     assert health_response.status_code == 200
 
-    response = await async_client.get("/metrics/")
+    response = await async_client.get(
+        "/metrics/",
+        headers={"X-Metrics-Token": os.environ["METRICS_TOKEN"]},
+    )
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("text/plain")
 
@@ -50,7 +54,10 @@ async def test_metrics_endpoint_includes_histogram_buckets(async_client):
     warmup_response = await async_client.get("/health/livez")
     assert warmup_response.status_code == 200
 
-    response = await async_client.get("/metrics/")
+    response = await async_client.get(
+        "/metrics/",
+        headers={"X-Metrics-Token": os.environ["METRICS_TOKEN"]},
+    )
     assert response.status_code == 200
 
     families = list(text_string_to_metric_families(response.text))

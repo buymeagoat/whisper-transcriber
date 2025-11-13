@@ -126,3 +126,51 @@ variable "rollback_image_tag" {
   type        = string
   default     = "previous"
 }
+
+variable "secret_key_parameter_arn" {
+  description = "ARN of the secret containing the SECRET_KEY value."
+  type        = string
+}
+
+variable "jwt_secret_key_parameter_arn" {
+  description = "ARN of the secret containing the JWT_SECRET_KEY value."
+  type        = string
+}
+
+variable "admin_bootstrap_password_parameter_arn" {
+  description = "ARN of the secret containing the ADMIN_BOOTSTRAP_PASSWORD value."
+  type        = string
+}
+
+variable "redis_url_parameter_arn" {
+  description = "ARN of the secret containing the REDIS_URL value."
+  type        = string
+}
+
+variable "redis_password_parameter_arn" {
+  description = "ARN of the secret containing the REDIS_PASSWORD value."
+  type        = string
+}
+
+variable "metrics_token_parameter_arn" {
+  description = "ARN of the secret containing the METRICS_TOKEN used to protect /metrics."
+  type        = string
+}
+
+variable "worker_desired_count" {
+  description = "Desired number of Celery worker tasks."
+  type        = number
+  default     = 1
+}
+
+variable "worker_task_cpu" {
+  description = "CPU units allocated to the Celery worker task."
+  type        = number
+  default     = 1024
+}
+
+variable "worker_task_memory" {
+  description = "Memory (MiB) allocated to the Celery worker task."
+  type        = number
+  default     = 2048
+}

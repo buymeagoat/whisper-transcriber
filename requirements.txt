@@ -11,21 +11,21 @@ sqlalchemy>=2.0.30
 alembic>=1.12.0
 
 # --- Security & Configuration ---
-cryptography>=41.0.0
+cryptography<42.0.0
 python-magic>=0.4.27
 filetype>=1.2.0
-bcrypt>=4.0.1
+bcrypt>=4.0.1,<4.1
 
 # --- File Handling ---
 python-multipart>=0.0.6
 aiofiles>=23.2.1
 
 # --- Audio Processing & Transcription ---
-openai-whisper==20250625
+openai-whisper==20231117
 torch>=2.2.2
 pydub>=0.25.1
 # Audio enhancement dependencies
-librosa>=0.10.0
+librosa==0.10.2.post1
 soundfile>=0.12.1
 numpy>=1.24.0
 scipy>=1.10.0
@@ -43,8 +43,8 @@ passlib[bcrypt]>=1.7.4
 
 # --- Configuration ---
 python-dotenv>=1.1.0
-pydantic[dotenv]>=2.6.0
-pydantic-settings>=2.2.1
+pydantic>=2.7.1,<2.8
+pydantic-settings>=2.2.1,<2.3
 tomli>=2.0.0  # TOML parsing for Python < 3.11
 
 # --- System Monitoring ---

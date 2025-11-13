@@ -17,9 +17,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 - Jobs authentication now resolves callers from JWT/cookie credentials while
 	retaining legacy header compatibility.
-- Docker builder and runtime images pin to Python 3.13 to keep Whisper/Numba
-	dependencies installable within container builds.
-	- Chunked upload routing now accepts legacy `/uploads/init` and singular
-		`/uploads/{session_id}/chunk/{n}` paths used by the current frontend.
-	- Transcript routes verified to serve owners while rejecting unauthorized
-		access.
+- Removed Docker images, compose manifests, and entrypoint scripts; deployments now
+	assume process managers (systemd, supervisord, etc.) running uvicorn and the
+	Celery worker directly.
+- Chunked upload routing now accepts legacy `/uploads/init` and singular
+	`/uploads/{session_id}/chunk/{n}` paths used by the current frontend.
+- Transcript routes verified to serve owners while rejecting unauthorized
+	access.
+- Pinned librosa to 0.10.2.post1 so lazy_loader can locate package stubs during
+	imports.

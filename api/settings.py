@@ -116,6 +116,16 @@ def _load_required_secrets() -> Dict[str, str]:
     return {name: _require_env(name, description) for name, description in required.items()}
 
 
+def _get_bool_env(name: str, default: bool) -> bool:
+    """Read an environment variable as a boolean."""
+
+    value = os.getenv(name)
+    if value is None:
+        return default
+
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def load_settings() -> Settings:
     """Load settings from environment variables."""
 
@@ -126,6 +136,9 @@ def load_settings() -> Settings:
 
     celery_broker_url = os.getenv("CELERY_BROKER_URL", redis_url)
     celery_result_backend = os.getenv("CELERY_RESULT_BACKEND", redis_url)
+
+    debug = _get_bool_env("DEBUG", False)
+    environment = os.getenv("ENVIRONMENT") or ("development" if debug else "production")
 
     return Settings(
         secret_key=secrets["SECRET_KEY"],
@@ -140,6 +153,8 @@ def load_settings() -> Settings:
         host=os.getenv("HOST", "0.0.0.0"),
         port=int(os.getenv("PORT", "8001")),
         log_level=os.getenv("LOG_LEVEL", "INFO"),
+        debug=debug,
+        environment=environment,
         backup_scheduler_enabled=os.getenv("BACKUP_SCHEDULER_ENABLED", "true").lower()
         not in {"false", "0", "no"},
     )

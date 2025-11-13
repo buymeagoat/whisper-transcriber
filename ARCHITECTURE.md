@@ -21,7 +21,7 @@ Whisper Transcriber is a production-ready audio transcription service built with
 - **Charts**: Chart.js with react-chartjs-2
 
 ### Infrastructure
-- **Containerization**: Docker with multi-service compose
+- **Process orchestration**: Host-managed services (systemd, supervisord, etc.) running uvicorn and Celery directly
 - **Web Server**: Uvicorn (ASGI server)
 - **Caching**: Redis for session and API caching
 - **File Storage**: Local filesystem with organized directory structure
@@ -70,10 +70,10 @@ whisper-transcriber/
 │   │   ├── services/            # API clients
 │   │   └── context/             # State management
 │   └── dist/                    # Built static files
-├── scripts/                     # Production scripts
+├── scripts/                     # CI tooling and security helpers
 ├── models/                      # Whisper model files (5GB)
 ├── storage/                     # Runtime file storage
-└── docker-compose.yml           # Container orchestration
+└── observability/               # Prometheus and Grafana assets
 ```
 
 ## Core Services (Consolidated)
@@ -321,7 +321,7 @@ Located in `/app/models/`:
 - **Network**: Minimal (local processing)
 
 ### Scalability
-- **Horizontal**: Multiple worker containers
+- **Horizontal**: Multiple worker processes or hosts
 - **Vertical**: Larger models for better accuracy
 - **Caching**: Redis for API responses
 - **Database**: SQLite suitable for moderate loads
@@ -336,19 +336,16 @@ Located in `/app/models/`:
 
 ## Deployment
 
-### Docker Compose Services
-```yaml
-services:
-  app:      # FastAPI + React frontend
-  worker:   # Celery background worker  
-  redis:    # Task queue and caching
-```
+### Runtime Services
+- **API service** – `uvicorn api.main:app` hosted by a process manager such as systemd or supervisord.
+- **Worker service** – `celery -A api.worker.celery_app worker` processing queued transcription jobs.
+- **Redis** – broker/result backend. Use a managed offering or install it on the target host.
 
 ### Health Monitoring
 - `/health` - Basic health check
 - `/admin/stats` - System statistics
-- Automatic log rotation
-- Container health checks
+- Configure your process manager to restart services when `/readyz` fails or when the worker health task reports issues.
+- Rotate logs via systemd journald or logrotate depending on your hosting environment.
 
 ## Development vs Production
 
@@ -368,6 +365,6 @@ This codebase is **production-only** after streamlining:
 4. **Transcription Fails**: Check model compatibility with audio format
 
 ### Logs
-- Application logs: `/app/logs/api.log`
-- Security audit: `/app/logs/security_audit.log`
-- Container logs: `docker-compose logs <service>`
+- Application logs: `logs/api.log` (if `logs/` exists alongside the application root)
+- Security audit: `logs/security_audit.log`
+- Worker output: review journalctl or your process manager logs for the Celery worker service

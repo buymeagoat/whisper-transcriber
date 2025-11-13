@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/security/integration.py
+# hypothesis_version: 6.147.0
+
+[1.5, 200, 429, 1000, ',', '...', 'Invalid API key used', 'Rate limit exceeded', 'action', 'action_taken', 'active_monitors', 'admin_user', 'api', 'api_key_prefix', 'auth_failures', 'banned_ip', 'banned_ips', 'client_ip', 'endpoint_type', 'error', 'failure_reason', 'file_size', 'filename', 'ip_monitoring', 'open', 'open_incidents', 'operation', 'period_hours', 'permissions', 'processing_time_ms', 'reason', 'secure', 'security_integration', 'security_violations', 'size', 'success', 'target', 'total_events', 'unknown', 'upload', 'user-agent', 'user_id', 'username']

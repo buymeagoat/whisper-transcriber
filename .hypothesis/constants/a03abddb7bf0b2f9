@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/core/settings.py
+# hypothesis_version: 6.147.0
+
+[5432, '.env', 'CELERY_BROKER_URL', 'CoreSettings', 'DATABASE_URL', 'POSTGRES_DB', 'POSTGRES_HOST', 'POSTGRES_OPTIONS', 'POSTGRES_PASSWORD', 'POSTGRES_PORT', 'POSTGRES_SSLMODE', 'POSTGRES_USER', 'REDIS_URL', 'SETTINGS_ENV_FILE', 'after', 'get_core_settings', 'ignore', 'localhost', 'options', 'postgres', 'postgres_db', 'postgres_host', 'postgres_options', 'postgres_password', 'postgres_port', 'postgres_sslmode', 'postgres_user', 'prefer', 'sslmode', 'utf-8', 'whisper_transcriber']

@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/extended_models/__init__.py
+# hypothesis_version: 6.147.0
+
+['APIKey', 'APIKeyPermission', 'APIKeyQuotaUsage', 'APIKeyStatus', 'APIKeyUsageLog', 'AuditLog', 'BatchExport', 'BatchExportStatus', 'BatchOperation', 'ConfigEntry', 'ExportFormat', 'ExportFormatConfig', 'ExportHistory', 'ExportJob', 'ExportStatus', 'ExportTemplate', 'Job', 'JobStatusEnum', 'JobTag', 'PerformanceMetric', 'QueryPerformanceLog', 'TemplateType', 'TranscriptBookmark', 'TranscriptExport', 'TranscriptMetadata', 'TranscriptTag', 'TranscriptVersion', 'User', 'UserSetting']

@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/app_state.py
+# hypothesis_version: 6.147.0
+
+[300, 3600, 'celery_connected', 'cleanup-thread', 'cleanup_thread', 'error', 'job_queue', 'language', 'model', 'segments', 'small', 'startup_time', 'success', 'text', 'unknown', 'uptime_seconds']

@@ -10,13 +10,14 @@ from contextlib import suppress
 from importlib import reload
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Callable, Dict, Optional
+from typing import AsyncIterator, Callable, Dict, Iterator, Optional
 
 import pytest
 import pytest_asyncio
 from contextlib import AsyncExitStack
 
 from httpx import ASGITransport, AsyncClient
+from fastapi.testclient import TestClient
 
 # ── Ephemeral filesystem layout ─────────────────────────────────────────────────
 TEST_ROOT = Path(tempfile.mkdtemp(prefix="whisper-tests-"))
@@ -82,14 +83,18 @@ import api.orm_bootstrap as orm_bootstrap_module  # noqa: E402
 orm_bootstrap = reload(orm_bootstrap_module)
 import api.security.audit_models as audit_models  # noqa: E402
 import api.models as models_module  # noqa: E402
+from sqlalchemy.orm import Session
+
+from api.services.user_service import UserService  # noqa: E402
 
 reload(audit_models)
 reload(models_module)
 orm_bootstrap.validate_or_initialize_database()
+SessionLocal = orm_bootstrap.SessionLocal
 
 
 @pytest.fixture(scope="session", autouse=True)
-def cleanup_test_artifacts() -> None:
+def cleanup_test_artifacts() -> Iterator[None]:
     """Remove the ephemeral database and storage directories after the test run."""
 
     yield
@@ -109,13 +114,13 @@ def event_loop():
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
-async def fakeredis_server():
+async def fakeredis_server() -> AsyncIterator[None]:
     """Back Redis integrations with an in-memory fakeredis instance."""
 
     import fakeredis.aioredis as fredis
     import redis.asyncio as redis_async
 
-    fake_server = fredis.FakeServer()
+    fake_server = fredis.FakeServer()  # type: ignore[attr-defined]
 
     def _create_client() -> fredis.FakeRedis:
         client = fredis.FakeRedis(server=fake_server, decode_responses=True)
@@ -165,7 +170,15 @@ async def async_client(app):
 
 
 @pytest.fixture
-def security_headers() -> Callable[[Optional[str], bool], Dict[str, str]]:
+def client(app):
+    """Provide a synchronous TestClient for legacy tests."""
+
+    with TestClient(app) as test_client:
+        yield test_client
+
+
+@pytest.fixture
+def security_headers() -> Callable[..., Dict[str, str]]:
     """Return a helper for constructing security-compliant headers."""
 
     def _build(token: Optional[str] = None, include_placeholder_auth: bool = False) -> Dict[str, str]:
@@ -181,6 +194,70 @@ def security_headers() -> Callable[[Optional[str], bool], Dict[str, str]]:
         return headers
 
     return _build
+
+
+@pytest.fixture
+def db_session() -> Iterator[Session]:
+    """Provide a database session bound to the ephemeral SQLite database."""
+
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
+
+
+@pytest.fixture
+def standard_user_credentials(db_session) -> tuple[str, str]:
+    """Ensure a regular test user exists and return its credentials."""
+
+    username = "testuser"
+    password = "Password123!"
+    service = UserService()
+    user = db_session.query(models_module.User).filter_by(username=username).first()
+    if user is None:
+        service.create_user(db_session, username, password)
+        db_session.commit()
+    return username, password
+
+
+@pytest.fixture
+def test_user(db_session, standard_user_credentials) -> models_module.User:
+    """Return the standard test user instance."""
+
+    username, _ = standard_user_credentials
+    user = db_session.query(models_module.User).filter_by(username=username).first()
+    assert user is not None
+    return user
+
+
+@pytest.fixture
+def auth_headers(
+    client: TestClient,
+    security_headers: Callable[..., Dict[str, str]],
+    standard_user_credentials: tuple[str, str],
+) -> Dict[str, str]:
+    """Authenticate as a regular user and return authorization headers."""
+
+    username, password = standard_user_credentials
+    response = client.post(
+        "/auth/login",
+        json={"username": username, "password": password},
+        headers=security_headers(token=None, include_placeholder_auth=True),
+    )
+    assert response.status_code == 200, response.text
+    token = response.json()["access_token"]
+    return security_headers(token=token, include_placeholder_auth=False)
+
+
+@pytest.fixture
+def admin_headers(
+    admin_token: str,
+    security_headers: Callable[..., Dict[str, str]],
+) -> Dict[str, str]:
+    """Return authorization headers for the bootstrap admin user."""
+
+    return security_headers(token=admin_token, include_placeholder_auth=False)
 
 
 @pytest_asyncio.fixture
@@ -221,7 +298,9 @@ def stub_job_queue(monkeypatch):
 
     job_queue_module = importlib.import_module("api.services.job_queue")
     jobs_routes = importlib.import_module("api.routes.jobs")
+    admin_routes = importlib.import_module("api.routes.admin")
 
     monkeypatch.setattr(job_queue_module, "job_queue", stub, raising=False)
     monkeypatch.setattr(jobs_routes, "job_queue", stub, raising=False)
+    monkeypatch.setattr(admin_routes, "job_queue", stub, raising=False)
     return stub

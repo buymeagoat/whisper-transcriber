@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/batch.py
+# hypothesis_version: 6.147.0
+
+[0.0, 100, 1000, '.', '.aac', '.flac', '.m4a', '.mp3', '.ogg', '.wav', '.wma', '/api/v1/batch', '/list', '/stats/summary', '/upload', '/{batch_id}', '/{batch_id}/cancel', '/{batch_id}/progress', '/{batch_id}/start', 'Batch not found', 'Name for the batch', 'Processing priority', 'Whisper model to use', 'active_batches', 'batch', 'batch_id', 'batch_routes', 'cancelled', 'cancelled_batches', 'completed_batches', 'failed_batches', 'message', 'processing', 'small', 'status', 'success_rate', 'total_batches', 'total_files_failed']

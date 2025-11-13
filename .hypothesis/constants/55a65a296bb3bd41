@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/search.py
+# hypothesis_version: 6.147.0
+
+[-1.0, 0.0, 1.0, 100, 200, 500, '/', '/filters', '/quick', '/search', '/stats', '/suggestions', 'Advanced Search', 'Filename A-Z', 'Filter by languages', 'Full Text Search', 'Longest First', 'Metadata Only', 'Newest First', 'Oldest First', 'Quick search failed', 'Quick search query', 'Relevance', 'Search error: {}', 'Search query', 'Shortest First', 'advanced', 'anonymous', 'combined', 'date_asc', 'date_desc', 'date_range', 'duration_asc', 'duration_desc', 'duration_range', 'error', 'filename', 'full_text', 'job_id', 'label', 'languages', 'max', 'max_date', 'max_duration', 'metadata', 'min', 'min_date', 'min_duration', 'models', 'query', 'relevance', 'results', 'results_count', 'search', 'search_api', 'search_time_ms', 'search_type', 'search_types', 'snippet', 'sort_options', 'total', 'transcripts', 'user_id', 'value']

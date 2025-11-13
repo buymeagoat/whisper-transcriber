@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/extended_models/api_keys.py
+# hypothesis_version: 6.147.0
+
+[0.0, 100, 255, 'APIKey', 'APIKeyUsageLog', 'active', 'admin', 'all, delete-orphan', 'analytics', 'api_key', 'api_key_quota_usage', 'api_key_usage_logs', 'api_keys', 'api_keys.id', 'batch', 'delete', 'expired', 'read', 'revoked', 'suspended', 'usage_logs', 'write']

@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/app_worker.py
+# hypothesis_version: 6.147.0
+
+['%s', '*.pt', '--force', '.download', 'WHISPER_MODELS_DIR', 'WHISPER_MODEL_NAME', 'WHISPER_MODEL_PATH', '__main__', 'base', 'file', 'large-v2', 'medium', 'small', 'tiny', 'wb']

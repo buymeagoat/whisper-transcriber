@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/extended_models/export_system.py
+# hypothesis_version: 6.147.0
+
+[0.0, 100, 255, 300, 500, 1000, 'BatchExport', 'ExportJob', 'ExportTemplate', 'Job', 'all, delete-orphan', 'batch_export', 'batch_exports', 'batch_exports.id', 'cancelled', 'completed', 'created', 'document', 'docx', 'export_history', 'export_jobs', 'export_jobs.id', 'export_templates', 'export_templates.id', 'exports', 'failed', 'jobs.id', 'json', 'partial', 'pdf', 'pending', 'plain_text', 'processing', 'queued', 'srt', 'structured', 'subtitle', 'template', 'txt', 'vtt']

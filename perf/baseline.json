@@ -1,5 +1,5 @@
 {
-  "description": "Baseline metrics captured from local docker-compose run using tiny Whisper model on 8 vCPU runner.",
+  "description": "Baseline metrics captured from a local host deployment (uvicorn + Celery) using the tiny Whisper model on an 8 vCPU runner.",
   "captured_at": "2024-05-07T00:00:00Z",
   "environment": {
     "model": "tiny",

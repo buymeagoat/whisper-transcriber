@@ -11,6 +11,10 @@ import json
 import os
 import shutil
 import threading
+
+# Ensure environments without compiled Zstandard wheels can fall back to the CFFI backend.
+os.environ.setdefault("PYTHON_ZSTANDARD_IMPORT_POLICY", "cffi_fallback")
+
 import zstandard
 from datetime import datetime, timedelta
 from pathlib import Path

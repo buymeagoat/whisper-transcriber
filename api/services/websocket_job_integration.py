@@ -4,7 +4,7 @@ Integrates WebSocket service with job processing for real-time status updates.
 """
 
 import asyncio
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Coroutine
 from datetime import datetime
 
 from sqlalchemy.orm import Session
@@ -185,15 +185,25 @@ def setup_job_event_listeners():
     @event.listens_for(Job, 'after_update')
     def job_after_update(mapper, connection, target):
         """Send WebSocket notification when job is updated."""
-        # This runs in a synchronous context, so we need to handle async calls
-        asyncio.create_task(_handle_job_update_async(target))
+        # Ensure synchronous SQLAlchemy hooks can safely trigger async work
+        _safe_async_schedule(_handle_job_update_async(target))
     
     @event.listens_for(Job, 'after_insert')
     def job_after_insert(mapper, connection, target):
         """Send WebSocket notification when job is created."""
-        asyncio.create_task(_handle_job_create_async(target))
+        _safe_async_schedule(_handle_job_create_async(target))
     
     logger.info("WebSocket job event listeners set up")
+
+def _safe_async_schedule(coro: Coroutine[Any, Any, Any]) -> None:
+    """Schedule an async task, falling back to running it inline if needed."""
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        # No running loop (likely during sync tests); execute inline for reliability
+        asyncio.run(coro)
+    else:
+        loop.create_task(coro)
 
 async def _handle_job_update_async(job: Job):
     """Handle job update in async context."""

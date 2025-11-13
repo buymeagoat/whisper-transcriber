@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/consolidated_transcript_service.py
+# hypothesis_version: 6.147.0
+
+[100, 400, 403, 404, 500, '%Y%m%d_%H%M%S', '**/*.txt', '...', 'Access denied', 'Invalid status', 'Job not found', 'Transcript not found', 'completed_at', 'created_at', 'error', 'excerpt', 'export_format', 'export_formats', 'export_path', 'filename', 'has_transcript', 'job_id', 'json', 'language', 'limit', 'message', 'metadata', 'model', 'offset', 'original_filename', 'r', 'results', 'status', 'total', 'total_size_bytes', 'total_transcripts', 'transcript', 'transcript_service', 'txt', 'utf-8', 'w']

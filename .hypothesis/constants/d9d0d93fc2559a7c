@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/admin_api_keys.py
+# hypothesis_version: 6.147.0
+
+[0.0, 100, 365, 400, 500, '/', '/admin/api-keys', '/cleanup/expired', '/stats', '/{key_id}/revoke', '/{key_id}/suspend', '/{key_id}/unsuspend', '/{key_id}/usage', 'API key not found', 'Filter by status', 'Filter by user ID', 'Page number', 'Unknown', 'admin', 'admin_api_keys', 'api-keys', 'endpoint', 'expired_count', 'message', 'request_count', 'suspended_at', 'suspended_by', 'suspension_reason', 'unsuspended_at', 'unsuspended_by', 'user_id', 'username']

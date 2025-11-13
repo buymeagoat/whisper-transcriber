@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/__init__.py
+# hypothesis_version: 6.147.0
+
+['admin', 'audio', 'audit', 'auth', 'cache', 'health', 'jobs', 'logs', 'metrics', 'progress', 'transcripts', 'tts', 'user_settings', 'users']

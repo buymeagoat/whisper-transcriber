@@ -37,6 +37,21 @@ logger = get_system_logger("jobs_api")
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
+
+def _normalize_upload_filename(filename: Optional[str]) -> str:
+    """Collapse user provided filenames to a safe, filesystem-friendly form."""
+
+    if not filename:
+        return "upload.bin"
+
+    candidate = Path(filename).name  # Drop any directory components
+    sanitized = "".join(
+        ch if ch.isalnum() or ch in {"-", "_", "."} else "_"
+        for ch in candidate
+    )
+    sanitized = sanitized.strip("._")
+    return sanitized or "upload.bin"
+
 @router.post("/", response_model=Dict[str, Any])
 async def create_job(
     request: Request,
@@ -98,7 +113,8 @@ async def create_job(
         
         # Save uploaded file
         file_id = str(uuid.uuid4())
-        file_path = settings.upload_dir / safe_log_format("{}_{}", sanitize_for_log(file_id), sanitize_for_log(file.filename))
+        safe_filename = _normalize_upload_filename(file.filename)
+        file_path = settings.upload_dir / f"{file_id}_{safe_filename}"
         
         with open(file_path, "wb") as f:
             f.write(content)
@@ -134,7 +150,13 @@ async def create_job(
             "user_id": user_id
         })
         
-        logger.info(safe_log_format("Created transcription job {} for file {}", sanitize_for_log(file_id), sanitize_for_log(file.filename)))
+        logger.info(
+            safe_log_format(
+                "Created transcription job {} for file {}",
+                sanitize_for_log(file_id),
+                sanitize_for_log(safe_filename),
+            )
+        )
         
         return {
             "job_id": file_id,

@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/core/__init__.py
+# hypothesis_version: 6.147.0
+
+['CoreSettings', 'get_core_settings']

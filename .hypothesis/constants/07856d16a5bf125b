@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/user_service.py
+# hypothesis_version: 6.147.0
+
+['Invalid credentials', 'User not found', 'action', 'admin', 'admin_created', 'admin_exists', 'change-me', 'created', 'default', 'development', 'environment', 'error', 'existing_admin_found', 'initial_password', 'initial_setup', 'message', 'password', 'secret', 'test', 'user', 'username', 'utf-8', 'your-secret-key']

@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/transcripts.py
+# hypothesis_version: 6.147.0
+
+[404, '/transcripts', '/{job_id}', '/{job_id}/download', '/{job_id}/raw', 'text/plain', 'transcript', 'transcripts', 'transcripts_api']

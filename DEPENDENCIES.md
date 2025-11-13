@@ -13,7 +13,7 @@ fastapi==0.111.0
 └── Critical: Core application framework
 
 uvicorn[standard]==0.29.0
-├── Used by: docker-entrypoint.sh, main.py
+├── Used by: main.py and deployment process managers
 ├── Purpose: ASGI server for running FastAPI application
 ├── Includes: websockets, watchfiles, colorama, python-dotenv
 └── Critical: Application server
@@ -380,9 +380,9 @@ Database:
 ├── SQLite 3.31+ (built into Python)
 ├── Redis 6.0+ (for queue and caching)
 
-Container Runtime:
-├── Docker 20.10+
-├── Docker Compose 2.0+
+Process Management:
+├── systemd or supervisord for long-running API and worker services
+├── Reverse proxy (nginx, Caddy, or equivalent) for TLS termination (optional)
 ```
 
 ## Security Dependencies

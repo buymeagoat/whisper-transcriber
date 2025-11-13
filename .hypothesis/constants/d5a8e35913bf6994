@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/security/audit_models.py
+# hypothesis_version: 6.147.0
+
+[100, 200, 500, 'admin_action', 'api_access', 'api_key_audit_logs', 'api_key_id', 'auth_failure', 'auth_logout', 'auth_success', 'client_ip', 'created_at', 'critical', 'data_export', 'event_type', 'file_download', 'file_upload', 'high', 'idx_api_key_time', 'idx_api_user_time', 'idx_audit_ip_time', 'idx_audit_risk_time', 'idx_audit_time_type', 'idx_audit_user_time', 'incident_type', 'low', 'medium', 'open', 'password_change', 'rate_limit_violation', 'risk_score', 'security_audit_logs', 'security_incidents', 'security_violation', 'severity', 'status', 'suspicious_header', 'suspicious_input', 'system_access', 'timestamp', 'user_id']

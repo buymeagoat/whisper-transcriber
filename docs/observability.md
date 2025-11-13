@@ -9,15 +9,16 @@ alerts or connecting the service to your telemetry backend.
 
 Whisper Transcriber exposes two HTTP probes from `api/routes/health.py`:
 
-- `GET /livez` – a cheap liveness probe used by Docker to verify the container
-  is still running.
+- `GET /livez` – a lightweight liveness probe used by local process managers
+  to confirm the API loop is still responsive.
 - `GET /readyz` – verifies database connectivity, Redis availability, and that
   the configured Whisper models are discoverable on disk. The endpoint responds
   with HTTP `503` when any dependency is degraded.
 
-The Docker image and the `docker-compose.yml` file both rely on `/readyz` for
-runtime health checks. Keep the response time for this endpoint under
-approximately one second to avoid cascading restarts.
+When wiring health checks in an orchestrator (systemd timers, external load
+balancers, etc.), prefer `/readyz` so dependency failures short-circuit before
+traffic is routed. Keep the response time for this endpoint under roughly one
+second to avoid cascading restarts.
 
 ## Structured logging
 
@@ -106,9 +107,11 @@ The repository now ships a local monitoring stack to visualise these metrics:
   contains the scrape configuration (`prometheus.yml`) and alert definitions
   (`alerts.yml`) aligned with the thresholds above.
 - **Grafana dashboards:** prebuilt JSON dashboards live under
-  `observability/grafana/dashboards/`. They are automatically provisioned via
-  the files in `observability/grafana/provisioning/` when you run the bundled
-  Docker Compose services.
-- **Local stack:** run `docker-compose up prometheus grafana` to launch the
-  monitoring stack alongside the application. Grafana becomes available at
-  <http://localhost:3000> (default credentials `admin` / `admin`).
+  `observability/grafana/dashboards/`. They are automatically provisioned when
+  `grafana server` runs with `GF_PATHS_PROVISIONING` pointing at
+  `observability/grafana/provisioning`.
+- **Local stack:** start Prometheus with
+  `prometheus --config.file=observability/prometheus/prometheus.yml` and launch
+  Grafana using `GF_PATHS_PROVISIONING=$(pwd)/observability/grafana/provisioning grafana server`.
+  Grafana becomes available at <http://localhost:3000> (default credentials
+  `admin` / `admin`).

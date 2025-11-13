@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/worker.py
+# hypothesis_version: 6.147.0
+
+[6379, '--concurrency', '--loglevel', '/', '1', '10', '5', 'INFO', 'UTC', 'WORKER_CONCURRENCY', 'WORKER_LOG_LEVEL', '__main__', 'api.services', 'db', 'host', 'info', 'json', 'localhost', 'ok', 'password', 'port', 'redis', 'rediss', 'ssl', 'status', 'username', 'whisper.worker', 'whisper_transcriber', 'worker']

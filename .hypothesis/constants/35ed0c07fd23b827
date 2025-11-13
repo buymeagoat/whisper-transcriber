@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/websockets.py
+# hypothesis_version: 6.147.0
+
+[1008, 1011, '/admin/monitoring', '/jobs/{job_id}', '/system/broadcasts', '/user/notifications', '/ws', 'Access denied', 'Authentication error', 'Authorization', 'Bearer ', 'Job not found', 'admin', 'broadcast', 'broadcast_connected', 'broadcast_sent', 'broadcast_type', 'command', 'connection_status', 'connections_response', 'get_connections', 'get_metrics', 'info', 'job_id', 'job_status', 'message', 'metrics', 'metrics_response', 'periodic_status', 'ping', 'pong', 'progress', 'real-time', 'status', 'subscribe', 'subscribed', 'system_status', 'timestamp', 'token', 'topic', 'type', 'unsubscribe', 'unsubscribed', 'websocket_routes', 'websockets', 'welcome']

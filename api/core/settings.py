@@ -90,8 +90,26 @@ class CoreSettings(BaseSettings):
             self.celery_broker_url = self.redis_url
         if self.celery_result_backend is None:
             self.celery_result_backend = self.redis_url
-        if not self.database_url:
-            self.database_url = self._compose_postgres_dsn()
+        env_database_url = os.getenv("DATABASE_URL")
+        component_fields = (
+            "postgres_host",
+            "postgres_port",
+            "postgres_db",
+            "postgres_user",
+            "postgres_password",
+            "postgres_sslmode",
+            "postgres_options",
+        )
+        component_overrides = any(
+            getattr(self, name) != CoreSettings.model_fields[name].default
+            for name in component_fields
+        )
+
+        if env_database_url:
+            self.database_url = env_database_url
+
+        if not self.database_url or (component_overrides and not env_database_url):
+            self.database_url = self._build_postgres_dsn()
         return self
 
     def broker_url(self) -> str:
@@ -108,7 +126,7 @@ class CoreSettings(BaseSettings):
         assert self.database_url is not None
         return self.database_url
 
-    def _compose_postgres_dsn(self) -> str:
+    def _build_postgres_dsn(self) -> str:
         """Construct a PostgreSQL connection string from component fields."""
 
         user = quote_plus(self.postgres_user)

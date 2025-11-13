@@ -10,7 +10,7 @@ This directory centralises the infrastructure-as-code definitions that support t
 1. Copy [`terraform/terraform.tfvars.example`](./terraform/terraform.tfvars.example) to `terraform/environments/<env>.tfvars` and customise the values for your account.
 2. Run the Terraform plan pipeline locally (see [`scripts/ci/run_infra_checks.sh`](../scripts/ci/run_infra_checks.sh)) to validate the manifests.
 3. Apply the Terraform plan when you are ready to create/update infrastructure.
-4. Use the Ansible playbook in [`ansible/site.yml`](./ansible/site.yml) to deploy containers or execute a rollback using the tags described below.
+4. Use the Ansible playbook in [`ansible/site.yml`](./ansible/site.yml) to render host configuration or execute a rollback using the tags described below. The playbook currently emits a Docker Compose bundle that is being phased out in favour of systemd unit templates.
 
 ## Terraform Parameters
 
@@ -49,10 +49,10 @@ All Ansible defaults live in [`ansible/group_vars/all.yml`](./ansible/group_vars
 | `project` | Name used for directory layout and Compose project. |
 | `deployment_root` | Path on the target host where deployment artefacts are stored. |
 | `deploy_user` / `deploy_group` | Owner of generated files. |
-| `compose_project_name` | Docker Compose project identifier. |
-| `container_image` | Fully-qualified container image (including registry). |
-| `desired_release_tag` | Image tag promoted on deploy. |
-| `rollback_release_tag` | Image tag restored on rollback. |
+| `compose_project_name` | Legacy identifier used while the Compose bundle is replaced. |
+| `container_image` | Legacy image reference used until host-based deployment tasks land. |
+| `desired_release_tag` | Target release identifier (currently mirrors legacy image tags). |
+| `rollback_release_tag` | Rollback identifier (mirrors legacy image tags). |
 | `db_*` variables | Connection metadata required by the service. |
 | `uploads_bucket` | Bucket where the API stores incoming audio. |
 

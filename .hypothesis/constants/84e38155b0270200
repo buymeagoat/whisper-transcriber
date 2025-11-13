@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/batch_upload_simple.py
+# hypothesis_version: 6.147.0
+
+[0.0, 0.1, 100.0, 100, 400, 404, 1024, '.', '.flac', '.m4a', '.mp3', '.mp4', '.ogg', '.wav', '.webm', 'No files provided', 'base', 'batch_id', 'batches', 'cancelled', 'completed', 'completed_files', 'created_at', 'error_message', 'failed', 'failed_files', 'filename', 'files', 'flac', 'info', 'job_id', 'jobs', 'm4a', 'mp3', 'mp4', 'ogg', 'pending', 'processing', 'progress', 'queued', 'skipped', 'status', 'success_rate', 'total', 'total_files', 'wav', 'webm', 'whisper_model']

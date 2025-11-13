@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/router_setup.py
+# hypothesis_version: 6.147.0
+
+[404, '\nSTATIC ROUTE CHECK:', '.env', '/', '/admin', '/api', '/assets', '/static', '/uploads', '/vite.svg', '/{full_path:path}', '0', 'ApiCacheMiddleware', 'Cache-Control', 'Expires', 'File not found', 'Not Found', 'Pragma', '__name__', 'admin', 'admin/download-all', 'admin/files', 'admin/reset', 'admin/restart', 'admin/shutdown', 'api-keys', 'api/', 'assets', 'audio-processing', 'audit', 'backup', 'batch', 'batch-upload', 'cache', 'chunked-uploads', 'cls', 'compatibility', 'database', 'docs', 'enhanced_cache', 'enhancement', 'export', 'export-system', 'exports', 'file-upload', 'formats', 'headers', 'health', 'index.html', 'jobs', 'log', 'no-cache', 'openapi.json', 'pwa', 'pyproject.toml', 'real-time', 'requirements.txt', 'search', 'security', 'static', 'system-performance', 'system-resources', 'transcripts', 'upload-websockets', 'uploads', 'vite.svg', 'websockets']

@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/transcript_search.py
+# hypothesis_version: 6.147.0
+
+[0.0, 0.1, 0.3, 0.7, 0.8, 1.0, 1.5, 2.0, 100, 200, 300, 1000, '"([^"]*)"', '"[^"]*"', ',', '...', '\\b\\w+\\b', 'advanced', 'combined', 'count', 'created_at', 'date_asc', 'date_desc', 'duration_asc', 'duration_desc', 'field', 'filename', 'full_text', 'inf', 'keywords', 'length', 'matches', 'metadata', 'operators', 'phrases', 'position', 'positions', 'r', 'relevance', 'summary', 'term', 'terms', 'transcript_search', 'utf-8']

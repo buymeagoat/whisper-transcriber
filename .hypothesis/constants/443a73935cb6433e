@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/tts.py
+# hypothesis_version: 6.147.0
+
+['/', '/tts', 'TTS not implemented', 'message', 'tts']

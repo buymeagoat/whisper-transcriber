@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/websocket_auth.py
+# hypothesis_version: 6.147.0
+
+['HS256', 'Token expired', 'User not found', 'admin', 'exp', 'sub', 'websocket_auth']

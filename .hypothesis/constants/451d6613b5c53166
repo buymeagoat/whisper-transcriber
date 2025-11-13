@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/websocket_job_integration.py
+# hypothesis_version: 6.147.0
+
+[1.2, 100, 'Job failed', 'after_insert', 'after_update', 'completed', 'completion_time', 'current_value', 'download_url', 'error_message', 'estimated_completion', 'failed', 'failure_time', 'info', 'job_completed', 'job_error', 'job_id', 'job_update', 'maintenance', 'maintenance_type', 'message', 'metric_type', 'performance', 'previous_status', 'processing', 'progress', 'scheduled', 'started_at', 'status', 'system', 'threshold', 'timestamp', 'updated_at', 'user_id', 'warning']

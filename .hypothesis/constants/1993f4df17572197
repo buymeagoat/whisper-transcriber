@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/progress.py
+# hypothesis_version: 6.147.0
+
+['/progress', '/{job_id}', 'job_id', 'progress']

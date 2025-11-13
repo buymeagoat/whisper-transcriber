@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/batch_processor.py
+# hypothesis_version: 6.147.0
+
+[0.0, 100.0, 100, 255, 1000, 1024, 'Batch not found', 'Name for the batch', 'Processing priority', 'batch_id', 'batch_info.json', 'batch_processor', 'batches', 'cancelled', 'completed', 'completed_jobs', 'created_at', 'failed', 'failed_jobs', 'high', 'info', 'low', 'normal', 'paused', 'pending', 'processed_files', 'processing', 'processing_jobs', 'progress_percentage', 'r', 'small', 'status', 'total_files', 'urgent', 'w', 'wb']

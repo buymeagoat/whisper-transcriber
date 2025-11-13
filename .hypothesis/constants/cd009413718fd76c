@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/cache.py
+# hypothesis_version: 6.147.0
+
+[0.0, 100, 256, 404, 512, 1024, 3600, '*', '/clear', '/entries', '/entries/{key}', '/health', '/stats', '/warm', '2024-01-01T12:00:00Z', 'None', 'access_count', 'active_sessions_data', 'cache', 'cache_size', 'configuration_data', 'created_at', 'healthy', 'hit_count', 'job_queue_status', 'key', 'last_accessed', 'last_cleanup', 'low', 'memory_usage', 'metadata', 'miss_count', 'queue_statistics', 'size_bytes', 'status', 'system_config', 'ttl_seconds', 'unknown', 'user_sessions', 'value']

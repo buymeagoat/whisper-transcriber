@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/token_service.py
+# hypothesis_version: 6.147.0
+
+['HS256', 'Token has expired', 'Token is required', 'admin', 'aud', 'exp', 'iat', 'id', 'is_admin', 'iss', 'require', 'role', 'sub', 'user', 'username', 'verify_aud', 'verify_exp', 'verify_iat', 'verify_iss', 'verify_signature', 'whisper-transcriber']

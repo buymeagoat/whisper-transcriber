@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/utils/model_validation.py
+# hypothesis_version: 6.147.0
+
+['expected_models', 'found_models', 'large-v3.pt', 'medium.pt', 'model_validation', 'models_dir', 'small.pt', 'tiny.pt']

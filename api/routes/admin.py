@@ -145,71 +145,6 @@ async def list_all_jobs(
         logger.error(f"Failed to list admin jobs: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/jobs/{job_id}", response_model=Dict[str, Any])
-async def get_job_details(
-    job_id: str,
-    current_user: dict = Depends(verify_token),
-    db: Session = Depends(get_db)
-):
-    """Get detailed job information for admin."""
-    try:
-        job = db.query(Job).filter(Job.id == job_id).first()
-        
-        if not job:
-            raise HTTPException(status_code=404, detail="Job not found")
-        
-        # Get queue status and details
-        queue_job = job_queue.get_job(job_id)
-        queue_details = {}
-        if queue_job:
-            queue_details = {
-                "queue_status": queue_job.status.value,
-                "queue_progress": getattr(queue_job, 'progress', None),
-                "queue_worker": getattr(queue_job, 'worker', None)
-            }
-        
-        # Read transcript if available
-        transcript_content = None
-        if job.transcript_path:
-            try:
-                with open(job.transcript_path, 'r') as f:
-                    transcript_content = f.read()
-            except Exception as e:
-                logger.warning(f"Could not read transcript for job {job_id}: {e}")
-        
-        # Read logs if available
-        log_content = None
-        if job.log_path:
-            try:
-                with open(job.log_path, 'r') as f:
-                    # Limit log size to prevent overwhelming response
-                    log_content = f.read()[-10000:]  # Last 10KB
-            except Exception as e:
-                logger.warning(f"Could not read logs for job {job_id}: {e}")
-        
-        return {
-            "job_id": job.id,
-            "original_filename": job.original_filename,
-            "saved_filename": job.saved_filename,
-            "model": job.model,
-            "status": job.status.value,
-            "created_at": job.created_at.isoformat(),
-            "updated_at": job.updated_at.isoformat(),
-            "started_at": job.started_at.isoformat() if job.started_at else None,
-            "finished_at": job.finished_at.isoformat() if job.finished_at else None,
-            "transcript_path": job.transcript_path,
-            "log_path": job.log_path,
-            "transcript_content": transcript_content,
-            "log_content": log_content,
-            "queue_details": queue_details
-        }
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to get job details for {job_id}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
 @router.post("/jobs/{job_id}/cancel")
 async def cancel_job(
     job_id: str,
@@ -374,6 +309,72 @@ async def get_job_stats(
     
     except Exception as e:
         logger.error(f"Failed to get job stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/jobs/{job_id}", response_model=Dict[str, Any])
+async def get_job_details(
+    job_id: str,
+    current_user: dict = Depends(verify_token),
+    db: Session = Depends(get_db)
+):
+    """Get detailed job information for admin."""
+    try:
+        job = db.query(Job).filter(Job.id == job_id).first()
+
+        if not job:
+            raise HTTPException(status_code=404, detail="Job not found")
+
+        # Get queue status and details
+        queue_job = job_queue.get_job(job_id)
+        queue_details = {}
+        if queue_job:
+            queue_details = {
+                "queue_status": queue_job.status.value,
+                "queue_progress": getattr(queue_job, 'progress', None),
+                "queue_worker": getattr(queue_job, 'worker', None)
+            }
+
+        # Read transcript if available
+        transcript_content = None
+        if job.transcript_path:
+            try:
+                with open(job.transcript_path, 'r') as f:
+                    transcript_content = f.read()
+            except Exception as e:
+                logger.warning(f"Could not read transcript for job {job_id}: {e}")
+
+        # Read logs if available
+        log_content = None
+        if job.log_path:
+            try:
+                with open(job.log_path, 'r') as f:
+                    # Limit log size to prevent overwhelming response
+                    log_content = f.read()[-10000:]
+            except Exception as e:
+                logger.warning(f"Could not read logs for job {job_id}: {e}")
+
+        return {
+            "job_id": job.id,
+            "original_filename": job.original_filename,
+            "saved_filename": job.saved_filename,
+            "model": job.model,
+            "status": job.status.value,
+            "created_at": job.created_at.isoformat(),
+            "updated_at": job.updated_at.isoformat(),
+            "started_at": job.started_at.isoformat() if job.started_at else None,
+            "finished_at": job.finished_at.isoformat() if job.finished_at else None,
+            "transcript_path": job.transcript_path,
+            "log_path": job.log_path,
+            "queue_details": queue_details,
+            "transcript_content": transcript_content,
+            "log_content": log_content
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get job details for {job_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/health")

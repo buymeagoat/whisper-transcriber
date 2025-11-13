@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/models.py
+# hypothesis_version: 6.147.0
+
+[100, 200, 255, 500, 'audit_logs', 'client_ip', 'completed', 'config_entries', 'created_at', 'endpoint', 'enriching', 'event_type', 'execution_time_ms', 'failed', 'failed_launch_error', 'failed_timeout', 'failed_unknown', 'failed_whisper_error', 'idx_jobs_created_at', 'idx_jobs_model', 'idx_jobs_status', 'idx_jobs_user_status', 'idx_metadata_job_id', 'idx_perf_name_time', 'idx_perf_time_type', 'idx_perf_type_name', 'idx_perf_value', 'idx_users_role', 'idx_users_username', 'job_id', 'jobs', 'jobs.id', 'legacy', 'medium', 'metric_name', 'metric_type', 'model', 'performance_metrics', 'processing', 'query_type', 'queued', 'role', 'severity', 'status', 'table_name', 'timestamp', 'transcript_metadata', 'user', 'user_id', 'user_settings', 'username', 'users', 'users.id', 'value']

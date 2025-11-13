@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/jobs.py
+# hypothesis_version: 6.147.0
+
+[100, 400, 404, 500, ', ', '.aac', '.flac', '.m4a', '.mp3', '.ogg', '.wav', '.webm', '/', '/jobs', '/{job_id}', 'Deleted job {}', 'Job not found', 'anonymous', 'completed_at', 'created_at', 'error_message', 'file:{}', 'filename', 'finished_at', 'job_id', 'jobs', 'jobs_api', 'language', 'limit', 'message', 'model', 'model_name', 'original_filename', 'queue_job_id', 'queue_status', 'skip', 'small', 'status', 'total', 'transcribe_audio', 'transcript', 'transcript_path', 'upload', 'user_id', 'utf-8', 'wb', '{}_{}']

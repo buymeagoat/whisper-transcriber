@@ -54,18 +54,6 @@ coverage.xml
 *.py,cover
 .tox/
 
-# === Docker ===
-*.tar
-*.img
-docker-compose.override.yml
-
-# Prevent Docker checksum errors from local envs
-**/bin/
-**/lib/
-**/include/
-**/share/
-**/.Python
-
 # === System Files ===
 .DS_Store
 Thumbs.db

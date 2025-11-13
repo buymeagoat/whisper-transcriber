@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/metrics.py
+# hypothesis_version: 6.147.0
+
+[0.0, 0.05, 0.1, 0.25, 0.5, 1.0, 100.0, 120, 300, 400, 512, 600, 900, 1800, 2048, 3600, '/', '/metrics', 'REQUESTS_IN_PROGRESS', 'clients', 'collection', 'connected_clients', 'cpu', 'disk', 'endpoint', 'failed', 'kind', 'maxclients', 'maxmemory', 'memory', 'method', 'metrics', 'record_http_request', 'redis', 'redis_connections', 'redis_memory', 'redis_pool', 'resource', 'router', 'status', 'status_code', 'unknown', 'used_memory', 'whisper_jobs_total']

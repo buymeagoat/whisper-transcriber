@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/api_key_service.py
+# hypothesis_version: 6.147.0
+
+[0.0, 200, 255, 365, 400, 1000, 3650, 10000, 'API key not found', 'Daily request quota', 'Optional description', 'Rate limit per hour', 'api_key_service', 'count', 'endpoint', 'wt_']

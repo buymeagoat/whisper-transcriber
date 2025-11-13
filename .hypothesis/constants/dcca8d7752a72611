@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/config_validator.py
+# hypothesis_version: 6.147.0
+
+[1024, 65535, 'DEBUG', 'app_name', 'database_url', 'debug', 'default_model', 'errors', 'false', 'host', 'info', 'log_level', 'max_file_size_mb', 'port', 'true', 'upload_dir', 'valid', 'version', 'warnings']

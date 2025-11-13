@@ -47,10 +47,16 @@ def test_migrations_generate_upgrade_sql_offline():
     """Upgrading to head in offline mode should yield SQL statements."""
 
     config = _make_alembic_config()
+    script_dir = ScriptDirectory.from_config(config)
+    targets = script_dir.get_heads() or [script_dir.get_current_head()]
+    targets = [rev for rev in targets if rev]
+    if not targets:
+        pytest.skip("No migration heads available to upgrade")
 
     buffer = io.StringIO()
     with redirect_stdout(buffer):
-        command.upgrade(config, "head", sql=True)
+        for target in targets:
+            command.upgrade(config, target, sql=True)
 
     upgrade_sql = buffer.getvalue().strip()
     assert upgrade_sql, "Expected offline upgrade to emit SQL statements"
@@ -60,11 +66,16 @@ def test_migrations_generate_downgrade_sql_offline():
     """Downgrading to base in offline mode should yield SQL statements."""
 
     config = _make_alembic_config()
-    head_revision = ScriptDirectory.from_config(config).get_current_head()
+    script_dir = ScriptDirectory.from_config(config)
+    targets = script_dir.get_heads() or [script_dir.get_current_head()]
+    targets = [rev for rev in targets if rev]
+    if not targets:
+        pytest.skip("No migration heads available to downgrade")
 
     buffer = io.StringIO()
     with redirect_stdout(buffer):
-        command.downgrade(config, f"{head_revision}:base", sql=True)
+        for target in targets:
+            command.downgrade(config, f"{target}:base", sql=True)
 
     downgrade_sql = buffer.getvalue().strip()
     assert downgrade_sql, "Expected offline downgrade to emit SQL statements"

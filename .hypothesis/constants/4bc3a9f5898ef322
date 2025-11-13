@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/main.py
+# hypothesis_version: 6.147.0
+
+[100, 120, 300, 500, 600, 1024, 3600, 8001, '*', ',', '/health', '/version', '0.0.0.0', '100', '300', 'CACHE_DEFAULT_TTL', 'CACHE_MAX_MEMORY_MB', 'DEBUG', 'REDIS_URL', 'SELECT 1', 'Shutting down app...', 'VITE_API_HOST', '__main__', 'api.main:app', 'db_error', 'details', 'error', 'info', 'job_queue', 'ok', 'project', 'pyproject.toml', 'status', 'transcribe_audio', 'unknown', 'version']

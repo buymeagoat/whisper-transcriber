@@ -1,0 +1,352 @@
+{
+  "backups": [
+    {
+      "id": "82758554-7263-49b2-99f1-2faa86607585",
+      "type": "full",
+      "timestamp": "2025-11-13T01:09:01.510426",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/82758554-7263-49b2-99f1-2faa86607585_db.sql.zst",
+        "uploads": "data/backups/files/82758554-7263-49b2-99f1-2faa86607585_uploads.tar.zst",
+        "transcripts": "data/backups/files/82758554-7263-49b2-99f1-2faa86607585_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "e7a8f4ef-c5ad-4cdf-83ad-67222ec3d714",
+      "type": "full",
+      "timestamp": "2025-11-12T22:12:34.169375",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/e7a8f4ef-c5ad-4cdf-83ad-67222ec3d714_db.sql.zst",
+        "uploads": "data/backups/files/e7a8f4ef-c5ad-4cdf-83ad-67222ec3d714_uploads.tar.zst",
+        "transcripts": "data/backups/files/e7a8f4ef-c5ad-4cdf-83ad-67222ec3d714_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "5909626c-9d99-40d0-9185-17d0510ff7d0",
+      "type": "full",
+      "timestamp": "2025-11-10T22:52:39.724428",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/5909626c-9d99-40d0-9185-17d0510ff7d0_db.sql.zst",
+        "uploads": "data/backups/files/5909626c-9d99-40d0-9185-17d0510ff7d0_uploads.tar.zst",
+        "transcripts": "data/backups/files/5909626c-9d99-40d0-9185-17d0510ff7d0_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "fd8354d7-81b2-4f32-853e-1cbe15f32b16",
+      "type": "full",
+      "timestamp": "2025-11-10T22:44:55.003953",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/fd8354d7-81b2-4f32-853e-1cbe15f32b16_db.sql.zst",
+        "uploads": "data/backups/files/fd8354d7-81b2-4f32-853e-1cbe15f32b16_uploads.tar.zst",
+        "transcripts": "data/backups/files/fd8354d7-81b2-4f32-853e-1cbe15f32b16_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "33eebccc-5394-48a4-b4aa-e9cdae497aa3",
+      "type": "full",
+      "timestamp": "2025-11-10T22:39:18.618835",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/33eebccc-5394-48a4-b4aa-e9cdae497aa3_db.sql.zst",
+        "uploads": "data/backups/files/33eebccc-5394-48a4-b4aa-e9cdae497aa3_uploads.tar.zst",
+        "transcripts": "data/backups/files/33eebccc-5394-48a4-b4aa-e9cdae497aa3_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "e5f01f47-05c1-4188-9e6b-d9b31fd4842b",
+      "type": "full",
+      "timestamp": "2025-11-10T22:33:19.631485",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/e5f01f47-05c1-4188-9e6b-d9b31fd4842b_db.sql.zst",
+        "uploads": "data/backups/files/e5f01f47-05c1-4188-9e6b-d9b31fd4842b_uploads.tar.zst",
+        "transcripts": "data/backups/files/e5f01f47-05c1-4188-9e6b-d9b31fd4842b_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "02032092-5c2e-4f66-b091-e519ce2e0d5e",
+      "type": "full",
+      "timestamp": "2025-11-10T22:26:19.446683",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/02032092-5c2e-4f66-b091-e519ce2e0d5e_db.sql.zst",
+        "uploads": "data/backups/files/02032092-5c2e-4f66-b091-e519ce2e0d5e_uploads.tar.zst",
+        "transcripts": "data/backups/files/02032092-5c2e-4f66-b091-e519ce2e0d5e_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "d4ed2df3-de8d-497e-a343-c4116b885464",
+      "type": "full",
+      "timestamp": "2025-11-10T22:20:46.580956",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/d4ed2df3-de8d-497e-a343-c4116b885464_db.sql.zst",
+        "uploads": "data/backups/files/d4ed2df3-de8d-497e-a343-c4116b885464_uploads.tar.zst",
+        "transcripts": "data/backups/files/d4ed2df3-de8d-497e-a343-c4116b885464_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "b1b4f6c6-f399-4dc4-84ca-b4bdf17af87d",
+      "type": "full",
+      "timestamp": "2025-11-10T22:15:15.736688",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/b1b4f6c6-f399-4dc4-84ca-b4bdf17af87d_db.sql.zst",
+        "uploads": "data/backups/files/b1b4f6c6-f399-4dc4-84ca-b4bdf17af87d_uploads.tar.zst",
+        "transcripts": "data/backups/files/b1b4f6c6-f399-4dc4-84ca-b4bdf17af87d_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "756bb795-771b-423d-b36e-1ed0e42f8b5d",
+      "type": "full",
+      "timestamp": "2025-11-10T22:09:14.462952",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/756bb795-771b-423d-b36e-1ed0e42f8b5d_db.sql.zst",
+        "uploads": "data/backups/files/756bb795-771b-423d-b36e-1ed0e42f8b5d_uploads.tar.zst",
+        "transcripts": "data/backups/files/756bb795-771b-423d-b36e-1ed0e42f8b5d_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "5869d9c2-13b3-403b-926e-7792d6a1d053",
+      "type": "full",
+      "timestamp": "2025-11-10T22:03:41.616566",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/5869d9c2-13b3-403b-926e-7792d6a1d053_db.sql.zst",
+        "uploads": "data/backups/files/5869d9c2-13b3-403b-926e-7792d6a1d053_uploads.tar.zst",
+        "transcripts": "data/backups/files/5869d9c2-13b3-403b-926e-7792d6a1d053_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "58fb71dd-0844-43b7-99ba-679df28b96a4",
+      "type": "full",
+      "timestamp": "2025-11-10T21:57:19.486900",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/58fb71dd-0844-43b7-99ba-679df28b96a4_db.sql.zst",
+        "uploads": "data/backups/files/58fb71dd-0844-43b7-99ba-679df28b96a4_uploads.tar.zst",
+        "transcripts": "data/backups/files/58fb71dd-0844-43b7-99ba-679df28b96a4_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "191ca028-5dfd-41d6-a011-52847855012d",
+      "type": "full",
+      "timestamp": "2025-11-10T21:50:29.478170",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/191ca028-5dfd-41d6-a011-52847855012d_db.sql.zst",
+        "uploads": "data/backups/files/191ca028-5dfd-41d6-a011-52847855012d_uploads.tar.zst",
+        "transcripts": "data/backups/files/191ca028-5dfd-41d6-a011-52847855012d_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "6d5fd9e6-0b54-457b-b50c-72465ccfda5a",
+      "type": "full",
+      "timestamp": "2025-11-10T21:43:28.284250",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/6d5fd9e6-0b54-457b-b50c-72465ccfda5a_db.sql.zst",
+        "uploads": "data/backups/files/6d5fd9e6-0b54-457b-b50c-72465ccfda5a_uploads.tar.zst",
+        "transcripts": "data/backups/files/6d5fd9e6-0b54-457b-b50c-72465ccfda5a_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "b3de9b50-9849-406b-b7a0-a44c164df696",
+      "type": "full",
+      "timestamp": "2025-11-10T21:38:28.843422",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/b3de9b50-9849-406b-b7a0-a44c164df696_db.sql.zst",
+        "uploads": "data/backups/files/b3de9b50-9849-406b-b7a0-a44c164df696_uploads.tar.zst",
+        "transcripts": "data/backups/files/b3de9b50-9849-406b-b7a0-a44c164df696_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "628a91fb-5ae2-4ce9-9a37-87f4d074243d",
+      "type": "full",
+      "timestamp": "2025-11-10T21:30:58.670194",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/628a91fb-5ae2-4ce9-9a37-87f4d074243d_db.sql.zst",
+        "uploads": "data/backups/files/628a91fb-5ae2-4ce9-9a37-87f4d074243d_uploads.tar.zst",
+        "transcripts": "data/backups/files/628a91fb-5ae2-4ce9-9a37-87f4d074243d_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "7ab71d74-edc8-415f-be4c-2492c8c3c046",
+      "type": "full",
+      "timestamp": "2025-11-10T21:22:11.409287",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/7ab71d74-edc8-415f-be4c-2492c8c3c046_db.sql.zst",
+        "uploads": "data/backups/files/7ab71d74-edc8-415f-be4c-2492c8c3c046_uploads.tar.zst",
+        "transcripts": "data/backups/files/7ab71d74-edc8-415f-be4c-2492c8c3c046_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "7e7688cf-46b6-408c-bc7a-9776e34caac0",
+      "type": "full",
+      "timestamp": "2025-11-10T21:16:23.652942",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/7e7688cf-46b6-408c-bc7a-9776e34caac0_db.sql.zst",
+        "uploads": "data/backups/files/7e7688cf-46b6-408c-bc7a-9776e34caac0_uploads.tar.zst",
+        "transcripts": "data/backups/files/7e7688cf-46b6-408c-bc7a-9776e34caac0_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "92e3219b-fca2-42d1-aa8b-35af4acdca2f",
+      "type": "full",
+      "timestamp": "2025-11-10T20:58:17.889390",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/92e3219b-fca2-42d1-aa8b-35af4acdca2f_db.sql.zst",
+        "uploads": "data/backups/files/92e3219b-fca2-42d1-aa8b-35af4acdca2f_uploads.tar.zst",
+        "transcripts": "data/backups/files/92e3219b-fca2-42d1-aa8b-35af4acdca2f_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "94ed6ac5-a77b-4b3e-95ce-84bd39d7178d",
+      "type": "full",
+      "timestamp": "2025-11-10T20:53:11.046777",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/94ed6ac5-a77b-4b3e-95ce-84bd39d7178d_db.sql.zst",
+        "uploads": "data/backups/files/94ed6ac5-a77b-4b3e-95ce-84bd39d7178d_uploads.tar.zst",
+        "transcripts": "data/backups/files/94ed6ac5-a77b-4b3e-95ce-84bd39d7178d_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "f9a347d9-cfbf-40c1-a190-3999611fff4c",
+      "type": "full",
+      "timestamp": "2025-11-10T20:49:35.080226",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/f9a347d9-cfbf-40c1-a190-3999611fff4c_db.sql.zst",
+        "uploads": "data/backups/files/f9a347d9-cfbf-40c1-a190-3999611fff4c_uploads.tar.zst",
+        "transcripts": "data/backups/files/f9a347d9-cfbf-40c1-a190-3999611fff4c_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "3ab23863-2efc-4905-b2da-e32027d0feb4",
+      "type": "full",
+      "timestamp": "2025-11-10T20:44:59.489708",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/3ab23863-2efc-4905-b2da-e32027d0feb4_db.sql.zst",
+        "uploads": "data/backups/files/3ab23863-2efc-4905-b2da-e32027d0feb4_uploads.tar.zst",
+        "transcripts": "data/backups/files/3ab23863-2efc-4905-b2da-e32027d0feb4_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "daff0d40-91d1-421d-9704-86a941e41230",
+      "type": "full",
+      "timestamp": "2025-11-10T20:32:12.399237",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/daff0d40-91d1-421d-9704-86a941e41230_db.sql.zst",
+        "uploads": "data/backups/files/daff0d40-91d1-421d-9704-86a941e41230_uploads.tar.zst",
+        "transcripts": "data/backups/files/daff0d40-91d1-421d-9704-86a941e41230_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "590b5222-789a-4054-83b9-d2336ddb9abe",
+      "type": "full",
+      "timestamp": "2025-11-10T20:27:14.533247",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/590b5222-789a-4054-83b9-d2336ddb9abe_db.sql.zst",
+        "uploads": "data/backups/files/590b5222-789a-4054-83b9-d2336ddb9abe_uploads.tar.zst",
+        "transcripts": "data/backups/files/590b5222-789a-4054-83b9-d2336ddb9abe_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "263ea8b8-ffa9-4a31-a677-cb6991dd5a4b",
+      "type": "full",
+      "timestamp": "2025-11-10T20:21:39.736955",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/263ea8b8-ffa9-4a31-a677-cb6991dd5a4b_db.sql.zst",
+        "uploads": "data/backups/files/263ea8b8-ffa9-4a31-a677-cb6991dd5a4b_uploads.tar.zst",
+        "transcripts": "data/backups/files/263ea8b8-ffa9-4a31-a677-cb6991dd5a4b_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "a1bf02f5-152a-481f-8594-6d5b0674952d",
+      "type": "full",
+      "timestamp": "2025-11-10T20:16:19.478452",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/a1bf02f5-152a-481f-8594-6d5b0674952d_db.sql.zst",
+        "uploads": "data/backups/files/a1bf02f5-152a-481f-8594-6d5b0674952d_uploads.tar.zst",
+        "transcripts": "data/backups/files/a1bf02f5-152a-481f-8594-6d5b0674952d_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "000ac233-b4ae-4bcf-9fed-881ac255ec3b",
+      "type": "full",
+      "timestamp": "2025-11-10T20:10:47.872062",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/000ac233-b4ae-4bcf-9fed-881ac255ec3b_db.sql.zst",
+        "uploads": "data/backups/files/000ac233-b4ae-4bcf-9fed-881ac255ec3b_uploads.tar.zst",
+        "transcripts": "data/backups/files/000ac233-b4ae-4bcf-9fed-881ac255ec3b_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "73ee8748-4aa9-44d7-a63f-8f3954c01990",
+      "type": "full",
+      "timestamp": "2025-11-10T20:06:23.286016",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/73ee8748-4aa9-44d7-a63f-8f3954c01990_db.sql.zst",
+        "uploads": "data/backups/files/73ee8748-4aa9-44d7-a63f-8f3954c01990_uploads.tar.zst",
+        "transcripts": "data/backups/files/73ee8748-4aa9-44d7-a63f-8f3954c01990_transcripts.tar.zst"
+      }
+    },
+    {
+      "id": "de97d2cc-5180-455a-b809-bf291d71ed2b",
+      "type": "full",
+      "timestamp": "2025-11-10T20:02:42.655694",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/de97d2cc-5180-455a-b809-bf291d71ed2b_db.sql.zst",
+        "uploads": "data/backups/files/de97d2cc-5180-455a-b809-bf291d71ed2b_uploads.tar.zst",
+        "transcripts": "data/backups/files/de97d2cc-5180-455a-b809-bf291d71ed2b_transcripts.tar.zst"
+      }
+    }
+  ]
+}

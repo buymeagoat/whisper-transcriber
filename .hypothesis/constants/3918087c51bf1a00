@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/backup.py
+# hypothesis_version: 6.147.0
+
+[b'\n', 400, 404, 500, 503, 1024, 8192, "'", "''", "'{}'", '*', '/admin/backup', '/cleanup', '/create', '/health', '/list', '/restore/{backup_id}', '/status', '02:00', '03:00', ';', 'Backup not found', 'NULL', '^(full|database)$', 'active', 'backup', 'backup-scheduler', 'backup_dir', 'backup_dirs_ready', 'backup_info', 'backup_manifest.json', 'backup_router', 'backup_service', 'backup_type', 'backups', 'cleaned', 'completed', 'database', 'deleted', 'description', 'disk_space_free_gb', 'error', 'failed', 'files', 'full', 'healthy', 'id', 'in_progress', 'initiated', 'last_backup', 'manifest_exists', 'message', 'path', 'r', 'rb', 'retained', 'size', 'status', 'storage_usage', 'success', 'temp_sql', 'timestamp', 'total_backups', 'transcripts', 'type', 'uploads', 'w', 'warning', 'wb']

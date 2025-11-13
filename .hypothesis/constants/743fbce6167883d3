@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/chunked_uploads.py
+# hypothesis_version: 6.147.0
+
+[100, 255, 400, 500, '/', '/cleanup', '/init', '/initialize', '/metrics', '/uploads', '/{session_id}', '/{session_id}/resume', '/{session_id}/status', 'Chunk data', 'Empty chunk data', 'Invalid chunk number', 'Original filename', 'Whisper model to use', 'active', 'assembling', 'chunked-uploads', 'chunked_upload_api', 'created_at', 'expires_at', 'message', 'missing_chunks', 'original_filename', 'progress_percent', 'resumable', 'session_id', 'sessions', 'small', 'status', 'total', 'total_chunks', 'uploaded_chunks']

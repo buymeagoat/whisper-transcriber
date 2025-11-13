@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/utils/log_sanitization.py
+# hypothesis_version: 6.147.0
+
+[1000, '%[sdf]', ',', '...', ':', 'None', 'Z', '[DATA_URL_REMOVED]', '[JS_REMOVED]', '[LDAP_REMOVED]', '[REMOVED]', '[SCRIPT_REMOVED]', '[SQL_REMOVED]', '\\${[^}]*}', '\\(.*?\\)', 'context', 'data:.*?base64', 'error_message', 'error_type', 'ip_address', 'javascript:', 'level', 'message', 'source_ip', 'threat_type', 'timestamp', 'user_id', '{}']

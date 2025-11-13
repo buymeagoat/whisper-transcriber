@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/app_worker.py
+# hypothesis_version: 6.147.0
+
+['Job %s completed', 'Job %s failed: %s', 'audio_path', 'cpu', 'cuda', 'healthy', 'job_id', 'jobs', 'missing', 'ok', 'status', 'text', 'timestamp', 'torch', 'transcript.txt', 'transcript_path', 'utf-8', 'whisper']

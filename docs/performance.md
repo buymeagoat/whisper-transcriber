@@ -18,10 +18,10 @@ Nightly CI fails if any metric drifts more than the tolerance percentages stored
 
 ## CPU sizing
 
-- **API container**: 2 vCPUs ensure FastAPI request handling and polling remains responsive.
-  Increase to 4 vCPUs when arrival rate exceeds 6 jobs/sec to avoid back-pressure from upload
-  processing.
-- **Worker container**: Allocate at least 4 vCPUs for the `tiny` or `base` Whisper models. For
+- **API service**: Reserve 2 vCPUs for the FastAPI process so request handling and polling stays
+  responsive. Increase to 4 vCPUs when arrival rate exceeds 6 jobs/sec to avoid back-pressure
+  from upload processing.
+- **Worker service**: Allocate at least 4 vCPUs for the `tiny` or `base` Whisper models. For
   medium and large models target 8 vCPUs to keep end-to-end latency under 2 minutes.
 - Enable CPU pinning when running multiple workers on the same host to minimize context switch
   overhead.
@@ -30,7 +30,8 @@ Nightly CI fails if any metric drifts more than the tolerance percentages stored
 
 - GPU acceleration is optional but recommended for large models or multilingual workloads.
 - When provisioning NVIDIA GPUs, set `WHISPER_INFERENCE_DEVICE=cuda` in the worker environment and
-  ensure the Docker runtime exposes the device (`--gpus all`).
+  confirm your process manager exposes the device to the worker (for example via
+  `CUDA_VISIBLE_DEVICES`).
 - Use one worker process per GPU. Scale horizontally by adding workers rather than sharing a device
   across processes; Whisper benefits from exclusive access.
 

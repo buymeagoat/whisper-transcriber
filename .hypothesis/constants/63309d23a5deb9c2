@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/middlewares/session_security.py
+# hypothesis_version: 6.147.0
+
+[0.7, 3600, 604800, ',', '/', '/auth/refresh', '127.0.0.1', 'Bearer', 'Bearer ', 'DELETE', 'PATCH', 'POST', 'PUT', 'WWW-Authenticate', 'X-CSRF-Token', 'X-Requested-With', 'XMLHttpRequest', 'auth_token', 'authorization', 'checks', 'csrf_protection', 'has_auth_cookie', 'has_auth_header', 'high', 'httponly', 'lax', 'localhost', 'low', 'max_age', 'medium', 'path', 'referer', 'referer_valid', 'refresh_token', 'samesite', 'secure', 'security_level', 'strict', 'user-agent', 'user_agent_present', 'valid']

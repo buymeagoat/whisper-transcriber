@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/transcript_management.py
+# hypothesis_version: 6.147.0
+
+[200, 400, 404, '#3B82F6', '...', 'Bookmark not found', 'Export not found', 'Tag already exists', 'Version not found', 'abstract', 'color', 'completed', 'created_at', 'desc', 'docx', 'duration', 'failed', 'finished_at', 'has_next', 'has_prev', 'id', 'is_current', 'json', 'language', 'model', 'name', 'original_filename', 'page', 'page_size', 'pdf', 'processing', 'results', 'srt', 'status', 'tags', 'tokens', 'total_count', 'total_pages', 'transcript', 'transcript_metadata', 'txt', 'vtt', 'wpm']

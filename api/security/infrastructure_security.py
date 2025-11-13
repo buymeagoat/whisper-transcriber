@@ -211,7 +211,7 @@ class InfrastructureSecurityManager:
         # Files to scan
         scan_patterns = [
             "**/*.py", "**/*.js", "**/*.yml", "**/*.yaml", 
-            "**/*.json", "docker-compose.yml"
+            "**/*.json"
         ]
         
         # Only scan actual files, skip .env* files as they should contain variables

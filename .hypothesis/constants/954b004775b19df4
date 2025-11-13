@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/middlewares/__init__.py
+# hypothesis_version: 6.147.0
+
+['rate_limit', 'security_headers']

@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/pwa_service.py
+# hypothesis_version: 6.147.0
+
+[1000, '/', '/api/v1/health', '/api/v1/jobs/list', '/offline.html', '/static/', '1.0.0', 'Transcription Failed', 'action_url', 'actual_job_id', 'auth', 'badge', 'batch_completed', 'batch_id', 'body', 'clicked_at', 'created_at', 'data', 'endpoint', 'error', 'filename', 'high', 'icon', 'id', 'is_active', 'is_read', 'job_completed', 'job_failed', 'job_id', 'keys', 'last_used', 'low', 'normal', 'notifications.json', 'offline_jobs.json', 'p256dh', 'pending', 'pwa', 'pwa_service', 'r', 'sent_at', 'stats', 'storage_warning', 'subscriptions.json', 'sync_status', 'synced', 'synced_at', 'system_maintenance', 'tag', 'timestamp', 'title', 'urgent', 'userAgent', 'user_id', 'v1', 'w']

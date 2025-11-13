@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/extended_models/transcript_management.py
+# hypothesis_version: 6.147.0
+
+[200, '#3B82F6', 'batch_operations', 'created_at', 'expires_at', 'export_format', 'idx_job_tags_job_id', 'idx_job_tags_tag_id', 'is_current', 'job_id', 'job_tags', 'jobs.id', 'operation_type', 'pending', 'status', 'tag_id', 'timestamp', 'transcript_bookmarks', 'transcript_exports', 'transcript_tags', 'transcript_tags.id', 'transcript_versions', 'version_number']

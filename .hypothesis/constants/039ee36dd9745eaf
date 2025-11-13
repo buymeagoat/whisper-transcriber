@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/settings.py
+# hypothesis_version: 6.147.0
+
+[100, 1024, 8001, '*', './cache', './models', './storage/uploads', '0', '0.0.0.0', '1', '1.0.0', '8001', 'CELERY_BROKER_URL', 'DATABASE_URL', 'DEBUG', 'ENVIRONMENT', 'HOST', 'INFO', 'JWT signing key', 'JWT_SECRET_KEY', 'LOG_LEVEL', 'PORT', 'REDIS_PASSWORD', 'REDIS_URL', 'Redis password', 'SECRET_KEY', 'Whisper Transcriber', 'audio/flac', 'audio/m4a', 'audio/mp3', 'audio/mp4', 'audio/mpeg', 'audio/wav', 'audio/wave', 'audio/x-flac', 'audio/x-m4a', 'audio/x-mp3', 'audio/x-wav', 'change-me', 'changeme', 'default', 'development', 'example', 'false', 'filesystem', 'large', 'large-v3', 'localtest', 'medium', 'no', 'on', 'placeholder', 'production', 'sample', 'small', 'thread', 'tiny', 'true', 'yes']

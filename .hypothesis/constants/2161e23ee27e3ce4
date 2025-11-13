@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/audit/integration.py
+# hypothesis_version: 6.147.0
+
+['args_count', 'error', 'function', 'id', 'ip_address', 'session_id', 'user', 'user-agent', 'user_agent', 'user_id', 'username']

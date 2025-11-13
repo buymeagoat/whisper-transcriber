@@ -63,6 +63,7 @@ def register_routes(app: FastAPI) -> None:
     """Attach all API routers and static paths."""
     app.include_router(jobs.router)
     app.include_router(admin.router)
+    app.include_router(admin.router, prefix="/api")
     app.include_router(logs.router)
     app.include_router(progress.router)
     app.include_router(metrics.router)
@@ -194,8 +195,8 @@ def register_routes(app: FastAPI) -> None:
         )
         
         # Block sensitive files and directories - check exact matches and startswith
-        sensitive_files = {".env", "requirements.txt", "Dockerfile", "docker-compose.yml", "pyproject.toml"}
-        sensitive_dirs = {"api/"}
+        sensitive_files = {".env", "requirements.txt", "pyproject.toml"}
+        sensitive_dirs = ("api/",)
         
         # Check protection
         is_protected = full_path.startswith(protected)

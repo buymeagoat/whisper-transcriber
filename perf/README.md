@@ -17,11 +17,21 @@ and waiting for the asynchronous job to finish.
 
 ## Running locally
 
-1. Start the application stack (API + worker + Redis). The quickest path mirrors CI:
+1. Start the application stack (API + worker + Redis). A simple local setup uses three
+  terminals (or background services):
 
-   ```bash
-   docker compose up -d --build redis app worker
-   ```
+  ```bash
+  # Terminal 1 – Redis (or point to an existing instance)
+  redis-server
+
+  # Terminal 2 – FastAPI service
+  source .venv/bin/activate
+  uvicorn api.main:app --host 0.0.0.0 --port 8001
+
+  # Terminal 3 – Celery worker
+  source .venv/bin/activate
+  celery -A api.worker.celery_app worker -l info
+  ```
 
 2. Run the load test. The script exports metrics to `perf/results/latest.json` for later
    comparison.

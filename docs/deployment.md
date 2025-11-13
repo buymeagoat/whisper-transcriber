@@ -24,13 +24,18 @@ and fails fast when the directory is empty.
 The routine raises a `WhisperModelBootstrapError` if no checkpoints are found
 so that worker startup cannot proceed silently with an empty models directory.
 
-### Container & Runtime Integration
+### Runtime Integration
 
-The Docker entrypoint (`scripts/docker-entrypoint.sh`) and production startup
-script (`scripts/start-production.sh`) invoke the bootstrapper before the API
-or worker starts. Any failure in retrieving the checkpoint stops the container
-with a clear error, ensuring deployments never succeed without usable model
-weights.
+The FastAPI service calls `bootstrap_model_assets()` from the application
+lifespan defined in `api.main`. This guarantees the models directory is
+validated before the API begins accepting requests. The Celery worker performs
+the same validation inside `api.services.app_worker.transcribe_audio` so queue
+tasks fail fast if the assets are unavailable.
+
+When orchestrating the application outside containers, ensure both the API
+process (for example `uvicorn api.main:app --host 0.0.0.0 --port 8001`) and the
+Celery worker (`celery -A api.worker.celery_app worker -l info`) run under the
+same deployment root so they share the `storage.models_dir` path.
 
 ### Verifying Model Availability
 

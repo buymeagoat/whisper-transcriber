@@ -1,24 +1,38 @@
-# Whisper Transcriber - Production
+# Whisper Transcriber
 
-A production-ready audio transcription service using OpenAI Whisper.
+An audio transcription service powered by OpenAI Whisper.
 
-## Quick Start
+## Quick Start (local runtime)
 
-1. **Set up environment variables:**
+1. Copy the environment template and populate values:
    ```bash
    cp env.template .env
-   # Edit .env with your production values
+   # edit .env with development secrets
    ```
-
-2. **Build and run with Docker:**
+2. Create a virtual environment and install backend dependencies:
    ```bash
-   docker-compose up --build
+   python -m venv .venv
+   source .venv/bin/activate
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+3. Install frontend dependencies and build assets (served by the API):
+   ```bash
+   cd frontend
+   npm install
+   npm run build
+   cd ..
+   ```
+4. Run the API server:
+   ```bash
+   source .venv/bin/activate
+   uvicorn api.main:app --host 0.0.0.0 --port 8001 --reload
    ```
 
-3. **Access the application:**
-   - Web Interface: http://localhost:8001
-   - Interactive OpenAPI docs: http://localhost:8001/docs
-   - Prometheus metrics: http://localhost:8001/metrics/
+### Access endpoints
+- Web interface: http://localhost:8001
+- OpenAPI docs: http://localhost:8001/docs
+- Prometheus metrics: http://localhost:8001/metrics/
 
 ## Testing
 
@@ -37,11 +51,8 @@ Refer to [docs/api/routes.md](docs/api/routes.md) for endpoint-level usage examp
 
 ## Continuous Integration and Branch Protection
 
-The `ci` workflow located in `.github/workflows/ci.yml` runs linting (`flake8`), static type checks, security tooling (`bandit`
-and `pip-audit`), the test suite, a Docker build, and Syft-powered CycloneDX SBOM generation on every push and pull request.
-Both the container image tarball (`whisper-transcriber-image`) and generated SBOM (`sbom`) are uploaded as workflow artifacts
-and exposed via the job outputs (`image-artifact-id`, `image-artifact-url`, `sbom-artifact-id`, `sbom-artifact-url`) for
-downstream automation.
+The `ci` workflow located in `.github/workflows/ci.yml` runs linting (`flake8`), static type checks, security tooling
+(`bandit` and `pip-audit`), and the test suite on every push and pull request.
 
 To keep `main` protected:
 
@@ -55,19 +66,11 @@ can be merged.
 
 ## Deployment
 
-Build the production image with the multi-stage Dockerfile and provide build metadata so the entrypoint validation passes:
+Package managers such as `pipx`, `uv`, or systemd services can host the application. At a minimum:
 
-```bash
-docker build \
-  --target production \
-  --build-arg BUILD_VERSION=$(git describe --tags --always) \
-  --build-arg BUILD_SHA=$(git rev-parse HEAD) \
-  --build-arg BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
-  -t whisper-transcriber:latest .
-```
-
-The runtime container runs as a non-root user, exposes port 8001, and publishes a healthcheck at `/` via `scripts/healthcheck.sh`.
-The entrypoint (`scripts/docker-entrypoint.sh`) validates the build metadata file (`/etc/whisper-build.info`), failing fast if it is missing and issuing a warning when placeholder values are detected so you know to rebuild with the expected Docker build arguments.
+1. Provision the secrets listed below via environment variables or a secrets manager.
+2. Build the frontend bundle (`npm run build`) and ensure `api/static/` contains the generated assets.
+3. Install Python dependencies in a virtual environment and run `uvicorn api.main:app` behind your preferred process manager.
 
 ## Versioning
 
@@ -85,41 +88,29 @@ Required environment variables in `.env.production` (provision via a secrets man
 
 ### Secret provisioning and rotation
 
-1. **Provision secrets in a vault** – Store all runtime secrets in your cloud provider's secret manager (AWS Secrets Manager, HashiCorp Vault, etc.) and scope access to the deployment service account.
-2. **Inject secrets at runtime** – Configure your orchestrator (Docker Swarm, Kubernetes, ECS) to mount the vault values as environment variables before the container entrypoint runs. Avoid baking secrets into images or `.env` files in source control.
-3. **Rotate regularly** – Rotate `SECRET_KEY` and `JWT_SECRET_KEY` together at least quarterly; rotate database and Redis credentials according to your infrastructure policy and immediately revoke old credentials.
+1. **Provision secrets in a vault** – Store runtime secrets in a secure secret manager and scope access to the deployment service account.
+2. **Inject secrets at runtime** – Configure your process manager or host environment to export the secret values before the application starts. Avoid checking secrets into source control.
+3. **Rotate regularly** – Rotate `SECRET_KEY` and `JWT_SECRET_KEY` together at least quarterly; rotate database and Redis credentials according to your infrastructure policy and revoke old credentials immediately.
 4. **Bootstrap administrator safely** – Generate `ADMIN_BOOTSTRAP_PASSWORD` just-in-time, use it once to create a permanent admin, then trigger rotation to invalidate the bootstrap credential.
-5. **Verify during deploys** – The Docker entrypoint and production startup scripts now fail fast when required secrets are missing or use placeholder values. Monitor deployment logs to confirm validation before rolling traffic.
+5. **Verify during deploys** – Monitor deployment logs to confirm validation succeeds before routing traffic.
 
 ## Production Deployment
 
-Production images now fail fast unless the following environment variables are provided with non-placeholder values:
+Provide the following environment variables with non-placeholder values before starting the application:
 
-- `SECRET_KEY` – application signing key used for session data.
-- `JWT_SECRET_KEY` – signing key for API tokens.
-- `DATABASE_URL` – SQLAlchemy DSN for the primary database.
-- `REDIS_URL` – Redis connection string (also used for the Celery broker when set).
-- `REDIS_PASSWORD` – password supplied to the Redis container/instance.
-- `ADMIN_BOOTSTRAP_PASSWORD` – temporary administrator credential used once at bootstrap.
+- `SECRET_KEY` – application signing key used for session data
+- `JWT_SECRET_KEY` – signing key for API tokens
+- `DATABASE_URL` – SQLAlchemy DSN for the primary database
+- `REDIS_URL` – Redis connection string (also used for the Celery broker when set)
+- `REDIS_PASSWORD` – password supplied to the Redis instance
+- `ADMIN_BOOTSTRAP_PASSWORD` – temporary administrator credential used once at bootstrap
 
-To prepare a secure deployment:
-
-1. Copy the template to a local secrets file and keep it out of version control:
-   ```bash
-   cp env.template .env
-   ```
-2. Generate the signing keys (rotate them in your secrets manager on a schedule):
-   ```bash
-   openssl rand -hex 64
-   openssl rand -hex 64
-   ```
-   Use two different outputs to populate `SECRET_KEY` and `JWT_SECRET_KEY` in `.env`.
-3. Provision `DATABASE_URL`, `REDIS_URL`, and `ADMIN_BOOTSTRAP_PASSWORD` using your secrets manager. For local
-   experiments you can set `DATABASE_URL=sqlite:////app/data/app.db`,
-   `REDIS_PASSWORD=local-redis-password`, and
-   `REDIS_URL=redis://:local-redis-password@redis:6379/0`.
-4. Store the populated `.env` in your orchestrator's secret store and inject it as environment variables. The
-   Docker Compose file expects these keys via `.env` and refuses to start without them.
+For local development you can use SQLite and a loopback Redis instance, for example:
+```bash
+DATABASE_URL=sqlite:///./data/dev.db
+REDIS_PASSWORD=local-redis-password
+REDIS_URL=redis://:local-redis-password@127.0.0.1:6379/0
+```
 
 Transcription jobs are executed through a **Celery-backed distributed task queue** defined in
 `api/services/job_queue.py` and `api/worker.py`. The Celery worker processes transcription jobs
@@ -128,13 +119,7 @@ Redis serves as both the message broker and result backend. The worker is define
 the repository root and executes tasks from `api.services.app_worker.py`, which performs the actual
 Whisper model inference.
 
-The provided Docker Compose file starts the following containers:
-- **app** – FastAPI backend + React frontend (port 8001) that submits jobs to the Celery queue.
-- **worker** – Celery worker that processes transcription jobs asynchronously.
-- **redis** – Message broker and result backend for Celery, also used for caching.
-
-If you deploy to another orchestrator, carry across the same environment variables and mount points used by the
-Compose definition and ensure secrets are injected through a secure mechanism (vault, secret manager, etc.).
+When deploying to an orchestrator, ensure the job queue (Redis + Celery worker) and storage paths mirror the local configuration described above.
 
 ## Observability
 

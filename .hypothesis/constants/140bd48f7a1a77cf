@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/security/middleware.py
+# hypothesis_version: 6.147.0
+
+[500, 1000, '/admin', '/admin/', '/api', '/api/', '/auth', '/docs', '/favicon.ico', '/health', '/login', '/openapi.json', '/redoc', '/register', '/upload', '1; mode=block', 'Bearer ', 'DENY', 'Permissions-Policy', 'Referrer-Policy', 'X-Frame-Options', 'X-XSS-Protection', 'admin', 'api', 'auth', 'authentication', 'authorization', 'csrf', 'exception_message', 'exception_type', 'general', 'injection', 'none', 'nosniff', 'permissions', 'processing_time_ms', 'rate limit', 'require-corp', 'same-origin', 'security_middleware', 'status_code', 'upload', 'user-agent', 'user_id', 'x-api-key', 'xss']

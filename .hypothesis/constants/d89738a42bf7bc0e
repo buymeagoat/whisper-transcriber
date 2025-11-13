@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/consolidated_upload_service.py
+# hypothesis_version: 6.147.0
+
+[100, 400, 500, 1024, '.aac', '.flac', '.m4a', '.mp3', '.ogg', '.wav', 'audio/aac', 'audio/flac', 'audio/mp3', 'audio/mpeg', 'audio/ogg', 'audio/wav', 'audio/x-m4a', 'audio/x-wav', 'completed', 'job_id', 'message', 'small', 'status', 'transcribe_audio', 'upload_service', 'wb']

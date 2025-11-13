@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/user_settings.py
+# hypothesis_version: 6.147.0
+
+['/', '/user-settings', 'settings', 'user-settings']

@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/middlewares/api_cache.py
+# hypothesis_version: 6.147.0
+
+[300, 400, 1000, '/admin', '/health', '/metrics', 'GET', 'HIT', 'X-Cache', 'X-Cache-TTL', 'accept', 'accept-encoding', 'api_cache', 'authorization', 'cache-control', 'content', 'expires_at', 'headers', 'no-cache', 'no-store', 'status_code', '|']

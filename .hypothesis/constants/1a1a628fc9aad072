@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/utils/admin_required.py
+# hypothesis_version: 6.147.0
+
+['current_user', 'is_admin']

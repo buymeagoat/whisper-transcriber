@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/batch_upload.py
+# hypothesis_version: 6.147.0
+
+[100, 400, 404, 500, 1024, '/batch-upload', '/create', '/list', '/stats', '/{batch_id}', '/{batch_id}/cancel', '/{batch_id}/jobs', '/{batch_id}/progress', '/{batch_id}/start', '/{batch_id}/status', 'active_batches', 'average_success_rate', 'base', 'batch-upload', 'batch_id', 'batches', 'cancelled', 'completed_batches', 'completed_files', 'concurrent_jobs', 'created_at', 'error_message', 'failed_batches', 'failed_files', 'file_size', 'filename', 'job_id', 'jobs', 'language', 'max_file_size', 'max_files', 'max_total_size', 'message', 'pending', 'processing', 'progress', 'status', 'success_rate', 'total', 'total_batches', 'total_files', 'total_files_failed', 'total_jobs', 'whisper_model', '{}']

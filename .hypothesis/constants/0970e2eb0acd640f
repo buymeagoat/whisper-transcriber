@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/api_keys.py
+# hypothesis_version: 6.147.0
+
+[365, 500, '/', '/api/keys', '/{key_id}', '/{key_id}/regenerate', '/{key_id}/revoke', '/{key_id}/usage', 'API key not found', 'Delete jobs and data', 'admin', 'analytics', 'api-keys', 'api_keys_routes', 'batch', 'delete', 'description', 'message', 'permissions', 'read', 'revoked', 'value', 'write']

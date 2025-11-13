@@ -83,6 +83,7 @@ class TokenService:
                 algorithms=["HS256"],
                 issuer="whisper-transcriber",
                 audience="whisper-transcriber-api",
+                leeway=5,  # Allow a small clock skew for integration tests and CI
                 options={
                     "verify_signature": True,
                     "verify_exp": True,

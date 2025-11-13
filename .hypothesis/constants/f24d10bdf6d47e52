@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/services/redis_cache.py
+# hypothesis_version: 6.147.0
+
+[0.0, 100, 120, 300, 600, 1024, 3600, '/', '/download', '/health', '/jobs', '/jobs/', '/stats', '/user', '/version', '0B', 'REDIS_URL', '__iter__', 'accept', 'accept-encoding', 'accept-language', 'allkeys-lru', 'application/json', 'config', 'content-type', 'errors', 'hit_ratio', 'hits', 'invalidations', 'jobs', 'maxmemory', 'maxmemory-policy', 'memory', 'memory_info', 'misses', 'redis_cache', 'sets', 'status', 'status_data', 'total_system_memory', 'used_memory', 'used_memory_human', 'used_memory_peak', 'user', 'user_data', 'utf-8', 'whisper_cache:', 'whisper_tags:', '|']

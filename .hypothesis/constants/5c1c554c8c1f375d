@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/uploads.py
+# hypothesis_version: 6.147.0
+
+['/api/upload', '/upload', 'small', 'uploads']

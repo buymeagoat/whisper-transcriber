@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/middlewares/api_key_auth.py
+# hypothesis_version: 6.147.0
+
+[900, 1000, ',', '/admin/', '/api/auth/login', '/api/auth/register', '/api/auth/token', '/api/jobs', '/api/transcribe', '/auth/', '/auth/login', '/auth/register', '/auth/token', '/batch', '/docs', '/favicon.ico', '/health', '/jobs/', '/login', '/openapi.json', '/redoc', '/register', '/token', '/upload/', '0', 'API key required', 'Authentication error', 'Authorization', 'Content-Length', 'Content-Type', 'DELETE', 'PATCH', 'POST', 'PUT', 'Retry-After', 'User-Agent', 'X-API-Key', 'X-Forwarded-For', 'X-RateLimit-Limit', 'X-RateLimit-Reset', 'X-Real-IP', 'allowed', 'api_key_middleware', 'application/json', 'bearer', 'blocked_until', 'body', 'count', 'daily', 'host', 'limit', 'monthly', 'quota_type', 'remaining', 'reset_time', 'retry_after', 'unknown', 'used', 'window_start', 'wt_']

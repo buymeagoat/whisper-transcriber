@@ -15,6 +15,16 @@ from api.paths import storage
 from api.services.app_worker import transcribe_audio
 
 
+def _disable_asyncio_background_tasks(monkeypatch) -> None:
+    """Prevent SQLAlchemy job event hooks from scheduling real asyncio tasks during tests."""
+
+    monkeypatch.setattr(
+        "api.services.websocket_job_integration.asyncio.create_task",
+        lambda coro: None,
+        raising=False,
+    )
+
+
 def test_transcribe_audio_uses_fixture_model(tmp_path, monkeypatch) -> None:
     models_dir = storage.models_dir
     models_dir.mkdir(parents=True, exist_ok=True)
@@ -25,6 +35,7 @@ def test_transcribe_audio_uses_fixture_model(tmp_path, monkeypatch) -> None:
     audio_path.write_bytes(b"fake audio data")
 
     job_id = str(uuid4())
+    _disable_asyncio_background_tasks(monkeypatch)
     with SessionLocal() as session:
         job = Job(
             id=job_id,
@@ -78,11 +89,12 @@ def test_transcribe_audio_uses_fixture_model(tmp_path, monkeypatch) -> None:
     assert stub_model.transcribe_called_with == str(audio_path)
 
 
-def test_transcribe_audio_failure_records_log(tmp_path) -> None:
+def test_transcribe_audio_failure_records_log(tmp_path, monkeypatch) -> None:
     audio_path = tmp_path / "missing.wav"
     audio_path.write_bytes(b"fake audio data")
 
     job_id = str(uuid4())
+    _disable_asyncio_background_tasks(monkeypatch)
     with SessionLocal() as session:
         job = Job(
             id=job_id,

@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/middlewares/access_log.py
+# hypothesis_version: 6.147.0
+
+[400, 500, 1000, ',', '0', 'X-Forwarded-For', 'X-Process-Time', 'X-Real-IP', 'access', 'authenticated', 'authorization', 'client_ip', 'content-length', 'content_length', 'method', 'path', 'query_params', 'request_id', 'response_time_ms', 'status_code', 'unknown', 'url', 'user-agent', 'user_agent']

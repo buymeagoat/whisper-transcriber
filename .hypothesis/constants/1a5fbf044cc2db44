@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/auth.py
+# hypothesis_version: 6.147.0
+
+['/api', '/api/auth', '/api/register', '/auth', '/change-password', '/login', '/logout', '/me', '/refresh', '/register', '/token', 'Bearer', 'User not found', 'WWW-Authenticate', 'access_token', 'admin', 'api', 'authentication', 'bearer', 'direct-api', 'expires_in', 'id', 'low', 'message', 'role', 'security_level', 'token_type', 'user', 'user_id', 'username']

@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/pwa.py
+# hypothesis_version: 6.147.0
+
+[100, 300, 1000, 1024, '/', '/api/v1/pwa', '/capabilities', '/notifications', '/offline/jobs', '/push/activity', '/push/subscribe', '/service-worker.js', 'Cache-Control', 'Endpoint is required', 'Event type', 'File size in bytes', 'Language code', 'Notification body', 'Notification title', 'Original filename', 'User agent string', 'Whisper model to use', 'actual_job_id', 'endpoint', 'message', 'notification_id', 'offline_job_id', 'pwa', 'pwa_routes', 'small']

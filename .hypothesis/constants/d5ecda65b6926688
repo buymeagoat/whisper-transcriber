@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/.venv/bin/pytest
+# hypothesis_version: 6.147.0
+
+['.exe', '__main__']

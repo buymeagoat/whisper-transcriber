@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/orm_bootstrap.py
+# hypothesis_version: 6.147.0
+
+['1', 'AUTO_MIGRATE', 'Error', 'SELECT 1', 'SQLite', 'Unknown', 'alembic.ini', 'auto_migrate', 'check_same_thread', 'database', 'false', 'head', 'sqlite', 'sqlite:///', 'true', 'type', 'url', 'version', 'yes']

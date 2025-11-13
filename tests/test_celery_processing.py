@@ -37,7 +37,7 @@ async def test_celery_transcription_task_updates_job(async_client, admin_token, 
     model_path = storage.models_dir / "small.pt"
     model_path.write_bytes(b"fake model contents")
 
-    loaded_paths: list[str] = []
+    loaded_models: list[tuple[str, str | None]] = []
 
     class _StubModel:
         def __init__(self) -> None:
@@ -54,8 +54,8 @@ async def test_celery_transcription_task_updates_job(async_client, admin_token, 
 
     stub_model = _StubModel()
 
-    def _fake_load_model(path: str) -> _StubModel:
-        loaded_paths.append(path)
+    def _fake_load_model(path: str, *, download_root: str | None = None) -> _StubModel:
+        loaded_models.append((path, download_root))
         return stub_model
 
     monkeypatch.setitem(sys.modules, "whisper", SimpleNamespace(load_model=_fake_load_model))
@@ -89,5 +89,5 @@ async def test_celery_transcription_task_updates_job(async_client, admin_token, 
         contents = transcript_file.read_text(encoding="utf-8")
         assert contents == "stub transcript"
 
-    assert loaded_paths == [str(model_path)]
+    assert loaded_models == [("small", str(storage.models_dir))]
     assert stub_model.transcribe_called_with == str(audio_path)

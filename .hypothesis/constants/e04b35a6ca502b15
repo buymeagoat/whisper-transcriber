@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/dependencies.py
+# hypothesis_version: 6.147.0
+
+[401, 'Authorization', 'User not found', 'X-User-ID', 'bearer ', 'id']

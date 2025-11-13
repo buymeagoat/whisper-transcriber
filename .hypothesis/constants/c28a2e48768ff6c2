@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/utils/logger.py
+# hypothesis_version: 6.147.0
+
+['ADMIN_METRICS_TOKEN', 'DATABASE_URL', 'INFO', 'JWT_SECRET_KEY', 'LOG_LEVEL', 'REDIS_PASSWORD', 'REDIS_URL', 'SECRET_KEY', 'Z', '_', 'api.log', 'args', 'bind_job_id', 'bind_latency', 'bind_request_id', 'created', 'exc_info', 'exc_text', 'exception', 'extra', 'filename', 'funcName', 'function', 'generate_request_id', 'get_app_logger', 'get_backend_logger', 'get_job_id', 'get_latency', 'get_logger', 'get_request_id', 'get_system_logger', 'job_id', 'latency_ms', 'level', 'levelname', 'levelno', 'line', 'lineno', 'logger', 'logs', 'message', 'module', 'msecs', 'msg', 'name', 'pathname', 'process', 'processName', 'process_id', 'relativeCreated', 'release_job_id', 'release_latency', 'release_request_id', 'request_id', 'stack', 'stack_info', 'thread', 'threadName', 'thread_id', 'timestamp', 'whisper_api', 'whisper_app', 'whisper_backend']

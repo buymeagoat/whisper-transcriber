@@ -264,29 +264,44 @@ async def api_login(
             detail="Authentication system error"
         )
 
+
+def _register_user(
+    register_data: RegisterRequest,
+    db: Session,
+) -> dict:
+    """Create a new non-admin user and return a minimal payload."""
+    try:
+        user = user_service.create_user(
+            db,
+            username=register_data.username,
+            password=register_data.password,
+            role="user",
+        )
+
+        return {
+            "message": "User registered successfully",
+            "user_id": str(user.id),
+            "username": user.username,
+        }
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )
+
+
+@router.post("/register", response_model=dict)
+async def register_user_auth(register_data: RegisterRequest, db: Session = Depends(get_db)):
+    """Register a new user under the /auth namespace."""
+    return _register_user(register_data, db)
+
+
 # API router version for frontend compatibility
 @api_router.post("/register", response_model=dict)
 async def api_register_user(register_data: RegisterRequest, db: Session = Depends(get_db)):
     """Register a new user (API version)."""
-    try:
-        user = user_service.create_user(
-            db, 
-            username=register_data.username, 
-            password=register_data.password,
-            role="user"
-        )
-        
-        return {
-            "message": "User registered successfully",
-            "user_id": str(user.id),
-            "username": user.username
-        }
-        
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(e)
-        )
+    return _register_user(register_data, db)
 
 # API router version for getting current user info
 @api_router.get("/me", response_model=UserInfo)
@@ -304,25 +319,7 @@ async def api_get_current_user_info(current_user: User = Depends(get_current_use
 @direct_api_router.post("/register", response_model=dict)
 async def direct_api_register_user(register_data: RegisterRequest, db: Session = Depends(get_db)):
     """Register a new user (Direct API version for /api/register)."""
-    try:
-        user = user_service.create_user(
-            db, 
-            username=register_data.username, 
-            password=register_data.password,
-            role="user"
-        )
-        
-        return {
-            "message": "User registered successfully",
-            "user_id": str(user.id),
-            "username": user.username
-        }
-        
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(e)
-        )
+    return _register_user(register_data, db)
 
 @router.get("/me", response_model=UserInfo)
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
@@ -381,50 +378,14 @@ async def get_token(
 @root_router.post("/register", response_model=dict)
 async def register_user(register_data: RegisterRequest, db: Session = Depends(get_db)):
     """Register a new user."""
-    try:
-        user = user_service.create_user(
-            db, 
-            username=register_data.username, 
-            password=register_data.password,
-            role="user"
-        )
-        
-        return {
-            "message": "User registered successfully",
-            "user_id": str(user.id),
-            "username": user.username
-        }
-        
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(e)
-        )
+    return _register_user(register_data, db)
 
 
 # Direct API endpoint for frontend calls to /api/register
 @root_router.post("/api/register", response_model=dict) 
 async def api_direct_register_user(register_data: RegisterRequest, db: Session = Depends(get_db)):
     """Register a new user (Direct API endpoint for /api/register)."""
-    try:
-        user = user_service.create_user(
-            db, 
-            username=register_data.username, 
-            password=register_data.password,
-            role="user"
-        )
-        
-        return {
-            "message": "User registered successfully",
-            "user_id": str(user.id),
-            "username": user.username
-        }
-        
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(e)
-        )
+    return _register_user(register_data, db)
 
 
 class ChangePasswordRequest(BaseModel):

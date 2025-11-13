@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/upload_websockets.py
+# hypothesis_version: 6.147.0
+
+[30.0, 100, 401, 4003, 4004, '/admin/monitoring', '/ws/uploads', 'Invalid JSON message', 'Upload failed', 'X-User-ID', 'active', 'active_sessions', 'active_uploads', 'admin', 'assembling', 'assembly_started', 'chunk_uploaded', 'cleanup_complete', 'cleanup_expired', 'connected', 'created_at', 'data', 'error', 'filename', 'get_active_sessions', 'get_metrics', 'get_missing_chunks', 'get_status', 'initial_metrics', 'initial_status', 'job_id', 'list_active_uploads', 'message', 'metrics_update', 'missing_chunks', 'periodic_metrics', 'ping', 'pong', 'progress', 'session_id', 'sessions', 'status', 'status_update', 'total_chunks', 'total_size', 'type', 'upload-websockets', 'upload_completed', 'upload_failed', 'upload_websocket', 'uploaded_chunks', 'uploads', 'user_id']

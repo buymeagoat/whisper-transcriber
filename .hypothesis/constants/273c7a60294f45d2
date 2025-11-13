@@ -1,0 +1,4 @@
+# file: /home/buymeagoat/dev/whisper-transcriber/api/routes/health.py
+# hypothesis_version: 6.147.0
+
+[200, 503, '*.pt', '/health', '/livez', '/readyz', 'REDIS_URL', 'SELECT 1', 'Service is running', '__version__', 'cache_service', 'checks', 'database', 'degraded', 'direct', 'download_required', 'error', 'health', 'health_check', 'healthy', 'message', 'models', 'models_dir', 'ok', 'preloaded_models', 'ready', 'redis', 'redis_url', 'selected_model', 'source', 'status', 'test_mode_override', 'tests/test-models', 'unknown', 'whisper_version']

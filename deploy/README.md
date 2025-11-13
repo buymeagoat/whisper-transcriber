@@ -43,6 +43,15 @@ This directory centralises the infrastructure-as-code definitions that support t
 | `ecs_task_role_arn` | IAM role granted to the running task. | `arn:aws:iam::123456789012:role/whisper-task` |
 | `release_image_tag` | Container tag promoted during a deploy. | `main-2025-11-08` |
 | `rollback_image_tag` | Container tag used when rolling back. | `main-2025-11-01` |
+| `secret_key_parameter_arn` | ARN for the runtime `SECRET_KEY` secret (SSM or Secrets Manager). | `arn:aws:ssm:...:parameter/whisper/prod/SECRET_KEY` |
+| `jwt_secret_key_parameter_arn` | ARN for the runtime `JWT_SECRET_KEY` secret. | `arn:aws:ssm:...:parameter/whisper/prod/JWT_SECRET_KEY` |
+| `admin_bootstrap_password_parameter_arn` | ARN for the runtime `ADMIN_BOOTSTRAP_PASSWORD` secret. | `arn:aws:ssm:...:parameter/whisper/prod/ADMIN_BOOTSTRAP_PASSWORD` |
+| `redis_url_parameter_arn` | ARN for the runtime `REDIS_URL` secret. | `arn:aws:ssm:...:parameter/whisper/prod/REDIS_URL` |
+| `redis_password_parameter_arn` | ARN for the runtime `REDIS_PASSWORD` secret. | `arn:aws:ssm:...:parameter/whisper/prod/REDIS_PASSWORD` |
+| `metrics_token_parameter_arn` | ARN for the runtime `METRICS_TOKEN` secret used by Prometheus scrapers. | `arn:aws:ssm:...:parameter/whisper/prod/METRICS_TOKEN` |
+| `worker_desired_count` | Number of Celery worker tasks provisioned alongside the API. | `2` |
+| `worker_task_cpu` | CPU units allocated to each Celery worker task. | `1024` |
+| `worker_task_memory` | Memory allocated to each Celery worker task in MiB. | `2048` |
 
 ## Ansible Parameters
 
@@ -60,6 +69,14 @@ All Ansible defaults live in [`ansible/group_vars/all.yml`](./ansible/group_vars
 | `rollback_release_tag` | Rollback identifier (mirrors legacy image tags). |
 | `db_*` variables | Connection metadata required by the service. |
 | `uploads_bucket` | Bucket where the API stores incoming audio. |
+| `redis_password` | Password injected into Redis connection strings. |
+| `secret_key` / `jwt_secret_key` | Application signing keys rendered into the `.env` file. |
+| `admin_bootstrap_password` | Bootstrap password used for the initial administrator. |
+| `metrics_token` | Shared secret distributed to trusted Prometheus scrapers. |
+
+The Terraform service definition now provisions an API service **and** a Celery worker service so that queued transcription jobs
+are processed automatically. Host-based installs should likewise ensure the worker unit is enabled and reading the same `.env`
+file as the API.
 
 ### Playbook Tags
 

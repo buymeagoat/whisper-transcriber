@@ -38,6 +38,7 @@ os.environ.setdefault("REDIS_PASSWORD", "unit-test-redis-password")
 os.environ.setdefault("ADMIN_BOOTSTRAP_PASSWORD", "super-secret-password-!123")
 os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB_PATH}"
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
+os.environ.setdefault("METRICS_TOKEN", "unit-test-metrics-token")
 os.environ.setdefault("CELERY_BROKER_URL", "memory://")
 os.environ.setdefault("CELERY_RESULT_BACKEND", "cache+memory://")
 # Skip Alembic migrations in tests; the migrations target Postgres-specific
@@ -57,6 +58,7 @@ settings = settings_module.settings.model_copy(
         "redis_url": os.environ["REDIS_URL"],
         "celery_broker_url": os.environ["CELERY_BROKER_URL"],
         "celery_result_backend": os.environ["CELERY_RESULT_BACKEND"],
+        "metrics_token": os.environ["METRICS_TOKEN"],
         "upload_dir": UPLOAD_DIR,
         "transcripts_dir": TRANSCRIPTS_DIR,
         "cache_dir": CACHE_DIR,

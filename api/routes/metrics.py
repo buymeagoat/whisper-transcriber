@@ -6,10 +6,11 @@ import asyncio
 import os
 import time
 from collections import deque
+from hmac import compare_digest
 from typing import Any, Deque, Dict, List, Tuple
 
 import psutil
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from fastapi.responses import Response
 from prometheus_client import (  # type: ignore
     CONTENT_TYPE_LATEST,
@@ -19,9 +20,10 @@ from prometheus_client import (  # type: ignore
     generate_latest,
 )
 
-from api.services.redis_cache import get_cache_service
-from api.orm_bootstrap import SessionLocal
 from api.models import Job, JobStatusEnum
+from api.orm_bootstrap import SessionLocal
+from api.services.redis_cache import get_cache_service
+from api.settings import settings
 from sqlalchemy import func
 
 router = APIRouter(prefix="/metrics", tags=["metrics"])
@@ -246,9 +248,22 @@ async def _update_job_metrics() -> None:
         if _remember_job(job_id):
             JOB_DURATION_SECONDS.observe(duration)
 
+async def require_metrics_access(x_metrics_token: str | None = Header(default=None)) -> None:
+    """Validate that the caller is authorised to retrieve metrics."""
+
+    expected = settings.metrics_token
+    if expected is None:
+        return
+
+    if not x_metrics_token or not compare_digest(x_metrics_token, expected):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing or invalid metrics token",
+        )
+
 
 @router.get("/")
-async def get_metrics() -> Response:
+async def get_metrics(_: None = Depends(require_metrics_access)) -> Response:
     """Expose Prometheus metrics for scraping."""
 
     await _update_system_metrics()

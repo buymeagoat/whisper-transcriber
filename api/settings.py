@@ -80,6 +80,9 @@ class Settings(BaseModel):
     celery_broker_url: str = Field(...)
     celery_result_backend: str = Field(...)
 
+    # Observability
+    metrics_token: str | None = None
+
     # Logging
     log_level: str = "INFO"
 
@@ -121,6 +124,25 @@ def _load_required_secrets() -> Dict[str, str]:
     return {name: _require_env(name, description) for name, description in required.items()}
 
 
+def _load_optional_secret(name: str) -> str | None:
+    """Load an optional secret, validating that placeholders are not used."""
+
+    value = os.getenv(name)
+    if value is None:
+        return None
+
+    stripped = value.strip()
+    if not stripped:
+        return None
+
+    if stripped.lower() in PLACEHOLDER_SENTINELS:
+        raise RuntimeError(
+            f"{name} is using an insecure placeholder value. Provide a rotated secret."
+        )
+
+    return stripped
+
+
 def _get_bool_env(name: str, default: bool) -> bool:
     """Read an environment variable as a boolean."""
 
@@ -155,6 +177,7 @@ def load_settings() -> Settings:
         redis_url=redis_url,
         celery_broker_url=celery_broker_url,
         celery_result_backend=celery_result_backend,
+        metrics_token=_load_optional_secret("METRICS_TOKEN"),
         host=os.getenv("HOST", "0.0.0.0"),
         port=int(os.getenv("PORT", "8001")),
         log_level=os.getenv("LOG_LEVEL", "INFO"),

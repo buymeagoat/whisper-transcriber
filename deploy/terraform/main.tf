@@ -32,6 +32,32 @@ provider "aws" {
 locals {
   project_slug = replace(var.project, " ", "-")
   name_prefix  = "${local.project_slug}-${var.environment}"
+  shared_container_secrets = [
+    {
+      name      = "SECRET_KEY"
+      valueFrom = var.secret_key_parameter_arn
+    },
+    {
+      name      = "JWT_SECRET_KEY"
+      valueFrom = var.jwt_secret_key_parameter_arn
+    },
+    {
+      name      = "ADMIN_BOOTSTRAP_PASSWORD"
+      valueFrom = var.admin_bootstrap_password_parameter_arn
+    },
+    {
+      name      = "REDIS_URL"
+      valueFrom = var.redis_url_parameter_arn
+    },
+    {
+      name      = "REDIS_PASSWORD"
+      valueFrom = var.redis_password_parameter_arn
+    },
+    {
+      name      = "METRICS_TOKEN"
+      valueFrom = var.metrics_token_parameter_arn
+    }
+  ]
 }
 
 resource "random_id" "uploads_bucket_suffix" {
@@ -190,12 +216,55 @@ resource "aws_ecs_task_definition" "api" {
           value = aws_s3_bucket.uploads.bucket
         }
       ]
+      secrets = local.shared_container_secrets
       logConfiguration = {
         logDriver = "awslogs"
         options = {
           "awslogs-group"         = "/ecs/${local.name_prefix}-api"
           "awslogs-region"        = var.aws_region
           "awslogs-stream-prefix" = "api"
+        }
+      }
+    }
+  ])
+}
+
+resource "aws_ecs_task_definition" "worker" {
+  family                   = "${local.name_prefix}-worker"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = tostring(var.worker_task_cpu)
+  memory                   = tostring(var.worker_task_memory)
+  execution_role_arn       = var.ecs_execution_role_arn
+  task_role_arn            = var.ecs_task_role_arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "worker"
+      image     = "${aws_ecr_repository.api.repository_url}:${var.release_image_tag}"
+      essential = true
+      command   = ["python", "-m", "api.worker"]
+      environment = [
+        {
+          name  = "APP_ENV"
+          value = var.environment
+        },
+        {
+          name  = "DATABASE_URL"
+          value = "postgresql://${var.db_username}:${var.db_password}@${aws_rds_cluster.transcriber.endpoint}:5432/${var.db_name}"
+        },
+        {
+          name  = "UPLOADS_BUCKET"
+          value = aws_s3_bucket.uploads.bucket
+        }
+      ]
+      secrets = local.shared_container_secrets
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "/ecs/${local.name_prefix}-worker"
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "worker"
         }
       }
     }
@@ -217,6 +286,23 @@ resource "aws_ecs_service" "api" {
 
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 200
+}
+
+resource "aws_ecs_service" "worker" {
+  name            = "${local.name_prefix}-worker"
+  cluster         = aws_ecs_cluster.transcriber.id
+  task_definition = aws_ecs_task_definition.worker.arn
+  desired_count   = var.worker_desired_count
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    assign_public_ip = true
+    security_groups  = [aws_security_group.service.id]
+    subnets          = aws_subnet.public[*].id
+  }
+
+  deployment_minimum_healthy_percent = 0
+  deployment_maximum_percent         = 100
 }
 
 output "uploads_bucket_name" {

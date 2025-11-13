@@ -18,3 +18,8 @@ db_username: transcriber
 db_password: change-me
 redis_endpoint: "redis.{{ deploy_env }}.example.com:6379"
 queue_backend: redis
+redis_password: change-me
+secret_key: "change-this-secret-key"
+jwt_secret_key: "change-this-jwt-secret"
+admin_bootstrap_password: "bootstrap-password-change-me"
+metrics_token: "metrics-scrape-token"

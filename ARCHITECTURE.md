@@ -2,7 +2,7 @@
 
 ## System Overview
 
-Whisper Transcriber is a production-ready audio transcription service built with FastAPI backend and React frontend. The application uses OpenAI's Whisper models for audio transcription with a streamlined, production-focused architecture.
+Whisper Transcriber is a production-ready audio transcription service built with FastAPI backend and React frontend. The application uses OpenAI's Whisper models for audio transcription with a streamlined, production-focused architecture. The current deployment intentionally runs in single-administrator mode while leaving the data model ready for future multi-user expansion.
 
 ## Application Stack
 
@@ -121,9 +121,9 @@ whisper-transcriber/
 ### Core Endpoints
 
 #### Authentication
-- `POST /auth/login` - User authentication
-- `POST /register` - User registration
-- `GET /auth/me` - Current user info
+- `POST /auth/login` - Administrator authentication (single-user mode)
+- `POST /change-password` - Administrator password rotation
+- `GET /auth/me` - Current administrator info
 - `POST /auth/logout` - Session termination
 
 #### Job Management
@@ -184,6 +184,8 @@ CREATE TABLE users (
     created_at TIMESTAMP
 );
 ```
+
+> **Note:** The table retains full multi-user capabilities (unique username/email, roles) so future releases can reintroduce self-service accounts without additional migrations. In the current single-admin mode only the bootstrap `admin` record is active.
 
 ## Dependencies Map
 
@@ -268,12 +270,12 @@ axios @ 1.5.0                        # HTTP client
 7. **Notification**: Updates job status
 
 ### Authentication Flow
-1. **Login**: User submits credentials
-2. **Validation**: Checks against database
-3. **Token**: Generates JWT with claims
-4. **Session**: Stores secure session data
-5. **Requests**: Token validates API access
-6. **Middleware**: Checks permissions per endpoint
+1. **Login**: Administrator submits the bootstrap username/password (`admin` / configurable secret)
+2. **Validation**: Credentials are verified against the single admin record (other usernames short-circuit with generic 401)
+3. **Token**: Generates JWT with admin claims for session continuity
+4. **Session**: Stores secure session data via HTTP-only cookies
+5. **Requests**: Token validates API access; future multi-user roles can plug into the same claims pipeline
+6. **Middleware**: Checks permissions per endpoint using the admin role guard
 
 ### Search Flow
 1. **Query**: User submits search criteria

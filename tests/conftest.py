@@ -35,11 +35,14 @@ for directory in (UPLOAD_DIR, TRANSCRIPTS_DIR, CACHE_DIR, MODELS_DIR, LOGS_DIR):
 os.environ.setdefault("SECRET_KEY", "unit-test-secret-key-should-be-long-and-randomized-1234567890")
 os.environ.setdefault("JWT_SECRET_KEY", "unit-test-jwt-secret-key-that-is-also-long-0987654321")
 os.environ.setdefault("REDIS_PASSWORD", "unit-test-redis-password")
-os.environ.setdefault("ADMIN_BOOTSTRAP_PASSWORD", "super-secure-test-password-!123")
-os.environ.setdefault("DATABASE_URL", f"sqlite:///{TEST_DB_PATH}")
+os.environ.setdefault("ADMIN_BOOTSTRAP_PASSWORD", "super-secret-password-!123")
+os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB_PATH}"
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("CELERY_BROKER_URL", "memory://")
 os.environ.setdefault("CELERY_RESULT_BACKEND", "cache+memory://")
+# Skip Alembic migrations in tests; the migrations target Postgres-specific
+# features and currently diverge from the SQLite schema we synthesize here.
+os.environ["AUTO_MIGRATE"] = "false"
 
 # Settings must be configured after environment variables are in place.
 import api.settings as settings_module  # noqa: E402
@@ -216,7 +219,10 @@ def standard_user_credentials(db_session) -> tuple[str, str]:
     service = UserService()
     user = db_session.query(models_module.User).filter_by(username=username).first()
     if user is None:
-        service.create_user(db_session, username, password)
+        service.create_user(db_session, username, "testuser@example.com", password)
+        db_session.commit()
+    elif not getattr(user, "email", None):
+        user.email = "testuser@example.com"
         db_session.commit()
     return username, password
 

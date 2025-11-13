@@ -4,22 +4,21 @@
 
 ### Authentication (`api/routes/auth.py`)
 
-#### `login(credentials: schemas.UserLogin)`
-- **Purpose**: Authenticate user and create session
-- **Input**: Username/email and password
+- **Purpose**: Authenticate the single administrator and create a session
+- **Input**: Username (must be `admin`) and password
 - **Output**: JWT token and user data
 - **Dependencies**: `password_service`, `user_service`
 - **Security**: Password hashing verification, rate limiting
 
-#### `register(user_data: schemas.UserCreate)`
-- **Purpose**: Create new user account
-- **Input**: User registration data
-- **Output**: User ID and confirmation
-- **Dependencies**: `user_service`, `password_service`
-- **Validation**: Email format, password strength
+#### `change_password(request: ChangePasswordRequest, current_user: User)`
+- **Purpose**: Rotate the administrator password while enforcing current-password validation
+- **Input**: Current password and new password payload, authenticated admin context
+- **Output**: Success message (raises `ValueError` on validation failure)
+- **Dependencies**: `user_service`
+- **Security**: Uses bcrypt hashing and requires the current secret to match
 
 #### `get_current_user(token: str)`
-- **Purpose**: Validate JWT and return user info
+- **Purpose**: Validate JWT and return user info (admin in the current deployment)
 - **Input**: JWT token from Authorization header
 - **Output**: Current user object
 - **Dependencies**: `jwt_service`
@@ -87,9 +86,11 @@
 
 ### Job Management (`api/routes/jobs.py`)
 
+> **Single-admin note:** The admin account owns every job in the current deployment. Per-user guards and headers remain in place so future multi-user support can be re-enabled without code churn.
+
 #### `create_job(job_data: schemas.JobCreate)`
 - **Purpose**: Create new transcription job
-- **Input**: Job parameters (file, model, language) sent with an `X-User-ID` header identifying the caller
+- **Input**: Job parameters (file, model, language); legacy `X-User-ID` header accepted for future multi-user flows
 - **Output**: Job ID and initial status
 - **Workflow**: Database record → queue task → status tracking
 - **Options**: Model selection, language hints, custom settings
@@ -100,7 +101,7 @@
 - **Output**: Status, progress percentage, results
 - **States**: pending, processing, completed, failed
 - **Progress**: Real-time updates via WebSocket
-- **Security**: Requires matching `X-User-ID` header; mismatched users receive 404
+- **Security**: Admin account bypasses per-user checks; `X-User-ID` guard remains for future multi-user enforcement
 
 #### `list_user_jobs(user_id: str, filters: dict)`
 - **Purpose**: Get paginated list of user's jobs
@@ -108,7 +109,7 @@
 - **Output**: Job list with metadata
 - **Filters**: Status, date range, filename search
 - **Sorting**: Creation date, status, filename
-- **Security**: Results limited to the authenticated `X-User-ID`
+- **Security**: Single admin receives full listing; per-user filtering is kept dormant for future multi-user support
 
 #### `cancel_job(job_id: str)`
 - **Purpose**: Cancel pending or running job
@@ -116,7 +117,7 @@
 - **Output**: Cancellation confirmation
 - **Process**: Queue removal → cleanup → status update
 - **Limitations**: Cannot cancel completed jobs
-- **Security**: Only the job owner (matching `X-User-ID`) may cancel
+- **Security**: Admin can cancel any job; owner-only restriction remains latent for future multi-user mode
 
 ### Audio Processing (`api/services/audio_processing.py`)
 

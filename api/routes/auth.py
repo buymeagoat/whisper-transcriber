@@ -1,10 +1,8 @@
-"""Authentication routes for user login and token management."""
+"""Authentication routes for single-admin login and token management."""
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel
-from datetime import datetime, timedelta
-from typing import Optional, List
+from pydantic import BaseModel, EmailStr
+from typing import List
 from sqlalchemy.orm import Session
 
 from ..models import User
@@ -32,14 +30,9 @@ router = APIRouter(prefix="/auth", tags=["authentication"])
 # Create an API router for /api/auth prefixed routes (for frontend compatibility)
 api_router = APIRouter(prefix="/api/auth", tags=["authentication", "api"])
 
-# Create a direct API router for /api prefixed routes (for frontend direct API calls)
-direct_api_router = APIRouter(prefix="/api", tags=["authentication", "direct-api"])
-
-# Create a second router for root-level routes that tests expect
+# Root-level routes maintained for backwards compatibility with tests and scripts
 root_router = APIRouter(tags=["authentication"])
 
-# Security scheme
-security = HTTPBearer()
 
 # Response models
 class Token(BaseModel):
@@ -51,26 +44,13 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
-class RegisterRequest(BaseModel):
-    username: str
-    password: str
-    email: Optional[str] = None
-
 class UserInfo(BaseModel):
     id: str
     username: str
+    email: EmailStr
     is_active: bool
     is_admin: bool = False
     roles: List[str] = []
-
-class FirstRunSetupRequest(BaseModel):
-    admin_password: str
-
-class AdminSetupResponse(BaseModel):
-    message: str
-    initial_setup: bool
-    username: Optional[str] = None
-    initial_password: Optional[str] = None
 
 # JWT settings - now using secure token service
 ACCESS_TOKEN_EXPIRE_MINUTES = 60  # Default to 60 minutes
@@ -135,191 +115,98 @@ async def get_current_admin_user(current_user: User = Depends(get_current_user))
 
 @router.post("/login", response_model=Token)
 async def login(
-    login_data: LoginRequest, 
+    login_data: LoginRequest,
     request: Request,
     response: Response,
     db: Session = Depends(get_db)
 ):
-    """Authenticate user and return access token with secure session management."""
-    try:
-        # Authenticate user with secure service
-        user = user_service.authenticate_user(db, login_data.username, login_data.password)
-        
-        # Audit successful login
+    """Authenticate the single admin user and return an access token."""
+    supplied_username = (login_data.username or "admin").strip().lower()
+    if supplied_username and supplied_username != "admin":
         audit_login_attempt(
-            user_id=str(user.id),
-            success=True,
-            request=request
-        )
-        
-        # Create secure access token
-        user_data = {
-            "id": user.id,
-            "username": user.username,
-            "role": user.role
-        }
-        access_token = token_service.create_access_token(user_data)
-        
-        # Set secure httpOnly cookies
-        session_security.set_auth_cookies(response, access_token)
-        
-        # Also return token for API clients that can't use cookies
-        return {
-            "access_token": access_token,
-            "token_type": "bearer",
-            "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60
-        }
-        
-    except ValueError as e:
-        # Audit failed login attempt
-        audit_login_attempt(
-            user_id=login_data.username,
+            user_id=supplied_username,
             success=False,
             request=request,
-            reason=str(e)
+            reason="Single-user mode: admin account only"
         )
-        
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    except Exception as e:
-        # Audit unexpected error
-        audit_login_attempt(
-            user_id=login_data.username,
-            success=False,
-            request=request,
-            reason=f"System error: {str(e)}"
-        )
-        
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Authentication system error"
-        )
 
-# API router version for frontend compatibility
-@api_router.post("/login", response_model=Token)
-async def api_login(
-    login_data: LoginRequest, 
-    request: Request,
-    response: Response,
-    db: Session = Depends(get_db)
-):
-    """Authenticate user and return access token with secure session management (API version)."""
     try:
-        # Authenticate user with secure service
-        user = user_service.authenticate_user(db, login_data.username, login_data.password)
-        
-        # Audit successful login
+        user = user_service.authenticate_user(db, "admin", login_data.password)
+
         audit_login_attempt(
             user_id=str(user.id),
             success=True,
             request=request
         )
-        
-        # Create secure access token
+
         user_data = {
             "id": user.id,
             "username": user.username,
+            "email": user.email,
             "role": user.role
         }
         access_token = token_service.create_access_token(user_data)
-        
-        # Set secure httpOnly cookies
+
         session_security.set_auth_cookies(response, access_token)
-        
-        # Also return token for API clients that can't use cookies
+
         return {
             "access_token": access_token,
             "token_type": "bearer",
             "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60
-        }
-        
-    except ValueError as e:
-        # Audit failed login attempt
-        audit_login_attempt(
-            user_id=login_data.username,
-            success=False,
-            request=request,
-            reason=str(e)
-        )
-        
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    except Exception as e:
-        # Audit unexpected error
-        audit_login_attempt(
-            user_id=login_data.username,
-            success=False,
-            request=request,
-            reason=f"System error: {str(e)}"
-        )
-        
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Authentication system error"
-        )
-
-
-def _register_user(
-    register_data: RegisterRequest,
-    db: Session,
-) -> dict:
-    """Create a new non-admin user and return a minimal payload."""
-    try:
-        user = user_service.create_user(
-            db,
-            username=register_data.username,
-            password=register_data.password,
-            role="user",
-        )
-
-        return {
-            "message": "User registered successfully",
-            "user_id": str(user.id),
-            "username": user.username,
         }
 
     except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(exc),
+        audit_login_attempt(
+            user_id="admin",
+            success=False,
+            request=request,
+            reason=str(exc)
         )
 
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except Exception as exc:  # pragma: no cover - defensive
+        audit_login_attempt(
+            user_id="admin",
+            success=False,
+            request=request,
+            reason=f"System error: {str(exc)}"
+        )
 
-@router.post("/register", response_model=dict)
-async def register_user_auth(register_data: RegisterRequest, db: Session = Depends(get_db)):
-    """Register a new user under the /auth namespace."""
-    return _register_user(register_data, db)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Authentication system error"
+        )
 
-
-# API router version for frontend compatibility
-@api_router.post("/register", response_model=dict)
-async def api_register_user(register_data: RegisterRequest, db: Session = Depends(get_db)):
-    """Register a new user (API version)."""
-    return _register_user(register_data, db)
-
-# API router version for getting current user info
 @api_router.get("/me", response_model=UserInfo)
 async def api_get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current authenticated user information (API version)."""
     return UserInfo(
         id=str(current_user.id),
         username=current_user.username,
-        is_active=True,  # User is active if they can authenticate
+        email=current_user.email,
+        is_active=True,
         is_admin=(current_user.role == "admin"),
         roles=[current_user.role]
     )
 
-# Direct API router version for frontend direct calls to /api/register
-@direct_api_router.post("/register", response_model=dict)
-async def direct_api_register_user(register_data: RegisterRequest, db: Session = Depends(get_db)):
-    """Register a new user (Direct API version for /api/register)."""
-    return _register_user(register_data, db)
+# API router version for getting current user info
+@api_router.post("/login", response_model=Token)
+async def api_login(
+    login_data: LoginRequest,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+):
+    return await login(login_data, request, response, db)
 
 @router.get("/me", response_model=UserInfo)
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
@@ -327,6 +214,7 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
     return UserInfo(
         id=str(current_user.id),
         username=current_user.username,
+        email=current_user.email,
         is_active=True,  # User is active if they can authenticate
         is_admin=(current_user.role == "admin"),
         roles=[current_user.role]
@@ -349,6 +237,7 @@ async def refresh_token(response: Response, current_user: User = Depends(get_cur
     user_data = {
         "id": current_user.id,
         "username": current_user.username,
+        "email": current_user.email,
         "role": current_user.role
     }
     access_token = token_service.create_access_token(user_data)
@@ -373,20 +262,6 @@ async def get_token(
 ):
     """Root-level token endpoint for compatibility."""
     return await login(login_data, request, response, db)
-
-
-@root_router.post("/register", response_model=dict)
-async def register_user(register_data: RegisterRequest, db: Session = Depends(get_db)):
-    """Register a new user."""
-    return _register_user(register_data, db)
-
-
-# Direct API endpoint for frontend calls to /api/register
-@root_router.post("/api/register", response_model=dict) 
-async def api_direct_register_user(register_data: RegisterRequest, db: Session = Depends(get_db)):
-    """Register a new user (Direct API endpoint for /api/register)."""
-    return _register_user(register_data, db)
-
 
 class ChangePasswordRequest(BaseModel):
     current_password: str

@@ -50,6 +50,9 @@ def _require_admin_bootstrap_password() -> str:
     return admin_password
 
 
+DEFAULT_ADMIN_EMAIL = "admin@admin.admin"
+
+
 def ensure_default_admin():
     """Ensure a default admin user exists."""
     db = None
@@ -64,15 +67,29 @@ def ensure_default_admin():
             admin_password = _require_admin_bootstrap_password()
             admin_user = User(
                 username="admin",
+                email=DEFAULT_ADMIN_EMAIL,
                 hashed_password=hash_password(admin_password),
                 role="admin",
-                must_change_password=True
+                must_change_password=False
             )
             db.add(admin_user)
             db.commit()
             logger.info("Created default admin user using secure bootstrap password (value redacted)")
         else:
-            logger.info("Admin user already exists")
+            updated = False
+            if not admin_user.email:
+                admin_user.email = DEFAULT_ADMIN_EMAIL
+                updated = True
+
+            if admin_user.must_change_password:
+                admin_user.must_change_password = False
+                updated = True
+
+            if updated:
+                db.commit()
+                logger.info("Updated default admin user with missing metadata")
+            else:
+                logger.info("Admin user already exists")
 
     except Exception as e:
         logger.critical(f"Failed to ensure default admin user: {e}")
@@ -93,10 +110,11 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     except Exception:
         return False
 
-def create_user(db: Session, username: str, password: str, role: str = "user") -> User:
+def create_user(db: Session, username: str, email: str, password: str, role: str = "user") -> User:
     """Create a new user."""
     user = User(
         username=username,
+        email=email,
         hashed_password=hash_password(password),
         role=role
     )

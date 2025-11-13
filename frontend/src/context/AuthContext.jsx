@@ -64,12 +64,13 @@ export const AuthProvider = ({ children }) => {
     }
   }, [])
 
-  const login = async (email, password) => {
+  const login = async (username, password) => {
     try {
       setLoading(true)
       setError(null)
       
-      const { user: userData, token } = await authService.login(email, password)
+      const normalizedUsername = username.trim()
+      const { user: userData, token } = await authService.login(normalizedUsername, password)
       
       // Store token (expiration time is already stored by authService)
       localStorage.setItem('auth_token', token)
@@ -80,28 +81,6 @@ export const AuthProvider = ({ children }) => {
       return userData
     } catch (error) {
       setError(error.message || 'Login failed')
-      throw error
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const register = async (email, password, fullName) => {
-    try {
-      setLoading(true)
-      setError(null)
-      
-      const { user: userData, token } = await authService.register(email, password, fullName)
-      
-      // Store token
-      localStorage.setItem('auth_token', token)
-      
-      // Set user data
-      setUser(userData)
-      
-      return userData
-    } catch (error) {
-      setError(error.message || 'Registration failed')
       throw error
     } finally {
       setLoading(false)
@@ -133,7 +112,6 @@ export const AuthProvider = ({ children }) => {
     loading,
     error,
     login,
-    register,
     logout,
     updateUser,
     clearError,

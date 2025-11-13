@@ -1,9 +1,12 @@
 """Secure user management service for authentication system."""
 
+import re
 import secrets
 import bcrypt
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
+
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -12,9 +15,15 @@ from ..orm_bootstrap import get_db
 from ..settings import settings
 
 
+EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
 class UserService:
     """Secure user management service."""
     
+    DEFAULT_ADMIN_USERNAME = "admin"
+    DEFAULT_ADMIN_EMAIL = "admin@admin.admin"
+
     def __init__(self):
         """Initialize user service with security validations."""
         self._validate_security_configuration()
@@ -82,10 +91,11 @@ class UserService:
             return False
     
     def create_user(
-        self, 
-        db: Session, 
-        username: str, 
-        password: str, 
+        self,
+        db: Session,
+        username: str,
+        email: str,
+        password: str,
         role: str = "user",
         must_change_password: bool = False
     ) -> User:
@@ -93,20 +103,42 @@ class UserService:
         if not username or not username.strip():
             raise ValueError("Username cannot be empty")
         
-        if len(username) < 3:
+        if len(username.strip()) < 3:
             raise ValueError("Username must be at least 3 characters long")
+
+        if not email or not email.strip():
+            raise ValueError("Email cannot be empty")
+
+        email_normalized = email.strip().lower()
+        if not EMAIL_PATTERN.match(email_normalized):
+            raise ValueError("Invalid email address")
+
+        username_normalized = username.strip()
         
         # Check if user already exists
-        existing_user = db.query(User).filter(User.username == username.strip()).first()
+        existing_user = (
+            db.query(User)
+            .filter(func.lower(User.username) == username_normalized.lower())
+            .first()
+        )
         if existing_user:
             raise ValueError(f"User '{username}' already exists")
+
+        existing_email = (
+            db.query(User)
+            .filter(func.lower(User.email) == email_normalized)
+            .first()
+        )
+        if existing_email:
+            raise ValueError(f"Email '{email_normalized}' is already in use")
         
         # Hash password securely
         hashed_password = self.hash_password(password)
         
         # Create new user
         user = User(
-            username=username.strip(),
+            username=username_normalized,
+            email=email_normalized,
             hashed_password=hashed_password,
             role=role,
             must_change_password=must_change_password,
@@ -118,16 +150,23 @@ class UserService:
             db.commit()
             db.refresh(user)
             return user
-        except IntegrityError:
+        except IntegrityError as exc:
             db.rollback()
-            raise ValueError(f"User '{username}' already exists")
+            detail = str(getattr(exc, "orig", exc)).lower()
+            if "email" in detail:
+                raise ValueError(f"Email '{email_normalized}' is already in use")
+            raise ValueError(f"User '{username_normalized}' already exists")
     
     def authenticate_user(self, db: Session, username: str, password: str) -> User:
         """Authenticate a user with secure password verification."""
         if not username or not password:
             raise ValueError("Username and password are required")
         
-        user = db.query(User).filter(User.username == username.strip()).first()
+        user = (
+            db.query(User)
+            .filter(func.lower(User.username) == username.strip().lower())
+            .first()
+        )
         if not user:
             raise ValueError("Invalid credentials")
         
@@ -141,7 +180,22 @@ class UserService:
         if not username:
             return None
         
-        return db.query(User).filter(User.username == username.strip()).first()
+        return (
+            db.query(User)
+            .filter(func.lower(User.username) == username.strip().lower())
+            .first()
+        )
+
+    def get_user_by_email(self, db: Session, email: str) -> Optional[User]:
+        """Get user by email."""
+        if not email:
+            return None
+
+        return (
+            db.query(User)
+            .filter(func.lower(User.email) == email.strip().lower())
+            .first()
+        )
     
     def get_user_by_id(self, db: Session, user_id: int) -> Optional[User]:
         """Get user by ID."""
@@ -201,13 +255,33 @@ class UserService:
     def ensure_admin_user_exists(self, db: Session) -> Dict[str, Any]:
         """Ensure an admin user exists, creating one if necessary."""
         # Check if any admin user exists
-        admin_user = db.query(User).filter(User.role == "admin").first()
+        admin_user = (
+            db.query(User)
+            .filter(func.lower(User.username) == self.DEFAULT_ADMIN_USERNAME)
+            .first()
+        )
         
         if admin_user:
+            updated = False
+            if not admin_user.email:
+                admin_user.email = self.DEFAULT_ADMIN_EMAIL
+                updated = True
+
+            if admin_user.role != "admin":
+                admin_user.role = "admin"
+                updated = True
+
+            if updated:
+                try:
+                    db.commit()
+                except Exception:
+                    db.rollback()
+
             return {
                 "admin_exists": True,
                 "action": "existing_admin_found",
                 "username": admin_user.username,
+                "email": admin_user.email,
                 "created": False,
                 "initial_setup": False
             }
@@ -215,12 +289,13 @@ class UserService:
         # No admin exists - this is first-run setup
         # Generate secure random password
         initial_password = secrets.token_urlsafe(16)  # 22 character secure password
-        admin_username = "admin"
+        admin_username = self.DEFAULT_ADMIN_USERNAME
         
         try:
             admin_user = self.create_user(
                 db=db,
                 username=admin_username,
+                email=self.DEFAULT_ADMIN_EMAIL,
                 password=initial_password,
                 role="admin",
                 must_change_password=True  # Force password change on first login
@@ -230,6 +305,7 @@ class UserService:
                 "admin_exists": True,
                 "action": "admin_created",
                 "username": admin_username,
+                "email": admin_user.email,
                 "initial_password": initial_password,
                 "created": True,
                 "initial_setup": True,

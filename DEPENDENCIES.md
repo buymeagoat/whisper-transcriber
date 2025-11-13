@@ -97,7 +97,7 @@ PyJWT==2.8.0
 └── Critical: Authentication
 
 passlib[bcrypt]==1.7.4
-├── Used by: User registration, password verification
+├── Used by: Admin authentication, password rotation (future multi-user flows reuse the same helpers)
 ├── Purpose: Password hashing and verification
 ├── Algorithm: bcrypt with salt rounds
 └── Critical: Security

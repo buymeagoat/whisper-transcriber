@@ -46,6 +46,7 @@ class TokenService:
         payload = {
             "sub": str(user_data.get("id")),  # Subject (user ID)
             "username": user_data.get("username"),
+            "email": user_data.get("email"),
             "role": user_data.get("role", "user"),
             "is_admin": user_data.get("role") == "admin",
             "exp": expire,  # Expiration time
@@ -117,6 +118,7 @@ class TokenService:
         return {
             "id": payload.get("sub"),
             "username": payload.get("username"),
+            "email": payload.get("email"),
             "role": payload.get("role"),
             "is_admin": payload.get("is_admin", False)
         }

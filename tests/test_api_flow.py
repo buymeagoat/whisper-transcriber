@@ -21,7 +21,7 @@ async def test_admin_login_returns_token_and_cookie(async_client, security_heade
 
     response = await async_client.post(
         "/auth/login",
-        json={"username": "admin", "password": "super-secure-test-password-!123"},
+        json={"username": "admin", "password": "super-secret-password-!123"},
         headers=security_headers(include_placeholder_auth=True),
     )
     assert response.status_code == 200
@@ -179,28 +179,23 @@ async def test_transcript_routes_enforce_ownership(async_client, admin_token, se
         assert download.status_code == 200
         assert download.text == transcript_text
 
-        other_username = f"viewer_{uuid.uuid4().hex[:6]}"
-        other_password = "ViewerPass123!"
-        register = await async_client.post(
+        register_attempt = await async_client.post(
             "/register",
-            json={"username": other_username, "password": other_password},
+            json={
+                "username": "unused",
+                "email": "unused@example.com",
+                "password": "SomePass123!",
+            },
             headers=security_headers(include_placeholder_auth=True),
         )
-        assert register.status_code == 200
+        assert register_attempt.status_code == 404
 
         other_login = await async_client.post(
             "/auth/login",
-            json={"username": other_username, "password": other_password},
+            json={"username": "not-admin", "password": "SomePass123!"},
             headers=security_headers(include_placeholder_auth=True),
         )
-        assert other_login.status_code == 200
-        other_token = other_login.json()["access_token"]
-
-        forbidden = await async_client.get(
-            f"/transcripts/{job_id}",
-            headers=security_headers(token=other_token),
-        )
-        assert forbidden.status_code == 403
+        assert other_login.status_code == 401
     finally:
         with SessionLocal() as db:
             db.query(Job).filter(Job.id == job_id).delete()

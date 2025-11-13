@@ -14,7 +14,6 @@ import LandingPage from './pages/LandingPage'
 
 // Lazy-loaded components with code splitting
 const LoginPage = React.lazy(() => import('./pages/auth/LoginPage'))
-const RegisterPage = React.lazy(() => import('./pages/auth/RegisterPage'))
 
 // Protected user pages (lazy-loaded)
 const Dashboard = React.lazy(() => import('./pages/user/Dashboard'))
@@ -84,10 +83,6 @@ function App() {
           <Route path="/login" element={
             user ? <Navigate to="/dashboard" replace /> : 
             <SuspenseWrapper><LoginPage /></SuspenseWrapper>
-          } />
-          <Route path="/register" element={
-            user ? <Navigate to="/dashboard" replace /> : 
-            <SuspenseWrapper><RegisterPage /></SuspenseWrapper>
           } />
           
           {/* Protected user routes */}

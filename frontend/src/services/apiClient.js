@@ -44,8 +44,7 @@ apiClient.interceptors.request.use(
     
     // Skip auth token for certain endpoints (cookies will be sent automatically)
     if (config.url?.includes('/auth/login') || 
-        config.url?.includes('/register') || 
-        config.url?.includes('/health')) {
+      config.url?.includes('/health')) {
       return config
     }
 
@@ -139,8 +138,7 @@ apiClient.interceptors.response.use(
       localStorage.removeItem('token_expires_at')
       
       // Only redirect if not already on auth pages
-      if (!window.location.pathname.includes('/login') && 
-          !window.location.pathname.includes('/register')) {
+        if (!window.location.pathname.includes('/login')) {
         
         // Dispatch custom event for auth context to handle
         window.dispatchEvent(new CustomEvent('auth:expired', {

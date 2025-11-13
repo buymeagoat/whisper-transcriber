@@ -1,6 +1,16 @@
 {
   "backups": [
     {
+      "id": "ca7ddb60-b75c-44f2-b08a-498773102c56",
+      "type": "database",
+      "timestamp": "2025-11-13T08:00:20.827758",
+      "description": null,
+      "status": "completed",
+      "files": {
+        "database": "data/backups/database/ca7ddb60-b75c-44f2-b08a-498773102c56_db.sql.zst"
+      }
+    },
+    {
       "id": "82758554-7263-49b2-99f1-2faa86607585",
       "type": "full",
       "timestamp": "2025-11-13T01:09:01.510426",

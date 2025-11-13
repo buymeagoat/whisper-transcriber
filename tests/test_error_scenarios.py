@@ -128,6 +128,7 @@ class TestJobErrors:
         # Create a job for a different user
         other_user = User(
             username="otheruser",
+            email="otheruser@example.com",
             hashed_password="hashed",
             role="user",
             created_at=datetime.utcnow()
@@ -209,7 +210,7 @@ class TestUserServiceErrors:
         db = SessionLocal()
         try:
             with pytest.raises(ValueError, match="Username cannot be empty"):
-                service.create_user(db, "", "password123")
+                service.create_user(db, "", "user@example.com", "password123")
         finally:
             db.close()
     
@@ -219,7 +220,7 @@ class TestUserServiceErrors:
         db = SessionLocal()
         try:
             with pytest.raises(ValueError, match="at least 3 characters"):
-                service.create_user(db, "ab", "password123")
+                service.create_user(db, "ab", "user@example.com", "password123")
         finally:
             db.close()
     
@@ -229,7 +230,7 @@ class TestUserServiceErrors:
         db = SessionLocal()
         try:
             with pytest.raises(ValueError, match="at least 8 characters"):
-                service.create_user(db, "shortpassuser", "short")
+                service.create_user(db, "shortpassuser", "shortpass@example.com", "short")
         finally:
             db.close()
     
@@ -239,7 +240,7 @@ class TestUserServiceErrors:
         db = SessionLocal()
         try:
             with pytest.raises(ValueError, match="Password cannot be empty"):
-                service.create_user(db, "emptypassuser", "")
+                service.create_user(db, "emptypassuser", "emptypass@example.com", "")
         finally:
             db.close()
     
@@ -249,17 +250,34 @@ class TestUserServiceErrors:
         db = SessionLocal()
         try:
             # Create first user
-            service.create_user(db, "duplicate_test", "password123")
+            service.create_user(db, "duplicate_test", "dup@example.com", "password123")
             
             # Try to create duplicate
             with pytest.raises(ValueError, match="already exists"):
-                service.create_user(db, "duplicate_test", "password456")
+                service.create_user(db, "duplicate_test", "dup2@example.com", "password456")
         finally:
             # Cleanup
             user = db.query(User).filter(User.username == "duplicate_test").first()
             if user:
                 db.delete(user)
                 db.commit()
+            db.close()
+
+    def test_create_user_with_duplicate_email(self):
+        """Test that duplicate email addresses are rejected."""
+        service = UserService()
+        db = SessionLocal()
+        try:
+            service.create_user(db, "email_dup_1", "dupemail@example.com", "Password123!")
+
+            with pytest.raises(ValueError, match="Email 'dupemail@example.com' is already in use"):
+                service.create_user(db, "email_dup_2", "dupemail@example.com", "Password456!")
+        finally:
+            for username in ("email_dup_1", "email_dup_2"):
+                user = db.query(User).filter(User.username == username).first()
+                if user:
+                    db.delete(user)
+            db.commit()
             db.close()
     
     def test_authenticate_with_wrong_password(self):
@@ -268,7 +286,7 @@ class TestUserServiceErrors:
         db = SessionLocal()
         try:
             # Create user
-            service.create_user(db, "auth_test_user", "correctpassword")
+            service.create_user(db, "auth_test_user", "authuser@example.com", "correctpassword")
             
             # Try to authenticate with wrong password
             with pytest.raises(ValueError, match="Invalid credentials"):

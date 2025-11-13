@@ -1,8 +1,7 @@
 """Simplified auth routes for testing the /api/register endpoint."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
 from api.models import User
@@ -24,7 +23,7 @@ root_router = APIRouter(tags=["authentication"])
 class RegisterRequest(BaseModel):
     username: str
     password: str
-    email: Optional[str] = None
+    email: EmailStr
 
 # Simple register endpoint for testing
 @root_router.post("/api/register", response_model=dict)
@@ -34,6 +33,7 @@ async def api_register_user(register_data: RegisterRequest, db: Session = Depend
         # Simple user creation logic for testing
         user = User(
             username=register_data.username,
+            email=register_data.email,
             hashed_password=f"hashed_{register_data.password}",  # Simple hash for testing
             role="user"
         )
@@ -44,7 +44,8 @@ async def api_register_user(register_data: RegisterRequest, db: Session = Depend
         return {
             "message": "User registered successfully", 
             "user_id": str(user.id),
-            "username": user.username
+            "username": user.username,
+            "email": user.email
         }
         
     except Exception as e:

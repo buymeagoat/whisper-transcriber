@@ -30,7 +30,7 @@ class TestPasswordSecurity:
         service = UserService()
         db = SessionLocal()
         try:
-            user = service.create_user(db, "security_test_1", "MySecurePassword123")
+            user = service.create_user(db, "security_test_1", "security_test_1@example.com", "MySecurePassword123")
             
             # Password should be hashed
             assert user.hashed_password != "MySecurePassword123"
@@ -51,7 +51,7 @@ class TestPasswordSecurity:
         try:
             username = f"pwd_len_{uuid.uuid4().hex[:8]}"
             with pytest.raises(ValueError, match="at least 8 characters"):
-                service.create_user(db, username, "short")
+                service.create_user(db, username, f"{username}@example.com", "short")
         finally:
             db.close()
     
@@ -73,7 +73,7 @@ class TestPasswordSecurity:
         service = UserService()
         db = SessionLocal()
         try:
-            user = service.create_user(db, "timing_test", "CorrectPassword123")
+            user = service.create_user(db, "timing_test", "timing_test@example.com", "CorrectPassword123")
             
             # Both should take similar time (constant-time comparison)
             # We can't easily test timing, but we verify both fail gracefully
@@ -94,7 +94,7 @@ class TestPasswordSecurity:
         service = UserService()
         db = SessionLocal()
         try:
-            user = service.create_user(db, "pwchange_test", "OldPassword123")
+            user = service.create_user(db, "pwchange_test", "pwchange_test@example.com", "OldPassword123")
             
             # Should fail without correct current password
             with pytest.raises(ValueError, match="Current password is incorrect"):
@@ -228,6 +228,7 @@ class TestAuthorizationSecurity:
         # Create another user's job
         other_user = User(
             username="other_security_user",
+            email="other_security_user@example.com",
             hashed_password="hashed",
             role="user",
             created_at=datetime.utcnow()

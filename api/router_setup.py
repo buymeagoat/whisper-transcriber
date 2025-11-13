@@ -70,7 +70,6 @@ def register_routes(app: FastAPI) -> None:
     app.include_router(health.router)
     app.include_router(auth.router)
     app.include_router(auth.api_router)  # Add API-prefixed auth routes
-    app.include_router(auth.direct_api_router)  # Add direct API routes for /api/register
     app.include_router(auth.root_router)  # Add root-level auth routes
     app.include_router(users.router)
     app.include_router(audit.router, prefix="/admin", tags=["audit"])

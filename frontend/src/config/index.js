@@ -3,8 +3,12 @@
  */
 
 // API Configuration
+const DEFAULT_API_BASE_URL = 'http://localhost:8001'
+const apiBaseFromEnv = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_HOST) || ''
+
 export const API_CONFIG = {
-  baseURL: '',
+  // Prefer the Vite-provided host, otherwise fall back to the backend default.
+  baseURL: apiBaseFromEnv.trim() || DEFAULT_API_BASE_URL,
   timeout: 30000,
 }
 

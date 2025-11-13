@@ -1,12 +1,12 @@
 import apiClient from './apiClient'
 
 export const secureAuthService = {
-  async login(email, password) {
+  async login(username, password) {
     try {
       // Use JSON format as per backend API spec
       const response = await apiClient.post('/auth/login', {
-        username: email,  // Backend expects 'username' field
-        password: password,
+        username,
+        password,
       }, {
         // Include CSRF protection header
         headers: {
@@ -38,18 +38,18 @@ export const secureAuthService = {
       }
     } catch (error) {
       if (error.response?.status === 401) {
-        throw new Error('Invalid email or password')
+        throw new Error('Invalid username or password')
       }
       throw new Error(error.response?.data?.detail || 'Login failed')
     }
   },
 
-  async register(email, password, fullName) {
+  async register(username, email, password) {
     try {
       const response = await apiClient.post('/auth/register', {
-        username: email,  // Backend expects 'username' field
-        password: password,
-        email: email,     // Also send as email field
+        username,
+        email,
+        password,
       }, {
         headers: {
           'X-Requested-With': 'XMLHttpRequest'
@@ -57,9 +57,9 @@ export const secureAuthService = {
       })
       
       // Auto-login after registration
-      return this.login(email, password)
+      return this.login(username, password)
     } catch (error) {
-      if (error.response?.status === 400) {
+      if (error.response?.status === 400 || error.response?.status === 409) {
         throw new Error(error.response.data?.detail || 'Registration failed')
       }
       throw new Error('Registration failed')

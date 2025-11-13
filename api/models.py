@@ -17,6 +17,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
     role: Mapped[str] = mapped_column(String, nullable=False, default="user")
     must_change_password: Mapped[bool] = mapped_column(
@@ -29,6 +30,7 @@ class User(Base):
     # Add database indexes for performance
     __table_args__ = (
         Index('idx_users_username', 'username'),
+        Index('idx_users_email', 'email', unique=True),
         Index('idx_users_role', 'role'),
     )
 

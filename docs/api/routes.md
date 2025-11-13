@@ -14,7 +14,7 @@ exercises the behaviour.
   ```
 
 ## `POST /auth/login`
-- **Purpose:** Exchange bootstrap credentials for a bearer token and session cookie.
+- **Purpose:** Exchange the administrator bootstrap credentials for a bearer token and session cookie.
 - **Implementation:** [`api/routes/auth.py::login`](../../api/routes/auth.py)
 - **Verification:** [`tests/test_api_smoke.py::test_admin_login_returns_token_and_cookie`](../../tests/test_api_smoke.py)
 - **Request Body:**
@@ -27,6 +27,24 @@ exercises the behaviour.
     "access_token": "<jwt>",
     "token_type": "bearer",
     "expires_in": 3600
+  }
+  ```
+
+## `POST /change-password`
+- **Purpose:** Allow the authenticated administrator to rotate the deployment password.
+- **Implementation:** [`api/routes/auth.py::change_password`](../../api/routes/auth.py)
+- **Verification:** [`tests/test_security.py::TestPasswordSecurity::test_password_change_requires_current`](../../tests/test_security.py)
+- **Request Body:**
+  ```json
+  {
+    "current_password": "super-secret-password-!123",
+    "new_password": "RotateMeNow!456"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "Password changed successfully"
   }
   ```
 

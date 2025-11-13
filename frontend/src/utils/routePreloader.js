@@ -5,10 +5,7 @@
 
 // Preload functions for lazy-loaded components
 export const preloadAuth = () => {
-  return Promise.all([
-    import('../pages/auth/LoginPage'),
-    import('../pages/auth/RegisterPage')
-  ])
+  return import('../pages/auth/LoginPage')
 }
 
 export const preloadUserPages = () => {
@@ -58,7 +55,6 @@ export const intelligentPreload = (user) => {
 export const preloadOnInteraction = (routePath) => {
   const preloadMap = {
     '/login': () => import('../pages/auth/LoginPage'),
-    '/register': () => import('../pages/auth/RegisterPage'),
     '/dashboard': () => import('../pages/user/Dashboard'),
     '/transcribe': () => import('../pages/user/TranscribePage'),
     '/jobs': () => import('../pages/user/JobsPage'),
@@ -93,7 +89,7 @@ export const preloadWithCache = (importFn, cacheKey) => {
 export const preloadByRoute = (currentPath) => {
   if (currentPath === '/') {
     // On landing page, preload auth components
-    return preloadWithCache(preloadAuth, 'auth-pages')
+    return preloadWithCache(() => import('../pages/auth/LoginPage'), 'auth-login')
   } else if (currentPath.startsWith('/admin')) {
     // On admin pages, preload other admin components
     return preloadWithCache(preloadAdminPages, 'admin-pages')

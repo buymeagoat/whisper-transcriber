@@ -34,6 +34,14 @@ An audio transcription service powered by OpenAI Whisper.
 - OpenAPI docs: http://localhost:8001/docs
 - Prometheus metrics: http://localhost:8001/metrics/
 
+### Authentication defaults
+- Administrator username: `admin`
+- Administrator email: `admin@admin.admin`
+- Administrator password: `super-secret-password-!123` (configurable via `ADMIN_BOOTSTRAP_PASSWORD`)
+- The application intentionally runs in single-user mode. Additional accounts remain a future enhancement even though the database schema still supports them.
+
+Use the **Settings → Change Password** panel in the web UI to rotate the admin credential after the first login.
+
 ## Testing
 
 The API includes deterministic smoke tests that exercise authentication, file uploads, the health endpoint, Prometheus metrics,

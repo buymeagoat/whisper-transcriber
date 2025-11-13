@@ -5,7 +5,9 @@ This document translates the current remediation status and architectural guidan
 
 ## Guiding Decisions
 - **Interface contract management:** Adopt the FastAPI OpenAPI schema as the single source of truth. Generate typed client hooks for the React application from this schema and enforce contract drift tests in CI so future changes remain coordinated.
-- **User identity model:** Extend the `jobs` table with a string-based `user_id` column that mirrors the opaque identifier provided in the `X-User-ID` header. This preserves compatibility with existing auth providers while allowing a future migration to relational user tables via a reversible migration.
+- **User identity model:** Extend the `jobs` table with a string-based `user_id` column that mirrors authenticated accounts.
+  The legacy `X-User-ID` header is now gated behind `LEGACY_USER_HEADER_ENABLED`, keeping the schema future-proof without
+  requiring the header in production.
 - **Incomplete features:** Finish partially implemented or stubbed functionality already present in the codebase (e.g., admin metrics routes, transcript retrieval). Defer entirely new concepts while documenting them as follow-up work.
 - **Model assets:** Assume Whisper `.pt` checkpoints are staged under `/models` at deploy time. Do not introduce alternate download logic; surface clear validation errors if assets are missing.
 
@@ -34,7 +36,8 @@ This document translates the current remediation status and architectural guidan
 - Cover these endpoints with backend unit/integration tests and frontend component tests, including error-state rendering.
 
 ### 4. Documentation & Contract Synchronization
-- Refresh `README.md`, `FUNCTIONS.md`, and API reference snippets to match the canonical `/uploads/*` and `/jobs/*` endpoints along with required headers (e.g., `X-User-ID`).
+- Refresh `README.md`, `FUNCTIONS.md`, and API reference snippets to match the canonical `/uploads/*` and `/jobs/*` endpoints
+  and document the compatibility switch (`LEGACY_USER_HEADER_ENABLED`) instead of a mandatory `X-User-ID` header.
 - Document the new job ownership semantics and admin telemetry sources.
 - Add a “Contract Drift” section to the contributing guide that explains how API schema updates propagate to generated clients and testing.
 

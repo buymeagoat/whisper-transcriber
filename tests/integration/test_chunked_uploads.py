@@ -8,13 +8,12 @@ import pytest
 
 
 @pytest.mark.asyncio
-async def test_finalize_enqueues_transcription_task(async_client, security_headers, stub_job_queue):
+async def test_finalize_enqueues_transcription_task(async_client, admin_token, security_headers, stub_job_queue):
     """Uploading a chunk and finalizing should enqueue ``transcribe_audio``."""
 
     stub_job_queue.submitted.clear()
 
-    headers = security_headers(include_placeholder_auth=True)
-    headers["X-User-ID"] = "chunk-user"
+    headers = security_headers(token=admin_token)
 
     chunk_bytes = b"chunked audio payload"
 
@@ -62,13 +61,12 @@ async def test_finalize_enqueues_transcription_task(async_client, security_heade
 
 
 @pytest.mark.asyncio
-async def test_rejects_empty_chunk_without_enqueuing(async_client, security_headers, stub_job_queue):
+async def test_rejects_empty_chunk_without_enqueuing(async_client, admin_token, security_headers, stub_job_queue):
     """Empty chunk uploads should be rejected and no task should be queued."""
 
     stub_job_queue.submitted.clear()
 
-    headers = security_headers(include_placeholder_auth=True)
-    headers["X-User-ID"] = "chunk-negative"
+    headers = security_headers(token=admin_token)
 
     init_response = await async_client.post(
         "/uploads/initialize",

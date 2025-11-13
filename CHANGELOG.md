@@ -15,11 +15,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Regression tests covering transcript retrieval and ownership enforcement.
 
 ### Changed
-- Jobs authentication now resolves callers from JWT/cookie credentials while
-	retaining legacy header compatibility.
-- Removed Docker images, compose manifests, and entrypoint scripts; deployments now
-	assume process managers (systemd, supervisord, etc.) running uvicorn and the
-	Celery worker directly.
+- Jobs authentication now resolves callers from JWT/cookie credentials and only
+        honours the legacy header when `LEGACY_USER_HEADER_ENABLED=1`.
+- Container tooling (Docker images, Compose manifests, ECS modules) remains in the
+        tree but is disabled by default; set `CONTAINER_BUILDS_ENABLED=1` to reactivate
+        the legacy pipeline.
 - Chunked upload routing now accepts legacy `/uploads/init` and singular
 	`/uploads/{session_id}/chunk/{n}` paths used by the current frontend.
 - Transcript routes verified to serve owners while rejecting unauthorized

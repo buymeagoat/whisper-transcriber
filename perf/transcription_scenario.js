@@ -11,6 +11,10 @@ const pollInterval = Number(__ENV.POLL_INTERVAL || 1);
 const maxPolls = Number(__ENV.MAX_POLLS || 40);
 const selectedModel = __ENV.WHISPER_MODEL || 'tiny';
 const userIdHeader = __ENV.UPLOAD_USER_ID || 'perf-tester';
+const adminUsername = __ENV.ADMIN_USERNAME || 'admin';
+const adminPassword = __ENV.ADMIN_PASSWORD || 'super-secret-password-!123';
+const legacyHeaderEnabled = String(__ENV.LEGACY_USER_HEADER || 'false').toLowerCase() === 'true';
+let adminToken = null;
 
 const audioFile = new SharedArray('sample-audio', () => {
   const encoded = open('./perf/assets/sample.wav.b64').replace(/\s+/g, '');
@@ -25,6 +29,50 @@ const audioFile = new SharedArray('sample-audio', () => {
 const transcriptionLatency = new Trend('transcription_latency_seconds');
 const transcriptionSuccess = new Rate('transcription_success_rate');
 const transcriptionFailures = new Rate('transcription_failure_rate');
+
+function ensureAdminToken() {
+  if (adminToken) {
+    return adminToken;
+  }
+
+  const loginPayload = JSON.stringify({
+    username: adminUsername,
+    password: adminPassword,
+  });
+
+  const loginRes = http.post(`${baseUrl}/auth/login`, loginPayload, {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  });
+
+  const ok = check(loginRes, {
+    'admin login succeeded': (r) => r.status === 200 && r.json('access_token'),
+  });
+
+  if (!ok) {
+    throw new Error('Unable to acquire admin access token for perf run');
+  }
+
+  adminToken = loginRes.json('access_token');
+  return adminToken;
+}
+
+function buildHeaders(overrides = {}) {
+  const token = ensureAdminToken();
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    Referer: baseUrl,
+    'X-Requested-With': 'XMLHttpRequest',
+  };
+
+  if (legacyHeaderEnabled && userIdHeader) {
+    headers['X-User-ID'] = userIdHeader;
+  }
+
+  return Object.assign(headers, overrides);
+}
 
 export const options = {
   summaryTrendStats: ['avg', 'min', 'max', 'p(90)', 'p(95)'],
@@ -54,12 +102,11 @@ function initializeUpload(fileSize, filename) {
     model_name: selectedModel,
   });
 
-  const res = http.post(`${uploadEndpoint}/initialize`, payload, {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-User-ID': userIdHeader,
-    },
-  });
+  const res = http.post(
+    `${uploadEndpoint}/initialize`,
+    payload,
+    { headers: buildHeaders({ 'Content-Type': 'application/json' }) },
+  );
 
   const ok = check(res, {
     'upload initialized': (r) => r.status === 200,
@@ -98,18 +145,12 @@ function getChunkData(buffer, chunkSize, chunkNumber) {
 }
 
 function uploadChunk(sessionId, chunkNumber, chunkData, audio) {
-  const params = {
-    headers: {
-      'X-User-ID': userIdHeader,
-    },
-  };
-
   const res = http.post(
     `${uploadEndpoint}/${sessionId}/chunks/${chunkNumber}`,
     {
       chunk_data: http.file(chunkData, audio.name, audio.type),
     },
-    params,
+    { headers: buildHeaders() },
   );
 
   const ok = check(res, {
@@ -128,11 +169,7 @@ function finalizeUpload(sessionId) {
   const res = http.post(
     `${uploadEndpoint}/${sessionId}/finalize`,
     null,
-    {
-      headers: {
-        'X-User-ID': userIdHeader,
-      },
-    },
+    { headers: buildHeaders() },
   );
 
   const ok = check(res, {
@@ -151,6 +188,8 @@ function finalizeUpload(sessionId) {
 function submitJob() {
   const audio = audioFile[0];
   const fileSize = audio.data.byteLength || audio.data.length || 0;
+
+  ensureAdminToken();
 
   const initResult = initializeUpload(fileSize, audio.name);
   if (!initResult) {
@@ -176,7 +215,7 @@ function submitJob() {
 
 function pollJob(jobId) {
   for (let attempt = 0; attempt < maxPolls; attempt += 1) {
-    const res = http.get(`${jobEndpoint}/${jobId}`);
+    const res = http.get(`${jobEndpoint}/${jobId}`, { headers: buildHeaders() });
     const status = res.json('status');
 
     if (status === 'COMPLETED' || status === 'completed') {

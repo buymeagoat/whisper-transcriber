@@ -137,20 +137,38 @@ When deploying to an orchestrator, ensure the job queue (Redis + Celery worker) 
 - **Metrics** – The `/metrics/` endpoint exposes RED/USE style Prometheus metrics by default without additional
   authentication. Network layer controls should therefore guard access to the endpoint in production environments.
 
+## Dormant features
+
+Some capabilities remain in the codebase but are intentionally disabled in production builds so they can mature off-line:
+
+- **Multi-user accounts** – Only the bootstrap `admin` account is active. Set `MULTI_USER_MODE_ENABLED=1` to re-enable
+  account-level scoping and the associated regression tests.
+- **Legacy header auth** – Historical clients that relied on the `X-User-ID` header can be supported temporarily by
+  toggling `LEGACY_USER_HEADER_ENABLED=1`. The header is otherwise ignored, and administrators authenticate with JWTs
+  or session cookies.
+- **Container delivery** – Terraform and Ansible still describe ECS/ECR-focused container rollouts, but deployments now
+  run directly on hosts. Opt back in with `CONTAINER_BUILDS_ENABLED=1` when the Docker workflow returns.
+
 ## API Usage
 
-Upload audio files via the web interface or API. All job endpoints require an `X-User-ID`
-header that carries the caller's opaque identity:
+Authenticate as the admin user to obtain a bearer token and then include it on subsequent requests:
+
 ```bash
+TOKEN=$(curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Requested-With: XMLHttpRequest" \
+  -d '{"username": "admin", "password": "super-secret-password-!123"}' \
+  http://localhost:8001/auth/login | jq -r '.access_token')
+
 curl -X POST \
-  -H "X-User-ID: demo-user-123" \
+  -H "Authorization: Bearer ${TOKEN}" \
   -F "file=@audio.wav" \
+  -F "model=small" \
   http://localhost:8001/jobs/
 ```
 
-Subsequent requests (polling `/jobs/{job_id}` or listing `/jobs/`) must send the same
-`X-User-ID` value; otherwise, the API will return `404 Not Found` to prevent accidental
-data leakage across accounts.
+> **Legacy clients:** set `LEGACY_USER_HEADER_ENABLED=1` if you must continue sending `X-User-ID`. This compatibility
+> switch will be removed once a new multi-user design lands.
 
 ## Supported Audio Formats
 

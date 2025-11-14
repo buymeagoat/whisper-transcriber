@@ -23,7 +23,12 @@ An audio transcription service powered by OpenAI Whisper.
    npm run build
    cd ..
    ```
-4. Run the API server:
+4. Start the Celery worker in a separate terminal so transcription jobs are processed:
+   ```bash
+   source .venv/bin/activate
+   celery -A api.worker.celery_app worker --loglevel=info
+   ```
+5. Run the API server:
    ```bash
    source .venv/bin/activate
    uvicorn api.main:app --host 0.0.0.0 --port 8001 --reload

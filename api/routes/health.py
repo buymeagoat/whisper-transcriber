@@ -20,6 +20,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from api.orm_bootstrap import engine
 from api.services.redis_cache import get_cache_service
 from api.settings import settings
+from api.app_state import check_celery_connection
 
 router = APIRouter(prefix="/health", tags=["health"])
 
@@ -71,6 +72,18 @@ async def _check_redis() -> CheckResult:
             await client.close()
     except Exception as exc:  # pragma: no cover - defensive guard
         return CheckResult(False, {"error": str(exc), "redis_url": redis_url})
+
+
+async def _check_celery() -> CheckResult:
+    """Ensure the Celery broker/worker is reachable."""
+
+    try:
+        healthy = await asyncio.to_thread(check_celery_connection)
+        if healthy:
+            return CheckResult(True, {"message": "Celery broker reachable"})
+        return CheckResult(False, {"error": "Celery broker unreachable"})
+    except Exception as exc:  # pragma: no cover - defensive guard
+        return CheckResult(False, {"error": str(exc)})
 
 
 def _check_models() -> CheckResult:
@@ -142,7 +155,9 @@ async def livez() -> JSONResponse:
 async def readyz() -> JSONResponse:
     """Readiness probe with dependency checks."""
 
-    db_result, redis_result = await asyncio.gather(_check_database(), _check_redis())
+    db_result, redis_result, celery_result = await asyncio.gather(
+        _check_database(), _check_redis(), _check_celery()
+    )
     model_result = _check_models()
 
     test_models_dir = Path("tests/test-models").resolve()
@@ -159,13 +174,16 @@ async def readyz() -> JSONResponse:
             "checks": {
                 "database": db_result.to_dict(),
                 "redis": redis_result.to_dict(),
+                "celery": celery_result.to_dict(),
                 "models": model_result.to_dict(),
             },
             "test_mode_override": True,
         }
         return JSONResponse(status_code=status_code, content=payload)
     else:
-        healthy = all([db_result.healthy, redis_result.healthy, model_result.healthy])
+        healthy = all(
+            [db_result.healthy, redis_result.healthy, celery_result.healthy, model_result.healthy]
+        )
         status_code = 200 if healthy else 503
         logger.info(f"readyz: status_code={status_code}, healthy={healthy}")
         payload = {
@@ -173,6 +191,7 @@ async def readyz() -> JSONResponse:
             "checks": {
                 "database": db_result.to_dict(),
                 "redis": redis_result.to_dict(),
+                "celery": celery_result.to_dict(),
                 "models": model_result.to_dict(),
             },
         }
